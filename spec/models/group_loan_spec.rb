@@ -18,6 +18,7 @@ describe GroupLoan do
     @interest_1           = BigDecimal("4000")
     @compulsory_savings_1 = BigDecimal("6000")
     @admin_fee_1          = BigDecimal('10000')
+    @initial_savings_1          = BigDecimal('0')
     
     @group_loan_product_1 = GroupLoanProduct.create_object({
       :name => "Produk 1, 500 Ribu",
@@ -25,7 +26,8 @@ describe GroupLoan do
       :principal          =>  @principal_1                ,
       :interest           =>  @interest_1                 , 
       :compulsory_savings        =>  @compulsory_savings_1       , 
-      :admin_fee          =>  @admin_fee_1                
+      :admin_fee          =>  @admin_fee_1,
+      :initial_savings          => @initial_savings_1
     }) 
     
     @total_weeks_2        = 8 
@@ -33,6 +35,7 @@ describe GroupLoan do
     @interest_2           = BigDecimal("5000")
     @compulsory_savings_2 = BigDecimal("4000")
     @admin_fee_2          = BigDecimal('10000')
+    @initial_savings_2          = BigDecimal('0')
 
     @group_loan_product_2 = GroupLoanProduct.create_object({
       :name => "Product 2, 800ribu",
@@ -40,7 +43,8 @@ describe GroupLoan do
       :principal          =>  @principal_2                ,
       :interest           =>  @interest_2                 , 
       :compulsory_savings        =>  @compulsory_savings_2       , 
-      :admin_fee          =>  @admin_fee_2                
+      :admin_fee          =>  @admin_fee_2     ,
+      :initial_savings          => @initial_savings_2           
     })
   end
   

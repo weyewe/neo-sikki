@@ -75,6 +75,7 @@ class GroupLoanProduct < ActiveRecord::Base
     new_object.interest        = BigDecimal( params[:interest        ] || '0')
     new_object.compulsory_savings     = BigDecimal( params[:compulsory_savings     ] || '0')
     new_object.admin_fee       = BigDecimal( params[:admin_fee       ] || '0')
+    new_object.initial_savings = BigDecimal( params[:initial_savings ] || '0')
     
     new_object.save 
     return new_object
@@ -88,6 +89,7 @@ class GroupLoanProduct < ActiveRecord::Base
     self.interest        = BigDecimal( params[:interest        ] || '0')
     self.compulsory_savings     = BigDecimal( params[:compulsory_savings     ] || '0')
     self.admin_fee       = BigDecimal( params[:admin_fee       ] || '0')
+    self.initial_savings = BigDecimal( params[:initial_savings ] || '0')
     
     self.save 
     return self

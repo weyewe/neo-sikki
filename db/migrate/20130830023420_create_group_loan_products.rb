@@ -10,6 +10,7 @@ class CreateGroupLoanProducts < ActiveRecord::Migration
       
       # The setup deduction 
       t.decimal :admin_fee,   :default       => 0,  :precision => 9, :scale => 2
+      t.decimal :initial_savings ,  :default => 0, :precision => 9, :scale => 2
       
       t.integer :total_weeks
 
