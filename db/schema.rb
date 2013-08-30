@@ -11,7 +11,48 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20130830022900) do
+ActiveRecord::Schema.define(version: 20130830023442) do
+
+  create_table "group_loan_memberships", force: true do |t|
+    t.integer  "group_loan_id"
+    t.integer  "group_loan_product_id"
+    t.integer  "member_id"
+    t.boolean  "is_active",             default: false
+    t.integer  "deactivation_case"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "group_loan_products", force: true do |t|
+    t.string   "name"
+    t.decimal  "principal",   precision: 9, scale: 2, default: 0.0
+    t.decimal  "interest",    precision: 9, scale: 2, default: 0.0
+    t.decimal  "min_savings", precision: 9, scale: 2, default: 0.0
+    t.decimal  "admin_fee",   precision: 9, scale: 2, default: 0.0
+    t.integer  "total_weeks"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "group_loans", force: true do |t|
+    t.string   "name"
+    t.integer  "number_of_meetings"
+    t.boolean  "is_loan_disbursement_prepared", default: false
+    t.boolean  "is_loan_disbursed",             default: false
+    t.boolean  "is_closed",                     default: false
+    t.integer  "group_leader_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "members", force: true do |t|
+    t.string   "name"
+    t.text     "address"
+    t.string   "id_number"
+    t.decimal  "total_savings_account", precision: 12, scale: 2, default: 0.0
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "roles", force: true do |t|
     t.string   "name",        null: false

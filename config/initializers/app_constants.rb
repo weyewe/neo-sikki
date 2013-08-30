@@ -89,3 +89,14 @@ GROUP_LOAN_DEACTIVATION_CASE = {
   :loan_disbursement_absent => 2 ,
   :finished_group_loan => 3 
 }
+
+FUND_TRANSFER_DIRECTION = {
+  :incoming => 1,
+  :outgoing => 2 
+}
+
+
+FUND_TRANSFER_CASE= {
+  :cash => 1,  
+  :savings => 2 
+}

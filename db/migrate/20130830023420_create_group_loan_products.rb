@@ -5,7 +5,8 @@ class CreateGroupLoanProducts < ActiveRecord::Migration
       
       t.decimal :principal , :default        => 0,  :precision => 9, :scale => 2 # 10^7 == 10 million ( max value )
       t.decimal :interest,    :default       => 0, :precision => 9, :scale => 2
-      t.decimal :min_savings, :default       => 0, :precision => 9, :scale => 2
+      t.decimal :compulsory_savings, :default       => 0, :precision => 9, :scale => 2
+      
       
       # The setup deduction 
       t.decimal :admin_fee,   :default       => 0,  :precision => 9, :scale => 2
