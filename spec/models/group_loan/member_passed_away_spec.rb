@@ -122,7 +122,7 @@ describe GroupLoan do
   end
   
    
-  context "a member is passed away"  do
+  context "a member is passed away ( week 2 ) "  do
     before(:each) do
       @passed_away_glm = @group_loan.active_group_loan_memberships.first 
       @passed_away_member = @passed_away_glm.member 
@@ -185,10 +185,38 @@ describe GroupLoan do
       @active_glm_id_list = @group_loan.active_group_loan_memberships.map{|x| x.id }
       @active_glm_id_list.include?(@passed_away_glm.id).should be_false 
     end
+    
+    context "perform collection and confirmation" do
+      before(:each) do
+        @second_group_loan_weekly_collection.collect(:collection_datetime => DateTime.now)
+        @second_group_loan_weekly_collection.confirm
+      end
+      
+      it 'should not create GroupLoanWeeklyPayment to the deceased member' do
+        GroupLoanWeeklyPayment.where(:group_loan_weekly_collection_id => @second_group_loan_weekly_collection.id,
+                :group_loan_membership_id => @passed_away_glm.id ).count.should == 0 
+      end
+    end
+    
+    context "finishing the payment collection cycle" do
+      before(:each) do
+        @group_loan.group_loan_weekly_collections.order("id ASC").each do |x|
+          next if x.is_collected? and x.is_confirmed? 
+          
+          x.collect(:collection_datetime => DateTime.now)
+          x.confirm 
+        end
+        
+        @group_loan.reload
+        @group_loan.close
+      end
+      
+      it 'should close the group loan' do
+        @group_loan.is_closed.should be_true 
+      end
+    end
   end
    
-  
-  
   
 end
 
