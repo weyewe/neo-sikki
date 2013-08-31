@@ -11,7 +11,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20130831082937) do
+ActiveRecord::Schema.define(version: 20130831102051) do
+
+  create_table "deceased_principal_receivables", force: true do |t|
+    t.integer  "member_id"
+    t.decimal  "amount_receivable", precision: 12, scale: 2, default: 0.0
+    t.decimal  "amount_paid",       precision: 12, scale: 2, default: 0.0
+    t.boolean  "is_closed",                                  default: false
+    t.string   "payment_document"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "group_loan_disbursements", force: true do |t|
     t.integer  "group_loan_membership_id"
@@ -26,6 +36,7 @@ ActiveRecord::Schema.define(version: 20130831082937) do
     t.integer  "member_id"
     t.boolean  "is_active",                                        default: true
     t.integer  "deactivation_case"
+    t.integer  "deactivation_week_number"
     t.decimal  "total_compulsory_savings", precision: 9, scale: 2, default: 0.0
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -88,6 +99,8 @@ ActiveRecord::Schema.define(version: 20130831082937) do
     t.text     "address"
     t.string   "id_number"
     t.decimal  "total_savings_account", precision: 12, scale: 2, default: 0.0
+    t.boolean  "is_deceased",                                    default: false
+    t.datetime "death_datetime"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

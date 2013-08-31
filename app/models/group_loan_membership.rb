@@ -4,6 +4,7 @@ class GroupLoanMembership < ActiveRecord::Base
   belongs_to :group_loan 
    
   belongs_to :group_loan_product 
+  has_many :group_loan_weekly_payments
   
   has_one :group_loan_disbursement  #checked  
   has_one :group_loan_port_compulsory_savings 
@@ -69,6 +70,19 @@ class GroupLoanMembership < ActiveRecord::Base
     
     self.total_compulsory_savings = incoming - outgoing 
     self.save 
+  end
+  
+=begin
+  Corner Case : Deceased member 
+=end
+
+  def remaining_deceased_principal_payment
+    
+      remaining_number_of_weeks = self.group_loan.number_of_collections - 
+                                  self.group_loan_weekly_payments.count 
+                                  
+      return remaining_number_of_weeks * self.group_loan_product.principal 
+    
   end
   
 end

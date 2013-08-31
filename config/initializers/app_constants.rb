@@ -87,7 +87,10 @@ IMAGE_ASSET_URL = {
 GROUP_LOAN_DEACTIVATION_CASE = {
   :financial_education_absent => 1, 
   :loan_disbursement_absent => 2 ,
-  :finished_group_loan => 3 
+  :finished_group_loan => 3 ,
+  
+  
+  :deceased => 10 
 }
 
 FUND_TRANSFER_DIRECTION = {

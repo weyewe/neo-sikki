@@ -8,6 +8,9 @@ class CreateMembers < ActiveRecord::Migration
       t.string :id_number 
       
       t.decimal :total_savings_account , :default        => 0,  :precision => 12, :scale => 2
+      
+      t.boolean :is_deceased, :default => false
+      t.datetime :death_datetime 
 
       t.timestamps
     end

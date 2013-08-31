@@ -70,5 +70,58 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
     
     self.create_group_loan_weekly_payments 
   end
+  
+  # week 1: full member. week 2: 1 member run away
+  # week 3 : another member run away 
+  # now we are in week 3... 
+  # the question is: how much is the amount receivable in week 2 ? 
+  
+  def active_group_loan_memberships
+    current_week_number = self.week_number
+     #    
+     # group_loan.active_group_loan_memberships + 
+     #   group_loan.group_loan_memberships.where{
+     #     (is_active.eq false) & 
+     #     ( deactivation_week_number.gt current_week_number)
+     #   }
+     # 
+     #   
+    if not group_loan.is_closed?
+      # puts "NON-CLOSED case.. the current week number: #{current_week_number}"
+      return group_loan.group_loan_memberships.where{
+        (is_active.eq true) | 
+        (
+          ( is_active.eq false) & 
+          ( deactivation_week_number.gt current_week_number)
+        )
+        
+      }
+    else
+      # GROUP_LOAN_DEACTIVATION_CASE
+      return group_loan.group_loan_memberships.where{
+        ( is_active.eq false ) & 
+        (
+          ( deactivation_case.eq GROUP_LOAN_DEACTIVATION_CASE[:finished_group_loan] ) & 
+          ( deactivation_week_number.eq nil) 
+        ) | 
+        (
+          ( deactivation_week_number.not_eq nil)  | 
+          ( deactivation_week_number.gte current_week_number)
+        )
+        
+      }
+    end
+  end
+  
+  def amount_receivable 
+    amount = BigDecimal('0')
+    self.active_group_loan_memberships.joins(:group_loan_product).each do |glm|
+      amount += glm.group_loan_product.weekly_payment_amount
+    end
+    
+    return amount 
+  end
+  
+  
    
 end

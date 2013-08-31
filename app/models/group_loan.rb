@@ -69,7 +69,7 @@ class GroupLoan < ActiveRecord::Base
     else
       # GROUP_LOAN_DEACTIVATION_CASE
       return self.group_loan_memberships.where{
-        (is_active.eq false ) and 
+        (is_active.eq false ) & 
         ( deactivation_case.eq GROUP_LOAN_DEACTIVATION_CASE[:finished_group_loan] )
       }
     end 
