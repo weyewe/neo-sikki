@@ -3,7 +3,7 @@ class GroupLoanPortCompulsorySavings < ActiveRecord::Base
   attr_accessible :group_loan_membership_id , :group_loan_id , :member_id 
   has_many :savings_entries, :as => :savings_source 
   
-  validates_uniqueness_of :group_loan_membership_id , :group_loan_id 
+  validates_uniqueness_of :group_loan_membership_id 
   
   after_create   :create_savings_entries
   

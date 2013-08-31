@@ -221,10 +221,14 @@ describe GroupLoan do
               before(:each) do
                 @glm_list = @group_loan.active_group_loan_memberships
                 
-                # @member_compulsory_savings_array = {} 
-                # @glm_list.each do |glm|
-                #   @member_compulsory_savings_array[glm.member_id.to_sym] = glm.total_compulsory_savings
-                # end
+                @member_compulsory_savings_array = [] 
+                 @glm_list.each do |glm|
+                   @member_compulsory_savings_array << [
+                      glm.member , 
+                      glm.member.total_savings_account, 
+                      glm.total_compulsory_savings 
+                     ]
+                 end
                 @group_loan.close 
                 @group_loan.reload 
               end
@@ -238,11 +242,22 @@ describe GroupLoan do
               end
               
               it 'should have increased the savings_account by the amount of compulsory_savings' do
+                @member_compulsory_savings_array.each do |pair|
+                  member = pair.first
+                  initial_savings =  pair[1]
+                  total_compulsory_savings = pair.last 
+                  
+                  member.reload 
+                  final_savings = member.total_savings_account 
+                  diff = final_savings - initial_savings 
+                  diff.should == total_compulsory_savings
+                end
               end
               
               it 'should produce 0 for total_compulsory_savings' do
                 @glm_list.each do |glm|
                   glm.reload
+                  puts "the total compulsory savings: #{glm.total_compulsory_savings.to_s} "
                   glm.total_compulsory_savings.should == BigDecimal('0')
                 end
                 
