@@ -8,6 +8,7 @@ class GroupLoan < ActiveRecord::Base
   has_one :group_loan_default_payment 
   
   has_many :group_loan_disbursements 
+  has_many :group_loan_port_compulsory_savings 
   
   has_many :savings_entries, :as => :financial_product 
   has_many :group_loan_backlogs
@@ -66,9 +67,10 @@ class GroupLoan < ActiveRecord::Base
     if not self.is_closed?
       return self.group_loan_memberships.where(:is_active => true )
     else
+      # GROUP_LOAN_DEACTIVATION_CASE
       return self.group_loan_memberships.where{
         (is_active.eq false ) and 
-        ( deactivation_status.eq GROUP_LOAN_DEACTIVATION_STATUS[:finished_group_loan] )
+        ( deactivation_case.eq GROUP_LOAN_DEACTIVATION_CASE[:finished_group_loan] )
       }
     end 
   end
@@ -175,15 +177,7 @@ class GroupLoan < ActiveRecord::Base
 Phase: loan disbursement finalization
 =end
  
-  
-  def deactivate_memberships_for_absentee_in_loan_disbursement
-    self.active_group_loan_memberships.where(:is_attending_loan_disbursement => false).each do |glm|
-      glm.is_active = false 
-      glm.deactivation_status = GROUP_LOAN_DEACTIVATION_STATUS[:loan_disbursement_absent]
-      glm.save
-    end
-  end
-  
+   
   def execute_loan_disbursement_payment
     self.active_group_loan_memberships.each do |glm|
       GroupLoanDisbursement.create :group_loan_membership_id => glm.id , :group_loan_id => self.id 
@@ -247,6 +241,48 @@ Phase: loan disbursement finalization
 =begin
   WeeklyCollection Finish 
 =end
+
+
+  def deduct_compulsory_savings_for_unsettled_default
+  end
+  
+  def port_compulsory_savings_to_voluntary_savings
+    self.active_group_loan_memberships.each do |glm|
+      GroupLoanPortCompulsorySavings.create :group_loan_id => self.id, 
+                                  :group_loan_membership_id => glm.id ,
+                                  :member_id => glm.member_id 
+    end
+  end 
+  
+  def deactivate_group_loan_memberships_due_to_group_closed
+    self.active_group_loan_memberships.each do |glm|
+      glm.is_active = false 
+      glm.deactivation_case = GROUP_LOAN_DEACTIVATION_CASE[:finished_group_loan]
+      glm.save 
+    end
+  end
+  
+  def close
+    if self.group_loan_weekly_collections.where(:is_confirmed => true, :is_collected => true).count != self.number_of_collections
+      self.errors.add(:generic_errors, "Ada Pengumpulan mingguan yang belum selesai")
+      return self 
+    end
+    
+    if self.is_closed?
+      self.errors.add(:generic_errors, "Sudah ditutup")
+      return self 
+    end
+    
+    
+    
+    # perform deduction for those unpaid member
+    self.deduct_compulsory_savings_for_unsettled_default
+    self.port_compulsory_savings_to_voluntary_savings 
+    self.deactivate_group_loan_memberships_due_to_group_closed
+    
+    self.is_closed = true 
+    self.save
+  end
 
  
  

@@ -7,6 +7,8 @@ class CreateGroupLoanMemberships < ActiveRecord::Migration
       
       t.boolean :is_active , :default => true 
       t.integer :deactivation_case # GROUP_LOAN_DEACTIVATION_CASE
+      
+      t.decimal :total_compulsory_savings  , :default        => 0,  :precision => 9, :scale => 2
 
       t.timestamps
     end

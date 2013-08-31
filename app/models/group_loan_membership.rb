@@ -6,6 +6,7 @@ class GroupLoanMembership < ActiveRecord::Base
   belongs_to :group_loan_product 
   
   has_one :group_loan_disbursement  #checked  
+  has_one :group_loan_port_compulsory_savings 
     
   
   validates_presence_of :group_loan_id, :member_id , :group_loan_product_id 
@@ -56,14 +57,14 @@ class GroupLoanMembership < ActiveRecord::Base
       :savings_status => SAVINGS_STATUS[:group_loan_compulsory_savings],
       :financial_product_type => GroupLoan.to_s, 
       :financial_product_id => self.group_loan_id ,
-      :direction => FUND_DIRECTION[:incoming]
+      :direction => FUND_TRANSFER_DIRECTION[:incoming]
     ).sum("amount")   
     
     outgoing = member.savings_entries.where(
       :savings_status => SAVINGS_STATUS[:group_loan_compulsory_savings],
       :financial_product_type => GroupLoan.to_s, 
       :financial_product_id => self.group_loan_id ,
-      :direction => FUND_DIRECTION[:outgoing]
+      :direction => FUND_TRANSFER_DIRECTION[:outgoing]
     ).sum("amount")
     
     self.total_compulsory_savings = incoming - outgoing 

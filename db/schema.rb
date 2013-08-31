@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20130831045146) do
+ActiveRecord::Schema.define(version: 20130831082937) do
 
   create_table "group_loan_disbursements", force: true do |t|
     t.integer  "group_loan_membership_id"
@@ -24,8 +24,17 @@ ActiveRecord::Schema.define(version: 20130831045146) do
     t.integer  "group_loan_id"
     t.integer  "group_loan_product_id"
     t.integer  "member_id"
-    t.boolean  "is_active",             default: true
+    t.boolean  "is_active",                                        default: true
     t.integer  "deactivation_case"
+    t.decimal  "total_compulsory_savings", precision: 9, scale: 2, default: 0.0
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "group_loan_port_compulsory_savings", force: true do |t|
+    t.integer  "group_loan_id"
+    t.integer  "group_loan_membership_id"
+    t.integer  "member_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -54,6 +63,9 @@ ActiveRecord::Schema.define(version: 20130831045146) do
   end
 
   create_table "group_loan_weekly_payments", force: true do |t|
+    t.integer  "group_loan_membership_id"
+    t.integer  "group_loan_id"
+    t.integer  "group_loan_weekly_collection_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

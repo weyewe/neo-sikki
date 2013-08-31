@@ -8,6 +8,8 @@ class Member < ActiveRecord::Base
   has_many :savings_entries 
   has_many :savings_account_payments 
   
+  has_many :group_loan_port_compulsory_savings 
+  
   validates_uniqueness_of :id_number 
   validates_presence_of :name, :id_number  
   
@@ -34,13 +36,14 @@ class Member < ActiveRecord::Base
   Savings Related 
 =end
   def update_total_savings_account
-    incoming = member.savings_entries.where(
+    incoming = self.savings_entries.where(
       :savings_status => SAVINGS_STATUS[:savings_account],
-      :direction => FUND_DIRECTION[:incoming]
+      :direction => FUND_TRANSFER_DIRECTION[:incoming]
     ).sum("amount")   
     
-    outgoing = member.savings_entries.where(
+    outgoing = self.savings_entries.where(
       :savings_status => SAVINGS_STATUS[:savings_account],
+      :direction => FUND_TRANSFER_DIRECTION[:outgoing]
     ).sum("amount")
     
     self.total_savings_account  = incoming - outgoing 

@@ -12,13 +12,7 @@ class GroupLoanWeeklyPayment < ActiveRecord::Base
   
   def create_transaction_activities  
     
-    
      
-    # COMPANY's perspective
-    # on group loan disbursement, there are 2 activities: 
-    # company disbursed the $$$
-    # member pays the admin fee
-    
     member = group_loan_membership.member 
     
     # Weekly payment 

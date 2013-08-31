@@ -164,12 +164,90 @@ describe GroupLoan do
           
           context "weekly payment collection: 1 week" do
             before(:each) do
+              @first_group_loan_weekly_collection = @group_loan.group_loan_weekly_collections.order("id ASC").first
+              @first_group_loan_weekly_collection.should be_valid 
+              @first_group_loan_weekly_collection.collect(
+                {
+                  :collection_datetime => DateTime.now 
+                }
+              )
+
+              @first_group_loan_weekly_collection.is_collected.should be_true
               
+              @first_glm = @group_loan.active_group_loan_memberships.first 
+              @initial_compulsory_savings = @first_glm.total_compulsory_savings
+              @first_group_loan_weekly_collection.confirm
+              @first_glm.reload 
+               
             end
+            
+            it 'should confirm the first group_loan_weekly_collection' do
+              @first_group_loan_weekly_collection.is_confirmed.should be_true 
+            end
+            
+            it 'should have increased the compulsory savings'  do
+              @final_compulsory_savings = @first_glm.total_compulsory_savings
+              diff = @final_compulsory_savings - @initial_compulsory_savings
+              diff.should == @first_glm.group_loan_product.compulsory_savings 
+            end
+            
+            it 'should give the 2nd week collection for group_loan#first_uncollected_weekly_collection' do
+              second_group_loan_weekly_collection = @group_loan.group_loan_weekly_collections.order("id ASC")[1]
+              @group_loan.first_uncollected_weekly_collection.id.should == second_group_loan_weekly_collection.id 
+            end
+            
+            
           end
           
           context "closing weekly loan: do all weekly payment collection" do
             before(:each) do
+              @group_loan.group_loan_weekly_collections.order("id ASC").each do |x|
+                x.collect(:collection_datetime => DateTime.now)
+                x.confirm 
+              end
+              
+              @group_loan.reload 
+            end
+            
+            it 'should have confirmed all group_loan weekly collections' do
+              @group_loan.group_loan_weekly_collections.where(:is_collected => true, :is_confirmed => true).count.should == @group_loan.number_of_collections 
+            end
+            
+            it 'should give nil to the next uncollected group_loan_weekly_collection' do
+              @group_loan.first_uncollected_weekly_collection.should be_nil 
+            end
+            
+            context 'closing group loan' do
+              before(:each) do
+                @glm_list = @group_loan.active_group_loan_memberships
+                
+                # @member_compulsory_savings_array = {} 
+                # @glm_list.each do |glm|
+                #   @member_compulsory_savings_array[glm.member_id.to_sym] = glm.total_compulsory_savings
+                # end
+                @group_loan.close 
+                @group_loan.reload 
+              end
+              
+              it 'should deactivate all glm' do
+                @glm_list.each do |glm|
+                  glm.reload
+                  glm.is_active.should be_false 
+                  glm.deactivation_case.should == GROUP_LOAN_DEACTIVATION_CASE[:finished_group_loan]
+                end
+              end
+              
+              it 'should have increased the savings_account by the amount of compulsory_savings' do
+              end
+              
+              it 'should produce 0 for total_compulsory_savings' do
+                @glm_list.each do |glm|
+                  glm.reload
+                  glm.total_compulsory_savings.should == BigDecimal('0')
+                end
+                
+              end
+              
             end
           end
         end
