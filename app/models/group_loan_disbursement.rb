@@ -1,6 +1,7 @@
 class GroupLoanDisbursement < ActiveRecord::Base
-  attr_accessible :group_loan_membership_id
+  attr_accessible :group_loan_membership_id, :group_loan_id 
                   
+  belongs_to :group_loan 
                   
   
   
@@ -40,7 +41,7 @@ class GroupLoanDisbursement < ActiveRecord::Base
     TransactionActivity.create :transaction_source_id => self.id, 
                               :transaction_source_type => self.class.to_s,
                               :amount => group_loan_membership.group_loan_product.admin_fee   ,
-                              :direction => FUND_DIRECTION[:incoming], 
+                              :direction => FUND_TRANSFER_DIRECTION[:incoming], 
                               :member_id => member.id,
                               :fund_case => FUND_TRANSFER_CASE[:cash]
                               
@@ -49,7 +50,7 @@ class GroupLoanDisbursement < ActiveRecord::Base
       TransactionActivity.create :transaction_source_id => self.id, 
                                 :transaction_source_type => self.class.to_s,
                                 :amount => group_loan_membership.group_loan_product.initial_savings   ,
-                                :direction => FUND_DIRECTION[:incoming], 
+                                :direction => FUND_TRANSFER_DIRECTION[:incoming], 
                                 :member_id => member.id ,
                                 :fund_case => FUND_TRANSFER_CASE[:cash]
     end

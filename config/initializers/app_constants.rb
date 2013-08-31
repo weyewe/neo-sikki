@@ -100,3 +100,13 @@ FUND_TRANSFER_CASE= {
   :cash => 1,  
   :savings => 2 
 }
+
+
+SAVINGS_STATUS = {
+  :savings_account => 0 ,  # the base savings account. every member has it. 
+  
+  
+  :group_loan_compulsory_savings => 10,
+  :group_loan_voluntary_savings => 11
+  
+}

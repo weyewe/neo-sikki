@@ -1,7 +1,6 @@
 class GroupLoanProduct < ActiveRecord::Base
   # attr_accessible :title, :body
   belongs_to :office 
-  has_many :group_loan_subcriptions  
   
   validates_presence_of  :total_weeks, 
                         :principal,

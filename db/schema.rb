@@ -11,13 +11,20 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20130830023442) do
+ActiveRecord::Schema.define(version: 20130831045146) do
+
+  create_table "group_loan_disbursements", force: true do |t|
+    t.integer  "group_loan_membership_id"
+    t.integer  "group_loan_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "group_loan_memberships", force: true do |t|
     t.integer  "group_loan_id"
     t.integer  "group_loan_product_id"
     t.integer  "member_id"
-    t.boolean  "is_active",             default: false
+    t.boolean  "is_active",             default: true
     t.integer  "deactivation_case"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -25,11 +32,28 @@ ActiveRecord::Schema.define(version: 20130830023442) do
 
   create_table "group_loan_products", force: true do |t|
     t.string   "name"
-    t.decimal  "principal",   precision: 9, scale: 2, default: 0.0
-    t.decimal  "interest",    precision: 9, scale: 2, default: 0.0
-    t.decimal  "min_savings", precision: 9, scale: 2, default: 0.0
-    t.decimal  "admin_fee",   precision: 9, scale: 2, default: 0.0
+    t.decimal  "principal",          precision: 9, scale: 2, default: 0.0
+    t.decimal  "interest",           precision: 9, scale: 2, default: 0.0
+    t.decimal  "compulsory_savings", precision: 9, scale: 2, default: 0.0
+    t.decimal  "admin_fee",          precision: 9, scale: 2, default: 0.0
+    t.decimal  "initial_savings",    precision: 9, scale: 2, default: 0.0
     t.integer  "total_weeks"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "group_loan_weekly_collections", force: true do |t|
+    t.integer  "group_loan_id"
+    t.integer  "week_number"
+    t.boolean  "is_collected",          default: false
+    t.boolean  "is_confirmed",          default: false
+    t.datetime "collection_datetime"
+    t.datetime "confirmation_datetime"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "group_loan_weekly_payments", force: true do |t|
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -37,6 +61,8 @@ ActiveRecord::Schema.define(version: 20130830023442) do
   create_table "group_loans", force: true do |t|
     t.string   "name"
     t.integer  "number_of_meetings"
+    t.integer  "number_of_collections"
+    t.boolean  "is_started",                    default: false
     t.boolean  "is_loan_disbursement_prepared", default: false
     t.boolean  "is_loan_disbursed",             default: false
     t.boolean  "is_closed",                     default: false
@@ -59,6 +85,33 @@ ActiveRecord::Schema.define(version: 20130830023442) do
     t.string   "title",       null: false
     t.text     "description", null: false
     t.text     "the_role",    null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "savings_entries", force: true do |t|
+    t.integer  "savings_source_id"
+    t.string   "savings_source_type"
+    t.decimal  "amount",                 precision: 9, scale: 2, default: 0.0
+    t.integer  "savings_status"
+    t.integer  "direction"
+    t.integer  "financial_product_id"
+    t.string   "financial_product_type"
+    t.integer  "member_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "transaction_activities", force: true do |t|
+    t.integer  "transaction_source_id"
+    t.string   "transaction_source_type"
+    t.integer  "fund_case"
+    t.decimal  "amount",                  precision: 9, scale: 2, default: 0.0
+    t.integer  "direction"
+    t.decimal  "savings",                 precision: 9, scale: 2, default: 0.0
+    t.integer  "savings_direction"
+    t.integer  "office_id"
+    t.integer  "member_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

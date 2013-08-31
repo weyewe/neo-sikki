@@ -3,8 +3,11 @@ class GroupLoan < ActiveRecord::Base
   belongs_to :office 
   has_many :members, :through => :group_loan_memberships 
   has_many :group_loan_memberships 
+  has_many :group_loan_weekly_collections 
   has_many :sub_group_loans 
   has_one :group_loan_default_payment 
+  
+  has_many :group_loan_disbursements 
   
   has_many :savings_entries, :as => :financial_product 
   has_many :group_loan_backlogs
@@ -12,10 +15,8 @@ class GroupLoan < ActiveRecord::Base
   
   
   has_many :group_loan_weekly_tasks # weekly payment, weekly attendance  
-  validates_presence_of :office_id , :name,
-                          :is_auto_deduct_admin_fee,
-                          :is_auto_deduct_initial_savings, 
-                          :is_compulsory_weekly_attendance
+  validates_presence_of   :name,
+                          :number_of_meetings
                           
   validates_uniqueness_of :name 
   
@@ -23,11 +24,8 @@ class GroupLoan < ActiveRecord::Base
   def self.create_object(  params)
     new_object = self.new
     
-    new_object.office_id = params[:office_id ]
-    new_object.name                            = params[:name]
-    new_object.is_auto_deduct_admin_fee        = true # params[:is_auto_deduct_admin_fee]
-    new_object.is_auto_deduct_initial_savings  = true # params[:is_auto_deduct_initial_savings]
-    new_object.is_compulsory_weekly_attendance = true 
+    new_object.name                            = params[:name] 
+    new_object.number_of_meetings = params[:number_of_meetings]
     
     new_object.save
     
@@ -37,10 +35,8 @@ class GroupLoan < ActiveRecord::Base
   def self.update_object( params ) 
     return nil if self.is_started?  
       
-    self.name                            = params[:name]
-    self.is_auto_deduct_admin_fee        = true #params[:is_auto_deduct_admin_fee]
-    self.is_auto_deduct_initial_savings  = true #params[:is_auto_deduct_initial_savings]
-    self.is_compulsory_weekly_attendance = true 
+    self.name                            = params[:name] 
+    self.number_of_meetings = params[:number_of_meetings]
     
     self.save
     
@@ -104,12 +100,7 @@ class GroupLoan < ActiveRecord::Base
   end
   
   def is_loan_disbursement_phase? 
-    is_started? and 
-    is_financial_education_finalized? and
-    not is_loan_disbursement_finalized? and 
-    not is_weekly_payment_period_closed? and 
-    not is_grace_period_payment_closed? and 
-    not is_default_payment_period_closed? and 
+    is_started? and  
     not is_closed?
   end
   
@@ -175,6 +166,7 @@ class GroupLoan < ActiveRecord::Base
     end
     
     self.is_started = true
+    self.number_of_collections = self.loan_duration 
     self.save 
    
   end 
@@ -194,32 +186,38 @@ Phase: loan disbursement finalization
   
   def execute_loan_disbursement_payment
     self.active_group_loan_memberships.each do |glm|
-      GroupLoanDisbursement.create :group_loan_membership_id => glm.id 
+      GroupLoanDisbursement.create :group_loan_membership_id => glm.id , :group_loan_id => self.id 
+    end
+  end
+  
+  def schedule_group_loan_weekly_collection
+    (1..self.number_of_collections).each do |week_number|
+      GroupLoanWeeklyCollection.create :group_loan_id => self.id, :week_number => week_number
     end
   end
 
-  def finalize_loan_disbursement
+  def disburse_loan 
     
     if not self.is_loan_disbursement_phase?  
       errors.add(:generic_errors, "Bukan di fase penyerahan pinjaman")
       return self
     end
     
-    if self.is_loan_disbursement_finalized?
+    if self.is_loan_disbursed?
       errors.add(:generic_errors, "Pinjaman keuangan sudah di finalisasi")
       return self
     end
     
-    if not self.is_all_loan_disbursement_attendances_marked?
-      errors.add(:generic_errors, "Ada anggota yang kehadirannya di penyerahan pinjaman belum ditandai")
-      return self
-    end
     
-    self.is_loan_disbursement_finalized = true 
+    
+    self.is_loan_disbursed = true 
     self.save 
     
     
     self.execute_loan_disbursement_payment 
+    
+    
+    self.schedule_group_loan_weekly_collection 
 
     # create GroupLoanWeeklyCollection  => it has many weird cases. new problem domain on that model.
   end
@@ -236,6 +234,14 @@ Phase: loan disbursement finalization
     end
     
     return duration_array.uniq.first  
+  end
+  
+  def has_unconfirmed_weekly_collection?
+    self.group_loan_weekly_collections.where(:is_confirmed => false, :is_collected => true).count != 0 
+  end
+  
+  def first_uncollected_weekly_collection
+    self.group_loan_weekly_collections.where(:is_confirmed => false, :is_collected => false).order("id ASC").first 
   end
   
 =begin
