@@ -120,6 +120,7 @@ class Member < ActiveRecord::Base
           GroupLoanRunAwayReceivable.create :member_id => self.id,  
                                   :amount_receivable => glm.run_away_remaining_group_loan_payment ,
                                   :group_loan_id => glm.group_loan_id,
+                                  :group_loan_membership_id => glm.id , 
                                   :payment_case => GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:weekly] # on end_of_cycle
         else
           glm.destroy

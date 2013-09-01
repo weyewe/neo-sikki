@@ -41,16 +41,39 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
     # do weekly payment for all active members
     # minus those that can't pay  (the dead and running away is considered as non active)    
     active_glm_id_list = group_loan.active_group_loan_memberships.map {|x| x.id }
-    no_payment_id_list = []
+    no_payment_id_list = [] 
+    run_away_glm_list = group_loan.
+                          group_loan_memberships.joins(:group_loan_run_away_receivable).
+                          where(:deactivation_case => GROUP_LOAN_DEACTIVATION_CASE[:run_away]  )
+    
     
     active_glm_id_list -= no_payment_id_list 
     
+    
+    # for the normal payment 
     active_glm_id_list.each do |glm_id|
       GroupLoanWeeklyPayment.create :group_loan_membership_id => glm_id,
                                     :group_loan_id => self.group_loan_id,
                                     :group_loan_weekly_collection_id => self.id 
     end
+    
+    # for the run_away_payment 
+    run_away_glm_list.each do |glm|
+      GroupLoanRunAwayReceivablePayment.create({
+        :group_loan_run_away_receivable_id => glm.group_loan_run_away_receivable.id ,
+        :group_loan_weekly_collection_id   => self.id ,
+        :group_loan_membership_id          => glm.id  ,
+        :group_loan_id                     => self.group_loan_id ,
+        :amount                            =>  glm.group_loan_product.weekly_payment_amount   ,
+        :payment_case                      => GROUP_LOAN_RUN_AWAY_RECEIVABLE_PAYMENT_CASE[:weekly]
+      })
+      
+      
+    end
+    
   end
+  
+  
   
   def confirm
     if not self.is_collected?
@@ -78,14 +101,7 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
   
   def active_group_loan_memberships
     current_week_number = self.week_number
-     #    
-     # group_loan.active_group_loan_memberships + 
-     #   group_loan.group_loan_memberships.where{
-     #     (is_active.eq false) & 
-     #     ( deactivation_week_number.gt current_week_number)
-     #   }
-     # 
-     #   
+    
     if not group_loan.is_closed?
       # puts "NON-CLOSED case.. the current week number: #{current_week_number}"
       return group_loan.group_loan_memberships.where{
@@ -118,13 +134,44 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
     end
   end
   
-  def amount_receivable 
+  
+  def extract_base_amount 
     amount = BigDecimal('0')
     self.active_group_loan_memberships.joins(:group_loan_product).each do |glm|
       amount += glm.group_loan_product.weekly_payment_amount
     end
     
     return amount 
+  end
+  
+  def extract_run_away_weekly_resolution_amount
+    amount = BigDecimal('0')
+    current_week_number = self.week_number
+    
+    group_loan.group_loan_memberships.joins(:group_loan_run_away_receivable).where{
+      ( deactivation_case.eq GROUP_LOAN_DEACTIVATION_CASE[:run_away] ) & 
+      ( deactivation_week_number.lte current_week_number ) & 
+      (
+        group_loan_run_away_receivable.payment_case.eq GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:weekly] 
+      )
+    }.each do |glm|
+      amount += glm.group_loan_product.weekly_payment_amount
+    end
+    
+    return amount
+  end
+  
+  def extract_uncollectable_weekly_payment_amount 
+    return BigDecimal('0')
+  end
+  
+  def amount_receivable 
+    
+    total_amount =  extract_base_amount + 
+                    extract_run_away_weekly_resolution_amount - 
+                    extract_uncollectable_weekly_payment_amount 
+    
+    return total_amount 
   end
   
   

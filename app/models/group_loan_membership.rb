@@ -8,6 +8,7 @@ class GroupLoanMembership < ActiveRecord::Base
   
   has_one :group_loan_disbursement  #checked  
   has_one :group_loan_port_compulsory_savings 
+  has_one :group_loan_run_away_receivable
     
   
   validates_presence_of :group_loan_id, :member_id , :group_loan_product_id 
