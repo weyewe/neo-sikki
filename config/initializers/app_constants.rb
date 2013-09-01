@@ -90,7 +90,8 @@ GROUP_LOAN_DEACTIVATION_CASE = {
   :finished_group_loan => 3 ,
   
   
-  :deceased => 10 
+  :deceased => 10,
+  :run_away => 11
 }
 
 FUND_TRANSFER_DIRECTION = {
@@ -113,3 +114,15 @@ SAVINGS_STATUS = {
   :group_loan_voluntary_savings => 11
   
 }
+
+GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE = {
+  :weekly => 1, 
+  :end_of_cycle => 2 
+}
+
+GROUP_LOAN_RUN_AWAY_RECEIVABLE_PAYMENT_CASE = {
+  :weekly => 1, 
+  :end_of_cycle => 2 ,
+  :extra_payment => 3 
+}
+

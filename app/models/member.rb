@@ -94,4 +94,38 @@ class Member < ActiveRecord::Base
       # Write Off Interest Receivable 
     end
   end
+  
+  def mark_as_run_away
+    if self.is_run_away? 
+      self.errors.add(:generic_errors, "#{self.name} sudah dinyatakan kabur")
+      return self 
+    end
+    
+    self.is_run_away = true  
+    
+    if self.save 
+      pending_receivable = BigDecimal('0')
+      
+      self.group_loan_memberships.where(:is_active => true ).each do |glm|
+        # deactivate group loan membership
+        glm.is_active = false 
+        glm.deactivation_case = GROUP_LOAN_DEACTIVATION_CASE[:run_away]   
+        
+        group_loan = glm.group_loan 
+        
+        if group_loan.is_loan_disbursed? 
+          glm.deactivation_week_number = group_loan.first_uncollected_weekly_collection.week_number
+          glm.save  
+
+          GroupLoanRunAwayReceivable.create :member_id => self.id,  
+                                  :amount_receivable => glm.run_away_remaining_group_loan_payment ,
+                                  :group_loan_id => glm.group_loan_id,
+                                  :payment_case => GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:weekly] # on end_of_cycle
+        else
+          glm.destroy
+        end                                 
+      end
+       
+    end
+  end
 end

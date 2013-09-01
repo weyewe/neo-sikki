@@ -85,4 +85,15 @@ class GroupLoanMembership < ActiveRecord::Base
     
   end
   
+=begin
+  Corner Case: RunAway member
+=end
+
+  def run_away_remaining_group_loan_payment
+    total_weeks = self.group_loan.number_of_collections 
+    paid_weeks_count = self.group_loan_weekly_payments.count 
+    
+    (total_weeks - paid_weeks_count ) * group_loan_product.weekly_payment_amount
+  end
+  
 end
