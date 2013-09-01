@@ -209,10 +209,26 @@ describe GroupLoan do
         
         @group_loan.reload
         @group_loan.close
+        @group_loan.reload
+        @second_group_loan_weekly_collection.reload 
+        @first_group_loan_weekly_collection.reload 
       end
       
       it 'should close the group loan' do
-        @group_loan.is_closed.should be_true 
+         @group_loan.is_closed.should be_true 
+       end
+      
+      it 'should give the correct number of active group_loan_membership (though it is closed)' do
+        @group_loan.active_group_loan_memberships.count.should == @initial_active_glm_count -1 # (1 deceased)
+        @group_loan.group_loan_memberships.where(:is_active => true).count.should == 0 
+        
+        week_2_active_glm_count = @second_group_loan_weekly_collection.active_group_loan_memberships.count 
+        week_2_active_glm_count.should == (@initial_active_glm_count - 1 )
+        
+        week_1_active_glm_count = @first_group_loan_weekly_collection.active_group_loan_memberships.count 
+        week_1_active_glm_count.should == (@initial_active_glm_count  )
+        
+        
       end
     end
   end

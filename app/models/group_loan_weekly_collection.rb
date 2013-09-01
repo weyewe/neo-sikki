@@ -98,16 +98,21 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
       }
     else
       # GROUP_LOAN_DEACTIVATION_CASE
+      # puts "Inside the closed group loan"
       return group_loan.group_loan_memberships.where{
         ( is_active.eq false ) & 
         (
-          ( deactivation_case.eq GROUP_LOAN_DEACTIVATION_CASE[:finished_group_loan] ) & 
-          ( deactivation_week_number.eq nil) 
-        ) | 
-        (
-          ( deactivation_week_number.not_eq nil)  | 
-          ( deactivation_week_number.gte current_week_number)
+          (
+            ( deactivation_case.eq GROUP_LOAN_DEACTIVATION_CASE[:finished_group_loan] ) & 
+            ( deactivation_week_number.eq nil)
+          ) | 
+          (
+            ( deactivation_week_number.not_eq nil) & 
+            ( deactivation_week_number.gt current_week_number) & 
+            ( deactivation_case.not_eq GROUP_LOAN_DEACTIVATION_CASE[:finished_group_loan] ) 
+          )
         )
+        
         
       }
     end
