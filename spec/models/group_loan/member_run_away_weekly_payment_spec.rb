@@ -124,14 +124,22 @@ describe GroupLoan do
       @initial_active_glm_count = @group_loan.active_group_loan_memberships.count 
       @first_week_amount_receivable=   @first_group_loan_weekly_collection.amount_receivable
       
+      @initial_group_loan_run_away_amount_receivable = @group_loan.run_away_amount_receivable
+      
       @run_away_member.mark_as_run_away
       @group_loan.reload 
       @run_away_glm.reload 
       @second_group_loan_weekly_collection = @group_loan.group_loan_weekly_collections.order("id ASC")[1]
+      
     end
      
     
     
+    it 'should increase the group_loan run_away_amount_receivable' do
+      @final_group_loan_run_away_amount_receivable = @group_loan.run_away_amount_receivable
+      diff = @final_group_loan_run_away_amount_receivable - @initial_group_loan_run_away_amount_receivable
+      diff.should == @run_away_glm.run_away_remaining_group_loan_payment
+    end
         
     context "pay at the same week run_away_receivable" do
       before(:each) do
@@ -155,15 +163,27 @@ describe GroupLoan do
       
       context "made 1 payment (weekly) including the member run away" do
         before(:each) do
+          
+          @initial_run_away_amount_received = @group_loan.run_away_amount_received
           @second_group_loan_weekly_collection.collect(:collection_datetime => DateTime.now)
           @second_group_loan_weekly_collection.confirm 
           
+        
           @group_loan.reload
           @group_loan.close
           @group_loan.reload
           @second_group_loan_weekly_collection.reload 
           @first_group_loan_weekly_collection.reload
           @gl_rar.reload 
+        end
+        
+        # group_loan_run_away_receivable_payment has nothing to do with the run away member
+        # it is not related. Just a punishment. 
+        
+        it 'should increase group_loan run_away_amount_received' do
+          final_amount = @group_loan.run_away_amount_received 
+          diff = final_amount - @initial_run_away_amount_received 
+          diff.should == @run_away_glm.group_loan_product.weekly_payment_amount
         end
         
         it 'should create group_loan_run_away_receivable_payment' do
@@ -176,7 +196,8 @@ describe GroupLoan do
         end
         
         it 'should update amount_received' do
-          @gl_rar.amount_received.should == @run_away_glm.group_loan_product.weekly_payment_amount
+          @group_loan.run_away_amount_received.should == @run_away_glm.group_loan_product.weekly_payment_amount
+          # @gl_rar.amount_received.should == @run_away_glm.group_loan_product.weekly_payment_amount
         end
         
         it 'should create transaction activity based on this run away receivable payment' do
@@ -226,6 +247,10 @@ describe GroupLoan do
         
         it 'should create (total_weeks - 1) run_away_receivable_payment' do
           @gl_rar.group_loan_run_away_receivable_payments.count.should == ( @group_loan.number_of_collections - 1 )
+        end
+        
+        it 'should complete the  run_away_amount_receivable' do 
+          @group_loan.run_away_amount_received.should == @group_loan.run_away_amount_receivable 
         end
       end
 

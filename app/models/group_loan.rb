@@ -4,15 +4,14 @@ class GroupLoan < ActiveRecord::Base
   has_many :members, :through => :group_loan_memberships 
   has_many :group_loan_memberships 
   has_many :group_loan_weekly_collections 
-  has_many :sub_group_loans 
-  has_one :group_loan_default_payment 
+  
+  has_many :group_loan_run_away_receivables
+  has_many :group_loan_run_away_receivable_payments 
   
   has_many :group_loan_disbursements 
   has_many :group_loan_port_compulsory_savings 
   
   has_many :savings_entries, :as => :financial_product 
-  has_many :group_loan_backlogs
-  has_many :group_loan_grace_payments 
   
   
   has_many :group_loan_weekly_tasks # weekly payment, weekly attendance  
@@ -242,8 +241,20 @@ Phase: loan disbursement finalization
   WeeklyCollection Finish 
 =end
 
+  def total_compulsory_savings
+    self.active_group_loan_memberships.sum("total_compulsory_savings")
+  end
+
 
   def deduct_compulsory_savings_for_unsettled_default
+    # The defaults: 
+    # 1. run_away_receivable
+    # 2. uncollected weekly payment 
+    
+    # cases: 
+    # 0. no run_away_receivable
+    # 1. only one run_away_receivable
+    # 2. many run_away_receivable 
   end
   
   def port_compulsory_savings_to_voluntary_savings

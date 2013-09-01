@@ -9,6 +9,10 @@ class GroupLoanRunAwayReceivable < ActiveRecord::Base
   validate :valid_payment_case
   validates_presence_of :payment_case
   
+  belongs_to :group_loan 
+  
+  after_create :update_group_loan_run_away_amount_receivable 
+  
   def valid_payment_case
     return if not payment_case.present?
       
@@ -22,6 +26,16 @@ class GroupLoanRunAwayReceivable < ActiveRecord::Base
       self.errors.add(:payment_case, "Metode Penagihan tidak valid")
     end
     
+  end
+  
+  def update_group_loan_run_away_amount_receivable
+    group_loan = self.group_loan 
+    amount = BigDecimal('0')
+    group_loan.group_loan_run_away_receivables.each do |x|
+      amount += x.amount_receivable 
+    end
+    group_loan.run_away_amount_receivable =  amount 
+    group_loan.save
   end
   
   def set_payment_case( params ) 
@@ -52,4 +66,6 @@ class GroupLoanRunAwayReceivable < ActiveRecord::Base
     # 2. write-off interest receivable => as bad expense 
     
   end
+  
+  
 end

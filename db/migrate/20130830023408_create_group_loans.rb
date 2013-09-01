@@ -18,6 +18,11 @@ class CreateGroupLoans < ActiveRecord::Migration
       
       
       
+      # if there is member running away, do this shite. 
+      t.decimal :run_away_amount_receivable, :default       => 0, :precision => 9, :scale => 2
+      t.decimal :run_away_amount_received , :default       => 0, :precision => 9, :scale => 2
+      
+      
       t.timestamps
     end
   end

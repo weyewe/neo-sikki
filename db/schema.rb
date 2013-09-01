@@ -79,7 +79,6 @@ ActiveRecord::Schema.define(version: 20130901065741) do
     t.integer  "group_loan_id"
     t.integer  "group_loan_weekly_collection_id"
     t.decimal  "amount_receivable",               precision: 12, scale: 2, default: 0.0
-    t.decimal  "amount_received",                 precision: 12, scale: 2, default: 0.0
     t.boolean  "is_closed",                                                default: false
     t.integer  "payment_case"
     t.datetime "created_at"
@@ -109,11 +108,13 @@ ActiveRecord::Schema.define(version: 20130901065741) do
     t.string   "name"
     t.integer  "number_of_meetings"
     t.integer  "number_of_collections"
-    t.boolean  "is_started",                    default: false
-    t.boolean  "is_loan_disbursement_prepared", default: false
-    t.boolean  "is_loan_disbursed",             default: false
-    t.boolean  "is_closed",                     default: false
+    t.boolean  "is_started",                                            default: false
+    t.boolean  "is_loan_disbursement_prepared",                         default: false
+    t.boolean  "is_loan_disbursed",                                     default: false
+    t.boolean  "is_closed",                                             default: false
     t.integer  "group_leader_id"
+    t.decimal  "run_away_amount_receivable",    precision: 9, scale: 2, default: 0.0
+    t.decimal  "run_away_amount_received",      precision: 9, scale: 2, default: 0.0
     t.datetime "created_at"
     t.datetime "updated_at"
   end

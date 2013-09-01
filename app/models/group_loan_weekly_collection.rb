@@ -67,6 +67,10 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
     # for the run_away_payment 
     run_away_glm_list.each do |glm|
       GroupLoanRunAwayReceivablePayment.create({
+        # the link to the member, glm, or group_loan_run_away_receivable is a bonus
+        # we don't know what it is for yet. but, just better to dump it.
+        # we can optimize later. 
+        # The core info needed: group_loan_id, weekly_collection_id, amount
         :group_loan_run_away_receivable_id => glm.group_loan_run_away_receivable.id ,
         :group_loan_weekly_collection_id   => self.id ,
         :group_loan_membership_id          => glm.id  ,
