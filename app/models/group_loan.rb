@@ -247,14 +247,40 @@ Phase: loan disbursement finalization
 
 
   def deduct_compulsory_savings_for_unsettled_default
+    total_amount = BigDecimal('0')
     # The defaults: 
-    # 1. run_away_receivable
+    # 1. run_away_receivable (end_of_cycle payment) 
     # 2. uncollected weekly payment 
     
+    
+    #### HANDLING THE DEFAULTS 1: run_away_receivable 
     # cases: 
     # 0. no run_away_receivable
     # 1. only one run_away_receivable
     # 2. many run_away_receivable 
+    
+    total_amount += self.group_loan_run_away_receivables.
+        where(:payment_case => GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:end_of_cycle]).
+        sum('amount_receivable')
+        
+    # and add the uncollected weekly payment 
+    
+    # total_amount += 
+    
+    
+    # what is the minimum denomination? 500 rupiah
+    amount_to_be_deducted  = BigDecimal('0')
+    if self.total_compulsory_savings < total_amount 
+      amount_to_be_deducted = self.total_compulsory_savings
+    else # case total_compulsory_savings => total_amount 
+      amount_to_be_deducted = total_amount
+    end
+    
+    
+    # then, gonna split this amount to all members.  
+    # round off to 500 rupiah? copy from kkims 
+    # if member's compulsory savings is not sufficient, count that loss as office's 
+    
   end
   
   def port_compulsory_savings_to_voluntary_savings
