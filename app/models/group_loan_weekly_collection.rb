@@ -3,6 +3,8 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
   belongs_to :group_loan 
   validates_presence_of :group_loan_id, :week_number 
   
+  has_many :group_loan_run_away_receivables 
+  
   
   def first_non_collected?
     group_loan.group_loan_weekly_collection.where(
@@ -44,7 +46,12 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
     no_payment_id_list = [] 
     run_away_glm_list = group_loan.
                           group_loan_memberships.joins(:group_loan_run_away_receivable).
-                          where(:deactivation_case => GROUP_LOAN_DEACTIVATION_CASE[:run_away]  )
+                          where{
+                            (deactivation_case.eq  GROUP_LOAN_DEACTIVATION_CASE[:run_away] ) & 
+                            (group_loan_run_away_receivable.payment_case.eq GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:weekly])
+                          }
+                          
+                          
     
     
     active_glm_id_list -= no_payment_id_list 

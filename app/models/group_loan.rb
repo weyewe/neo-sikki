@@ -280,6 +280,10 @@ Phase: loan disbursement finalization
     self.port_compulsory_savings_to_voluntary_savings 
     self.deactivate_group_loan_memberships_due_to_group_closed
     
+    # self.close_group_loan_run_away_receivable # the receivable is being written off:
+    # 1. loan portfolio will be provisioned
+    # 2. the interest receivable will be written-off (as expense) 
+    
     self.is_closed = true 
     self.save
   end
