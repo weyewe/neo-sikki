@@ -7,8 +7,8 @@ class CreateGroupLoanRunAwayReceivables < ActiveRecord::Migration
       
       
       
-      t.decimal :amount_receivable , :default        => 0,  :precision => 12, :scale => 2 
-      t.decimal :amount_received , :default        => 0,  :precision => 12, :scale => 2 
+      t.decimal :amount_receivable , :default     => 0,  :precision => 12, :scale => 2 
+      t.decimal :amount_received , :default       => 0,  :precision => 12, :scale => 2 
       t.boolean :is_closed, :default => false 
       
       # they can choose whether it is paid weekly or @end_of_cycle. 

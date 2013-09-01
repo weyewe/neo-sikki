@@ -13,7 +13,7 @@ class GroupLoanRunAwayReceivablePayment < ActiveRecord::Base
   belongs_to :group_loan_weekly_collection
   belongs_to :group_loan_run_away_receivable
   
-  after_create :create_transaction_activities 
+  after_create :create_transaction_activities , :update_run_away_receivable_amount_received
   
   def create_transaction_activities
     member = group_loan_membership.member 
@@ -25,5 +25,12 @@ class GroupLoanRunAwayReceivablePayment < ActiveRecord::Base
                               :direction => FUND_TRANSFER_DIRECTION[:incoming],
                               :member_id => member.id,
                               :fund_case => FUND_TRANSFER_CASE[:cash]
+  end
+  
+  def update_run_away_receivable_amount_received
+    receivable = self.group_loan_run_away_receivable
+    receivable.amount_received += self.amount
+    receivable.save 
+    
   end
 end

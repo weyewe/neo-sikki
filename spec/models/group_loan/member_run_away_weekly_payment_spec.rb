@@ -163,28 +163,71 @@ describe GroupLoan do
           @group_loan.reload
           @second_group_loan_weekly_collection.reload 
           @first_group_loan_weekly_collection.reload
+          @gl_rar.reload 
         end
         
         it 'should create group_loan_run_away_receivable_payment' do
           @gl_rar.group_loan_run_away_receivable_payments.count.should == 1 
         end
+        
+        it 'should use weekly as payment case' do
+          @gl_rar_payment = @gl_rar.group_loan_run_away_receivable_payments.first
+          @gl_rar_payment.payment_case.should == GROUP_LOAN_RUN_AWAY_RECEIVABLE_PAYMENT_CASE[:weekly]
+        end
+        
+        it 'should update amount_received' do
+          @gl_rar.amount_received.should == @run_away_glm.group_loan_product.weekly_payment_amount
+        end
+        
+        it 'should create transaction activity based on this run away receivable payment' do
+          @gl_rar_payment = @gl_rar.group_loan_run_away_receivable_payments.first
+          @gl_rar_payment.transaction_activities.count.should == 1 
+        end
+        
+        it "can't change payment case  after a payment has been made" do
+          @gl_rar.set_payment_case({
+            :payment_case => GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:weekly]
+          })
+          
+          @gl_rar.errors.size.should_not == 0 
+          
+          @gl_rar.reload 
+          @gl_rar.set_payment_case({
+            :payment_case => GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:end_of_cycle]
+          })
+          
+          @gl_rar.errors.size.should_not == 0
+        end
       end
       
-      # context "perform all remaining collection" do
-      #   before(:each) do
-      #     @group_loan.group_loan_weekly_collections.order("id ASC").each do |x|
-      #       next if x.is_collected? and x.is_confirmed? 
-      #       x.collect(:collection_datetime => DateTime.now)
-      #       x.confirm 
-      #     end
-      # 
-      #     @group_loan.reload
-      #     @group_loan.close
-      #     @group_loan.reload
-      #     @second_group_loan_weekly_collection.reload 
-      #     @first_group_loan_weekly_collection.reload
-      #   end
-      # end
+      context "perform all remaining collection" do
+        before(:each) do
+          @group_loan.group_loan_weekly_collections.order("id ASC").each do |x|
+            next if x.is_collected? and x.is_confirmed? 
+            x.collect(:collection_datetime => DateTime.now)
+            x.confirm 
+          end
+      
+          @group_loan.reload
+          @group_loan.close
+          @group_loan.reload
+        end
+        
+        it 'should close the group loan' do
+          @group_loan.is_closed.should be_true 
+        end
+        
+        it 'should confirm all group loan weekly collections' do
+          @group_loan.group_loan_weekly_collections.order("id ASC").each do |x|
+            x.is_collected.should be_true 
+            x.is_confirmed.should be_true 
+          end
+        end
+        
+        it 'should create (total_weeks - 1) run_away_receivable_payment' do
+          @gl_rar.group_loan_run_away_receivable_payments.count.should == ( @group_loan.number_of_collections - 1 )
+        end
+      end
 
     end
      
