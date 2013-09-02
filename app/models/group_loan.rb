@@ -13,6 +13,7 @@ class GroupLoan < ActiveRecord::Base
   
   has_many :savings_entries, :as => :financial_product 
   
+  has_many :group_loan_default_payments
   
   has_many :group_loan_weekly_tasks # weekly payment, weekly attendance  
   validates_presence_of   :name,
@@ -188,6 +189,13 @@ Phase: loan disbursement finalization
       GroupLoanWeeklyCollection.create :group_loan_id => self.id, :week_number => week_number
     end
   end
+  
+  def create_group_loan_default_payments
+    self.active_group_loan_memberships.each do |glm|
+      GroupLoanDefaultPayment.create :group_loan_membership_id => glm.id ,
+                                      :group_loan_id => self.id 
+    end
+  end
 
   def disburse_loan 
     
@@ -211,6 +219,7 @@ Phase: loan disbursement finalization
     
     
     self.schedule_group_loan_weekly_collection 
+    self.create_group_loan_default_payments
 
     # create GroupLoanWeeklyCollection  => it has many weird cases. new problem domain on that model.
   end
@@ -246,11 +255,44 @@ Phase: loan disbursement finalization
   end
 
 
+
+  def self.rounding_up(amount,  nearest_amount ) 
+    total = amount
+    # total_amount
+
+    multiplication_of_500 = ( total.to_i/nearest_amount.to_i ) .to_i
+    remnant = (total.to_i%nearest_amount.to_i)
+    if remnant > 0  
+      return  nearest_amount *( multiplication_of_500 + 1 )
+    else
+      return nearest_amount *( multiplication_of_500  )
+    end  
+  end
+  
+  
   def deduct_compulsory_savings_for_unsettled_default
+    # if the member's compulsory savings is not sufficient, calculate that as office's bad debt expense 
+    return if total_active_glm == 0
+    
+    self.active_group_loan_memberships.joins(:group_loan_default_payment).each do |default_payment|
+      default_payment.execute_compulsory_savings_deduction 
+    end
+    
+    # self.update_bad_expense_debt 
+  end
+  
+  def default_payment_total_amount
     total_amount = BigDecimal('0')
     # The defaults: 
-    # 1. run_away_receivable (end_of_cycle payment) 
-    # 2. uncollected weekly payment 
+    # 1. + run_away_receivable (payment_case => end_of_cycle ) 
+    # 2. + uncollected weekly payment 
+    # 3. - deduct by the total amount of GroupLoanAdditionalDefaultPayment  (can come from member.. but doesn't matter)
+    # 4. - Deduct by the total amount of PrematureClearance 
+    
+    # on deceased member, if they have default, will be handled by the present member 
+    # recalculate the default resolution amount. 
+    
+    # total debt: sum of all default_payment.remaining_amount_receivable where the glm.is_active => true 
     
     
     #### HANDLING THE DEFAULTS 1: run_away_receivable 
@@ -263,12 +305,22 @@ Phase: loan disbursement finalization
         where(:payment_case => GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:end_of_cycle]).
         sum('amount_receivable')
         
-    # and add the uncollected weekly payment 
-    
-    # total_amount += 
-    
-    
-    # what is the minimum denomination? 500 rupiah
+  end
+  
+  
+  # default payment amount_receivable will be updated on:
+  #  1. run_away member 
+  #   2. Uncollectable weekly collection 
+  
+  
+  def update_default_payment_amount_receivable  
+    # update the default_payment#amount_receivable on 
+    # 1. weekly_payment_collection#confirm 
+    # 2. PrematureClearance#confirm 
+    # 3. GroupLoanAdditionalDefaultPayment#confirm 
+
+    total_amount = self.default_payment_total_amount
+     
     amount_to_be_deducted  = BigDecimal('0')
     if self.total_compulsory_savings < total_amount 
       amount_to_be_deducted = self.total_compulsory_savings
@@ -276,11 +328,18 @@ Phase: loan disbursement finalization
       amount_to_be_deducted = total_amount
     end
     
+    total_active_glm = self.active_group_loan_memberships.count 
     
-    # then, gonna split this amount to all members.  
-    # round off to 500 rupiah? copy from kkims 
-    # if member's compulsory savings is not sufficient, count that loss as office's 
+    return if total_active_glm == 0 
     
+    splitted_amount = amount_to_be_deducted/total_active_glm 
+    
+    self.active_group_loan_memberships.joins(:group_loan_default_payment).each do |glm| 
+        
+        default_payment = glm.default_payment 
+        default_payment.amount_receivable = self.class.rounding_up(splitted_amount, DEFAULT_PAYMENT_ROUND_UP_VALUE)
+        default_payment.save 
+    end
   end
   
   def port_compulsory_savings_to_voluntary_savings

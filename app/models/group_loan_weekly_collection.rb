@@ -103,6 +103,7 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
     self.save 
     
     self.create_group_loan_weekly_payments 
+    self.group_loan.update_default_payment_amount_receivable
   end
   
   # week 1: full member. week 2: 1 member run away

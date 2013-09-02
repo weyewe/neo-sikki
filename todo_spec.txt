@@ -1,2 +1,4 @@
-1. member_run_away_end_of_cycle_spec => only create 1 run_away_receivable_payment 
-
+GroupLoan#close => split the compulsory savings to all member. round up to 500 IDR 
+	#copy this rounding up from kkims
+	
+Before group_loan#close, they can create GroupLoanBadDebtPayment => for the uncollectibles 
