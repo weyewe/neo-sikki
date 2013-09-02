@@ -215,10 +215,20 @@ describe GroupLoan do
           @gl_rar.reload 
         end
         
-        it 'should create 1 saving entry for savings deduction' do
+        it 'should have total_default_amount_receivable' do
+          @group_loan.default_payment_total_amount.should_not == BigDecimal( '0')
+          @group_loan.default_payment_total_amount.should == @run_away_glm.run_away_remaining_group_loan_payment
+        end
+        
+        it 'should create many saving entry for savings deduction' do
           total_active_glm = @group_loan.active_group_loan_memberships.count
           SavingsEntry.where(:savings_source_type => "GroupLoanDefaultPayment").count.should == total_active_glm
         end
+        
+        it 'should not do compulsory-savings deduction with 0 amount' do
+          SavingsEntry.where(:savings_source_type => "GroupLoanDefaultPayment",:amount => BigDecimal('0')).count.should == 0 
+        end
+        
         
         it 'should close the group loan' do
           @group_loan.is_closed.should be_true 

@@ -358,6 +358,7 @@ Phase: loan disbursement finalization
     end
   end
   
+ 
   def close
     if self.group_loan_weekly_collections.where(:is_confirmed => true, :is_collected => true).count != self.number_of_collections
       self.errors.add(:generic_errors, "Ada Pengumpulan mingguan yang belum selesai")

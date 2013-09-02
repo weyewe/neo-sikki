@@ -2,3 +2,8 @@ GroupLoan#close => split the compulsory savings to all member. round up to 500 I
 	#copy this rounding up from kkims
 	
 Before group_loan#close, they can create GroupLoanBadDebtPayment => for the uncollectibles 
+
+
+TODO:
+1. test the round up mechanism in the group loan default payment
+2. 
