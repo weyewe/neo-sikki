@@ -4,6 +4,7 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
   validates_presence_of :group_loan_id, :week_number 
   
   has_many :group_loan_run_away_receivables 
+  has_many :group_loan_weekly_uncollectibles 
   
   
   def first_non_collected?
@@ -174,7 +175,7 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
   end
   
   def extract_uncollectable_weekly_payment_amount 
-    return BigDecimal('0')
+    self.group_loan_weekly_uncollectibles.sum("amount")
   end
   
   def amount_receivable 

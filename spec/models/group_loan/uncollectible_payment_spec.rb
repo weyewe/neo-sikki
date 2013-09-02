@@ -87,6 +87,8 @@ describe GroupLoan do
     @group_loan.reload
     
     @first_group_loan_weekly_collection = @group_loan.group_loan_weekly_collections.order("id ASC").first
+    @second_group_loan_weekly_collection = @group_loan.group_loan_weekly_collections.order("id ASC")[1]
+    @third_group_loan_weekly_collection = @group_loan.group_loan_weekly_collections.order("id ASC")[2]
     @first_group_loan_weekly_collection.should be_valid 
     @first_group_loan_weekly_collection.collect(
       {
@@ -97,7 +99,10 @@ describe GroupLoan do
     @first_group_loan_weekly_collection.is_collected.should be_true
     @first_group_loan_weekly_collection.confirm
     @first_group_loan_weekly_collection.reload
-    
+    @second_group_loan_weekly_collection.reload 
+    @uncollectible_glm = @group_loan.active_group_loan_memberships[0] 
+    @second_uncollectible_glm = @group_loan.active_group_loan_memberships[1] 
+    @third_uncollectible_glm = @group_loan.active_group_loan_memberships[2] 
   end
   
   
@@ -105,6 +110,172 @@ describe GroupLoan do
     @first_group_loan_weekly_collection.is_collected.should be_true 
     @first_group_loan_weekly_collection.is_confirmed.should be_true 
   end
+  
+  it 'should create uncollectible_weekly_payment for first due weekly_collection' do
+    @gl_wu =GroupLoanWeeklyUncollectible.create_object({
+      :group_loan_id => @group_loan.id,
+      :group_loan_membership_id => @uncollectible_glm.id ,
+      :group_loan_weekly_collection_id => @second_group_loan_weekly_collection.id 
+    })
+    
+    @gl_wu.should be_valid 
+  end
+  
+  it 'should not create uncollectible_weekly_payment for the confirmed week' do
+    @gl_wu = GroupLoanWeeklyUncollectible.create_object({
+      :group_loan_id => @group_loan.id,
+      :group_loan_membership_id => @uncollectible_glm.id ,
+      :group_loan_weekly_collection_id => @first_group_loan_weekly_collection.id  
+    })
+    
+    @gl_wu.should_not be_valid
+  end
+  
+  it 'should not create double uncollectible weekly payment' do
+    @gl_wu =GroupLoanWeeklyUncollectible.create_object({
+      :group_loan_id => @group_loan.id,
+      :group_loan_membership_id => @uncollectible_glm.id ,
+      :group_loan_weekly_collection_id => @second_group_loan_weekly_collection.id  
+    })
+    
+    @gl_wu.should be_valid
+    
+    @gl_wu =GroupLoanWeeklyUncollectible.create_object({
+      :group_loan_id => @group_loan.id,
+      :group_loan_membership_id => @uncollectible_glm.id ,
+      :group_loan_weekly_collection_id => @second_group_loan_weekly_collection.id  
+    })
+    
+    @gl_wu.should_not  be_valid
+  end
+  
+  it 'should not create uncollectible_weekly_payment for the non first uncollected week' do
+    @gl_wu = GroupLoanWeeklyUncollectible.create_object({
+      :group_loan_id => @group_loan.id,
+      :group_loan_membership_id => @uncollectible_glm.id ,
+      :group_loan_weekly_collection_id => @third_group_loan_weekly_collection.id  
+    })
+    
+    @gl_wu.should_not be_valid
+  end
+  
+  context "updating the uncollectible's glm id" do
+    before(:each) do
+      @first_gl_wu = GroupLoanWeeklyUncollectible.create_object({
+        :group_loan_id => @group_loan.id,
+        :group_loan_membership_id => @uncollectible_glm.id ,
+        :group_loan_weekly_collection_id => @second_group_loan_weekly_collection.id   
+      })
+      
+      @second_gl_wu = GroupLoanWeeklyUncollectible.create_object({
+        :group_loan_id => @group_loan.id,
+        :group_loan_membership_id => @second_uncollectible_glm.id ,
+        :group_loan_weekly_collection_id => @second_group_loan_weekly_collection.id  
+      })
+    end
+    
+    it 'should create first_gl_wu and second_gl_wu ' do
+      @first_gl_wu.should be_valid 
+      @second_gl_wu.should be_valid 
+    end
+    
+    it 'should allow update to the second_gl_wu' do
+      @second_gl_wu.update_object({
+        :group_loan_id => @group_loan.id,
+        :group_loan_membership_id => @third_uncollectible_glm.id ,
+        :group_loan_weekly_collection_id => @second_group_loan_weekly_collection.id 
+      })
+      
+      @second_gl_wu.should be_valid 
+       
+       
+      @second_gl_wu.group_loan_membership.id.should == @third_uncollectible_glm.id
+    end
+    
+    it 'should not allow update to the first_gl_wu (create 2 uncollectibles with equal glm_id)' do
+      @second_gl_wu.update_object({
+        :group_loan_id => @group_loan.id,
+        :group_loan_membership_id => @uncollectible_glm.id ,
+        :group_loan_weekly_collection_id => @second_group_loan_weekly_collection.id 
+      })
+      
+      @second_gl_wu.should_not be_valid 
+    end
+  end
+  
+  
+  context "create one uncollectible: impact on the weekly_collection amount" do
+    before(:each) do
+      @initial_amount_receivable = @second_group_loan_weekly_collection.amount_receivable
+      
+      @initial_extract_uncollectable_weekly_payment_amount = @second_group_loan_weekly_collection.extract_uncollectable_weekly_payment_amount
+      @first_gl_wu = GroupLoanWeeklyUncollectible.create_object({
+        :group_loan_id => @group_loan.id,
+        :group_loan_membership_id => @uncollectible_glm.id ,
+        :group_loan_weekly_collection_id => @second_group_loan_weekly_collection.id   
+      })
+      @group_loan.reload 
+    end
+    
+    it 'should produce 0 for the initial_uncollectable_payment_amount' do
+      @initial_extract_uncollectable_weekly_payment_amount.should == BigDecimal('0')
+    end
+    
+    it 'should create valid gl_wu' do
+      @first_gl_wu.should be_valid 
+    end
+    
+    it 'should reduce the weekly_collection amount' do
+      final_amount_receivable = @second_group_loan_weekly_collection.amount_receivable
+      diff = @initial_amount_receivable - final_amount_receivable
+      diff.should == @uncollectible_glm.group_loan_product.weekly_payment_amount
+    end
+    
+    it 'should not update default_payment amount_receivable pre-weekly_collection confirmation' do
+      @group_loan.active_group_loan_memberships.joins(:group_loan_default_payment).each do |glm|
+        glm.group_loan_default_payment.amount_receivable.should == BigDecimal('0')
+      end
+    end
+    
+    context "confirming the weekly_collection with group_loan_weekly_uncollectible" do
+      before(:each) do
+        @second_group_loan_weekly_collection.collect({
+          :collection_datetime => DateTime.now 
+        })
+        
+        @second_group_loan_weekly_collection.confirm 
+        @group_loan.reload 
+      end
+      
+      it 'should confirm the second_group_loan_weekly_collection' do
+        @second_group_loan_weekly_collection.is_confirmed.should be_true 
+      end
+      
+      it 'should update the group_loan_default_payment amount_receivable' do
+        @group_loan.active_group_loan_memberships.joins(:group_loan_default_payment).each do |glm|
+          glm.group_loan_default_payment.amount_receivable.should_not == BigDecimal('0')
+        end
+      end
+      
+      it 'should produce equal splitting' do
+        # GroupLoan.rounding_up(amount,  nearest_amount ) 
+        total_default_amount = @uncollectible_glm.group_loan_product.weekly_payment_amount 
+        share_per_member= total_default_amount/@group_loan.active_group_loan_memberships.count 
+        
+        expected_amount_receivable  = GroupLoan.rounding_up( share_per_member, DEFAULT_PAYMENT_ROUND_UP_VALUE)
+        
+        @group_loan.active_group_loan_memberships.joins(:group_loan_default_payment).each do |glm|
+          glm.group_loan_default_payment.amount_receivable.should == expected_amount_receivable
+        end
+      end
+     
+    end
+    
+    
+  end
+  
+  
+  
   
   
 end

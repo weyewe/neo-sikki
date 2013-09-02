@@ -4,6 +4,7 @@ class GroupLoan < ActiveRecord::Base
   has_many :members, :through => :group_loan_memberships 
   has_many :group_loan_memberships 
   has_many :group_loan_weekly_collections 
+  has_many :group_loan_weekly_uncollectibles 
   
   has_many :group_loan_run_away_receivables
   has_many :group_loan_run_away_receivable_payments 
@@ -305,6 +306,13 @@ Phase: loan disbursement finalization
         where(:payment_case => GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:end_of_cycle]).
         sum('amount_receivable')
         
+        
+    # contribution from the uncollectibles
+    total_amount += self.group_loan_weekly_uncollectibles.sum("amount")
+    
+    
+    total_amount
+        
   end
   
   
@@ -315,9 +323,9 @@ Phase: loan disbursement finalization
   
   def update_default_payment_amount_receivable  
     # update the default_payment#amount_receivable on 
-    # 1. weekly_payment_collection#confirm 
-    # 2. PrematureClearance#confirm 
-    # 3. GroupLoanAdditionalDefaultPayment#confirm 
+    # 1. weekly_payment_collection#confirm  => effect from run away and uncollectible will take place 
+    # 2. PrematureClearance#confirm  => should this be ported to be done inside weekly_payment_collection? 
+    # 3. GroupLoanAdditionalDefaultPayment#confirm  => this is right. 
 
     total_amount = self.default_payment_total_amount
      
