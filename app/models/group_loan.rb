@@ -272,10 +272,10 @@ Phase: loan disbursement finalization
   
   def deduct_compulsory_savings_for_unsettled_default
     # if the member's compulsory savings is not sufficient, calculate that as office's bad debt expense 
-    return if total_active_glm == 0
+    return if self.active_group_loan_memberships.count == 0
     
-    self.active_group_loan_memberships.joins(:group_loan_default_payment).each do |default_payment|
-      default_payment.execute_compulsory_savings_deduction 
+    self.active_group_loan_memberships.joins(:group_loan_default_payment).each do |glm|
+      glm.group_loan_default_payment.execute_compulsory_savings_deduction 
     end
     
     # self.update_bad_expense_debt 
@@ -336,7 +336,7 @@ Phase: loan disbursement finalization
     
     self.active_group_loan_memberships.joins(:group_loan_default_payment).each do |glm| 
         
-        default_payment = glm.default_payment 
+        default_payment = glm.group_loan_default_payment 
         default_payment.amount_receivable = self.class.rounding_up(splitted_amount, DEFAULT_PAYMENT_ROUND_UP_VALUE)
         default_payment.save 
     end

@@ -10,6 +10,9 @@ class GroupLoanDefaultPayment < ActiveRecord::Base
   attr_accessible :group_loan_id, :group_loan_membership_id 
   belongs_to :group_loan
   belongs_to :group_loan_membership 
+  has_many :transaction_activities, :as => :transaction_source 
+  has_many :savings_entries, :as => :savings_source
+  
   
   def execute_compulsory_savings_deduction
     return if self.amount_receivable <=  BigDecimal('0')

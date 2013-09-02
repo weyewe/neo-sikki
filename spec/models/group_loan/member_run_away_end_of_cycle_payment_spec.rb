@@ -165,6 +165,7 @@ describe GroupLoan do
           @second_group_loan_weekly_collection.collect(:collection_datetime => DateTime.now)
           @second_group_loan_weekly_collection.confirm 
           
+          @initial_run_away_amount_received = @group_loan.run_away_amount_received
           @group_loan.reload
           @group_loan.close
           @group_loan.reload
@@ -177,11 +178,13 @@ describe GroupLoan do
           @gl_rar.group_loan_run_away_receivable_payments.count.should == 0 
         end
         
-       
+        it 'should NOT  increase amount_received @group_loan'  do
+          final_run_away_amount_received = @group_loan.run_away_amount_received
+          diff = final_run_away_amount_received - @initial_run_away_amount_received
+          
+          diff == BigDecimal('0')
+        end
         
-        it 'should NOT  update amount_received @group_loan'  
-        
-     
         it "can't change payment case  after a payment has been made" do
           @gl_rar.set_payment_case({
             :payment_case => GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:weekly]
@@ -212,6 +215,11 @@ describe GroupLoan do
           @gl_rar.reload 
         end
         
+        it 'should create 1 saving entry for savings deduction' do
+          total_active_glm = @group_loan.active_group_loan_memberships.count
+          SavingsEntry.where(:savings_source_type => "GroupLoanDefaultPayment").count.should == total_active_glm
+        end
+        
         it 'should close the group loan' do
           @group_loan.is_closed.should be_true 
         end
@@ -223,9 +231,9 @@ describe GroupLoan do
           end
         end
         
-        # it 'should create  1 run_away_receivable_payment' do
-        #   @gl_rar.group_loan_run_away_receivable_payments.count.should == 1
-        # end
+        it 'should create  0 run_away_receivable_payment' do
+          @gl_rar.group_loan_run_away_receivable_payments.count.should == 0
+        end
       end
 
     end
