@@ -100,4 +100,14 @@ class GroupLoanWeeklyUncollectible < ActiveRecord::Base
     self.update_amount if self.save  
   end
   
+  def delete_object
+    if group_loan_weekly_collection.is_collected? or 
+      group_loan_weekly_collection.is_collected?
+      self.errors.add(:generic_errors, "Kumpulan mingguan sudah terlaksana")
+      return self 
+    end
+    
+    self.destroy 
+  end
+  
 end

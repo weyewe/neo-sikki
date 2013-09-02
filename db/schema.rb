@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20130902023420) do
+ActiveRecord::Schema.define(version: 20130902112630) do
 
   create_table "deceased_principal_receivables", force: true do |t|
     t.integer  "member_id"
@@ -56,6 +56,15 @@ ActiveRecord::Schema.define(version: 20130902023420) do
     t.integer  "group_loan_id"
     t.integer  "group_loan_membership_id"
     t.integer  "member_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "group_loan_premature_clearance_payments", force: true do |t|
+    t.integer  "group_loan_id"
+    t.integer  "group_loan_membership_id"
+    t.integer  "group_loan_weekly_collection_id"
+    t.decimal  "amount",                          precision: 12, scale: 2, default: 0.0
     t.datetime "created_at"
     t.datetime "updated_at"
   end

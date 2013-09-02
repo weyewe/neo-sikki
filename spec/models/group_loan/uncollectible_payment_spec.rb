@@ -237,6 +237,11 @@ describe GroupLoan do
       end
     end
     
+    it 'should be deletable' do
+      @first_gl_wu.delete_object
+      @first_gl_wu.persisted?.should be_false 
+    end
+    
     context "confirming the weekly_collection with group_loan_weekly_uncollectible" do
       before(:each) do
         @second_group_loan_weekly_collection.collect({
@@ -245,8 +250,17 @@ describe GroupLoan do
         
         @second_group_loan_weekly_collection.confirm 
         @group_loan.reload 
+        @first_gl_wu.reload 
       end
       
+      
+       it 'should NOT be deletable' do
+          @first_gl_wu.delete_object
+          @first_gl_wu.errors.size.should_not == 0 
+          @first_gl_wu.persisted?.should be_true  
+        end
+        
+        
       it 'should confirm the second_group_loan_weekly_collection' do
         @second_group_loan_weekly_collection.is_confirmed.should be_true 
       end
@@ -270,13 +284,6 @@ describe GroupLoan do
       end
      
     end
-    
-    
   end
-  
-  
-  
-  
-  
 end
 
