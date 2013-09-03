@@ -18,6 +18,7 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
   validates_uniqueness_of :group_loan_membership_id 
   
   validate :group_loan_weekly_collection_must_be_uncollected
+  validate :next_weekly_collection_must_be_available # reason: the deactivation will start from next week
   
   
   def all_fields_present?
@@ -42,6 +43,18 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
       return self 
     end
     
+  end
+  
+  def next_weekly_collection_must_be_available
+    return if not all_fields_present? 
+    current_weekly_collection = group_loan_weekly_collection
+    next_weekly_collection = group_loan.group_loan_weekly_collections.
+                                where(:week_number => current_weekly_collection.week_number + 1 )
+                                
+    if next_weekly_collection.nil?
+      self.errors.add(:group_loan_weekly_collection_id , "Tidak ada pengumpulan minggu #{current_weekly_collection.week_number + 1 }")
+      return self 
+    end
   end
   
   def self.create_object(params)
@@ -90,11 +103,13 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
     # example: premature_clearance is applied@week_2. If there are total 8 installments,
     # then, week 2 has to be paid full. and 6*principal has to be returned
     # plus + default payment 
-    total_unpaid_week = group_loan.number_of_collections - group_loan.first_uncollected_weekly_collection.week_number   
+    total_unpaid_week = group_loan.number_of_collections - 
+                    group_loan.first_uncollected_weekly_collection.week_number   
     total_principal =  group_loan_membership.group_loan_product.principal * total_unpaid_week
+    
     self.amount = total_principal + 
-                  group_loan_membership.group_loan_default_payment.amount_receivable + 
-                  group_loan_membership.group_loan_product.weekly_payment_amount 
+                  group_loan_membership.group_loan_default_payment.amount_receivable # + 
+                  # group_loan_membership.group_loan_product.weekly_payment_amount 
     self.save 
   end
   
@@ -124,7 +139,7 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
     glm = self.group_loan_membership
     glm.is_active = false 
     glm.deactivation_case =  GROUP_LOAN_DEACTIVATION_CASE[:premature_clearance]
-    glm.deactivation_week_number = self.group_loan_weekly_collection.week_number 
+    glm.deactivation_week_number = self.group_loan_weekly_collection.week_number + 1 
     glm.save 
     
     puts "premature_clearance#confirm: transaction activities and saving_entries must be created"
