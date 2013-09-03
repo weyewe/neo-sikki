@@ -187,10 +187,16 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
     self.group_loan_weekly_uncollectibles.sum("amount")
   end
   
+  def extract_premature_clearance_payment_amount
+    puts "We have not implemented: weekly_collection.extract_premature_clearance_amount"
+    return self.group_loan_premature_clearance_payments.sum("amount")
+    # return BigDecimal('0')
+  end
+  
   def amount_receivable 
-    
     total_amount =  extract_base_amount + 
-                    extract_run_away_weekly_resolution_amount - 
+                    extract_run_away_weekly_resolution_amount + 
+                    extract_premature_clearance_payment_amount - 
                     extract_uncollectable_weekly_payment_amount 
     
     return total_amount 

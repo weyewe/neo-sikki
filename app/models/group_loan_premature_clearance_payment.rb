@@ -82,18 +82,33 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
     self.destroy 
   end
   
+  
+  # manifested in the group loan clearance payment 
   def update_amount
-    total_unpaid_week = group_loan.number_of_collections - group_loan.first_uncollected_weekly_collection.week_number + 1 
+    # the current week is not counted. it has to be paid in full.
+    # plus 1 because the current week where premature_clearance is applied has to be paid full 
+    # example: premature_clearance is applied@week_2. If there are total 8 installments,
+    # then, week 2 has to be paid full. and 6*principal has to be returned
+    # plus + default payment 
+    total_unpaid_week = group_loan.number_of_collections - group_loan.first_uncollected_weekly_collection.week_number   
     total_principal =  group_loan_membership.group_loan_product.principal * total_unpaid_week
-    self.amount = total_principal + group_loan_membership.group_loan_default_payment.amount_receivable
+    self.amount = total_principal + 
+                  group_loan_membership.group_loan_default_payment.amount_receivable + 
+                  group_loan_membership.group_loan_product.weekly_payment_amount 
     self.save 
   end
   
   def premature_clearance_amount
-    # will change week to week. 
-    total_unpaid_week = group_loan.number_of_collections - group_loan.first_uncollected_weekly_collection.week_number + 1 
+    # will change week to week.  => call this method to extract the payment clearance amount
+    # for active glm
+    total_unpaid_week = group_loan.number_of_collections - group_loan.first_uncollected_weekly_collection.week_number 
     total_principal =  group_loan_membership.group_loan_product.principal * total_unpaid_week
-    total_principal + group_loan_membership.group_loan_default_payment.amount_receivable
+    
+    
+    total_principal + 
+                  group_loan_membership.group_loan_default_payment.amount_receivable + 
+                  group_loan_membership.group_loan_product.weekly_payment_amount
+                  
   end
   
   def confirm

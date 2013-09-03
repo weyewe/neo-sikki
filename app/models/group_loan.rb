@@ -36,7 +36,7 @@ class GroupLoan < ActiveRecord::Base
     return new_object 
   end
   
-  def self.update_object( params ) 
+  def  update_object( params ) 
     return nil if self.is_started?  
       
     self.name                            = params[:name] 
