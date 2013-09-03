@@ -191,57 +191,57 @@ describe GroupLoan do
       
       @first_gl_pc.amount.should == expected_premature_clearance_payment
     end
-    # 
-    # it 'should increase the amount receivable in the group_loan_weekly_collection' do
-    #   final = @second_group_loan_weekly_collection.amount_receivable 
-    #   diff = final - @initial_weekly_collection_amount_receivable
-    #   diff.should == @first_gl_pc.amount
-    # end
-    # 
-    # it 'shoud allow deletion if the weekly_collection has not been confirmed' do
-    #   @first_gl_pc.delete_object
-    #   @first_gl_pc.persisted?.should be_false 
-    # end
-    # 
-    # it 'should not allow double creation' do
-    #   @second_gl_pc = GroupLoanPrematureClearancePayment.create_object({
-    #     :group_loan_id => @group_loan.id,
-    #     :group_loan_membership_id => @premature_clearance_glm.id ,
-    #     :group_loan_weekly_collection_id => @second_group_loan_weekly_collection.id   
-    #   })
-    #   
-    #   
-    #   @second_gl_pc.should_not be_valid 
-    # end
-    # 
-    # it 'should produce weekly_collection with one premature clearance' do
-    #   @second_group_loan_weekly_collection.group_loan_premature_clearance_payments.count.should == 1 
-    # end
     
-    # context "weekly_collection.confirm" do
-    #   before(:each) do
-    #     @second_group_loan_weekly_collection.collect(
-    #       {
-    #         :collection_datetime => DateTime.now 
-    #       }
-    #     )
-    #     
-    #     @second_group_loan_weekly_collection.confirm 
-    #     @premature_clearance_glm.reload 
-    #     @first_gl_pc.reload 
-    #   end
-    #   
-    #   it 'should confirm the clearance' do
-    #     @first_gl_pc.is_confirmed.should be_true 
-    #   end
-    #   
-    #   it 'should deactivate the membership' do
-    #     @premature_clearance_glm.is_active.should be_false
-    #     @premature_clearance_glm.deactivation_case.should == GROUP_LOAN_DEACTIVATION_CASE[:premature_clearance]
-    #     @premature_clearance_glm.deactivation_week_number.should == @second_group_loan_weekly_collection.week_number 
-    #   end
-    #    
-    # end
+    it 'should increase the amount receivable in the group_loan_weekly_collection' do
+      final = @second_group_loan_weekly_collection.amount_receivable 
+      diff = final - @initial_weekly_collection_amount_receivable
+      diff.should == @first_gl_pc.amount
+    end
+    
+    it 'shoud allow deletion if the weekly_collection has not been confirmed' do
+      @first_gl_pc.delete_object
+      @first_gl_pc.persisted?.should be_false 
+    end
+    
+    it 'should not allow double creation' do
+      @second_gl_pc = GroupLoanPrematureClearancePayment.create_object({
+        :group_loan_id => @group_loan.id,
+        :group_loan_membership_id => @premature_clearance_glm.id ,
+        :group_loan_weekly_collection_id => @second_group_loan_weekly_collection.id   
+      })
+      
+      
+      @second_gl_pc.should_not be_valid 
+    end
+    
+    it 'should produce weekly_collection with one premature clearance' do
+      @second_group_loan_weekly_collection.group_loan_premature_clearance_payments.count.should == 1 
+    end
+    
+    context "weekly_collection.confirm" do
+      before(:each) do
+        @second_group_loan_weekly_collection.collect(
+          {
+            :collection_datetime => DateTime.now 
+          }
+        )
+        
+        @second_group_loan_weekly_collection.confirm 
+        @premature_clearance_glm.reload 
+        @first_gl_pc.reload 
+      end
+      
+      it 'should confirm the clearance' do
+        @first_gl_pc.is_confirmed.should be_true 
+      end
+      
+      it 'should deactivate the membership' do
+        @premature_clearance_glm.is_active.should be_false
+        @premature_clearance_glm.deactivation_case.should == GROUP_LOAN_DEACTIVATION_CASE[:premature_clearance]
+        @premature_clearance_glm.deactivation_week_number.should == @second_group_loan_weekly_collection.week_number + 1 
+      end
+       
+    end
   end
 end
 
