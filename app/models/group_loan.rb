@@ -16,6 +16,8 @@ class GroupLoan < ActiveRecord::Base
   
   has_many :group_loan_default_payments
   
+  has_many :group_loan_premature_clearance_payments 
+  
   has_many :group_loan_weekly_tasks # weekly payment, weekly attendance  
   validates_presence_of   :name,
                           :number_of_meetings
@@ -282,6 +284,12 @@ Phase: loan disbursement finalization
     # self.update_bad_expense_debt 
   end
   
+  def cleared_default_payment_amount
+    puts " #group_loan.cleared_default_payment_amount: We have not been implemented.\n"
+    # sum of default payment made by premature payment 
+    return BigDecimal('0')
+  end
+  
   def default_payment_total_amount
     total_amount = BigDecimal('0')
     # The defaults: 
@@ -306,13 +314,12 @@ Phase: loan disbursement finalization
         where(:payment_case => GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:end_of_cycle]).
         sum('amount_receivable')
         
-        
     # contribution from the uncollectibles
     total_amount += self.group_loan_weekly_uncollectibles.sum("amount")
     
+    total_amount -= self.cleared_default_payment_amount # from member passed away. 
     
-    total_amount
-        
+    return total_amount
   end
   
   

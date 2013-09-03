@@ -4,7 +4,8 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
   validates_presence_of :group_loan_id, :week_number 
   
   has_many :group_loan_run_away_receivables 
-  has_many :group_loan_weekly_uncollectibles 
+  has_many :group_loan_weekly_uncollectibles
+  has_many :group_loan_premature_clearance_payments 
   
   
   def first_non_collected?
@@ -105,8 +106,16 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
     
     self.create_group_loan_weekly_payments 
     self.group_loan.update_default_payment_amount_receivable
+    self.confirm_premature_clearances
   end
   
+  
+  def confirm_premature_clearances
+    self.group_loan_premature_clearance_payments.each do |x|
+      x.confirm 
+    end
+  end
+ 
   # week 1: full member. week 2: 1 member run away
   # week 3 : another member run away 
   # now we are in week 3... 

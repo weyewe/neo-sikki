@@ -91,7 +91,8 @@ GROUP_LOAN_DEACTIVATION_CASE = {
   
   
   :deceased => 10,
-  :run_away => 11
+  :run_away => 11,
+  :premature_clearance => 12 
 }
 
 FUND_TRANSFER_DIRECTION = {

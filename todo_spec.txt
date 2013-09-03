@@ -7,3 +7,45 @@ Before group_loan#close, they can create GroupLoanBadDebtPayment => for the unco
 TODO:
 1. test the round up mechanism in the group loan default payment
 2. 
+
+
+What if in the same week, there are all those cases:
+1. Member Deceased
+2. Member Run Away
+3. Member Uncollectible Amount
+4. Member Premature Clearance 
+
+Solution:
+
+# Default Payment has many entries.the sum of all entries are the amount receivable . 
+# choose: heavy data or heavy logic? 
+# default payment entry is locked to the weekly_collection 
+# default payment source 
+1. Deactive deceased member << he doesn't have to pay for default payment. And default payment is assumed to be fulfilled. 
+2. Deactivate member run away  + create uncollectible << it will change the default amount receivable 
+3. Member premature clearance will need to bear the default amount from run_away and uncollectible 	
+			Member C. 
+
+How about the premature clearance is happening in week 3. 
+In week 4, there is uncollectible >> The uncollectible default amount will not be burneded to the "Member C"
+
+The information about default_loan amount_receivable is encompassing. 
+If a member wants to
+cancel his membership: just pay the default amount and the principal. Then, he is free 
+
+SOP:
+1. Create deceased member
+2. Create Member run away
+3. Create uncollectible loans 
+4. confirm weekly collection
+5. create GroupLoanPrematureClearancePayment << it means that the member has to pay for the current week
+	If it has been paid, then the premature clearance can be done 
+	
+	
+Confirmation is not needed. We have to enforce the SOP. However, what if they do the same shit? 
+
+# SPEC this shit! 
+# uncollectibe can't be created if there is premature clearance payment. 
+# deceased member can't be created if there is premature clearance payment 
+# run_away can't be created if there is premature clearance payment  => uniq glm 
+# maintain uniqueness of premature clearance payment => uniq glm. 

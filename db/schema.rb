@@ -65,6 +65,7 @@ ActiveRecord::Schema.define(version: 20130902112630) do
     t.integer  "group_loan_membership_id"
     t.integer  "group_loan_weekly_collection_id"
     t.decimal  "amount",                          precision: 12, scale: 2, default: 0.0
+    t.boolean  "is_confirmed",                                             default: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
