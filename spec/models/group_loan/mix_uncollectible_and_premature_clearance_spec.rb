@@ -105,10 +105,10 @@ describe GroupLoan do
   end
   
   
-  it 'should confirm the first group_loan_weekly_collection' do
-    @first_group_loan_weekly_collection.is_collected.should be_true 
-    @first_group_loan_weekly_collection.is_confirmed.should be_true 
-  end
+  # it 'should confirm the first group_loan_weekly_collection' do
+  #   @first_group_loan_weekly_collection.is_collected.should be_true 
+  #   @first_group_loan_weekly_collection.is_confirmed.should be_true 
+  # end
   
   context "create 1 uncollectible in the week 2" do
     before(:each) do
@@ -128,29 +128,29 @@ describe GroupLoan do
       @group_loan.reload 
     end
     
-    it 'should confirm the weekly collection' do
-      @second_group_loan_weekly_collection.is_confirmed.should be_true 
-    end
-    
-    it 'should have normal amount receivable minus the weekly_payment of uncollectible member' do
-      expected_amount = BigDecimal('0')
-      @group_loan.active_group_loan_memberships.each do |glm|
-        next if glm.id == @first_glm.id 
-        expected_amount += glm.group_loan_product.weekly_payment_amount 
-      end
-      @second_group_loan_weekly_collection.amount_receivable.should == expected_amount
-    end
-    
-    it 'should create default_payment.amount_receivable for all members' do
-      total_amount = @first_glm.group_loan_product.weekly_payment_amount 
-      splitted_amount = total_amount/@group_loan.active_group_loan_memberships.count 
-      
-      amount_per_member = GroupLoan.rounding_up(splitted_amount, DEFAULT_PAYMENT_ROUND_UP_VALUE)
-      
-      @group_loan.active_group_loan_memberships.joins(:group_loan_default_payment).each do |glm|
-        glm.group_loan_default_payment.amount_receivable.should == amount_per_member
-      end
-    end
+    # it 'should confirm the weekly collection' do
+    #   @second_group_loan_weekly_collection.is_confirmed.should be_true 
+    # end
+    # 
+    # it 'should have normal amount receivable minus the weekly_payment of uncollectible member' do
+    #   expected_amount = BigDecimal('0')
+    #   @group_loan.active_group_loan_memberships.each do |glm|
+    #     next if glm.id == @first_glm.id 
+    #     expected_amount += glm.group_loan_product.weekly_payment_amount 
+    #   end
+    #   @second_group_loan_weekly_collection.amount_receivable.should == expected_amount
+    # end
+    # 
+    # it 'should create default_payment.amount_receivable for all members' do
+    #   total_amount = @first_glm.group_loan_product.weekly_payment_amount 
+    #   splitted_amount = total_amount/@group_loan.active_group_loan_memberships.count 
+    #   
+    #   amount_per_member = GroupLoan.rounding_up(splitted_amount, DEFAULT_PAYMENT_ROUND_UP_VALUE)
+    #   
+    #   @group_loan.active_group_loan_memberships.joins(:group_loan_default_payment).each do |glm|
+    #     glm.group_loan_default_payment.amount_receivable.should == amount_per_member
+    #   end
+    # end
     
     context "declare 1 member premature clearance on week 2" do
       before(:each) do
@@ -186,76 +186,140 @@ describe GroupLoan do
         @second_glm.reload 
       end
       
-      it 'should set the deactivation week number to the next week' do
-        expected_deactivation_week_number = @gl_pc.group_loan_weekly_collection.week_number + 1 
-        expected_deactivation_week_number.should == @second_glm.deactivation_week_number
-      end
-      it 'should give normal initial_weekly_collection.amount_receivable' do
-        @initial_weekly_collection_amount_receivable.should == @normal_expected_weekly_collection_ar
-      end
+      # it 'should set the deactivation week number to the next week' do
+      #   expected_deactivation_week_number = @gl_pc.group_loan_weekly_collection.week_number + 1 
+      #   expected_deactivation_week_number.should == @second_glm.deactivation_week_number
+      # end
+      # it 'should give normal initial_weekly_collection.amount_receivable' do
+      #   @initial_weekly_collection_amount_receivable.should == @normal_expected_weekly_collection_ar
+      # end
+      # 
+      # it 'should produce base_amount equal to the calculated amount' do
+      #   @normal_expected_weekly_collection_ar.should == @third_group_loan_weekly_collection.extract_base_amount
+      # end
       
-      it 'should produce base_amount equal to the calculated amount' do
-        @normal_expected_weekly_collection_ar.should == @third_group_loan_weekly_collection.extract_base_amount
-      end
+      # it 'should produce 0 run away resolution' do
+      #   @third_group_loan_weekly_collection.extract_run_away_weekly_resolution_amount.should == BigDecimal('0')
+      # end
+      # 
+      # it 'should produce 0 run away resolution on uncollectible weekly payment' do
+      #   @third_group_loan_weekly_collection.extract_uncollectable_weekly_payment_amount.should == BigDecimal('0')
+      # end
+      # 
+      # it 'should generate non 0 in extract_premature_clearance_payment_amount' do
+      #   @third_group_loan_weekly_collection.extract_premature_clearance_payment_amount.should_not == BigDecimal('0')
+      #   premature_clearance_payment_amount = @third_group_loan_weekly_collection.extract_premature_clearance_payment_amount
+      #   
+      #   puts "\ninspection!! ========================\n\n"
+      #   puts "The premature_clearance_payment_amount: #{premature_clearance_payment_amount.to_s}"
+      #   
+      #   principal = @second_glm.group_loan_product.principal 
+      #   default_payment_amount_receivable = @second_glm.group_loan_default_payment.amount_receivable 
+      #   total_principal_return = principal*5 
+      #   puts "The weekly principal: #{principal.to_s}"
+      #   puts "The total_principal_return (remaining week * principal): #{total_principal_return.to_s}"
+      #   puts "default_payment amount_receivable: #{default_payment_amount_receivable.to_s}"
+      #   total_payment_clearance = default_payment_amount_receivable + total_principal_return
+      #   puts "  => total expected from payment_clearance: #{total_payment_clearance.to_s}"
+      #   
+      #   puts "\n Actual premature_clearance_amount: #{@third_group_loan_weekly_collection.extract_premature_clearance_payment_amount}"
+      #   
+      #   puts "\n\n END inspection!! ========================\n"
+      #   
+      #   # premature clearance payment: principal * remaining weeks  + default loan 
+      # end
       
-      it 'should produce 0 run away resolution' do
-        @third_group_loan_weekly_collection.extract_run_away_weekly_resolution_amount.should == BigDecimal('0')
-      end
+      # it 'should increase the normal_weekly_collection amount by the principal amount' do
+      #   # this is the week 3.. it means 5 more weeks' principal to be paid 
+      #   additional_amount = @second_glm.group_loan_product.principal * 5 
+      #   default_payment_amount_receivable = @second_glm.group_loan_default_payment.amount_receivable 
+      #   expected_amount_receivable = additional_amount + @initial_weekly_collection_amount_receivable + 
+      #                                 default_payment_amount_receivable
+      #   
+      #   actual_amount_receivable = @third_group_loan_weekly_collection.amount_receivable
+      #   
+      #   puts "\n\n================ inspection =========== \n"
+      #   puts "The additional_amount (5*principal): #{additional_amount.to_s}"
+      #   puts "The weekly payment for premature_clearance: #{@second_glm.group_loan_product.weekly_payment_amount.to_s}"
+      #   puts "The default payment: #{default_payment_amount_receivable.to_s}"
+      #   puts "count of active glm: #{@third_group_loan_weekly_collection.active_group_loan_memberships.count}"
+      #   
+      #   
+      #   puts "\n ==> The end result: "
+      #   puts "expected amount receivable : #{expected_amount_receivable.to_s}"
+      #   puts "actual amount receivable: #{actual_amount_receivable.to_s}"
+      #   
+      #   
+      #   
+      #   actual_amount_receivable.should == expected_amount_receivable
+      # end
       
-      it 'should produce 0 run away resolution on uncollectible weekly payment' do
-        @third_group_loan_weekly_collection.extract_uncollectable_weekly_payment_amount.should == BigDecimal('0')
-      end
-      
-      it 'should generate non 0 in extract_premature_clearance_payment_amount' do
-        @third_group_loan_weekly_collection.extract_premature_clearance_payment_amount.should_not == BigDecimal('0')
-        premature_clearance_payment_amount = @third_group_loan_weekly_collection.extract_premature_clearance_payment_amount
+      context "week 4: 1 uncollectible collection" do
+        before(:each) do
+          @initial_premature_default_payment_receivable = @second_glm.group_loan_default_payment.amount_receivable
+          @second_gl_wu = GroupLoanWeeklyUncollectible.create_object({
+            :group_loan_id => @group_loan.id,
+            :group_loan_membership_id => @third_glm.id ,
+            :group_loan_weekly_collection_id => @fourth_group_loan_weekly_collection.id   
+          })
+
+          @fourth_group_loan_weekly_collection.collect(
+            {
+              :collection_datetime => DateTime.now 
+            }
+          )
+
+          @fourth_group_loan_weekly_collection.confirm 
+          @group_loan.reload
+          @fourth_group_loan_weekly_collection.reload
+        end
         
-        puts "\ninspection!! ========================\n\n"
-        puts "The premature_clearance_payment_amount: #{premature_clearance_payment_amount.to_s}"
-        
-        principal = @second_glm.group_loan_product.principal 
-        default_payment_amount_receivable = @second_glm.group_loan_default_payment.amount_receivable 
-        total_principal_return = principal*5 
-        puts "The weekly principal: #{principal.to_s}"
-        puts "The total_principal_return (remaining week * principal): #{total_principal_return.to_s}"
-        puts "default_payment amount_receivable: #{default_payment_amount_receivable.to_s}"
-        total_payment_clearance = default_payment_amount_receivable + total_principal_return
-        puts "  => total expected from payment_clearance: #{total_payment_clearance.to_s}"
-        
-        puts "\n Actual premature_clearance_amount: #{@third_group_loan_weekly_collection.extract_premature_clearance_payment_amount}"
-        
-        puts "\n\n END inspection!! ========================\n"
-        
-        # premature clearance payment: principal * remaining weeks  + default loan 
-      end
-      
-      it 'should increase the normal_weekly_collection amount by the principal amount' do
-        # this is the week 3.. it means 5 more weeks' principal to be paid 
-        additional_amount = @second_glm.group_loan_product.principal * 5 
-        default_payment_amount_receivable = @second_glm.group_loan_default_payment.amount_receivable 
-        expected_amount_receivable = additional_amount + @initial_weekly_collection_amount_receivable + 
-                                      default_payment_amount_receivable
-        
-        actual_amount_receivable = @third_group_loan_weekly_collection.amount_receivable
-        
-        puts "\n\n================ inspection =========== \n"
-        puts "The additional_amount (5*principal): #{additional_amount.to_s}"
-        puts "The weekly payment for premature_clearance: #{@second_glm.group_loan_product.weekly_payment_amount.to_s}"
-        puts "The default payment: #{default_payment_amount_receivable.to_s}"
-        puts "count of active glm: #{@third_group_loan_weekly_collection.active_group_loan_memberships.count}"
+        it 'should confirm the third group loan weekly collection' do
+          @fourth_group_loan_weekly_collection.is_confirmed.should be_true 
+        end
         
         
-        puts "\n ==> The end result: "
-        puts "expected amount receivable : #{expected_amount_receivable.to_s}"
-        puts "actual amount receivable: #{actual_amount_receivable.to_s}"
+        it 'should have deactivate @second_glm' do
+          @second_glm.is_active.should be_false 
+          @second_glm.deactivation_week_number.should == @fourth_group_loan_weekly_collection.week_number 
+        end
         
+        it 'should not contain @second_glm as active_glm' do
+          group_loan_active_glm_id_list = @group_loan.active_group_loan_memberships.map{|x| x.id }
+          weekly_collection_active_glm_id_list = @fourth_group_loan_weekly_collection.active_group_loan_memberships.map{|x| x.id}
+          
+          group_loan_active_glm_id_list.include?(@second_glm.id ).should be_false 
+          weekly_collection_active_glm_id_list.include?(@second_glm.id).should be_false 
+        end
         
+        it 'should create amount receivable: all members except the uncollectible + premature_clearance' do
+          expected_receivable = BigDecimal('0')
+          @group_loan.active_group_loan_memberships.each do |glm|
+            next if glm.id == @second_glm.id 
+            next if glm.id == @third_glm.id 
+            expected_receivable += glm.group_loan_product.weekly_payment_amount
+          end
+
+          @fourth_group_loan_weekly_collection.amount_receivable.should == expected_receivable
+        end
+
+        it 'should not increase the amount of default payment in the premature_clearance member' do
+          @second_glm.reload 
+          @final_premature_default_payment_receivable = @second_glm.group_loan_default_payment.amount_receivable
+          diff  = @initial_premature_default_payment_receivable - @final_premature_default_payment_receivable
+          diff.should == BigDecimal('0')
+        end
         
-        actual_amount_receivable.should == expected_amount_receivable
-      end
-      
-   
-    end
+        it 'should deduct the premature_clearance default_paymnet.amount_receivable in the new default payment calculation' do
+          total_default_payment = @first_glm.group_loan_product.weekly_payment_amount +   
+                                      @third_glm.group_loan_product.weekly_payment_amount 
+          
+          expected_default_payment_remaining =  total_default_payment - @second_glm.group_loan_default_payment.amount_receivable 
+          @group_loan.default_payment_total_amount.should == expected_default_payment_remaining
+        end
+        
+      end # end of week 4
+    end # end of week 3 
     
   end # end of week 2 
   

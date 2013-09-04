@@ -252,13 +252,24 @@ describe GroupLoan do
         @group_loan.reload 
         @first_gl_wu.reload 
       end
-      
-      
-       it 'should NOT be deletable' do
-          @first_gl_wu.delete_object
-          @first_gl_wu.errors.size.should_not == 0 
-          @first_gl_wu.persisted?.should be_true  
-        end
+
+
+      it 'should NOT be deletable' do
+        @first_gl_wu.delete_object
+        @first_gl_wu.errors.size.should_not == 0 
+        @first_gl_wu.persisted?.should be_true  
+      end
+
+      it 'should not allow creation of uncollectible' do
+        @second_uncollectible_glm = @group_loan.active_group_loan_memberships.last 
+        @second_gl_wu = GroupLoanWeeklyUncollectible.create_object({
+          :group_loan_id => @group_loan.id,
+          :group_loan_membership_id => @second_uncollectible_glm.id ,
+          :group_loan_weekly_collection_id => @second_group_loan_weekly_collection.id   
+        })
+        
+        @second_gl_wu.should_not be_valid 
+      end
         
         
       it 'should confirm the second_group_loan_weekly_collection' do

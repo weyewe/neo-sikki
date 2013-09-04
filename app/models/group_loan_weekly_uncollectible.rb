@@ -10,6 +10,7 @@ class GroupLoanWeeklyUncollectible < ActiveRecord::Base
   
   validate :uniq_weekly_collection_and_membership
   validate :use_first_uncollected_weekly_collection
+  validate :no_creation_if_weekly_collection_is_confirmed
   
   def all_fields_present?
     group_loan_weekly_collection_id.present? and 
@@ -64,6 +65,14 @@ class GroupLoanWeeklyUncollectible < ActiveRecord::Base
       msg = "Pengumpulan minggu #{group_loan_weekly_collection.week_number} telah ditutup"
       self.errors.add(:group_loan_weekly_collection_id , msg  )
       return self 
+    end
+  end
+  
+  def no_creation_if_weekly_collection_is_confirmed
+    return if not all_fields_present? 
+    
+    if group_loan_weekly_collection.is_collected?
+      self.errors.add(:group_loan_weekly_collection_id, "Sudah terkonfirmasi. Tidak bisa ditambah.")
     end
   end
   

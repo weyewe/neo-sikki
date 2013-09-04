@@ -285,9 +285,17 @@ Phase: loan disbursement finalization
   end
   
   def cleared_default_payment_amount
-    puts " #group_loan.cleared_default_payment_amount: We have not been implemented.\n"
+    # puts " #group_loan.cleared_default_payment_amount: We have not been implemented.\n"
     # sum of default payment made by premature payment 
-    return BigDecimal('0')
+    sum = BigDecimal('0')
+    
+    self.group_loan_memberships.where(
+      :is_active => false, 
+      :deactivation_case => GROUP_LOAN_DEACTIVATION_CASE[:premature_clearance]
+      ).each do |glm|
+        sum += glm.group_loan_default_payment.amount_receivable 
+    end
+    return sum #  BigDecimal('0')
   end
   
   def default_payment_total_amount

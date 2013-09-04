@@ -49,3 +49,14 @@ Confirmation is not needed. We have to enforce the SOP. However, what if they do
 # deceased member can't be created if there is premature clearance payment 
 # run_away can't be created if there is premature clearance payment  => uniq glm 
 # maintain uniqueness of premature clearance payment => uniq glm. 
+
+
+Todo: 
+continue with the mix_uncollectible_and_premature_clearance_spec.rb :
+week 2 : 1 uncollectible
+week 3 : 1 premature_clearance
+week 4 : 1 uncollectible  << spec this ! : the amount of $$ is divided among active members. 
+		SHIT. we have a problem over  here. 
+		
+			Total amount = total default - default_payment_cleared , splitted to all members
+
