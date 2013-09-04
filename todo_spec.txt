@@ -60,3 +60,76 @@ week 4 : 1 uncollectible  << spec this ! : the amount of $$ is divided among act
 		
 			Total amount = total default - default_payment_cleared , splitted to all members
 
+
+Success spec. ,
+
+What are the other concern? 
+run away (on the same week, or end_of_cycle), deceased, uncollectible, premature_clearance 
+
+
+
+# the spec is done.. 
+#	next step: UI work
+
+how should the UI be done? 
+0. Corner Cases 
+	a. Create deceased member => we haven't created the payment 
+	b. Create premature clearance
+	c. Create RunAwayMember
+	d. Create Uncollectible 
+	
+1. Master Data   => priority #1 
+	a. create the User + add role 
+	b. Create Group Loan Product
+	c. Create Member 
+	
+	
+2. Group Loan   => priority # 2 
+	a. Create the GroupLoan  => assign group_leader
+	b. Create GroupLoanMembership  (add group loan product) 
+	c. Start GroupLoan => print the pdf (member list)
+	c. disburse loan => prior to this, they can deactivate member. (haven't coded this)
+	
+3. Weekly Payment Cycle   => priority #3 
+
+4. Savings => create savings, create withdrawal (savings_account)
+
+
+============================ the segmentation 
+1. Loan Management
+	1.1 Setup Loan: GroupLoanProduct, GroupLoan(create + start + select), GroupLoanMembership, 
+									assign group loan to the AccountOfficer 
+	
+	1.2 Operational: Deactivate GLM prior to LoanDisbursement, Perform Disbursement << admin
+									Add Uncollectible,
+									Confirm Weekly Collection,
+									See DefaultPayment report 
+		
+	
+2. Office Management 
+	2.1.	Create User 
+	2.2.	See report  (low priority) => Loan progress. How many loan in the 25% percentile. How many in 50% percentile, how many in 75-100?  => How can we measure completion? from the progress 
+	
+3. Central Admin 
+	3.1 Corner Cases : Deceased Member, Run Away member (fatal)
+	
+	
+	TODO: update default payment ON run_away creation, deceased member, and uncollectible. << Create, Update, Destroy. It will break some spec. 
+	
+	
+	RUN AWAY = deactivate member
+	Deceased = deactivate member >> ok. perform 3 updates. 
+	
+	
+	
+STILL premature clearance.. if there is run-away member in week 3, end_of_cycle payment, and premature clearance in week 2, how can we calculate the clearance payment amount ? 
+		=> clearance_amount == principal*weeks_left + default payment 
+
+If there is run-away in week 2, weekly_payment, and premature clearance in week 3, how can we calculate the clearance payment amount? 
+		=> clearance_amount = principal*weeks_left + default_payment + sum_of_all_weekly_from run_away that is paid weekly by his payment clearance application week / active_group_loan_memberships including him 
+		
+		
+		
+# 	@group_loan_run_away_receivable.update the fucking amount. 
+		
+

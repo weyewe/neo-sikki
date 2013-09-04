@@ -341,6 +341,9 @@ Phase: loan disbursement finalization
   #   2. Uncollectable weekly collection 
   
   
+  # glm.group_loan_default_payment.amount_receivable => total split must be paid 
+  # glm.group_loan_default_payment.amount_received == payment 
+  
   def update_default_payment_amount_receivable  
     # update the default_payment#amount_receivable on 
     # 1. weekly_payment_collection#confirm  => effect from run away and uncollectible will take place 
@@ -350,11 +353,16 @@ Phase: loan disbursement finalization
     total_amount = self.default_payment_total_amount
      
     amount_to_be_deducted  = BigDecimal('0')
-    if self.total_compulsory_savings < total_amount 
-      amount_to_be_deducted = self.total_compulsory_savings
-    else # case total_compulsory_savings => total_amount 
-      amount_to_be_deducted = total_amount
-    end
+    
+    # we don't need to think whether member can pay for it.. just show the amount to be paid. 
+    # to pay or not to pay is another matter. 
+    # if self.total_compulsory_savings < total_amount 
+    #   amount_to_be_deducted = self.total_compulsory_savings
+    # else # case total_compulsory_savings => total_amount 
+    #   amount_to_be_deducted = total_amount
+    # end
+    
+    amount_to_be_deducted = total_amount
     
     total_active_glm = self.active_group_loan_memberships.count 
     

@@ -99,6 +99,8 @@ class GroupLoanMembership < ActiveRecord::Base
     paid_weeks_count = self.group_loan_weekly_payments.count 
     
     (total_weeks - paid_weeks_count ) * group_loan_product.weekly_payment_amount
+    
+    # for the default payment, will be recalculated, reducing the pool of default bearer. 
   end
   
 end

@@ -19,6 +19,9 @@ class CreateGroupLoans < ActiveRecord::Migration
       
       
       # if there is member running away, do this shite. 
+      # why do we need it? Won't it all be encompassed inside the default_payment? 
+      
+      # fuck it.. just leave it as it is.. I can't recall why it was coded 
       t.decimal :run_away_amount_receivable, :default       => 0, :precision => 9, :scale => 2
       t.decimal :run_away_amount_received , :default       => 0, :precision => 9, :scale => 2
       
