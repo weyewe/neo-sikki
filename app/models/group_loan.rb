@@ -327,7 +327,12 @@ Phase: loan disbursement finalization
     
     total_amount -= self.cleared_default_payment_amount # from member passed away. 
     
-    return total_amount
+    if total_amount < BigDecimal('0')
+      return BigDecimal('0')
+    else
+      return total_amount
+    end
+    
   end
   
   
