@@ -131,5 +131,27 @@ If there is run-away in week 2, weekly_payment, and premature clearance in week 
 		
 		
 # 	@group_loan_run_away_receivable.update the fucking amount. 
+
+
+===================== run_away mixed with premature clearance 
+
+Total weeks == 8 weeks
+week 2 == run away , member C  => weekly payment  (not end of cycle) 
+week 3 == premature_clearnce , member D pays full week 3 payment + contribution for week 3 run away.  
+					premature_clearance_amount: 	5* principal + 
+										5 weeks * weekly_run_away_amount / 7  (himself included) << rounded_up 
+in the premature_clearane => extract_weekly_payment_share				
+										
+On week 4 = each active member pay for run_away, adjusted after the premature_clearance 
+
+extract_weekly_run_away amount = GroupLoan.rounding_up( 
+			total_weekly_run_away - premature_weekly_for_single_group, BigDecimal('500')
+			) 
+			
+			
+Next thing to be tested: what if run_away, uncollectible, deceased, and premature clearance is happening
+in the same week?  FUK.
+
+
 		
 

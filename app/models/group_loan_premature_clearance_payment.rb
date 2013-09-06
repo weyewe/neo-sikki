@@ -29,8 +29,9 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
   
   def group_loan_weekly_collection_must_be_uncollected
     return if not all_fields_present?
-    return if self.persisted? and self.group_loan_weekly_collection.is_confirmed? 
-    
+    # puts "is it confirmed?"
+    return if self.group_loan_weekly_collection.is_confirmed?   
+    # puts "the group loan weekly collection is not confirmed "
     first_uncollected = group_loan.first_uncollected_weekly_collection
     
     if not first_uncollected.present?
@@ -104,33 +105,80 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
     # then, week 2 has to be paid full. and 6*principal has to be returned
     # plus + default payment 
     total_unpaid_week = group_loan.number_of_collections - 
-                    group_loan.first_uncollected_weekly_collection.week_number   
+                    group_loan_weekly_collection.week_number 
     total_principal =  group_loan_membership.group_loan_product.principal * total_unpaid_week
     
+    
+    
+    total_run_away_weekly_payment_share = self.extract_run_away_default_weekly_payment_share * total_unpaid_week
+    
+    #  it will work in the case if there is run_away member 
+    # and the payment is end_of_cycle => the default amount is shared inside 
+    # group_loan_default_payment.amount_receivable 
+    
+    # remaining_weeks = group_loan.number_of_collections - group_loan_weekly_collection.week_number 
     self.amount = total_principal + 
-                  group_loan_membership.group_loan_default_payment.amount_receivable # + 
-                  # group_loan_membership.group_loan_product.weekly_payment_amount 
+                  group_loan_membership.group_loan_default_payment.amount_receivable  + 
+                  total_run_away_weekly_payment_share
+                  
+    # we have to account for those run away with weekly payment. 
     self.save 
   end
   
-  def premature_clearance_amount
-    # will change week to week.  => call this method to extract the payment clearance amount
-    # for active glm
-    total_unpaid_week = group_loan.number_of_collections - group_loan.first_uncollected_weekly_collection.week_number 
-    total_principal =  group_loan_membership.group_loan_product.principal * total_unpaid_week
+  def extract_run_away_default_weekly_payment_share 
+    # puts "************* inside the extraction of run_away_default_payment_share"
+    current_glm = group_loan_membership 
+    deactivation_week = group_loan_weekly_collection.week_number + 1 
+    amount = BigDecimal('0')
     
     
-    total_principal + 
-                  group_loan_membership.group_loan_default_payment.amount_receivable + 
-                  group_loan_membership.group_loan_product.weekly_payment_amount
-                  
+    weekly_run_away_glm_list =  group_loan.group_loan_memberships.joins(:group_loan_run_away_receivable, :group_loan_product).where{
+      ( is_active.eq false ) & 
+      ( deactivation_case.eq GROUP_LOAN_DEACTIVATION_CASE[:run_away]) & 
+      ( deactivation_week_number.lt  deactivation_week) & 
+      ( group_loan_run_away_receivable.payment_case.eq GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:weekly]) 
+    }
+    
+    
+    # glm_count = group_loan.group_loan_memberships.joins(:group_loan_run_away_receivable, :group_loan_product).where{
+    #   ( is_active.eq false ) & 
+    #   ( deactivation_case.eq GROUP_LOAN_DEACTIVATION_CASE[:run_away]) & 
+    #   ( deactivation_week_number.lt  deactivation_week) & 
+    #   ( group_loan_run_away_receivable.payment_case.eq GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:weekly]) 
+    # }.count 
+    
+    glm_count = weekly_run_away_glm_list.count 
+    
+    # puts "The glm_count: #{glm_count}"
+    
+    # group_loan.group_loan_memberships.joins(:group_loan_run_away_receivable, :group_loan_product).where{
+    #   ( is_active.eq false ) & 
+    #   ( deactivation_case.eq GROUP_LOAN_DEACTIVATION_CASE[:run_away]) & 
+    #   ( deactivation_week_number.lt  deactivation_week ) & 
+    #   ( group_loan_run_away_receivable.payment_case.eq GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:weekly]) 
+    # }.each do |glm|
+    #   amount += glm.group_loan_product.weekly_payment_amount  
+    # end
+    
+    weekly_run_away_glm_list.each do |glm|
+      amount += glm.group_loan_product.weekly_payment_amount
+    end
+    
+    share_amount = amount / group_loan_weekly_collection.active_group_loan_memberships.count 
+    
+    # puts "***end of extraction"
+    
+    return GroupLoan.rounding_up( share_amount, DEFAULT_PAYMENT_ROUND_UP_VALUE)
   end
+  
+  
   
   def confirm
     if self.is_confirmed?
       self.errors.add(:generic_errors, "Sudah konfirmasi")
       return self
     end
+    
     
     
     self.is_confirmed = true 

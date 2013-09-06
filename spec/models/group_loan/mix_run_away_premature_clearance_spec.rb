@@ -131,6 +131,13 @@ describe GroupLoan do
       @first_run_away.payment_case.should == GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:weekly]
     end
     
+    it 'should set appropriate run_away deactivation case' do
+      glm = @first_run_away.group_loan_membership
+      glm.is_active.should be_false
+      glm.deactivation_case.should == GROUP_LOAN_DEACTIVATION_CASE[:run_away]
+      glm.deactivation_week_number.should == @second_group_loan_weekly_collection.week_number 
+    end
+    
     it 'should deactivate the glm' do
       @final_glm_count = @group_loan.active_group_loan_memberships.count 
       
@@ -144,72 +151,316 @@ describe GroupLoan do
         glm.group_loan_default_payment.amount_receivable.should == BigDecimal('0')
       end
     end
+    
+    context "create premature clearance in week 3" do 
+      before(:each) do
+        @second_group_loan_weekly_collection.collect(
+          {
+            :collection_datetime => DateTime.now 
+          }
+        )
+        @second_group_loan_weekly_collection.confirm 
+        
+        @group_loan.reload 
+        # second_glm wants to do premature clearance 
+        @first_run_away.reload 
+        
+        @gl_pc = GroupLoanPrematureClearancePayment.create_object({
+          :group_loan_id => @group_loan.id,
+          :group_loan_membership_id => @second_glm.id ,
+          :group_loan_weekly_collection_id => @third_group_loan_weekly_collection.id   
+        })
+        
+        
+      end
+      
+      it 'should create premature clearance, weekly payment_case' do
+        @gl_pc.should be_valid
+        # @gl_pc.group_loan_membership.deactivation_case.should == GROUP_LOAN_DEACTIVATION_CASE[:premature_clearance]
+      end
+      
+      context "confirming 3rd weekly collection" do
+        before(:each) do
+          @third_group_loan_weekly_collection.collect(
+            {
+              :collection_datetime => DateTime.now 
+            }
+          )
+          @third_group_loan_weekly_collection.confirm
+          @gl_pc.reload 
+        end
+        
+        it 'should confirm third group weekly collection' do
+          @third_group_loan_weekly_collection.is_confirmed.should be_true 
+        end
+        
+        it 'should still produce valid premature clearance' do
+          @gl_pc.should be_valid
+          @gl_pc.is_confirmed.should be_true 
+          glm  = @gl_pc.group_loan_membership
+          glm.is_active.should be_false 
+          glm.deactivation_case.should == GROUP_LOAN_DEACTIVATION_CASE[:premature_clearance  ]
+          glm.deactivation_week_number.should_not == nil 
+        end
+        
+        it 'should have one deactivated member with case: run_away' do
+          run_away_count = @group_loan.group_loan_memberships.
+                              where(:deactivation_case => GROUP_LOAN_DEACTIVATION_CASE[:run_away]).count
+
+          run_away_count.should == 1 
+          run_away_glm =  @group_loan.group_loan_memberships.
+                              where(:deactivation_case => GROUP_LOAN_DEACTIVATION_CASE[:run_away]).first
+
+          run_away_glm.deactivation_week_number.should == 2 
+
+          amount = BigDecimal('0')
+          @group_loan.group_loan_memberships.joins(:group_loan_run_away_receivable, :group_loan_product).where{
+            ( is_active.eq false ) & 
+            ( deactivation_case.eq GROUP_LOAN_DEACTIVATION_CASE[:run_away]) & 
+            ( deactivation_week_number.lt 3 ) & 
+            ( group_loan_run_away_receivable.payment_case.eq GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:weekly]) 
+          }.count.should == 1
+
+
+          @gl_pc.group_loan_membership.deactivation_week_number.should == 4 
+
+          @group_loan.group_loan_memberships.joins(:group_loan_run_away_receivable, :group_loan_product).where{
+            ( is_active.eq false ) & 
+            ( deactivation_case.eq GROUP_LOAN_DEACTIVATION_CASE[:run_away]) & 
+            ( deactivation_week_number.lt 4 ) & 
+            ( group_loan_run_away_receivable.payment_case.eq GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:weekly]) 
+          }.each do |glm|
+            amount += glm.group_loan_product.weekly_payment_amount 
+          end
+
+
+
+          # puts "\n\n ==============> Inspecting the premature_clearance_run_away <============\n\n"
+
+          # puts "The amount: #{amount.to_s}"
+          total_active_glm = @gl_pc.group_loan_weekly_collection.active_group_loan_memberships.count
+          # puts "number of active glm: #{total_active_glm}"
+
+          share_amount = amount / total_active_glm
+
+          # puts "Share amount: #{share_amount.to_s}"
+          # puts "rounded_up: #{ GroupLoan.rounding_up( share_amount, DEFAULT_PAYMENT_ROUND_UP_VALUE)}"
+
+          rounded_up_calculated_share_amount = @gl_pc.extract_run_away_default_weekly_payment_share
+          # puts "The calculated, rounded_up: #{rounded_up_calculated_share_amount.to_s}"
+
+          # puts "\n\n ========= end "
+        end
+
+        it 'should create appropriate amount-receivable' do 
+          @gl_pc.reload 
+          # @gl_pc.update_amount
+          total_unpaid_week = @group_loan.number_of_collections - 
+                          @gl_pc.group_loan_weekly_collection.week_number   
+          total_principal =  @gl_pc.group_loan_membership.group_loan_product.principal * total_unpaid_week
+          
+          
+          # shares_for_of_all_weekly_collection_for_run_away_members = 
+          # 1. for each run_away happening before this week, sum the remaining week * weekly payment amount 
+          # 2. divide the weekly payment amount by all weekly_collection.active_group_loan_memberships 
+          # 3. add it to the amount for this premature_clearance  
+          # 
+          # what are the extra amount to be paid for run_away weekly collection? 
+          # remaining_amount? In the next week, what is the weekly_collection.amount_receivable? 
+          
+          default_loan_amount_receivable = @gl_pc.group_loan_membership.group_loan_default_payment.amount_receivable
+          expected_amount = total_principal + 
+                                  default_loan_amount_receivable + 
+                                  @gl_pc.extract_run_away_default_weekly_payment_share * total_unpaid_week
+                                  
+          puts "\n==================== Inspect the amount payable ========\n\n"
+                
+                
+          puts "total unpaid ewek: #{total_unpaid_week}"
+          puts "weekly principal: #{@gl_pc.group_loan_membership.group_loan_product.principal.to_s}"
+          puts "Principal to be returned : #{total_principal.to_s}"
+          
+          puts "\n DefaultLoan amount receivable: #{default_loan_amount_receivable.to_s}"
+          
+          puts "\n Weekly run_away default payment share : #{@gl_pc.extract_run_away_default_weekly_payment_share.to_s}"
+          
+          puts "The expected amount: #{expected_amount.to_s}"
+          puts "The actal amount: #{@gl_pc.amount.to_s}"
+          
+          puts "\n\n ======> End of inspection"
+          @gl_pc.amount.should == expected_amount
+                    
+        end
+
+        # it 'should have run_away_default_weekly_payment_share' do
+        #     @gl_pc.extract_run_away_default_weekly_payment_share.should_not == BigDecimal('0')
+        #   end
+        #   
+        #   
+        #   it 'should create deactivation week in week 4' do
+        #     @gl_pc.group_loan_membership.deactivation_week_number.should == 4 
+        #   end
+        
+        # in week_3, there is premature clearance. 
+        # premature clearance == pay for remaining total principal + default's share 
+        
+        # on top of that , he has to pay all defaults in week 3 + weekly payment 
+        # it 'should not create offset run_away premature clearance @ week_3' do
+        #   offset_amount = @third_group_loan_weekly_collection.extract_weekly_run_away_premature_clearance_paid_amount
+        #   
+        #   @group_loan.group_loan_memberships.where{
+        #     ( is_active.eq false) & 
+        #     ( deactivation_week_number.lte 3) & 
+        #     ( deactivation_case.eq GROUP_LOAN_DEACTIVATION_CASE[:premature_clearance] ) 
+        #   }.count.should == 0 
+        #   
+        #   
+        #   offset_amount.should == BigDecimal('0')
+        # end
+        # 
+        # it 'should create run_away_weekly premature_clearance offset in the amount_receivable' do
+        #   offset_amount = @fourth_group_loan_weekly_collection.extract_weekly_run_away_premature_clearance_paid_amount
+        #   offset_amount.should_not == BigDecimal('0')
+        # end
+        # 
+        # it 'should offset the amount_receivable in weekly_collection #4' do
+        #   base_amount = BigDecimal('0')
+        #   @fourth_group_loan_weekly_collection.active_group_loan_memberships.each do |glm|
+        #     base_amount += glm.group_loan_product.weekly_payment_amount 
+        #   end
+        #   
+        #   # first glm is run_away glm 
+        #   run_away_weekly_addition = @first_glm.group_loan_product.weekly_payment_amount 
+        #   
+        #   @fourth_group_loan_weekly_collection.amount_receivable.should_not == base_amount + run_away_weekly_addition
+        # end
+
+        # context "week 4: the weekly_collection.amount_receivable will be offset due to the premature clearance" do
+        #   before(:each) do
+        #     @fourth_group_loan_weekly_collection
+        #     
+        #   end
+        #   
+        # end
+      end
+      
+
+      
+    end
+    
   end  
   
   
-  context 'switch run away payment case to end_of_cycle' do
-    before(:each) do
-      
-     
-      
-      @initial_glm_count = @group_loan.active_group_loan_memberships.count 
-      @run_away_member = @first_glm.member 
-      @run_away_member.mark_as_run_away
-      
-      @first_run_away = GroupLoanRunAwayReceivable.first 
-       
-      @first_run_away.set_payment_case( {
-        :payment_case =>  GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:end_of_cycle]
-      } ) 
-      
-      @group_loan.reload 
-    end
-    
-    it 'should update the payment case' do 
-      @first_run_away.errors.size.should == 0 
-      @first_run_away.payment_case.should ==   GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:end_of_cycle]
-    end
-    
-    it 'should deactivate one member' do
-      @group_loan.active_group_loan_memberships.count.should == @initial_glm_count - 1 
-    end
-    
-    it 'should update default payment total amount' do
-      @group_loan.default_payment_total_amount.should == @first_run_away.amount_receivable 
-    end
-    
-    it 'should update the amount of dfeault payment' do
-      @group_loan.active_group_loan_memberships.each do |glm|
-        next if glm.id == @first_glm.id 
-        glm.group_loan_default_payment.amount_receivable.should_not == BigDecimal('0')
-      end
-      
-      amount_to_be_split = @first_run_away.amount_receivable 
-      
-      splitted_amount = amount_to_be_split/@group_loan.active_group_loan_memberships.count 
-      
-      rounded_up = GroupLoan.rounding_up(splitted_amount, DEFAULT_PAYMENT_ROUND_UP_VALUE)
-      # puts "\n\n ================== The Eval ============== \n\n"
-      # 
-      # 
-      # puts "amount_to_be_split: #{amount_to_be_split.to_s}"
-      # puts "default_payment_total_amount: #{@group_loan.default_payment_total_amount.to_s}"
-      # puts "splitted_amount: #{splitted_amount}"
-      # puts "\nrounded up amount: #{rounded_up.to_s}\n"
-      # puts "active_glm_count: #{@group_loan.active_group_loan_memberships.count }"
-      # 
-      # puts "==========> =========> the amount_receivable"
-      # 
-      @group_loan.active_group_loan_memberships.each do |glm|
-        next if glm.id == @first_glm.id 
-        
-        # puts "glm #{glm.id}, amount_receivable: #{glm.group_loan_default_payment.amount_receivable.to_s}"
-      
-        glm.group_loan_default_payment.amount_receivable.should  == rounded_up
-      end
-      
-    end
-  end
+  # context 'create 1 run_away, payment_case ==  end_of_cycle ' do
+  #   before(:each) do
+  #     
+  #    
+  #     
+  #     @initial_glm_count = @group_loan.active_group_loan_memberships.count 
+  #     @run_away_member = @first_glm.member 
+  #     @run_away_member.mark_as_run_away
+  #     
+  #     @first_run_away = GroupLoanRunAwayReceivable.first 
+  #      
+  #     @first_run_away.set_payment_case( {
+  #       :payment_case =>  GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:end_of_cycle]
+  #     } ) 
+  #     
+  #     @group_loan.reload 
+  #   end
+  #   
+  #   it 'should update the payment case' do 
+  #     @first_run_away.errors.size.should == 0 
+  #     @first_run_away.payment_case.should ==   GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:end_of_cycle]
+  #   end
+  #   
+  #   it 'should deactivate one member' do
+  #     @group_loan.active_group_loan_memberships.count.should == @initial_glm_count - 1 
+  #   end
+  #   
+  #   it 'should update default payment total amount' do
+  #     @group_loan.default_payment_total_amount.should == @first_run_away.amount_receivable 
+  #   end
+  #   
+  #   it 'should update the amount of dfeault payment' do
+  #     @group_loan.active_group_loan_memberships.each do |glm|
+  #       next if glm.id == @first_glm.id 
+  #       glm.group_loan_default_payment.amount_receivable.should_not == BigDecimal('0')
+  #     end
+  #     
+  #     amount_to_be_split = @first_run_away.amount_receivable 
+  #     
+  #     splitted_amount = amount_to_be_split/@group_loan.active_group_loan_memberships.count 
+  #     
+  #     rounded_up = GroupLoan.rounding_up(splitted_amount, DEFAULT_PAYMENT_ROUND_UP_VALUE)
+  #     # puts "\n\n ================== The Eval ============== \n\n"
+  #     # 
+  #     # 
+  #     # puts "amount_to_be_split: #{amount_to_be_split.to_s}"
+  #     # puts "default_payment_total_amount: #{@group_loan.default_payment_total_amount.to_s}"
+  #     # puts "splitted_amount: #{splitted_amount}"
+  #     # puts "\nrounded up amount: #{rounded_up.to_s}\n"
+  #     # puts "active_glm_count: #{@group_loan.active_group_loan_memberships.count }"
+  #     # 
+  #     # puts "==========> =========> the amount_receivable"
+  #     # 
+  #     @group_loan.active_group_loan_memberships.each do |glm|
+  #       next if glm.id == @first_glm.id 
+  #       
+  #       # puts "glm #{glm.id}, amount_receivable: #{glm.group_loan_default_payment.amount_receivable.to_s}"
+  #     
+  #       glm.group_loan_default_payment.amount_receivable.should  == rounded_up
+  #     end
+  #   end
+  #   
+  #   context "create premature clearance in week 3 " do
+  #     before(:each) do
+  #       @second_group_loan_weekly_collection.collect(
+  #         {
+  #           :collection_datetime => DateTime.now 
+  #         }
+  #       )
+  #       @second_group_loan_weekly_collection.confirm 
+  #       
+  #       @group_loan.reload 
+  #       # second_glm wants to do premature clearance 
+  #       @first_run_away.reload 
+  #       
+  #       @gl_pc = GroupLoanPrematureClearancePayment.create_object({
+  #         :group_loan_id => @group_loan.id,
+  #         :group_loan_membership_id => @second_glm.id ,
+  #         :group_loan_weekly_collection_id => @third_group_loan_weekly_collection.id   
+  #       })
+  #     end
+  #     
+  #     it 'should not allow run_away payment to be changed to weekly' do
+  #       @first_run_away.set_payment_case( {
+  #         :payment_case =>  GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:end_of_cycle]
+  #       } )
+  #       
+  #       @first_run_away.errors.size.should_not == 0 
+  #     end
+  #     
+  #     it 'should create premature clearance' do
+  #       @gl_pc.should be_valid 
+  #       @gl_pc
+  #       
+  #       @gl_pc.is_confirmed.should be_false 
+  #     end
+  #     
+  #     it 'should create expect the amount to be paid == principal*remaining weeks + default.amount_receivable' do
+  #       total_unpaid_week = @group_loan.number_of_collections - 
+  #                       @group_loan.first_uncollected_weekly_collection.week_number   
+  #       total_principal =  @second_glm.group_loan_product.principal * total_unpaid_week
+  #       
+  #       
+  #       @gl_pc.amount.should == total_principal + @second_glm.group_loan_default_payment.amount_receivable 
+  #       
+  #     end
+  #     
+  #   
+  #   end
+  # end
   
   
   
