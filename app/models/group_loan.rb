@@ -325,7 +325,7 @@ Phase: loan disbursement finalization
     # contribution from the uncollectibles
     total_amount += self.group_loan_weekly_uncollectibles.sum("amount")
     
-    total_amount -= self.cleared_default_payment_amount # from member passed away. 
+    total_amount -= self.cleared_default_payment_amount # from member premature clearce
     
     if total_amount < BigDecimal('0')
       return BigDecimal('0')

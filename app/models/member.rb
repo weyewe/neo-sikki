@@ -80,6 +80,8 @@ class Member < ActiveRecord::Base
           glm.save  
           # puts "THe deactivation week number: #{glm.deactivation_week_number}"
           pending_receivable += glm.remaining_deceased_principal_payment    
+          
+          group_loan.update_default_payment_amount_receivable
         else
           glm.destroy
         end                                 

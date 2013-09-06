@@ -150,8 +150,19 @@ extract_weekly_run_away amount = GroupLoan.rounding_up(
 			
 			
 Next thing to be tested: what if run_away, uncollectible, deceased, and premature clearance is happening
-in the same week?  FUK.
+in the same week?  
+		=> We need to arrange the priority to maximize the amount recovered.
 
+Deceased => adjust the default resolution pool   => after create, group_loan.update_default_amount 
+Uncollectible => adjust the default resolution pool => after create , group_loan.update_default_amount
 
+ 
+Run Away => Adjust the default resolution pool   => after_create, group_loan.update_default amount
+					after_update => group_loan.update_default_amount => policy is made on the spot. 
+					
+premature clearance  << last one. After all defaults are summed up.  => update amount makes no difference. 
+				since premature clearance won't add to default_amount.amount_receivable
+
+Pretty much done.. do the spec! 
 		
 

@@ -12,6 +12,12 @@ class GroupLoanWeeklyUncollectible < ActiveRecord::Base
   validate :use_first_uncollected_weekly_collection
   validate :no_creation_if_weekly_collection_is_confirmed
   
+  after_create :update_group_loan_default_amount_receivable
+  
+  def update_group_loan_default_amount_receivable
+    group_loan.update_default_payment_amount_receivable
+  end
+  
   def all_fields_present?
     group_loan_weekly_collection_id.present? and 
                 group_loan_id.present? and 

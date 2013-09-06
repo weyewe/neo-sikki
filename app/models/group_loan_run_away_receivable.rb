@@ -11,7 +11,7 @@ class GroupLoanRunAwayReceivable < ActiveRecord::Base
   
   belongs_to :group_loan 
   
-  after_create :update_group_loan_run_away_amount_receivable 
+  after_create :update_group_loan_run_away_amount_receivable  
   
   def valid_payment_case
     return if not payment_case.present?
