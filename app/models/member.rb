@@ -82,6 +82,13 @@ class Member < ActiveRecord::Base
           pending_receivable += glm.remaining_deceased_principal_payment    
           
           group_loan.update_default_payment_amount_receivable
+          
+          GroupLoanPortCompulsorySavings.create :group_loan_id => group_loan.id, 
+                                      :group_loan_membership_id => glm.id ,
+                                      :member_id => glm.member_id ,
+                                      :case =>PORT_GROUP_LOAN_COMPULSORY_SAVINGS_CASE[:deceased_member]
+                                      
+                                      
         else
           glm.destroy
         end                                 

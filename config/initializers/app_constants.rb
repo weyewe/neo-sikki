@@ -129,3 +129,10 @@ GROUP_LOAN_RUN_AWAY_RECEIVABLE_PAYMENT_CASE = {
 
 
 DEFAULT_PAYMENT_ROUND_UP_VALUE = BigDecimal("500")
+
+PORT_GROUP_LOAN_COMPULSORY_SAVINGS_CASE = {
+  :group_loan_closing => 1 , 
+  :deceased_member => 2, 
+  :premature_clearance => 3, 
+  # :run_away_member => 4   # nope, run away member , the compulsory savings will be counted as "Other Revenue"
+}

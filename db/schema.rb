@@ -44,18 +44,10 @@ ActiveRecord::Schema.define(version: 20130902112630) do
     t.integer  "group_loan_id"
     t.integer  "group_loan_product_id"
     t.integer  "member_id"
-    t.boolean  "is_active",                                        default: true
+    t.boolean  "is_active",                                         default: true
     t.integer  "deactivation_case"
     t.integer  "deactivation_week_number"
-    t.decimal  "total_compulsory_savings", precision: 9, scale: 2, default: 0.0
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "group_loan_port_compulsory_savings", force: true do |t|
-    t.integer  "group_loan_id"
-    t.integer  "group_loan_membership_id"
-    t.integer  "member_id"
+    t.decimal  "total_compulsory_savings", precision: 10, scale: 2, default: 0.0
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -66,17 +58,18 @@ ActiveRecord::Schema.define(version: 20130902112630) do
     t.integer  "group_loan_weekly_collection_id"
     t.decimal  "amount",                          precision: 12, scale: 2, default: 0.0
     t.boolean  "is_confirmed",                                             default: false
+    t.decimal  "premature_clearance_deposit",     precision: 12, scale: 2, default: 0.0
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
   create_table "group_loan_products", force: true do |t|
     t.string   "name"
-    t.decimal  "principal",          precision: 9, scale: 2, default: 0.0
-    t.decimal  "interest",           precision: 9, scale: 2, default: 0.0
-    t.decimal  "compulsory_savings", precision: 9, scale: 2, default: 0.0
-    t.decimal  "admin_fee",          precision: 9, scale: 2, default: 0.0
-    t.decimal  "initial_savings",    precision: 9, scale: 2, default: 0.0
+    t.decimal  "principal",          precision: 10, scale: 2, default: 0.0
+    t.decimal  "interest",           precision: 10, scale: 2, default: 0.0
+    t.decimal  "compulsory_savings", precision: 10, scale: 2, default: 0.0
+    t.decimal  "admin_fee",          precision: 10, scale: 2, default: 0.0
+    t.decimal  "initial_savings",    precision: 10, scale: 2, default: 0.0
     t.integer  "total_weeks"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -108,8 +101,9 @@ ActiveRecord::Schema.define(version: 20130902112630) do
   create_table "group_loan_weekly_collections", force: true do |t|
     t.integer  "group_loan_id"
     t.integer  "week_number"
-    t.boolean  "is_collected",          default: false
-    t.boolean  "is_confirmed",          default: false
+    t.boolean  "is_collected",                                               default: false
+    t.decimal  "premature_clearance_deposit_usage", precision: 10, scale: 2, default: 0.0
+    t.boolean  "is_confirmed",                                               default: false
     t.datetime "collection_datetime"
     t.datetime "confirmation_datetime"
     t.datetime "created_at"
@@ -137,13 +131,22 @@ ActiveRecord::Schema.define(version: 20130902112630) do
     t.string   "name"
     t.integer  "number_of_meetings"
     t.integer  "number_of_collections"
-    t.boolean  "is_started",                                            default: false
-    t.boolean  "is_loan_disbursement_prepared",                         default: false
-    t.boolean  "is_loan_disbursed",                                     default: false
-    t.boolean  "is_closed",                                             default: false
+    t.boolean  "is_started",                                                     default: false
+    t.datetime "started_at"
+    t.boolean  "is_loan_disbursement_prepared",                                  default: false
+    t.boolean  "is_loan_disbursed",                                              default: false
+    t.datetime "disbursed_at"
+    t.boolean  "is_closed",                                                      default: false
+    t.datetime "closed_at"
+    t.boolean  "is_compulsory_savings_withdrawn",                                default: false
+    t.datetime "compulsory_savings_withdrawn_at"
     t.integer  "group_leader_id"
-    t.decimal  "run_away_amount_receivable",    precision: 9, scale: 2, default: 0.0
-    t.decimal  "run_away_amount_received",      precision: 9, scale: 2, default: 0.0
+    t.decimal  "run_away_amount_receivable",            precision: 10, scale: 2, default: 0.0
+    t.decimal  "run_away_amount_received",              precision: 10, scale: 2, default: 0.0
+    t.decimal  "remaining_premature_clearance_deposit", precision: 10, scale: 2, default: 0.0
+    t.decimal  "premature_clearance_deposit",           precision: 10, scale: 2, default: 0.0
+    t.decimal  "total_compulsory_savings_pre_closure",  precision: 10, scale: 2, default: 0.0
+    t.decimal  "end_of_cycle_default_resolution",       precision: 10, scale: 2, default: 0.0
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -172,7 +175,7 @@ ActiveRecord::Schema.define(version: 20130902112630) do
   create_table "savings_entries", force: true do |t|
     t.integer  "savings_source_id"
     t.string   "savings_source_type"
-    t.decimal  "amount",                 precision: 9, scale: 2, default: 0.0
+    t.decimal  "amount",                 precision: 10, scale: 2, default: 0.0
     t.integer  "savings_status"
     t.integer  "direction"
     t.integer  "financial_product_id"
@@ -186,9 +189,9 @@ ActiveRecord::Schema.define(version: 20130902112630) do
     t.integer  "transaction_source_id"
     t.string   "transaction_source_type"
     t.integer  "fund_case"
-    t.decimal  "amount",                  precision: 9, scale: 2, default: 0.0
+    t.decimal  "amount",                  precision: 10, scale: 2, default: 0.0
     t.integer  "direction"
-    t.decimal  "savings",                 precision: 9, scale: 2, default: 0.0
+    t.decimal  "savings",                 precision: 10, scale: 2, default: 0.0
     t.integer  "savings_direction"
     t.integer  "office_id"
     t.integer  "member_id"

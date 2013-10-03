@@ -6,10 +6,10 @@ class CreateTransactionActivities < ActiveRecord::Migration
       
       
       t.integer :fund_case # FUND_TRANSFER_CASE[:cash] or FUND_TRANSFER_CASE[:savings]
-      t.decimal :amount , :default        => 0,  :precision => 9, :scale => 2
+      t.decimal :amount , :default        => 0,  :precision => 10, :scale => 2
       t.integer :direction  
       
-      t.decimal :savings, :default        => 0,  :precision => 9, :scale => 2
+      t.decimal :savings, :default        => 0,  :precision => 10, :scale => 2
       t.integer :savings_direction
       
       t.integer :office_id 

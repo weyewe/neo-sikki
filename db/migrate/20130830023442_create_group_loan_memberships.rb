@@ -10,7 +10,7 @@ class CreateGroupLoanMemberships < ActiveRecord::Migration
       t.integer :deactivation_week_number 
      # if deactivation_week_number == nil , it means it is deactivated because the group loan is closed 
       
-      t.decimal :total_compulsory_savings  , :default        => 0,  :precision => 9, :scale => 2
+      t.decimal :total_compulsory_savings  , :default        => 0,  :precision => 10, :scale => 2
 
       t.timestamps
     end

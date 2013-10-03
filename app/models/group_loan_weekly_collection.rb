@@ -33,9 +33,16 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
     end
     
     self.collection_datetime = params[:collection_datetime]
+    self.premature_clearance_deposit_usage = BigDecimal( params[:premature_clearance_deposit_usage] || BigDecimal('0'))
     
     if self.collection_datetime.present?
       self.is_collected = true 
+    end
+    
+    if self.premature_clearance_deposit_usage > self.group_loan.remaining_premature_clearance_deposit
+      msg = "Jumlah uang titipan tersisa: #{self.group_loan.remaining_premature_clearance_deposit.to_s}"
+      self.errors.add(:premature_clearance_deposit_usage, msg )
+      return self
     end
     
     self.save 

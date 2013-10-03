@@ -164,5 +164,38 @@ premature clearance  << last one. After all defaults are summed up.  => update a
 				since premature clearance won't add to default_amount.amount_receivable
 
 Pretty much done.. do the spec! 
+
+
+
+========= okay, group loan can't be confirmed if there are uncollectible payment. Extract the god-damned uncollectible.
+
+=======> what if compulsory savings is not enough for the end-of-cycle default payment? bad debt expense
+
+
+=> Done.. we have to reboot our test.
+
+
+# on default creation: add the end_of_cycle default amount 
+1. Test the normal cycle: loan disbursement => weekly payment => close group loan => withdraw remaining compulsory savings   [DON't PORT]... yeah baby.. withdraw the remaining compulsory savings. 
+
+2. Test the Uncollectible. 
+	Loan Disbursement => weekly payment => can't close group loan if there is uncollectible => close group loan => withdraw remaining compulsory savings 
+	
+3. Test the run away member => weekly resolution 
+														=> end of cycle resolution 
+														
+		On weekly resolution: amount of $$ received by the cashier must be (active_members + run_away_weekly_resolution) * each principle payment
+		
+		On end_of_cycle resolution: amount of $$ == active_members + run_away_weekly_resolution 
+		
+		
+4. Test the premature clearance 
+
+5. Test the premature_clearance + run_away member (end_of_cycle and weekly_resolution)
+
+6. Test the combination cases. 
+
+7. DONE. 
+
 		
 

@@ -253,8 +253,30 @@ Phase: loan disbursement finalization
   WeeklyCollection Finish 
 =end
 
-  def total_compulsory_savings
-    self.active_group_loan_memberships.sum("total_compulsory_savings")
+  def glm_eligible_for_compulsory_savings_calculation
+    if not self.is_closed?
+      return self.group_loan_memberships.where{
+        (is_active.eq true) | 
+        (
+          (is_active.eq false) &
+          (deactivation_case.eq GROUP_LOAN_DEACTIVATION_CASE[:run_away])
+        )
+      }
+    else
+      # GROUP_LOAN_DEACTIVATION_CASE
+      return self.group_loan_memberships.where{
+        (is_active.eq false ) & 
+        (
+          (deactivation_case.eq GROUP_LOAN_DEACTIVATION_CASE[:finished_group_loan] ) | 
+          (deactivation_case.eq GROUP_LOAN_DEACTIVATION_CASE[:run_away])
+        )
+        
+      }
+    end
+  end
+
+  def total_compulsory_savings 
+    self.glm_eligible_for_compulsory_savings_calculation.sum("total_compulsory_savings")
   end
 
 
@@ -275,13 +297,17 @@ Phase: loan disbursement finalization
   
   def deduct_compulsory_savings_for_unsettled_default
     # if the member's compulsory savings is not sufficient, calculate that as office's bad debt expense 
-    return if self.active_group_loan_memberships.count == 0
+    # return if self.active_group_loan_memberships.count == 0
+    # 
+    #   
+    # 
+    # self.active_group_loan_memberships.joins(:group_loan_default_payment).each do |glm|
+    #   glm.group_loan_default_payment.execute_compulsory_savings_deduction 
+    # end
     
-    self.active_group_loan_memberships.joins(:group_loan_default_payment).each do |glm|
-      glm.group_loan_default_payment.execute_compulsory_savings_deduction 
-    end
-    
-    # self.update_bad_expense_debt 
+    # create JournalPosting
+    #  compulsory_savings is debit by the default_amount
+    #  allowance is credited by the default_amount  (Allowance is contra account of revenue)
   end
   
   def cleared_default_payment_amount
@@ -382,7 +408,8 @@ Phase: loan disbursement finalization
     self.active_group_loan_memberships.each do |glm|
       GroupLoanPortCompulsorySavings.create :group_loan_id => self.id, 
                                   :group_loan_membership_id => glm.id ,
-                                  :member_id => glm.member_id 
+                                  :member_id => glm.member_id ,
+                                  :case =>PORT_GROUP_LOAN_COMPULSORY_SAVINGS_CASE[:group_loan_closing]
     end
   end 
   
@@ -394,8 +421,22 @@ Phase: loan disbursement finalization
     end
   end
   
+  
+  def manifest_total_compulsory_savings_pre_closure
+    self.total_compulsory_savings_pre_closure = self.total_compulsory_savings
+    self.save 
+  end
+  
+  def total_compulsory_savings_post_closure
+    amount = total_compulsory_savings_pre_closure - end_of_cycle_default_resolution
+    if amount > BigDecimal('0')
+      return amount
+    else
+      return BigDecimal('0')
+    end
+  end
  
-  def close
+  def close(params)
     if self.group_loan_weekly_collections.where(:is_confirmed => true, :is_collected => true).count != self.number_of_collections
       self.errors.add(:generic_errors, "Ada Pengumpulan mingguan yang belum selesai")
       return self 
@@ -406,19 +447,43 @@ Phase: loan disbursement finalization
       return self 
     end
     
+    self.closed_at = params[:closed_at]
+    
+    if self.closed_at.nil?
+      self.errors.add(:closed_at, "Harus ada tanggal penutupan")
+      return self 
+    end
+    
     
     
     # perform deduction for those unpaid member
-    self.deduct_compulsory_savings_for_unsettled_default
-    self.port_compulsory_savings_to_voluntary_savings 
+    self.manifest_total_compulsory_savings_pre_closure
+    self.deduct_compulsory_savings_for_unsettled_default 
     self.deactivate_group_loan_memberships_due_to_group_closed
     
-    # self.close_group_loan_run_away_receivable # the receivable is being written off:
-    # 1. loan portfolio will be provisioned
-    # 2. the interest receivable will be written-off (as expense) 
+     
     
     self.is_closed = true 
     self.save
+  end
+  
+  def withdraw_compulsory_savings(params)
+    
+    if self.is_closed?
+      self.errors.add(:generic_errors, "Belum ditutup")
+      return self 
+    end
+    
+    
+    self.compulsory_savings_withdrawn_at = params[:compulsory_savings_withdrawn_at]
+    
+    if self.compulsory_savings_withdrawn_at.nil?
+      self.errors.add(:compulsory_savings_withdrawn_at, "Harus ada tanggal penarikan sisa tabungan wajib")
+      return self 
+    end
+    
+    self.is_compulsory_savings_withdrawn = true
+    self.save 
   end
 
  

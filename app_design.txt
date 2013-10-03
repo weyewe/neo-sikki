@@ -1,0 +1,110 @@
+UangTitipan (liability)   => PrematureClearanceDeposit 
+
+	On premature clearance, if there is run away member and has to be paid weekly,
+		the premature clearance applicant has to leave deposit to pay for the run-away member weekly payment.
+		
+	On weekly payment, containing 1 run_away member, paid weekly + 1 premature clearance 
+	
+		=> weekly, has to be manual => PrematureClearanceDepositUsage 
+		
+		# oh , in the premature Clearance Declaration, put the deposit amount 
+		
+		
+Data to be logged in the GroupLoan
+1. Total Premature Clearance Deposit
+2. Remaining Premature Clearance Deposit
+3. LoanLossAllowance (default amount)   => Will be converted into debt 
+4. LoanPortfolio  => Total loan disbursed (can be calculated)
+5. TotalCompulsorySavings
+
+6. TotalRevenue (from the interest) 
+
+		
+		
+use the parent's document to add the accounting. To understand the 
+detailed transaction, he should look at TransactionActivity.
+
+
+In practice: how can the usage of PrematureClearanceDeposit should be used? 
+when can a compulsory savings can be used to cover for all the remaining weekly payment?
+
+(n - x)*m*weekly_payment = x*k*weekly_payment   ; 
+; where 0< k < 1  
+; where 0< m < 1 
+; k is the percentage of weekly payment used for compulsory savings 
+; m is the percentage of weekly payment used for principle payment 
+
+
+nm = mx + xk
+n*m = x( k+m )
+x = n*m/(k+m)
+
+example: k=0.2; m = 0.6; n = 24 
+x = 17.9 => 18 ..  after week 18, the compulsory savings can be used to pay for all remaining 
+principal.
+
+In the premature clearance, sum of all remaining principal - compulsory savings has to be paid.. 
+
+what if compulsory_savings > sum of all remaining_principals + default_contribution? 
+ => deduct compulsory savings. port it into voluntary savings. withdraw the voluntary savings. done. 
+
+
+=================
+Rounding down 
+=====================
+
+group of 14 people
+1 run away => 777.777 Rupiah of principal + interest
+Total savings per person = 250k IDr.. 
+=> Total compulsory savings = 3,250k IDR
+
+ok, treat this shite as a group. 
+
+
+The compulsory savings returned at the end of cycle: allow the member to decide on 
+the share. 
+
+Ideology: shifting risk to group. 
+
+
+===============
+New Design
+==============
+
+1. KKI is not responsible on returning the compulsory savings post group-loan-closing.
+It will give the bulk $$ to the group. Group is responsible of taking care for themselves.
+
+Hence, no porting from compulsory savings to voluntary savings. 
+	On GroupLoanClose => the field worker can withdraw all compulsory savings on behalf of member. 
+
+
+2. Default Resolution: KKI treats it as a bulk. No  member-specific default resolution 
+
+3. For Premature Clearance, if there is run_away member, default resolved at end of the cycle, then there has to be premature_clearance_deposit that will be used to cover for the monthly payment.
+
+
+4. How is the mechanic to use PrematureDepositClearance? 
+Group Loan hold the total remaining amount. 
+
+Collect the $$ from the member
+
+
+
+==========
+PrematureDepositClearance.. weekly collection amount for run away member + weekly_default_resolution.. 
+
+It's all has to be full weeks... Cashier has to confirm the amount => 
+
+total cash == weekly_collection_amount - premature_deposit_usage 
+
+if cash == actual cash, confirm it. Banzai! lovey dovey. 
+
+new definition of transaction_activity: it is used to track all payments from member. 
+
+TransactionActivity: impacting the cash coming and going out from the member. 
+
+VoluntarySavings + WeeklyPayment + EndOfCycleDefaultResolution 
+
+not recording the compulsory savings.  
+
+
