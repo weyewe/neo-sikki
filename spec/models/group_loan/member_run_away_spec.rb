@@ -101,7 +101,7 @@ describe GroupLoan do
     @first_group_loan_weekly_collection.should be_valid 
     @first_group_loan_weekly_collection.collect(
       {
-        :collection_datetime => DateTime.now 
+        :collected_at => DateTime.now 
       }
     )
 

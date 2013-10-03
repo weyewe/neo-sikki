@@ -88,7 +88,7 @@ describe GroupLoan do
     @first_group_loan_weekly_collection.should be_valid 
     @first_group_loan_weekly_collection.collect(
       {
-        :collection_datetime => DateTime.now 
+        :collected_at => DateTime.now 
       }
     )
 
@@ -115,7 +115,7 @@ describe GroupLoan do
       
       @second_group_loan_weekly_collection.collect(
         {
-          :collection_datetime => DateTime.now 
+          :collected_at => DateTime.now 
         }
       )
       
@@ -156,7 +156,7 @@ describe GroupLoan do
       before(:each) do
         @second_group_loan_weekly_collection.collect(
           {
-            :collection_datetime => DateTime.now 
+            :collected_at => DateTime.now 
           }
         )
         @second_group_loan_weekly_collection.confirm 
@@ -183,7 +183,7 @@ describe GroupLoan do
         before(:each) do
           @third_group_loan_weekly_collection.collect(
             {
-              :collection_datetime => DateTime.now 
+              :collected_at => DateTime.now 
             }
           )
           @third_group_loan_weekly_collection.confirm
@@ -417,7 +417,7 @@ describe GroupLoan do
   #     before(:each) do
   #       @second_group_loan_weekly_collection.collect(
   #         {
-  #           :collection_datetime => DateTime.now 
+  #           :collected_at => DateTime.now 
   #         }
   #       )
   #       @second_group_loan_weekly_collection.confirm 

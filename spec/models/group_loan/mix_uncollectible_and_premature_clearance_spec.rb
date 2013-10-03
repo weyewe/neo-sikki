@@ -91,7 +91,7 @@ describe GroupLoan do
     @first_group_loan_weekly_collection.should be_valid 
     @first_group_loan_weekly_collection.collect(
       {
-        :collection_datetime => DateTime.now 
+        :collected_at => DateTime.now 
       }
     )
 
@@ -120,7 +120,7 @@ describe GroupLoan do
       
       @second_group_loan_weekly_collection.collect(
         {
-          :collection_datetime => DateTime.now 
+          :collected_at => DateTime.now 
         }
       )
       
@@ -177,7 +177,7 @@ describe GroupLoan do
         
         @third_group_loan_weekly_collection.collect(
           {
-            :collection_datetime => DateTime.now 
+            :collected_at => DateTime.now 
           }
         )
         @third_group_loan_weekly_collection.confirm 
@@ -203,7 +203,7 @@ describe GroupLoan do
       # end
       # 
       # it 'should produce 0 run away resolution on uncollectible weekly payment' do
-      #   @third_group_loan_weekly_collection.extract_uncollectable_weekly_payment_amount.should == BigDecimal('0')
+      #   @third_group_loan_weekly_collection.extract_uncollectible_weekly_payment_amount.should == BigDecimal('0')
       # end
       # 
       # it 'should generate non 0 in extract_premature_clearance_payment_amount' do
@@ -265,7 +265,7 @@ describe GroupLoan do
 
           @fourth_group_loan_weekly_collection.collect(
             {
-              :collection_datetime => DateTime.now 
+              :collected_at => DateTime.now 
             }
           )
 

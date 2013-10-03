@@ -92,7 +92,7 @@ describe GroupLoan do
     @first_group_loan_weekly_collection.should be_valid 
     @first_group_loan_weekly_collection.collect(
       {
-        :collection_datetime => DateTime.now 
+        :collected_at => DateTime.now 
       }
     )
 
@@ -208,7 +208,7 @@ describe GroupLoan do
     before(:each) do
       @initial_amount_receivable = @second_group_loan_weekly_collection.amount_receivable
       
-      @initial_extract_uncollectable_weekly_payment_amount = @second_group_loan_weekly_collection.extract_uncollectable_weekly_payment_amount
+      @initial_extract_uncollectible_weekly_payment_amount = @second_group_loan_weekly_collection.extract_uncollectible_weekly_payment_amount
       @first_gl_wu = GroupLoanWeeklyUncollectible.create_object({
         :group_loan_id => @group_loan.id,
         :group_loan_membership_id => @uncollectible_glm.id ,
@@ -217,8 +217,8 @@ describe GroupLoan do
       @group_loan.reload 
     end
     
-    it 'should produce 0 for the initial_uncollectable_payment_amount' do
-      @initial_extract_uncollectable_weekly_payment_amount.should == BigDecimal('0')
+    it 'should produce 0 for the initial_uncollectible_payment_amount' do
+      @initial_extract_uncollectible_weekly_payment_amount.should == BigDecimal('0')
     end
     
     it 'should create valid gl_wu' do
@@ -231,11 +231,7 @@ describe GroupLoan do
       diff.should == @uncollectible_glm.group_loan_product.weekly_payment_amount
     end
     
-    it 'should not update default_payment amount_receivable pre-weekly_collection confirmation' do
-      @group_loan.active_group_loan_memberships.joins(:group_loan_default_payment).each do |glm|
-        glm.group_loan_default_payment.amount_receivable.should == BigDecimal('0')
-      end
-    end
+    # it 'should not update default_payment amount_receivable pre-weekly_collection confirmation'  
     
     it 'should be deletable' do
       @first_gl_wu.delete_object
@@ -245,14 +241,19 @@ describe GroupLoan do
     context "confirming the weekly_collection with group_loan_weekly_uncollectible" do
       before(:each) do
         @second_group_loan_weekly_collection.collect({
-          :collection_datetime => DateTime.now 
+          :collected_at => DateTime.now 
         })
         
         @second_group_loan_weekly_collection.confirm 
         @group_loan.reload 
         @first_gl_wu.reload 
+        @second_group_loan_weekly_collection.reload 
       end
-
+      
+      it 'should allow uncollectible amount' do
+        final_uncollectible_weekly_payment_amount = @second_group_loan_weekly_collection.extract_uncollectible_weekly_payment_amount
+        final_uncollectible_weekly_payment_amount.should == @uncollectible_glm.group_loan_product.weekly_payment_amount
+      end
 
       it 'should NOT be deletable' do
         @first_gl_wu.delete_object
@@ -276,23 +277,22 @@ describe GroupLoan do
         @second_group_loan_weekly_collection.is_confirmed.should be_true 
       end
       
-      it 'should update the group_loan_default_payment amount_receivable' do
-        @group_loan.active_group_loan_memberships.joins(:group_loan_default_payment).each do |glm|
-          glm.group_loan_default_payment.amount_receivable.should_not == BigDecimal('0')
-        end
+      it 'should update the group_loan.default_amount'   do
+        @group_loan.reload
+        @group_loan.default_amount.should_not == BigDecimal('0')
       end
       
-      it 'should produce equal splitting' do
-        # GroupLoan.rounding_up(amount,  nearest_amount ) 
-        total_default_amount = @uncollectible_glm.group_loan_product.weekly_payment_amount 
-        share_per_member= total_default_amount/@group_loan.active_group_loan_memberships.count 
-        
-        expected_amount_receivable  = GroupLoan.rounding_up( share_per_member, DEFAULT_PAYMENT_ROUND_UP_VALUE)
-        
-        @group_loan.active_group_loan_memberships.joins(:group_loan_default_payment).each do |glm|
-          glm.group_loan_default_payment.amount_receivable.should == expected_amount_receivable
-        end
-      end
+      it 'should produce equal splitting' # do
+      #         # GroupLoan.rounding_up(amount,  nearest_amount ) 
+      #         total_default_amount = @uncollectible_glm.group_loan_product.weekly_payment_amount 
+      #         share_per_member= total_default_amount/@group_loan.active_group_loan_memberships.count 
+      #         
+      #         expected_amount_receivable  = GroupLoan.rounding_up( share_per_member, DEFAULT_PAYMENT_ROUND_UP_VALUE)
+      #         
+      #         @group_loan.active_group_loan_memberships.joins(:group_loan_default_payment).each do |glm|
+      #           glm.group_loan_default_payment.amount_receivable.should == expected_amount_receivable
+      #         end
+      #       end
      
     end
   end

@@ -98,32 +98,32 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
   
   
   # manifested in the group loan clearance payment 
-  def update_amount
-    # the current week is not counted. it has to be paid in full.
-    # plus 1 because the current week where premature_clearance is applied has to be paid full 
-    # example: premature_clearance is applied@week_2. If there are total 8 installments,
-    # then, week 2 has to be paid full. and 6*principal has to be returned
-    # plus + default payment 
-    total_unpaid_week = group_loan.number_of_collections - 
-                    group_loan_weekly_collection.week_number 
-    total_principal =  group_loan_membership.group_loan_product.principal * total_unpaid_week
-    
-    
-    
-    total_run_away_weekly_payment_share = self.extract_run_away_default_weekly_payment_share * total_unpaid_week
-    
-    #  it will work in the case if there is run_away member 
-    # and the payment is end_of_cycle => the default amount is shared inside 
-    # group_loan_default_payment.amount_receivable 
-    
-    # remaining_weeks = group_loan.number_of_collections - group_loan_weekly_collection.week_number 
-    self.amount = total_principal + 
-                  group_loan_membership.group_loan_default_payment.amount_receivable  + 
-                  total_run_away_weekly_payment_share
-                  
-    # we have to account for those run away with weekly payment. 
-    self.save 
-  end
+  # def update_amount
+  #   # the current week is not counted. it has to be paid in full.
+  #   # plus 1 because the current week where premature_clearance is applied has to be paid full 
+  #   # example: premature_clearance is applied@week_2. If there are total 8 installments,
+  #   # then, week 2 has to be paid full. and 6*principal has to be returned
+  #   # plus + default payment 
+  #   total_unpaid_week = group_loan.number_of_collections - 
+  #                   group_loan_weekly_collection.week_number 
+  #   total_principal =  group_loan_membership.group_loan_product.principal * total_unpaid_week
+  #   
+  #   
+  #   
+  #   total_run_away_weekly_payment_share = self.extract_run_away_default_weekly_payment_share * total_unpaid_week
+  #   
+  #   #  it will work in the case if there is run_away member 
+  #   # and the payment is end_of_cycle => the default amount is shared inside 
+  #   # group_loan_default_payment.amount_receivable 
+  #   
+  #   # remaining_weeks = group_loan.number_of_collections - group_loan_weekly_collection.week_number 
+  #   self.amount = total_principal + 
+  #                 group_loan_membership.group_loan_default_payment.amount_receivable  + 
+  #                 total_run_away_weekly_payment_share
+  #                 
+  #   # we have to account for those run away with weekly payment. 
+  #   self.save 
+  # end
   
   def extract_run_away_default_weekly_payment_share 
     # puts "************* inside the extraction of run_away_default_payment_share"

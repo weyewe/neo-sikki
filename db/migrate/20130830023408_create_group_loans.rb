@@ -39,7 +39,7 @@ class CreateGroupLoans < ActiveRecord::Migration
       t.decimal :premature_clearance_deposit, :default       => 0, :precision => 10, :scale => 2
       
       t.decimal :total_compulsory_savings_pre_closure, :default       => 0, :precision => 10, :scale => 2
-      t.decimal :end_of_cycle_default_resolution, :default       => 0, :precision => 10, :scale => 2
+      t.decimal :default_amount, :default       => 0, :precision => 10, :scale => 2
       
       
       

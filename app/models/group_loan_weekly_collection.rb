@@ -32,10 +32,10 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
       return self
     end
     
-    self.collection_datetime = params[:collection_datetime]
+    self.collected_at = params[:collected_at]
     self.premature_clearance_deposit_usage = BigDecimal( params[:premature_clearance_deposit_usage] || BigDecimal('0'))
     
-    if self.collection_datetime.present?
+    if self.collected_at.present?
       self.is_collected = true 
     end
     
@@ -95,6 +95,20 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
   
   
   
+  def update_group_loan_default_payment
+    # update from uncollectible
+    
+    # update from run_away [case == end_of_cycle default_resolution]
+    
+    # self.
+    gl = self.group_loan
+    gl.default_amount += self.extract_uncollectible_weekly_payment_amount + 
+                    self.extract_run_away_weekly_resolution_amount
+                    
+    gl.save 
+  end
+  
+  
   def confirm
     if not self.is_collected?
       self.errors.add(:generic_errors, "Belum melakukan pengumpulan di minggu ini")
@@ -107,14 +121,17 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
     end
     
     
-    self.confirmation_datetime = DateTime.now 
+    self.confirmed_at = DateTime.now 
     self.is_confirmed = true 
     self.save 
     
     self.create_group_loan_weekly_payments 
-    self.group_loan.update_default_payment_amount_receivable
+    # self.group_loan.update_default_payment_amount_receivable
+    self.update_group_loan_default_payment
     self.confirm_premature_clearances
   end
+  
+  
   
   
   def confirm_premature_clearances
@@ -174,18 +191,19 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
   end
   
   def extract_run_away_weekly_resolution_amount
-    amount = BigDecimal('0')
-    current_week_number = self.week_number
-    
-    group_loan.group_loan_memberships.joins(:group_loan_run_away_receivable).where{
-      ( deactivation_case.eq GROUP_LOAN_DEACTIVATION_CASE[:run_away] ) & 
-      ( deactivation_week_number.lte current_week_number ) & 
-      (
-        group_loan_run_away_receivable.payment_case.eq GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:weekly] 
-      )
-    }.each do |glm|
-      amount += glm.group_loan_product.weekly_payment_amount
-    end
+    return BigDecimal('0')
+    # amount = BigDecimal('0')
+    # current_week_number = self.week_number
+    # 
+    # group_loan.group_loan_memberships.joins(:group_loan_run_away_receivable).where{
+    #   ( deactivation_case.eq GROUP_LOAN_DEACTIVATION_CASE[:run_away] ) & 
+    #   ( deactivation_week_number.lte current_week_number ) & 
+    #   (
+    #     group_loan_run_away_receivable.payment_case.eq GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:weekly] 
+    #   )
+    # }.each do |glm|
+    #   amount += glm.group_loan_product.weekly_payment_amount
+    # end
     
     # adjust the weekly_amount, deduct the premature_clearance 
     
@@ -208,7 +226,7 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
     return offset_amount
   end
   
-  def extract_uncollectable_weekly_payment_amount 
+  def extract_uncollectible_weekly_payment_amount 
     self.group_loan_weekly_uncollectibles.sum("amount")
   end
   
@@ -220,7 +238,7 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
     total_amount =  extract_base_amount + 
                     extract_run_away_weekly_resolution_amount + 
                     extract_premature_clearance_payment_amount -  #premature clearance for that week 
-                    extract_uncollectable_weekly_payment_amount  -
+                    extract_uncollectible_weekly_payment_amount  -
                     extract_weekly_run_away_premature_clearance_paid_amount
                      
     

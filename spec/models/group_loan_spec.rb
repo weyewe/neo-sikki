@@ -144,7 +144,7 @@ describe GroupLoan do
             @first_group_loan_weekly_collection.should be_valid 
             @first_group_loan_weekly_collection.collect(
               {
-                :collection_datetime => DateTime.now 
+                :collected_at => DateTime.now 
               }
             )
             
@@ -156,7 +156,7 @@ describe GroupLoan do
             @second_group_loan_weekly_collection.should be_valid 
             @second_group_loan_weekly_collection.collect(
               {
-                :collection_datetime => DateTime.now 
+                :collected_at => DateTime.now 
               }
             )
             
@@ -171,7 +171,7 @@ describe GroupLoan do
               @first_group_loan_weekly_collection.should be_valid 
               @first_group_loan_weekly_collection.collect(
                 {
-                  :collection_datetime => DateTime.now 
+                  :collected_at => DateTime.now 
                 }
               )
 
@@ -214,7 +214,7 @@ describe GroupLoan do
           context "closing weekly loan: do all weekly payment collection" do
             before(:each) do
               @group_loan.group_loan_weekly_collections.order("id ASC").each do |x|
-                x.collect(:collection_datetime => DateTime.now)
+                x.collect(:collected_at => DateTime.now)
                 x.confirm 
               end
               
@@ -233,7 +233,7 @@ describe GroupLoan do
               @group_loan.withdraw_compulsory_savings(:compulsory_savings_withdrawn_at => @withdrawn_at)
               @group_loan.errors.size.should_not == 0  
             end
-            
+
             context 'closing group loan' do
               before(:each) do
                 @glm_list = @group_loan.active_group_loan_memberships

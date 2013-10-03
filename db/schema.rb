@@ -23,16 +23,6 @@ ActiveRecord::Schema.define(version: 20130902112630) do
     t.datetime "updated_at"
   end
 
-  create_table "group_loan_default_payments", force: true do |t|
-    t.integer  "group_loan_membership_id"
-    t.integer  "group_loan_id"
-    t.decimal  "amount_receivable",            precision: 12, scale: 2, default: 0.0
-    t.decimal  "compulsory_savings_deduction", precision: 12, scale: 2, default: 0.0
-    t.decimal  "remaining_amount_receivable",  precision: 12, scale: 2, default: 0.0
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
   create_table "group_loan_disbursements", force: true do |t|
     t.integer  "group_loan_membership_id"
     t.integer  "group_loan_id"
@@ -104,8 +94,8 @@ ActiveRecord::Schema.define(version: 20130902112630) do
     t.boolean  "is_collected",                                               default: false
     t.decimal  "premature_clearance_deposit_usage", precision: 10, scale: 2, default: 0.0
     t.boolean  "is_confirmed",                                               default: false
-    t.datetime "collection_datetime"
-    t.datetime "confirmation_datetime"
+    t.datetime "collected_at"
+    t.datetime "confirmed_at"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -146,7 +136,7 @@ ActiveRecord::Schema.define(version: 20130902112630) do
     t.decimal  "remaining_premature_clearance_deposit", precision: 10, scale: 2, default: 0.0
     t.decimal  "premature_clearance_deposit",           precision: 10, scale: 2, default: 0.0
     t.decimal  "total_compulsory_savings_pre_closure",  precision: 10, scale: 2, default: 0.0
-    t.decimal  "end_of_cycle_default_resolution",       precision: 10, scale: 2, default: 0.0
+    t.decimal  "default_amount",                        precision: 10, scale: 2, default: 0.0
     t.datetime "created_at"
     t.datetime "updated_at"
   end

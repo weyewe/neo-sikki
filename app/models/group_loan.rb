@@ -14,7 +14,7 @@ class GroupLoan < ActiveRecord::Base
   
   has_many :savings_entries, :as => :financial_product 
   
-  has_many :group_loan_default_payments
+  # has_many :group_loan_default_payments
   
   has_many :group_loan_premature_clearance_payments 
   
@@ -222,7 +222,7 @@ Phase: loan disbursement finalization
     
     
     self.schedule_group_loan_weekly_collection 
-    self.create_group_loan_default_payments
+    # self.create_group_loan_default_payments
 
     # create GroupLoanWeeklyCollection  => it has many weird cases. new problem domain on that model.
   end
@@ -324,7 +324,7 @@ Phase: loan disbursement finalization
     return sum #  BigDecimal('0')
   end
   
-  def default_payment_total_amount
+  def default_payment_total_amount  # we will redo this method
     total_amount = BigDecimal('0')
     # The defaults: 
     # 1. + run_away_receivable (payment_case => end_of_cycle ) 
@@ -351,7 +351,7 @@ Phase: loan disbursement finalization
     # contribution from the uncollectibles
     total_amount += self.group_loan_weekly_uncollectibles.sum("amount")
     
-    total_amount -= self.cleared_default_payment_amount # from member premature clearce
+    # total_amount -= self.cleared_default_payment_amount # from member premature clearce
     
     if total_amount < BigDecimal('0')
       return BigDecimal('0')
@@ -364,44 +364,47 @@ Phase: loan disbursement finalization
   
   # default payment amount_receivable will be updated on:
   #  1. run_away member 
-  #   2. Uncollectable weekly collection 
+  #   2. uncollectible weekly collection 
   
   
   # glm.group_loan_default_payment.amount_receivable => total split must be paid 
   # glm.group_loan_default_payment.amount_received == payment 
   
   def update_default_payment_amount_receivable  
-    # update the default_payment#amount_receivable on 
-    # 1. weekly_payment_collection#confirm  => effect from run away and uncollectible will take place 
-    # 2. PrematureClearance#confirm  => should this be ported to be done inside weekly_payment_collection? 
-    # 3. GroupLoanAdditionalDefaultPayment#confirm  => this is right. 
-
-    total_amount = self.default_payment_total_amount
-     
-    amount_to_be_deducted  = BigDecimal('0')
+    # update the sum in the group_loan 
     
-    # we don't need to think whether member can pay for it.. just show the amount to be paid. 
-    # to pay or not to pay is another matter. 
-    # if self.total_compulsory_savings < total_amount 
-    #   amount_to_be_deducted = self.total_compulsory_savings
-    # else # case total_compulsory_savings => total_amount 
-    #   amount_to_be_deducted = total_amount
-    # end
-    
-    amount_to_be_deducted = total_amount
-    
-    total_active_glm = self.active_group_loan_memberships.count 
-    
-    return if total_active_glm == 0 
-    
-    splitted_amount = amount_to_be_deducted/total_active_glm 
-    
-    self.active_group_loan_memberships.joins(:group_loan_default_payment).each do |glm| 
-        
-        default_payment = glm.group_loan_default_payment 
-        default_payment.amount_receivable = self.class.rounding_up(splitted_amount, DEFAULT_PAYMENT_ROUND_UP_VALUE)
-        default_payment.save 
-    end
+        # 
+        # # update the default_payment#amount_receivable on 
+        # # 1. weekly_payment_collection#confirm  => effect from run away and uncollectible will take place 
+        # # 2. PrematureClearance#confirm  => should this be ported to be done inside weekly_payment_collection? 
+        # # 3. GroupLoanAdditionalDefaultPayment#confirm  => this is right. 
+        #   
+        # total_amount = self.default_payment_total_amount
+        #  
+        # amount_to_be_deducted  = BigDecimal('0')
+        # 
+        # # we don't need to think whether member can pay for it.. just show the amount to be paid. 
+        # # to pay or not to pay is another matter. 
+        # # if self.total_compulsory_savings < total_amount 
+        # #   amount_to_be_deducted = self.total_compulsory_savings
+        # # else # case total_compulsory_savings => total_amount 
+        # #   amount_to_be_deducted = total_amount
+        # # end
+        # 
+        # amount_to_be_deducted = total_amount
+        # 
+        # total_active_glm = self.active_group_loan_memberships.count 
+        # 
+        # return if total_active_glm == 0 
+        # 
+        # splitted_amount = amount_to_be_deducted/total_active_glm 
+        # 
+        # self.active_group_loan_memberships.joins(:group_loan_default_payment).each do |glm| 
+        #     
+        #     default_payment = glm.group_loan_default_payment 
+        #     default_payment.amount_receivable = self.class.rounding_up(splitted_amount, DEFAULT_PAYMENT_ROUND_UP_VALUE)
+        #     default_payment.save 
+        # end
   end
   
   def port_compulsory_savings_to_voluntary_savings
@@ -428,7 +431,7 @@ Phase: loan disbursement finalization
   end
   
   def total_compulsory_savings_post_closure
-    amount = total_compulsory_savings_pre_closure - end_of_cycle_default_resolution
+    amount = total_compulsory_savings_pre_closure - default_amount
     if amount > BigDecimal('0')
       return amount
     else
@@ -469,8 +472,10 @@ Phase: loan disbursement finalization
   
   def withdraw_compulsory_savings(params)
     
-    if self.is_closed?
+    # puts "withdraw_compulsory_savings is called"
+    if not self.is_closed?
       self.errors.add(:generic_errors, "Belum ditutup")
+      # puts "adding error.. returning myself"
       return self 
     end
     

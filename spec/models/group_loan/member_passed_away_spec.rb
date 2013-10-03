@@ -105,7 +105,7 @@ describe GroupLoan do
     @first_group_loan_weekly_collection.should be_valid 
     @first_group_loan_weekly_collection.collect(
       {
-        :collection_datetime => DateTime.now 
+        :collected_at => DateTime.now 
       }
     )
 
@@ -188,7 +188,7 @@ describe GroupLoan do
     
     context "perform collection and confirmation" do
       before(:each) do
-        @second_group_loan_weekly_collection.collect(:collection_datetime => DateTime.now)
+        @second_group_loan_weekly_collection.collect(:collected_at => DateTime.now)
         @second_group_loan_weekly_collection.confirm
       end
       
@@ -203,7 +203,7 @@ describe GroupLoan do
         @group_loan.group_loan_weekly_collections.order("id ASC").each do |x|
           next if x.is_collected? and x.is_confirmed? 
           
-          x.collect(:collection_datetime => DateTime.now)
+          x.collect(:collected_at => DateTime.now)
           x.confirm 
         end
         

@@ -10,7 +10,7 @@ class GroupLoanMembership < ActiveRecord::Base
   has_one :group_loan_port_compulsory_savings 
   has_one :group_loan_run_away_receivable
   
-  has_one :group_loan_default_payment 
+  # has_one :group_loan_default_payment 
   has_one :group_loan_premature_clearance_payment 
   
     

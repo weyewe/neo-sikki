@@ -198,4 +198,11 @@ Pretty much done.. do the spec!
 7. DONE. 
 
 		
+		
+		
+And we have to build unconfirm mechanism.
+
+Confirm => execute the transaction
+UnConfirm => undo the transaction, if it has no further effect.
+Then, you can change the variables in it. 
 

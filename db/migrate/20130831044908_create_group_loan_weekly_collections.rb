@@ -5,12 +5,13 @@ class CreateGroupLoanWeeklyCollections < ActiveRecord::Migration
       t.integer :week_number 
       t.boolean :is_collected, :default => false 
       
+      
       t.decimal :premature_clearance_deposit_usage, :default       => 0, :precision => 10, :scale => 2
       t.boolean :is_confirmed, :default => false 
       
-      t.datetime :collection_datetime   # explicit, has to be selected by the loan officer 
+      t.datetime :collected_at   # explicit, has to be selected by the loan officer 
       
-      t.datetime :confirmation_datetime # implicit, generated when the admin is confirming loan 
+      t.datetime :confirmed_at # implicit, generated when the admin is confirming loan 
       
       
 
