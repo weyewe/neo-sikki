@@ -11,7 +11,7 @@ class CreateGroupLoanWeeklyCollections < ActiveRecord::Migration
       
       t.datetime :collected_at   # explicit, has to be selected by the loan officer 
       
-      t.datetime :confirmed_at # implicit, generated when the admin is confirming loan 
+      t.datetime :confirmed_at # explicit as well 
       
       
 

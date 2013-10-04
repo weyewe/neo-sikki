@@ -89,12 +89,16 @@ describe GroupLoan do
       })
     end
     
+    
+    @started_at = DateTime.new(2013,10,5,0,0,0)
+    @disbursed_at = DateTime.new(2013,10,10,0,0,0)
+    
     # start group loan 
-    @group_loan.start 
+    @group_loan.start(:started_at => @started_at)
     @group_loan.reload
 
     # disburse loan 
-    @group_loan.disburse_loan 
+    @group_loan.disburse_loan(:disbursed_at => @disbursed_at)
     @group_loan.reload
     
     @first_group_loan_weekly_collection = @group_loan.group_loan_weekly_collections.order("id ASC").first
@@ -106,7 +110,7 @@ describe GroupLoan do
     )
 
     @first_group_loan_weekly_collection.is_collected.should be_true
-    @first_group_loan_weekly_collection.confirm
+    @first_group_loan_weekly_collection.confirm(:confirmed_at => DateTime.now )
     @first_group_loan_weekly_collection.reload
     
   end
@@ -130,7 +134,7 @@ describe GroupLoan do
       @second_group_loan_weekly_collection = @group_loan.group_loan_weekly_collections.order("id ASC")[1]
     end
     
-    it 'should create one DeceasedPrincipalReceivable' do
+    it 'should create one deactivated glm' do
       
       
       @run_away_glm.reload 

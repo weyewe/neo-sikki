@@ -89,12 +89,15 @@ describe GroupLoan do
       })
     end
     
+    @started_at = DateTime.new(2013,10,5,0,0,0)
+    @disbursed_at = DateTime.new(2013,10,10,0,0,0)
+    
     # start group loan 
-    @group_loan.start 
+    @group_loan.start(:started_at =>@started_at)
     @group_loan.reload
 
     # disburse loan 
-    @group_loan.disburse_loan 
+    @group_loan.disburse_loan(:disbursed_at => @disbursed_at)
     @group_loan.reload
     
     @first_group_loan_weekly_collection = @group_loan.group_loan_weekly_collections.order("id ASC").first
@@ -106,9 +109,9 @@ describe GroupLoan do
     )
 
     @first_group_loan_weekly_collection.is_collected.should be_true
-    @first_group_loan_weekly_collection.confirm
+    @first_group_loan_weekly_collection.confirm(:confirmed_at => DateTime.now )
     @first_group_loan_weekly_collection.reload
-    
+    @closed_at = DateTime.new(2013,12,5,0,0,0)
   end
   
   
@@ -166,19 +169,22 @@ describe GroupLoan do
           
           @initial_run_away_amount_received = @group_loan.run_away_amount_received
           @second_group_loan_weekly_collection.collect(:collected_at => DateTime.now)
-          @second_group_loan_weekly_collection.confirm 
+          @second_group_loan_weekly_collection.confirm(:confirmed_at => DateTime.now)
           
         
           @group_loan.reload
-          @group_loan.close
+          @group_loan.close(:closed_at => @closed_at)
           @group_loan.reload
           @second_group_loan_weekly_collection.reload 
           @first_group_loan_weekly_collection.reload
           @gl_rar.reload 
         end
         
-        # group_loan_run_away_receivable_payment has nothing to do with the run away member
-        # it is not related. Just a punishment. 
+        it 'should not close group loan' do
+          @group_loan.errors.size.should_not ==0 
+          @group_loan.is_closed.should be_false 
+        end
+         
         
         it 'should increase group_loan run_away_amount_received' do
           final_amount = @group_loan.run_away_amount_received 
@@ -226,11 +232,11 @@ describe GroupLoan do
           @group_loan.group_loan_weekly_collections.order("id ASC").each do |x|
             next if x.is_collected? and x.is_confirmed? 
             x.collect(:collected_at => DateTime.now)
-            x.confirm 
+            x.confirm(:confirmed_at => DateTime.now)
           end
       
           @group_loan.reload
-          @group_loan.close
+          @group_loan.close(:closed_at => @closed_at)
           @group_loan.reload
         end
         

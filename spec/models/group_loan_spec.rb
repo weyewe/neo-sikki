@@ -48,6 +48,8 @@ describe GroupLoan do
     
     @glp_array  = [@group_loan_product_1, @group_loan_product_2]
     
+    @started_at = DateTime.new(2013,10,5,0,0,0)
+    @disbursed_at = DateTime.new(2013,10,10,0,0,0)
     @closed_at = DateTime.new(2013,12,5,0,0,0)
     @withdrawn_at = DateTime.new(2013,12,6,0,0,0)
   end
@@ -110,7 +112,7 @@ describe GroupLoan do
       
       context "starting the group_loan" do
         before(:each) do
-          @group_loan.start 
+          @group_loan.start(:started_at => @started_at) 
           @group_loan.reload 
         end
         
@@ -124,7 +126,7 @@ describe GroupLoan do
         
         context "execute loan disbursement" do
           before(:each) do
-            @group_loan.disburse_loan 
+            @group_loan.disburse_loan(:disbursed_at => @disbursed_at)
           end
           
           it 'should be marked as loan disbursed' do
@@ -148,6 +150,9 @@ describe GroupLoan do
               }
             )
             
+            object = DateTime.now 
+            object.is_a?(DateTime).should be_true 
+            @first_group_loan_weekly_collection.errors.messages.each {|x| puts "msg : #{x}"}
             @first_group_loan_weekly_collection.is_collected.should be_true 
           end
           
@@ -179,7 +184,7 @@ describe GroupLoan do
               
               @first_glm = @group_loan.active_group_loan_memberships.first 
               @initial_compulsory_savings = @first_glm.total_compulsory_savings
-              @first_group_loan_weekly_collection.confirm
+              @first_group_loan_weekly_collection.confirm(:confirmed_at => DateTime.now)
               @first_glm.reload 
                
             end
@@ -215,7 +220,7 @@ describe GroupLoan do
             before(:each) do
               @group_loan.group_loan_weekly_collections.order("id ASC").each do |x|
                 x.collect(:collected_at => DateTime.now)
-                x.confirm 
+                x.confirm(:confirmed_at => DateTime.now)
               end
               
               @group_loan.reload 

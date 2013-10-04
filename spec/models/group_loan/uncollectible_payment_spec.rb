@@ -78,12 +78,15 @@ describe GroupLoan do
       })
     end
     
+    @started_at = DateTime.new(2013,10,5,0,0,0)
+    @disbursed_at = DateTime.new(2013,10,10,0,0,0)
+    
     # start group loan 
-    @group_loan.start 
+    @group_loan.start(:started_at => @started_at)
     @group_loan.reload
 
     # disburse loan 
-    @group_loan.disburse_loan 
+    @group_loan.disburse_loan(:disbursed_at => @disbursed_at)
     @group_loan.reload
     
     @first_group_loan_weekly_collection = @group_loan.group_loan_weekly_collections.order("id ASC").first
@@ -97,12 +100,13 @@ describe GroupLoan do
     )
 
     @first_group_loan_weekly_collection.is_collected.should be_true
-    @first_group_loan_weekly_collection.confirm
+    @first_group_loan_weekly_collection.confirm(:confirmed_at => DateTime.now)
     @first_group_loan_weekly_collection.reload
     @second_group_loan_weekly_collection.reload 
     @uncollectible_glm = @group_loan.active_group_loan_memberships[0] 
     @second_uncollectible_glm = @group_loan.active_group_loan_memberships[1] 
     @third_uncollectible_glm = @group_loan.active_group_loan_memberships[2] 
+    
     
     @closed_at = DateTime.new(2013,12,5,0,0,0)
     @withdrawn_at = DateTime.new(2013,12,6,0,0,0)
@@ -255,7 +259,7 @@ describe GroupLoan do
           :collected_at => DateTime.now 
         })
         
-        @second_group_loan_weekly_collection.confirm 
+        @second_group_loan_weekly_collection.confirm(:confirmed_at => DateTime.now) 
         @group_loan.reload 
         @first_gl_wu.reload 
         @second_group_loan_weekly_collection.reload 
@@ -306,7 +310,7 @@ describe GroupLoan do
         before(:each) do
           @group_loan.group_loan_weekly_collections.order("id ASC").each do |x|
             x.collect(:collected_at => DateTime.now)
-            x.confirm 
+            x.confirm(:confirmed_at => DateTime.now) 
           end
           
           @group_loan.reload

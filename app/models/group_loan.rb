@@ -153,12 +153,14 @@ class GroupLoan < ActiveRecord::Base
 =begin
   Switching phases 
 =end
-  def start
+  def start(params)
      
     if  self.is_started?
       errors.add(:generic_errors, "Pinjaman grup sudah dimulai")
       return self 
     end
+    
+    
     
     if self.group_loan_memberships.count == 0 
       errors.add(:generic_errors, "Jumlah anggota harus lebih besar dari 0")
@@ -170,6 +172,13 @@ class GroupLoan < ActiveRecord::Base
       return self 
     end
     
+    
+    if params[:started_at].nil? or not params[:started_at].is_a?(DateTime)
+      self.errors.add(:started_at, "Harus ada tanggal mulai")
+      return self 
+    end
+    
+    self.started_at = params[:started_at]
     self.is_started = true
     self.number_of_collections = self.loan_duration 
     self.save 
@@ -200,7 +209,7 @@ Phase: loan disbursement finalization
     end
   end
 
-  def disburse_loan 
+  def disburse_loan(params)
     
     if not self.is_loan_disbursement_phase?  
       errors.add(:generic_errors, "Bukan di fase penyerahan pinjaman")
@@ -212,8 +221,12 @@ Phase: loan disbursement finalization
       return self
     end
     
+    if params[:disbursed_at].nil? or not params[:disbursed_at].is_a?(DateTime)
+      errors.add(:disbursed_at, "Harus ada tanggal pemberian pinjaman")
+      return self
+    end
     
-    
+    self.disbursed_at = params[:disbursed_at]
     self.is_loan_disbursed = true 
     self.save 
     
@@ -461,6 +474,11 @@ Phase: loan disbursement finalization
       return self 
     end
     
+    if params[:closed_at].nil? or not params[:closed_at].is_a?(DateTime)
+      self.errors.add(:closed_at, "Harus ada tanggal tutup")
+      return self 
+    end
+    
     self.closed_at = params[:closed_at]
     
     if self.closed_at.nil?
@@ -491,13 +509,14 @@ Phase: loan disbursement finalization
     end
     
     
-    self.compulsory_savings_withdrawn_at = params[:compulsory_savings_withdrawn_at]
     
-    if self.compulsory_savings_withdrawn_at.nil?
+    
+    if params[:compulsory_savings_withdrawn_at].nil? or not params[:compulsory_savings_withdrawn_at].is_a?(DateTime)
       self.errors.add(:compulsory_savings_withdrawn_at, "Harus ada tanggal penarikan sisa tabungan wajib")
       return self 
     end
     
+    self.compulsory_savings_withdrawn_at = params[:compulsory_savings_withdrawn_at]
     self.is_compulsory_savings_withdrawn = true
     self.save 
   end
