@@ -103,6 +103,10 @@ describe GroupLoan do
     @uncollectible_glm = @group_loan.active_group_loan_memberships[0] 
     @second_uncollectible_glm = @group_loan.active_group_loan_memberships[1] 
     @third_uncollectible_glm = @group_loan.active_group_loan_memberships[2] 
+    
+    @closed_at = DateTime.new(2013,12,5,0,0,0)
+    @withdrawn_at = DateTime.new(2013,12,6,0,0,0)
+    @cleared_at=   DateTime.new(2013,11,5,0,0,0)
   end
   
   
@@ -209,12 +213,19 @@ describe GroupLoan do
       @initial_amount_receivable = @second_group_loan_weekly_collection.amount_receivable
       
       @initial_extract_uncollectible_weekly_payment_amount = @second_group_loan_weekly_collection.extract_uncollectible_weekly_payment_amount
+      @initial_default_amount = @group_loan.default_amount
       @first_gl_wu = GroupLoanWeeklyUncollectible.create_object({
         :group_loan_id => @group_loan.id,
         :group_loan_membership_id => @uncollectible_glm.id ,
         :group_loan_weekly_collection_id => @second_group_loan_weekly_collection.id   
       })
       @group_loan.reload 
+    end
+    
+    it 'should not change group loan default amount ' do
+      final_default_amount = @group_loan.default_amount
+      diff = final_default_amount - @initial_default_amount
+      diff.should == BigDecimal('0')
     end
     
     it 'should produce 0 for the initial_uncollectible_payment_amount' do
@@ -248,6 +259,14 @@ describe GroupLoan do
         @group_loan.reload 
         @first_gl_wu.reload 
         @second_group_loan_weekly_collection.reload 
+        
+        @group_loan.reload 
+      end
+      
+      it 'should update the default payment amount by the uncollectible\'s principal' do
+        @final_default_amount = @group_loan.default_amount
+        diff = @final_default_amount  - @initial_default_amount
+        diff.should == @uncollectible_glm.group_loan_product.principal 
       end
       
       it 'should allow uncollectible amount' do
@@ -263,6 +282,8 @@ describe GroupLoan do
 
       it 'should not allow creation of uncollectible' do
         @second_uncollectible_glm = @group_loan.active_group_loan_memberships.last 
+         
+        
         @second_gl_wu = GroupLoanWeeklyUncollectible.create_object({
           :group_loan_id => @group_loan.id,
           :group_loan_membership_id => @second_uncollectible_glm.id ,
@@ -270,6 +291,7 @@ describe GroupLoan do
         })
         
         @second_gl_wu.should_not be_valid 
+        @group_loan.reload
       end
         
         
@@ -277,24 +299,73 @@ describe GroupLoan do
         @second_group_loan_weekly_collection.is_confirmed.should be_true 
       end
       
-      it 'should update the group_loan.default_amount'   do
-        @group_loan.reload
-        @group_loan.default_amount.should_not == BigDecimal('0')
+       
+     
+    
+      context "closing the group loan" do
+        before(:each) do
+          @group_loan.group_loan_weekly_collections.order("id ASC").each do |x|
+            x.collect(:collected_at => DateTime.now)
+            x.confirm 
+          end
+          
+          @group_loan.reload
+        end
+        
+        it 'should keep the default amount value' do
+          @group_loan.default_amount.should == @uncollectible_glm.group_loan_product.principal 
+        end
+        
+        it 'should not allow group loan closing if there are uncleared uncollectibles' do
+          @group_loan.close(:closed_at => @closed_at)
+          @group_loan.errors.size.should_not == 0 
+          @group_loan.is_closed.should be_false 
+        end
+        
+        context "clearing uncollectibles"  do
+          before(:each) do
+            @group_loan.reload
+            @initial_group_loan_default_amount = @group_loan.default_amount
+            @first_gl_wu.clear(:cleared_at => @cleared_at)
+          
+            @first_gl_wu .reload
+            @group_loan.reload
+          end
+          
+          
+          it 'should set the default amount == 0 ' do
+            @group_loan.default_amount.should == BigDecimal('0')
+          end
+          
+          
+          it 'should update the group loan default amount' do
+            @group_loan.reload
+            final_group_loan_default_amount = @group_loan.default_amount
+            diff = final_group_loan_default_amount - @initial_group_loan_default_amount
+            
+            diff.should == -1*@uncollectible_glm.group_loan_product.principal 
+          end
+          
+          
+          
+          it 'should clear the gl_wu' do
+            @first_gl_wu.errors.messages.each {|x| puts "msg: #{x}"}
+            @first_gl_wu .is_cleared.should be_true  
+          end
+          
+          it 'should allow group loan closing if the uncollectibles are cleared' do
+            @group_loan.reload
+            @group_loan.close(:closed_at => @closed_at )
+            
+            @group_loan.is_closed.should be_true 
+            @group_loan.errors.size.should == 0 
+          end
+        end
       end
-      
-      it 'should produce equal splitting' # do
-      #         # GroupLoan.rounding_up(amount,  nearest_amount ) 
-      #         total_default_amount = @uncollectible_glm.group_loan_product.weekly_payment_amount 
-      #         share_per_member= total_default_amount/@group_loan.active_group_loan_memberships.count 
-      #         
-      #         expected_amount_receivable  = GroupLoan.rounding_up( share_per_member, DEFAULT_PAYMENT_ROUND_UP_VALUE)
-      #         
-      #         @group_loan.active_group_loan_memberships.joins(:group_loan_default_payment).each do |glm|
-      #           glm.group_loan_default_payment.amount_receivable.should == expected_amount_receivable
-      #         end
-      #       end
      
     end
   end
 end
+
+# there are only 2 cases of default: uncollectible and run_away 
 

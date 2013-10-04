@@ -12,11 +12,12 @@ class GroupLoanWeeklyUncollectible < ActiveRecord::Base
   validate :use_first_uncollected_weekly_collection
   validate :no_creation_if_weekly_collection_is_confirmed
   
-  after_create :update_group_loan_default_amount_receivable
+  # after_create :update_group_loan_default_amount_receivable
   
-  def update_group_loan_default_amount_receivable
-    group_loan.update_default_payment_amount_receivable
-  end
+  # def update_group_loan_default_amount_receivable
+  #   group_loan.update_default_payment_amount_receivable
+  #   
+  # end
   
   def all_fields_present?
     group_loan_weekly_collection_id.present? and 
@@ -66,6 +67,7 @@ class GroupLoanWeeklyUncollectible < ActiveRecord::Base
   
   def use_first_uncollected_weekly_collection
     return if not all_fields_present? 
+    return if self.persisted? 
     
     if group_loan.first_uncollected_weekly_collection.id != self.group_loan_weekly_collection_id 
       msg = "Pengumpulan minggu #{group_loan_weekly_collection.week_number} telah ditutup"
@@ -76,6 +78,7 @@ class GroupLoanWeeklyUncollectible < ActiveRecord::Base
   
   def no_creation_if_weekly_collection_is_confirmed
     return if not all_fields_present? 
+    return if self.persisted? 
     
     if group_loan_weekly_collection.is_collected?
       self.errors.add(:group_loan_weekly_collection_id, "Sudah terkonfirmasi. Tidak bisa ditambah.")
@@ -88,6 +91,7 @@ class GroupLoanWeeklyUncollectible < ActiveRecord::Base
   
   def update_amount 
     self.amount = self.group_loan_membership.group_loan_product.weekly_payment_amount
+    self.principal = self.group_loan_membership.group_loan_product.principal
     self.save
   end
   
@@ -123,6 +127,26 @@ class GroupLoanWeeklyUncollectible < ActiveRecord::Base
     end
     
     self.destroy 
+  end
+  
+  def clear(params)
+    if self.is_cleared? 
+      self.errors.add(:generic_errors, "Sudah di selesaikan")
+      return self 
+    end
+    
+    self.is_cleared = true 
+    self.cleared_at = params[:cleared_at]
+    
+    if self.cleared_at.nil?
+      self.errors.add(:cleared_at, "Harus ada tanggal penutupan")
+      return self 
+    end
+    
+  
+    if self.save 
+      group_loan.update_default_amount( -1*self.principal )
+    end
   end
   
 end

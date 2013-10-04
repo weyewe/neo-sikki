@@ -95,17 +95,11 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
   
   
   
-  def update_group_loan_default_payment
-    # update from uncollectible
-    
-    # update from run_away [case == end_of_cycle default_resolution]
-    
-    # self.
-    gl = self.group_loan
-    gl.default_amount += self.extract_uncollectible_weekly_payment_amount + 
-                    self.extract_run_away_weekly_resolution_amount
-                    
-    gl.save 
+  def update_group_loan_default_payment 
+    group_loan.update_default_amount(                 
+                      self.extract_uncollectible_weekly_payment_default_amount + 
+                      self.extract_run_away_weekly_resolution_amount
+    )
   end
   
   
@@ -127,8 +121,14 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
     
     self.create_group_loan_weekly_payments 
     # self.group_loan.update_default_payment_amount_receivable
-    self.update_group_loan_default_payment
+    self.update_group_loan_default_payment  # from uncollectible +  run_away_member
     self.confirm_premature_clearances
+  end
+  
+  
+  def unconfirm
+    # if it is unconfirmable (the next group loan weekly collection is not confirmed?)
+    # and there is no corner cases created for the next group 
   end
   
   
@@ -228,6 +228,10 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
   
   def extract_uncollectible_weekly_payment_amount 
     self.group_loan_weekly_uncollectibles.sum("amount")
+  end
+  
+  def extract_uncollectible_weekly_payment_default_amount
+    self.group_loan_weekly_uncollectibles.sum("principal")
   end
   
   def extract_premature_clearance_payment_amount

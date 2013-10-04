@@ -370,6 +370,11 @@ Phase: loan disbursement finalization
   # glm.group_loan_default_payment.amount_receivable => total split must be paid 
   # glm.group_loan_default_payment.amount_received == payment 
   
+  def update_default_amount( amount ) 
+    self.default_amount += amount
+    self.save 
+  end
+  
   def update_default_payment_amount_receivable  
     # update the sum in the group_loan 
     
@@ -444,6 +449,12 @@ Phase: loan disbursement finalization
       self.errors.add(:generic_errors, "Ada Pengumpulan mingguan yang belum selesai")
       return self 
     end
+    
+    if self.group_loan_weekly_uncollectibles.where(:is_cleared => false).count != 0 
+      self.errors.add(:generic_errors, "Ada pembayaran tak tertagih")
+      return self 
+    end
+    
     
     if self.is_closed?
       self.errors.add(:generic_errors, "Sudah ditutup")
