@@ -206,3 +206,123 @@ Confirm => execute the transaction
 UnConfirm => undo the transaction, if it has no further effect.
 Then, you can change the variables in it. 
 
+
+There are only 2 cases: run_away and uncollectible 
+
+For uncollectible, it is not bailed out by the premature clearance member. 
+
+RunAway member will be bailed out by premature clearance member. 
+
+The question: 
+
+weekly payment == remaining_payment_by_active_members + bailed_out_for_run_away_member 
+
+for weekly collection => the bail_out will be adjusted. 
+for end_of_cycle collection => the default_amount will be reduced. 
+
+what if there are both weekly  and end_of_cycle resolution?
+
+How should we allocate the lump-sum bail out?
+
+example:
+
+20 weeks
+per member: 10K idr: principal (6k)  + interest (2k) + compulsory_savings(2k)
+
+on week 5 : run_away weekly_resolution
+
+on week 8 : premature clearance => has to pay for premature clearance: remaining principal - compulsory savings +  run_away_5  weekly resolution lump_sum 
+
+
+on week 12 : run_away end_of_cycle resolution
+
+on week 15 : premature clearance => premature clearance: remaining principal - compulsory savings + 
+run_away_5 weekly_resolution lump_sum + run_away_12 end_of_cycle lump_sum 
+
+
+
+Question: 
+decide the amount of run_away_5 weekly resolution lump sum 
+decide the premature clearance amount (remaining principal - compulsory savings + lump_sum to cover run away member)
+decide the weekly_collection.amount receivable for week 9 (after premature clearance)
+
+
+=====> first task... what if there is subsequent run_away and premature clearance
+
+Rule: round_up on the money to be received
+Rule: round_down on money to be paid by KKI
+
+rule of thumb: minimize cost, maximize revenue 
+
+=> how can we do the posting? 
+there should be an account to keep the lump sum: deposit. 
+
+PrematureClearanceDeposit => total sum is recorded at the group_loan
+PrematureClearanceDepositUsage => use of the premature clearance.... (bound to the weekly payment)
+
+On every weekly payment => it will be withdrawn
+
+
+week 5 == run_away, weekly resolved
+week 8 == premature clearance.. 
+19members remaining, 1 is premature_cleared on week 8.  start to be inactive on week 9
+
+How much should the premature_clearance member pay? 
+	week9-week20 principal amount return == 12 * principal 
+	the compulsory savings is used to pay ==  - compulsory_savings 
+	it has to pay its share for run_away member (lump sum) == lump_sum amount
+	
+	Hence, it boils down to the amount of lump sum amount..
+	
+	CASE 1: if the run_away is resolved at the end of the week
+		Total remaining run_away payment == weekly_payment*12 
+		The premature clearance member's share per week == weekly_payment*1/19 
+		====> The lump sum to be paid:
+					The premature clearance member's share for 12 week == weekly_payment*12*1/19 
+		
+		=> The adjustment of the weekly bail out== weekly_payment*1/19
+		The final run_away payable weekly: weekly_payment*18/19
+		
+		Problem: the rounding up.
+		
+		Let's use number... 
+		Lump sum to be paid: 10,000*12/19 == 6315.78  => will go to premature clearance deposit 
+		
+		initial bail out before premature_clearance == 10,000   
+		The adjusted bail out:: 10,000*18/19 == 9473.68
+
+
+
+		To maximize $$ == rounding up the lump sum:: 6315.78 => 6400   (extra profit: 84.22)
+		To maximize $$ == rounding up the adjusted bail out:: 9500   (extra profit: 26.32)  => Double profit? 
+		
+		How can we account for this mechanism? 
+			So, if the amount received (cash) is the same with the calculated
+						weekly_collection + adjusted_run_away_weekly_resolution_bail_out 
+						
+			=> Proceed to deduct the premature_clearance_deposit, deduct so that the amount received
+				is equal to number of active members + run_away_but_assumed_full_weekly_collection 
+				
+			=> At the end of loan cycle, there will be excess premature_clearance_deposit.. 
+			
+				==> go to revenue? indeed. 
+				
+	Case 2: what if it is decided as end_of_cycle resolved. 
+		the lump_sum => component paid: principal + interest + compulsory savings 
+		but the end_of_cycle is paid by using compulsory savings. 
+		
+		proposed solution: 
+		the end compulsory savings:: base compulsory savings + remaining of premature_clearance_deposit
+		
+		it will be used to deduct the (interest+principal )*remaining_week of end_of_cycle payment 
+		
+		The remnant will be used for compulsory savings return. 
+	
+			
+		In this way, we are being fair to the member. the only 'un' fair point: if
+		the compulsory savings return is not a round number.=> 175.350
+		175,000 will be returned.
+				
+		
+			
+			
