@@ -337,42 +337,42 @@ Phase: loan disbursement finalization
     return sum #  BigDecimal('0')
   end
   
-  def default_payment_total_amount  # we will redo this method
-    total_amount = BigDecimal('0')
-    # The defaults: 
-    # 1. + run_away_receivable (payment_case => end_of_cycle ) 
-    # 2. + uncollected weekly payment 
-    # 3. - deduct by the total amount of GroupLoanAdditionalDefaultPayment  (can come from member.. but doesn't matter)
-    # 4. - Deduct by the total amount of PrematureClearance 
-    
-    # on deceased member, if they have default, will be handled by the present member 
-    # recalculate the default resolution amount. 
-    
-    # total debt: sum of all default_payment.remaining_amount_receivable where the glm.is_active => true 
-    
-    
-    #### HANDLING THE DEFAULTS 1: run_away_receivable 
-    # cases: 
-    # 0. no run_away_receivable
-    # 1. only one run_away_receivable
-    # 2. many run_away_receivable 
-    
-    total_amount += self.group_loan_run_away_receivables.
-        where(:payment_case => GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:end_of_cycle]).
-        sum('amount_receivable')
-        
-    # contribution from the uncollectibles
-    total_amount += self.group_loan_weekly_uncollectibles.sum("amount")
-    
-    # total_amount -= self.cleared_default_payment_amount # from member premature clearce
-    
-    if total_amount < BigDecimal('0')
-      return BigDecimal('0')
-    else
-      return total_amount
-    end
-    
-  end
+  # def default_payment_total_amount  # we will redo this method
+  #   total_amount = BigDecimal('0')
+  #   # The defaults: 
+  #   # 1. + run_away_receivable (payment_case => end_of_cycle ) 
+  #   # 2. + uncollected weekly payment 
+  #   # 3. - deduct by the total amount of GroupLoanAdditionalDefaultPayment  (can come from member.. but doesn't matter)
+  #   # 4. - Deduct by the total amount of PrematureClearance 
+  #   
+  #   # on deceased member, if they have default, will be handled by the present member 
+  #   # recalculate the default resolution amount. 
+  #   
+  #   # total debt: sum of all default_payment.remaining_amount_receivable where the glm.is_active => true 
+  #   
+  #   
+  #   #### HANDLING THE DEFAULTS 1: run_away_receivable 
+  #   # cases: 
+  #   # 0. no run_away_receivable
+  #   # 1. only one run_away_receivable
+  #   # 2. many run_away_receivable 
+  #   
+  #   total_amount += self.group_loan_run_away_receivables.
+  #       where(:payment_case => GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:end_of_cycle]).
+  #       sum('amount_receivable')
+  #       
+  #   # contribution from the uncollectibles
+  #   total_amount += self.group_loan_weekly_uncollectibles.sum("amount")
+  #   
+  #   # total_amount -= self.cleared_default_payment_amount # from member premature clearce
+  #   
+  #   if total_amount < BigDecimal('0')
+  #     return BigDecimal('0')
+  #   else
+  #     return total_amount
+  #   end
+  #   
+  # end
   
   
   # default payment amount_receivable will be updated on:

@@ -103,7 +103,7 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
   def update_group_loan_default_payment 
     group_loan.update_default_amount(                 
                       self.extract_uncollectible_weekly_payment_default_amount + 
-                      self.extract_run_away_weekly_resolution_amount
+                      self.extract_run_away_end_of_cycle_resolution_default_amount
     )
   end
   
@@ -197,6 +197,23 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
     amount = BigDecimal('0')
     self.active_group_loan_memberships.joins(:group_loan_product).each do |glm|
       amount += glm.group_loan_product.weekly_payment_amount
+    end
+    
+    return amount 
+  end
+  
+  
+  def extract_run_away_end_of_cycle_resolution_default_amount
+    amount = BigDecimal('0')
+    current_week_number = self.week_number 
+    total_weeks = self.group_loan.loan_duration 
+    
+    remaining_weeks = total_weeks - current_week_number + 1 
+    
+    self.group_loan_run_away_receivables.joins(:group_loan_membership => [:group_loan_product]).
+          where(:payment_case => GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:end_of_cycle]).each do |gl_rar|
+            
+      amount += gl_rar.group_loan_membership.group_loan_product.principal*remaining_weeks
     end
     
     return amount 

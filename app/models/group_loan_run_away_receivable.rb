@@ -64,15 +64,18 @@ class GroupLoanRunAwayReceivable < ActiveRecord::Base
     end 
   end
   
-  def close
-    self.is_closed = true 
-    self.save 
-    
-    # over here, trigger the accounting shite to
-    # 1. loan provision
-    # 2. write-off interest receivable => as bad expense 
-    
-  end
+  
+  # is it needed to be closed? no need. 
+  # def close
+  #   self.is_closed = true 
+  #   self.save 
+  #   
+  #   
+  #   # over here, trigger the accounting shite to
+  #   # 1. loan provision
+  #   # 2. write-off interest receivable => as bad expense 
+  #   
+  # end
   
   
 end
