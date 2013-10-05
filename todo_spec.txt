@@ -262,7 +262,7 @@ PrematureClearanceDepositUsage => use of the premature clearance.... (bound to t
 
 On every weekly payment => it will be withdrawn
 
-
+===========================================
 week 5 == run_away, weekly resolved
 week 8 == premature clearance.. 
 19members remaining, 1 is premature_cleared on week 8.  start to be inactive on week 9
@@ -321,8 +321,247 @@ How much should the premature_clearance member pay?
 			
 		In this way, we are being fair to the member. the only 'un' fair point: if
 		the compulsory savings return is not a round number.=> 175.350
-		175,000 will be returned.
-				
+		175,000 will be returned. => (350 IDR is taken as rounding profit)
 		
+		
+================== ok fair enough. what if there are subsequent run_away and premature clearance? )
+=> another weekly_default resolution + premature clearance
+		
+week 5 == run_away, weekly resolved
+week 8 == premature clearance..
+week 10 == run_away, weekly resolved,
+week 12 == premature clearance 
+
+week_1 <= weekly_collection amount_receivable == 20 members <= week_8 
+
+week_9 <= weekly_collection amount_receivable == 19 members + adjusted_run_away_member_1  <= week 12 
+
+week_13 <= weekly_collection amount_receivable == 18_members + adjusted_run_away_member_2 <= week_20 
+
+premature_clearance_8 == ? 
+He has to bail out for his contribution for
+		complete run_away_member weekly payment from week 9-20 (12 weeks)
+		
+		12weeks * run_away_5_weeky_payment /19   << rounded up 
+
+
+adjusted_run_away_member_1 == run_away_5_weekly_payment*18/19 
+
+premature_clearance_12 == ? 
+He has to bail out for his contribution for 
+	complete run_away_member_5 weekly payment from week 13-20 (8 weeks)
+	complete run_away_member_10 weekly payment from week 13-20 (8 weeks) 
+	
+		8_weeks*run_away_5_weekly_payment/18   ( 18 remaining members, 2 run_away)
+		8_weeks*run_away_10_weekly_payment/18  ( 18 remaining members, 2 run_away)
+		
+		total == 8weeks*(run_away_5_weekly + run_away_10_weekly)/18 
+		
+adjusted_run_away_2 = 8weeks*(run_away_5_weekly + run_away_10_weekly)*17/18 
+
+
+
+Case: 1 weekly_resolved... 1 end_of_cycle resolved
+=========================================================================
+				
+week 5 == run_away, weekly resolved
+week 8 == premature clearance..
+week 10 == run_away, end_of_cyle resolved,
+week 12 == premature clearance 
+
+week_1 <= weekly_collection amount_receivable == 20 members <= week_8 
+
+week_9 <= weekly_collection amount_receivable == 19 members + adjusted_run_away_member_1  <= week_9
+
+week_10 <= weekly_collection amount_receivable == 18 members + adjusted_run_away_member_1 <= week_12 
+
+week_13 <= weekly_collection amount_receivable == 18_members + adjusted_run_away_member_2 <= week_20 
+
+premature_clearance_8 == ? 
+He has to bail out for his contribution for
+		complete run_away_member weekly payment from week 9-20 (12 weeks)
+		
+		12weeks * run_away_5_weeky_payment /19   << rounded up 
+
+
+adjusted_run_away_member_1 == run_away_5_weekly_payment*18/19 
+
+premature_clearance_12 == ? 
+He has to bail out for his contribution for 
+	complete run_away_member_5 weekly payment from week 13-20 (8 weeks)
+	complete run_away_member_10 weekly payment from week 13-20 (8 weeks) 
+	
+		8_weeks*run_away_5_weekly_payment/18   ( 18 remaining members, 2 run_away)
+		8_weeks*run_away_10_weekly_payment/18  ( 18 remaining members, 2 run_away)
+		
+		total == 8weeks*(run_away_5_weekly + run_away_10_weekly)/18 
+		
+adjusted_run_away_2 = 8weeks*(run_away_5_weekly )*17/18   << we are not including the week 10 because it is done at the end_of_cycle 
+
+=======> during the weekly collection, get the $$ from the premature_clearance_deposit
+so that amount_receivable + x == active_member.weekly_colection + in_active_member_weely_resolved.weekly_collection
+
+x = active_member.weekly_colection + in_active_member_weely_resolved.weekly_collection - amount_receivable
+=> deducted from premature_clearance_deposit 
+
+
+at the end of cycle... total $$ belonging to the member == 
+total_compulsory_savings + remaining_premature_clearance_deposit - default_amount 
+
+We will give them the history + summary. Do the division on their own. 
+
+ok, fair enough. We aren't stealing any money from member. Just keeping more till the duration ends. 
+
+
+
+======> Deceased => reducing the active_member pool... if there is uncollectible with deceased?
+ => clear the uncollectible, clearance_case => deceased
+What if deceased contains uncollectible?  => contributed to default payment. 
+# uncollectible has clearance_case => end_of_cycle
+# what if run away has uncollectible? => end_of_cycle clearance. 
+
+oh, on deceased or run_away => update the uncollectible case => end_of_cycle clearance
+initial clearance_case => cash_payment 
+
+
+=======> What if we bring deceased into the equation? 
+
+
+week 5 == run_away, weekly resolved
+week 8 == premature clearance..
+week 10 ==  deceased  
+week 13 == premature clearance
+
+week_1 <= weekly_collection amount_receivable == 19 members + run_away_member_1 <= week_8 
+
+week_9 <= weekly_collection amount_receivable == 18 members + adjusted_run_away_member_1  <= week9
+ premature clearance amount == 12_weeks*run_away_5_weekly_collection*1/19  
+			(1/19 > 1 out of 19 remaining members)
 			
+adjusted_run_away_member_1 == run_away_5_weekly_collection* 18/19 
+			(18/19> 18 remaining members, out of 19 including the premature cleared)
+
+
+week 10 -week 13 => there is deceased member. it will pull down the active group loan 
+	What is the expected amount received from the group? good question..
+	Who is liable to pay for the run_away contribution from deceased member? 
+		=> the group...  
+
+		week10 <=   17members			+ adjusted_run_away_member_1								<= week13
+
+
+
+week14 - week 20   (on week13 => premature clearance)
+	what is premature clearance amount? week 14-week 20 == 7 weeks 
+	premature_clearance_13 == 
+	1.		(  7weeks*run_away_weekly_payment - remaining_premature_clearance_deposit) * 1/17 
+			We are being fair.. only taking $$ that we need. 
+			
+			And we will have trouble of rebuilding the history.. taking the easy way..
+			what is the hard way?
+			
+	2. if it is the first premature clearance : 
+					premature clearance amount == 7_weeks*run_away_5_weekly_collection*1/17
+					
+		But this is the second premature clearance. Which means that there are parts paid by the first
+		  premature clearance. 
+		
+			Hence: 7_weeks*run_away_5_weekly_collection*(1 - 1/19)/17    
+			1/19 has been paid by the first premature_clearance.
+			Leaving us with 18/19.. the portion of the second premature_clearance is 
+			1/17 => => 7_weeks*run_away_5_weekly_collection*18/19*1/17
+	
+	
+	amount to be paid by the rest of the member == 7weeks * run_away_weekly_payment*18/19 * 16/17 
+
+	week14 <=    16members + double_adjusted_run_away_member_2               <= week20
+
+
+
+
+
+
+
+
+
+
+======> + Uncollectible (can only be paid by hardcash. ). group loan can't be closed if there is still
+uncleared uncollectible  => we can mark: clearance_case .. group_loan can't be closed if there is any uncleared uncollectible with clearance_case == end_of_cycle.. 
+
+
+Yes.. done.. understood all the cases.. 
+
+=> on weekly collection confirm, Amount receivable? => it has to be calculated. 
+
+
+
+========= what if there are 2 subsequent premature clearance? 
+
+week 5 == run_away, weekly resolved
+week 10 == premature clearance
+week 12 == premature clearance
+
+week 1 <= 19_remaining_member + bail out for run_away member <= week 10 
+
+week 10 == premature clearance
+week 11 <=  18_remaining member  + adjusted_bail_out_1 <= week_12
+
+			adjusted_bail_out_1 = 18/19*run_away_weekly_payment 
+			
+week 12 == premature_clearance_2
+
+week13 <= 17_remaining_member + adjusted_bail_out_2 <= week_20
+
+adjusted bail out 2 == 1 run_away_weekly_payment - contribution from premature_1 - contribution_from premature_2 
+
+		contribution from premature_1 == 1/19*run_away_weekly_payment 
+		contribution from premature_2 = 1/17*remaining_adjusted_run_away_weekly_payment_1 
+		
+		
+			adjusted_bail_out_2	= 16/17* 18/19* run_away_weekly_payment 
+					what is the algorithm to extract 1/17   and 18/19 ? 
+					
+					get the timeline indicating run_away, premature_clearance, sort by week number it happened
+					priority => run_away, premature_clearance
+					
+					# algorithm to calculate adjusted_bail_out amount 
+					
+					1. if you bump into run_away, extract it to the run_away_bailout list 
+					2. if you bump into a premature_clearance, multiply each run_away in the bailout list
+						by 
+						(number_of_active member on premature_clearance week start - number_of_premature_clearance_started)
+						 divide_by number_of_active_member_on_premature_clearance_week_start
+					
+					
+					That's it. Will this scheme work if there are 2 premature clearances on a given week? 
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					What is the algorithm to calculate current week premature_clearance_payment_amount (to be paid by
+						premature clearance member)? 
+					0. if week <= current_week 
+					1. if you bump into run_away, put it onto the bailout list
+					2. if you bump into a premature clearance, multiply each run_away in the bailout list
+						by 
+						(number_of_active member on premature_clearance week start - number_of_premature_clearance_started that week)
+						 divide_by number_of_active_member_on_premature_clearance_week_start
+						
+					3. Then, we will have array of remaining_premature_clearance up to last week
+					4. To get the premature clearance amount for 1 member for this week: 
+					multiply each remaining_run_away_weekly_payment by 
+					(1/active_member_this_week)  * number_of_remaining_weeks 
+						=> we have the amount of premature clearance for a member. 
+						
+						=> rounded UP! 
+					
+					
+					Then, sum all premature_clearance amount for this week. => amount receivable.
+					
+					
 			

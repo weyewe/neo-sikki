@@ -220,6 +220,30 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
   end
   
   def extract_run_away_weekly_resolution_amount
+    # new methodology
+    # build the timeline of corner_cases (x-axis is the week_number) from week1 to the current week 
+    # ordered by case as well.. deceased => 1, run_away_weekly_resolution => 2, premature_clearance => 3 
+    # if there is run_away_weekly_resolution, put it into the bail out array 
+    # if there premature_clearance => adjust each run away weekly resolution 
+    
+    # 1. get all premature clearance lte than this week
+    # 2. get all run_away_weekly_resolution lte than this week. 
+    
+    # for each run_away_weekly_resolution
+    # traverse over all premature_clearance (order by week_number )
+    # if premature clearance is gte than the run_away_weekly_resolution
+    # extract the multipler (1/number_of_active_glm_at_that_week)
+    
+    # get the run_away member lte than this week 
+    # for each run_away member => get all premature clearance up to this week
+    
+    # calculate the multiplier 
+    # for each premature clearance
+    # 1. on the week of premature clearance is starting, get the number of active members
+    # 2. return the 1/number_of_active members
+    
+    
+    
     # return BigDecimal('0')
     amount = BigDecimal('0')
     current_week_number = self.week_number
@@ -268,11 +292,11 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
   end
   
   def amount_receivable 
-    total_amount =  extract_base_amount + 
-                    extract_run_away_weekly_resolution_amount + 
+    total_amount =  extract_base_amount +  # from all still active member 
+                    extract_run_away_weekly_resolution_amount +  # amount used to bail out the run_away weekly_resolution
                     extract_premature_clearance_payment_amount -  #premature clearance for that week 
-                    extract_uncollectible_weekly_payment_amount  -
-                    extract_weekly_run_away_premature_clearance_paid_amount
+                    extract_uncollectible_weekly_payment_amount   #-
+                    # extract_weekly_run_away_premature_clearance_paid_amount
                      
     
     return total_amount 
