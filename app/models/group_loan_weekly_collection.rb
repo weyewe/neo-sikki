@@ -193,6 +193,8 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
   end
   
   
+  
+  
   def extract_base_amount 
     amount = BigDecimal('0')
     self.active_group_loan_memberships.joins(:group_loan_product).each do |glm|
@@ -219,65 +221,102 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
     return amount 
   end
   
-  def extract_run_away_weekly_resolution_amount
-    # new methodology
-    # build the timeline of corner_cases (x-axis is the week_number) from week1 to the current week 
-    # ordered by case as well.. deceased => 1, run_away_weekly_resolution => 2, premature_clearance => 3 
-    # if there is run_away_weekly_resolution, put it into the bail out array 
-    # if there premature_clearance => adjust each run away weekly resolution 
-    
-    # 1. get all premature clearance lte than this week
-    # 2. get all run_away_weekly_resolution lte than this week. 
-    
-    # for each run_away_weekly_resolution
-    # traverse over all premature_clearance (order by week_number )
-    # if premature clearance is gte than the run_away_weekly_resolution
-    # extract the multipler (1/number_of_active_glm_at_that_week)
-    
-    # get the run_away member lte than this week 
-    # for each run_away member => get all premature clearance up to this week
-    
-    # calculate the multiplier 
-    # for each premature clearance
-    # 1. on the week of premature clearance is starting, get the number of active members
-    # 2. return the 1/number_of_active members
-    
-    
-    
-    # return BigDecimal('0')
-    amount = BigDecimal('0')
-    current_week_number = self.week_number
-    
-    group_loan.group_loan_memberships.joins(:group_loan_run_away_receivable).where{
-      ( deactivation_case.eq GROUP_LOAN_DEACTIVATION_CASE[:run_away] ) & 
-      ( deactivation_week_number.lte current_week_number ) & 
-      (
-        group_loan_run_away_receivable.payment_case.eq GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:weekly] 
-      )
-    }.each do |glm|
-      amount += glm.group_loan_product.weekly_payment_amount
-    end
-    
-    # adjust the weekly_amount, deduct the premature_clearance 
-    
-    
-    
-    return amount 
-  end
+  # def extract_run_away_weekly_resolution_amount
+  #   # new methodology
+  #   # build the timeline of corner_cases (x-axis is the week_number) from week1 to the current week 
+  #   # ordered by case as well.. deceased => 1, run_away_weekly_resolution => 2, premature_clearance => 3 
+  #   # if there is run_away_weekly_resolution, put it into the bail out array 
+  #   # if there premature_clearance => adjust each run away weekly resolution 
+  #   
+  #   # 1. get all premature clearance lte than this week
+  #   # 2. get all run_away_weekly_resolution lte than this week. 
+  #   
+  #   # for each run_away_weekly_resolution
+  #   # traverse over all premature_clearance (order by week_number )
+  #   # if premature clearance is gte than the run_away_weekly_resolution
+  #   # extract the multipler (1/number_of_active_glm_at_that_week)
+  #   
+  #   # get the run_away member lte than this week 
+  #   # for each run_away member => get all premature clearance up to this week
+  #   
+  #   # calculate the multiplier 
+  #   # for each premature clearance
+  #   # 1. on the week of premature clearance is starting, get the number of active members
+  #   # 2. return the 1/number_of_active members
+  #   
+  #   
+  #   
+  #   # return BigDecimal('0')
+  #   amount = BigDecimal('0')
+  #   current_week_number = self.week_number
+  #   
+  #   group_loan.group_loan_memberships.joins(:group_loan_run_away_receivable).where{
+  #     ( deactivation_case.eq GROUP_LOAN_DEACTIVATION_CASE[:run_away] ) & 
+  #     ( deactivation_week_number.lte current_week_number ) & 
+  #     (
+  #       group_loan_run_away_receivable.payment_case.eq GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:weekly] 
+  #     )
+  #   }.each do |glm|
+  #     amount += glm.group_loan_product.weekly_payment_amount
+  #   end
+  #   
+  #   # adjust the weekly_amount, deduct the premature_clearance 
+  #   
+  #   
+  #   
+  #   return amount 
+  # end
   
-  def extract_weekly_run_away_premature_clearance_paid_amount
-    offset_amount = BigDecimal('0')
+  def premature_clearance_group_loan_memberships
     current_week_number = self.week_number
     group_loan.group_loan_memberships.where{
       ( is_active.eq false) & 
-      ( deactivation_week_number.lte current_week_number) & 
+      ( deactivation_week_number.eq current_week_number) & 
       ( deactivation_case.eq GROUP_LOAN_DEACTIVATION_CASE[:premature_clearance] ) 
-    }.each do |glm|
-      offset_amount += glm.group_loan_premature_clearance_payment.extract_run_away_default_weekly_payment_share
+    }  
+  end
+  
+  def extract_run_away_weekly_bail_out_amount
+    amount = BigDecimal('0')
+    current_week_number = self.week_number
+    
+    run_away_bail_out_list = []
+    group_loan.group_loan_weekly_collections.
+      where{week_number.lte current_week_number}.order("week_number ASC").each do |weekly_collection|
+        
+      weekly_collection.group_loan_run_away_receivables.
+          where(:payment_case => GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:weekly]).each do |gl_rar|
+            
+        run_away_bail_out_list << gl_rar.group_loan_membership.group_loan_product.weekly_payment_amount
+      end
+      
+      number_of_premature_clearance_starting_this_week = self.premature_clearance_group_loan_memberships.count
+      if number_of_premature_clearance_starting_this_week != 0 
+        this_week_active_glm_count = self.active_group_loan_memberships.count 
+        multiplier = this_week_active_glm_count /  (this_week_active_glm_count + number_of_premature_clearance_starting_this_week).to_f
+        run_away_bail_out_list = run_away_bail_out_list.map {|x| x*multiplier}
+      end
+        
     end
     
-    return offset_amount
+    sum = BigDecimal('0')
+    run_away_bail_out_list.each { |a| sum+=a }
+    return sum
   end
+  
+  # def extract_weekly_run_away_premature_clearance_paid_amount
+  #   offset_amount = BigDecimal('0')
+  #   current_week_number = self.week_number
+  #   group_loan.group_loan_memberships.where{
+  #     ( is_active.eq false) & 
+  #     ( deactivation_week_number.lte current_week_number) & 
+  #     ( deactivation_case.eq GROUP_LOAN_DEACTIVATION_CASE[:premature_clearance] ) 
+  #   }.each do |glm|
+  #     offset_amount += glm.group_loan_premature_clearance_payment.extract_run_away_default_weekly_payment_share
+  #   end
+  #   
+  #   return offset_amount
+  # end
   
   def extract_uncollectible_weekly_payment_amount 
     self.group_loan_weekly_uncollectibles.sum("amount")
@@ -293,7 +332,7 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
   
   def amount_receivable 
     total_amount =  extract_base_amount +  # from all still active member 
-                    extract_run_away_weekly_resolution_amount +  # amount used to bail out the run_away weekly_resolution
+                    extract_run_away_weekly_bail_out_amount +  # amount used to bail out the run_away weekly_resolution
                     extract_premature_clearance_payment_amount -  #premature clearance for that week 
                     extract_uncollectible_weekly_payment_amount   #-
                     # extract_weekly_run_away_premature_clearance_paid_amount

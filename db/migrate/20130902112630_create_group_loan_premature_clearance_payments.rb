@@ -9,6 +9,9 @@ class CreateGroupLoanPrematureClearancePayments < ActiveRecord::Migration
       # the amount is calculated value  => the update 
       # mechanism is kinda fancy. Use group loan default payment
       t.decimal :amount , :default        => 0,  :precision => 12, :scale => 2 
+      # t.decimal :principal_return , :default        => 0,  :precision => 12, :scale => 2 
+      # t.decimal :run_away_contribution , :default        => 0,  :precision => 12, :scale => 2 
+      
       t.boolean :is_confirmed, :default => false 
       
       t.decimal :premature_clearance_deposit , :default        => 0,  :precision => 12, :scale => 2 

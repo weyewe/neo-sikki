@@ -564,4 +564,37 @@ adjusted bail out 2 == 1 run_away_weekly_payment - contribution from premature_1
 					Then, sum all premature_clearance amount for this week. => amount receivable.
 					
 					
+					# are we supposed to pre-cache the amount-receivable? 
+					YES.. component of amount receivable: 
+							normal payment + 
+							premature_clearance_payment + 
+							bail_out_for_run_away
+							
+							Why do we need to pre-cache it? Because the calculation is heavy. And
+							it must be shown up at the amount receivable.
+							There is no flexibility. it must be that $$. not more not less.
+							amount_receivable  
+							actual_amount_receivable
+							
+							What we save: the amount received. 
+							ok.. let's just say that it has to be seen after the index is clicked.. no problem.. 
+							
+							After the index is clicked: show the breakdown of amount receivable. 
+							1. base weekly payment
+							2. adjusted_bail_out for run away member 
+							3. UncollectiblePayment 
+							4. premature clearance
+							
+							total amount = 1+2+4 - 3 
+							
+							On display details: show these amount. s
+							
+							
+							premature_clearance_amount == weekly_resolved contribution + end_of_cycle contribution
+								weekly_resolved => use this tedious shite. 
+								end_of_cycle contribution: 
+								
+								(1/number_of_active_member_at_run_away) * 
+										remaining_week_since_run_away (including the run away week)
+					
 			

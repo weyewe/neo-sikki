@@ -8,6 +8,9 @@
   
   Then, the premature clearance will takes place. 
 =end
+
+# group_loan_weekly_collection shows the weekly collection where there is this premature clearance declaration
+# but the actual execution will be on the next week. 
 class GroupLoanPrematureClearancePayment < ActiveRecord::Base
   belongs_to :group_loan
   belongs_to :group_loan_membership
@@ -19,7 +22,7 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
   
   validate :group_loan_weekly_collection_must_be_uncollected
   validate :next_weekly_collection_must_be_available # reason: the deactivation will start from next week
-  
+  validate :no_uncleared_weekly_uncollectible
   
   def all_fields_present?
     group_loan_id.present? and 
@@ -58,12 +61,20 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
     end
   end
   
+  def no_uncleared_weekly_uncollectible
+    return if not all_fields_present? 
+    
+    if self.group_loan_membership.group_loan_weekly_uncollectibles.where(:is_cleared => false ).count != 0 
+      self.errors.add(:generic_errors, "Ada pembayaran tak tertagih")
+      return self 
+    end
+  end
+  
   def self.create_object(params)
     new_object = self.new
     new_object.group_loan_id                    = params[:group_loan_id]
     new_object.group_loan_membership_id         = params[:group_loan_membership_id]
     new_object.group_loan_weekly_collection_id  = params[:group_loan_weekly_collection_id]
-    
     
     new_object.update_amount if new_object.save 
     
@@ -98,32 +109,69 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
   
   
   # manifested in the group loan clearance payment 
-  # def update_amount
-  #   # the current week is not counted. it has to be paid in full.
-  #   # plus 1 because the current week where premature_clearance is applied has to be paid full 
-  #   # example: premature_clearance is applied@week_2. If there are total 8 installments,
-  #   # then, week 2 has to be paid full. and 6*principal has to be returned
-  #   # plus + default payment 
-  #   total_unpaid_week = group_loan.number_of_collections - 
-  #                   group_loan_weekly_collection.week_number 
-  #   total_principal =  group_loan_membership.group_loan_product.principal * total_unpaid_week
-  #   
-  #   
-  #   
-  #   total_run_away_weekly_payment_share = self.extract_run_away_default_weekly_payment_share * total_unpaid_week
-  #   
-  #   #  it will work in the case if there is run_away member 
-  #   # and the payment is end_of_cycle => the default amount is shared inside 
-  #   # group_loan_default_payment.amount_receivable 
-  #   
-  #   # remaining_weeks = group_loan.number_of_collections - group_loan_weekly_collection.week_number 
-  #   self.amount = total_principal + 
-  #                 group_loan_membership.group_loan_default_payment.amount_receivable  + 
-  #                 total_run_away_weekly_payment_share
-  #                 
-  #   # we have to account for those run away with weekly payment. 
-  #   self.save 
-  # end
+  def update_amount
+    # the current week is not counted. it has to be paid in full.
+    # plus 1 because the current week where premature_clearance is applied has to be paid full 
+    # example: premature_clearance is applied@week_2. If there are total 8 installments,
+    # then, week 2 has to be paid full. and 6*principal has to be returned
+    # plus + default payment 
+    total_unpaid_week = group_loan.number_of_collections - 
+                    group_loan_weekly_collection.week_number 
+    total_principal_return =  group_loan_membership.group_loan_product.principal * total_unpaid_week
+    
+    # minus compulsory savings ... ? 
+    # if compulsory savings > amount => amount == 0 
+    # compulsory_savings_return =>  (port to voluntary savings)
+    
+    
+    # premature clearance can't be created if there is uncollectible weekly payment on the name of this member. 
+    available_compulsory_savings = group_loan_weekly_collection.week_number  * group_loan_membership.group_loan_product.compulsory_savings 
+    
+    
+    
+    amount_payable = total_principal_return + 
+                    run_away_weekly_resolved_bail_out_contribution +
+                    run_away_end_of_cycle_resolved_bail_out_contribution 
+       
+                 
+    if available_compulsory_savings >= amount_payable
+      self.remaining_compulsory_savings = available_compulsory_savings - amount_payable
+      self.amount = BigDecimal('0')
+    else
+      self.remaining_compulsory_savings = BigDecimal('0')
+      self.amount = GroupLoan.rounding_up( amount_payable - available_compulsory_savings ) 
+    end               
+     
+    self.save 
+    # on confirm, port the compulsory savings using to savings_account using this document. 
+  end
+  
+  def run_away_weekly_resolved_bail_out_contribution
+    group_loan_weekly_collection.extract_run_away_weekly_bail_out_amount* 1 / group_loan_weekly_collection.active_group_loan_memberships.count.to_f
+  end
+  
+  def run_away_end_of_cycle_resolved_bail_out_contribution
+    group_loan_weekly_collection
+    current_week_number = group_loan_weekly_collection.week_number
+     
+    amount = BigDecimal('0')
+    
+    run_away_end_of_cycle_resolved = group_loan.group_loan_run_away_receivables.joins(:group_loan_weekly_collection).
+        where{
+          (payment_case.eq GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:end_of_cycle]) & 
+          (group_loan_weekly_collection.week_number.lte current_week_number)
+        }
+        
+    return amount  if run_away_end_of_cycle_resolved.count == 0 
+      
+        
+        
+    run_away_end_of_cycle_resolved.each do |gl_rar|
+      amount << gl_rar.group_loan_membership.group_loan_product.weekly_payment_amount
+    end
+    
+    amount* 1/group_loan_weekly_collection.active_group_loan_memberships.count.to_f
+  end
   
   def extract_run_away_default_weekly_payment_share 
     # puts "************* inside the extraction of run_away_default_payment_share"
