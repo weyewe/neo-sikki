@@ -147,12 +147,16 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
   end
   
   def run_away_weekly_resolved_bail_out_contribution
-    group_loan_weekly_collection.extract_run_away_weekly_bail_out_amount* 1 / group_loan_weekly_collection.active_group_loan_memberships.count.to_f
+    current_week_number = group_loan_weekly_collection.week_number
+    remaining_weeks = group_loan.loan_duration -  current_week_number
+    
+    group_loan_weekly_collection.extract_run_away_weekly_bail_out_amount* remaining_weeks*1 / group_loan_weekly_collection.active_group_loan_memberships.count.to_f
   end
   
   def run_away_end_of_cycle_resolved_bail_out_contribution
-    group_loan_weekly_collection
+    # group_loan_weekly_collection  
     current_week_number = group_loan_weekly_collection.week_number
+    remaining_weeks = group_loan.loan_duration -  current_week_number
      
     amount = BigDecimal('0')
     
@@ -170,7 +174,7 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
       amount << gl_rar.group_loan_membership.group_loan_product.weekly_payment_amount
     end
     
-    amount* 1/group_loan_weekly_collection.active_group_loan_memberships.count.to_f
+    amount* remaining_weeks*1/group_loan_weekly_collection.active_group_loan_memberships.count.to_f
   end
   
   # def extract_run_away_default_weekly_payment_share 
