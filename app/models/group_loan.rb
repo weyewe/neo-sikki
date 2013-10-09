@@ -472,6 +472,13 @@ Phase: loan disbursement finalization
       return BigDecimal('0')
     end
   end
+  
+  def clear_end_of_cycle_uncollectibles
+    self.group_loan_weekly_uncollectibles.where(
+      :clearance_case => UNCOLLECTIBLE_CLEARANCE_CASE[:end_of_cycle],
+      :is_cleared => false 
+    ).each { |x| x.clear_end_of_cycle}
+  end
  
   def close(params)
     if self.group_loan_weekly_collections.where(:is_confirmed => true, :is_collected => true).count != self.number_of_collections
@@ -511,11 +518,37 @@ Phase: loan disbursement finalization
     self.deduct_compulsory_savings_for_unsettled_default 
     self.deactivate_group_loan_memberships_due_to_group_closed
     
+    
     # self.update_bad_debt_allowance
     # self.update_bad_debt_expense 
     
     self.is_closed = true 
-    self.save
+    if self.save
+      self.clear_end_of_cycle_uncollectibles
+    end
+    
+    # create journal posting to recover bad_debt_allowance
+    # create journal posting to assume bad_debt_expense 
+  end
+  
+  def expected_revenue_from_run_away_member_end_of_cycle_resolution
+    total_week = self.loan_duration
+    amount = BigDecimal('0')
+    
+    run_away_end_of_cycle_resolution_receivables = self.group_loan_run_away_receivables.joins(
+                        :group_loan_membership => [:group_loan_product]
+                      ).
+                      where(:payment_case => GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:end_of_cycle])
+    
+    return amount if run_away_end_of_cycle_resolution_receivables.count == 0
+    
+    run_away_end_of_cycle_resolution_receivables.each do |x|
+      run_away_week = x.group_loan_weekly_collection.week_number 
+      remaining_week = total_week - run_away_week + 1 
+      amount += x.group_loan_membership.group_loan_product.interest  * remaining_week
+    end
+    
+    return amount 
   end
   
   def compulsory_savings_return_amount
@@ -523,7 +556,8 @@ Phase: loan disbursement finalization
     
     amount =   self.total_compulsory_savings  + 
               self.remaining_premature_clearance_deposit  -
-              self.bad_debt_allowance  # uncleared uncollectibles, run_away end_of_cycle resolution 
+              self.bad_debt_allowance - # uncleared uncollectibles, run_away end_of_cycle resolution 
+              self.expected_revenue_from_run_away_member_end_of_cycle_resolution
               
     return BigDecimal('0') if amount <= BigDecimal('0')
     

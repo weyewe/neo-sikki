@@ -6,6 +6,7 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
   has_many :group_loan_run_away_receivables 
   has_many :group_loan_weekly_uncollectibles
   has_many :group_loan_premature_clearance_payments 
+  has_many :group_loan_weekly_payments
   
   
   def first_non_collected?

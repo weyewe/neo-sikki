@@ -48,6 +48,8 @@ describe GroupLoanWeeklyCollection do
     
     @glp_array  = [@group_loan_product_1, @group_loan_product_2]
     
+    
+    @started_at = DateTime.new(2013,9,5,0,0,0)
     @closed_at = DateTime.new(2013,12,5,0,0,0)
     @withdrawn_at = DateTime.new(2013,12,6,0,0,0)
   end
@@ -110,7 +112,7 @@ describe GroupLoanWeeklyCollection do
       
       context "starting the group_loan" do
         before(:each) do
-          @group_loan.start 
+          @group_loan.start(:started_at => @started_at )
           @group_loan.reload 
         end
         

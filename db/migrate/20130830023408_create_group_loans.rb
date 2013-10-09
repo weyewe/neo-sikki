@@ -55,7 +55,7 @@ class CreateGroupLoans < ActiveRecord::Migration
       # t.decimal :recovered_default_amount, :default       => 0, :precision => 10, :scale => 2
       
       t.decimal :round_down_compulsory_savings_return_revenue, :default       => 0, :precision => 10, :scale => 2
-      
+      t.decimal :interest_revenue, :default       => 0, :precision => 10, :scale => 2
       
       
       t.timestamps

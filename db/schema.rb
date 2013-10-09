@@ -65,17 +65,6 @@ ActiveRecord::Schema.define(version: 20130902112630) do
     t.datetime "updated_at"
   end
 
-  create_table "group_loan_run_away_receivable_payments", force: true do |t|
-    t.integer  "group_loan_run_away_receivable_id"
-    t.integer  "group_loan_weekly_collection_id"
-    t.integer  "group_loan_membership_id"
-    t.integer  "group_loan_id"
-    t.decimal  "amount",                            precision: 12, scale: 2, default: 0.0
-    t.integer  "payment_case"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
   create_table "group_loan_run_away_receivables", force: true do |t|
     t.integer  "member_id"
     t.integer  "group_loan_membership_id"
@@ -115,6 +104,8 @@ ActiveRecord::Schema.define(version: 20130902112630) do
     t.integer  "group_loan_id"
     t.decimal  "amount",                          precision: 12, scale: 2, default: 0.0
     t.decimal  "principal",                       precision: 12, scale: 2, default: 0.0
+    t.boolean  "is_collected",                                             default: false
+    t.datetime "collected_at"
     t.integer  "clearance_case",                                           default: 2
     t.boolean  "is_cleared",                                               default: false
     t.datetime "cleared_at"

@@ -44,10 +44,10 @@ class GroupLoanRunAwayReceivable < ActiveRecord::Base
   end
   
   def set_payment_case( params ) 
-    if self.group_loan_run_away_receivable_payments.count != 0 
-      self.errors.add(:generic_errors, "Sudah ada pembayaran")
-      return self 
-    end
+    # if self.group_loan_run_away_receivable_payments.count != 0 
+    #   self.errors.add(:generic_errors, "Sudah ada pembayaran")
+    #   return self 
+    # end
     
     if self.group_loan_weekly_collection.is_collected? || 
        self.group_loan_weekly_collection.is_confirmed? 

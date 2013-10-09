@@ -6,11 +6,12 @@ class GroupLoanWeeklyUncollectible < ActiveRecord::Base
   belongs_to :group_loan_weekly_collection 
   
   
-  validates_presence_of :group_loan_membership_id, :group_loan_id, :group_loan_weekly_collection_id 
+  validates_presence_of :group_loan_membership_id, :group_loan_id, :group_loan_weekly_collection_id , :clearance_case
   
   validate :uniq_weekly_collection_and_membership
   validate :use_first_uncollected_weekly_collection
   validate :no_creation_if_weekly_collection_is_confirmed
+  validate :valid_clearance_case
   
   # after_create :update_group_loan_default_amount_receivable
   
@@ -19,10 +20,23 @@ class GroupLoanWeeklyUncollectible < ActiveRecord::Base
   #   
   # end
   
+  def valid_clearance_case
+    return if not all_fields_present?
+    
+    if not [
+      UNCOLLECTIBLE_CLEARANCE_CASE[:end_of_cycle],
+      UNCOLLECTIBLE_CLEARANCE_CASE[:in_cycle]
+      ].include?(self.clearance_case)
+      self.errors.add(:clearance_case, "Kasus penyelesaian pembayaran tak tertagih harus dipilih")
+      return self 
+    end
+  end
+  
   def all_fields_present?
     group_loan_weekly_collection_id.present? and 
                 group_loan_id.present? and 
-                group_loan_membership_id.present?
+                group_loan_membership_id.present? and 
+                clearance_case.present? 
   end
   
   def has_duplicate_entry?
@@ -104,10 +118,10 @@ class GroupLoanWeeklyUncollectible < ActiveRecord::Base
     new_object.group_loan_id                     = params[:group_loan_id]  
     new_object.group_loan_membership_id          = params[:group_loan_membership_id]  
     new_object.group_loan_weekly_collection_id   = params[:group_loan_weekly_collection_id]
+    new_object.clearance_case = params[:clearance_case]
     
-    if new_object.save 
-      new_object.update_amount
-    end
+    new_object.update_amount if new_object.save 
+      
     
     return new_object
   end
@@ -123,29 +137,48 @@ class GroupLoanWeeklyUncollectible < ActiveRecord::Base
     self.group_loan_id                     = params[:group_loan_id]
     self.group_loan_membership_id          = params[:group_loan_membership_id]  
     self.group_loan_weekly_collection_id   = params[:group_loan_weekly_collection_id]
+    self.clearance_case = params[:clearance_case]
     
     
-    if self.save 
-      self.update_amount
-    end
-    
-    
-    self.save  
+    self.update_amount if self.save  
     
   end
   
   def delete_object
+    if self.is_collected?
+      self.errors.add(:generic_errors, 'Sudah terkumpul. Tidak bisa di hapus')
+      return self 
+    end
+    
     if self.group_loan_weekly_collection.is_confirmed? or 
         self.group_loan_weekly_collection.is_collected? 
       self.errors.add(:generic_errors, "Pengumpulan mingguan terkumpul atau terkonfirmasi ")
       return self 
     end
     
-    
-    
     self.destroy 
+  end
+  
+  def collect( params ) 
+    if self.clearance_case == UNCOLLECTIBLE_CLEARANCE_CASE[:end_of_cycle]
+      msg =  "Penyelesaian tak tertagih dilakukan dengan cara pemotongan tabungan wajib"
+      self.errors.add(:generic_errors, msg )
+      return self 
+    end
     
-    # journal posting or group_loan update will only be done @weekly_collection confirmation
+    if self.is_collected?
+      self.errors.add(:generic_errors, "Sudah dikumpul")
+      return self 
+    end
+    
+    if params[:collected_at].nil? or not params[:collected_at].is_a?(DateTime)
+      self.errors.add(:collected_at, "Harus ada tanggal pengumpulan")
+      return self
+    end
+    
+    self.is_collected = true 
+    self.collected_at = params[:collected_at]
+    self.save 
   end
   
   def clear(params)
@@ -153,7 +186,6 @@ class GroupLoanWeeklyUncollectible < ActiveRecord::Base
       self.errors.add(:generic_errors, "Belum dikumpulkan oleh field officer")
       return self 
     end
-    
     
     if not self.group_loan_weekly_collection.is_confirmed?
       self.errors.add(:generic_errors, "Belum konfirmasi pengumpulan mingguan")
@@ -165,19 +197,24 @@ class GroupLoanWeeklyUncollectible < ActiveRecord::Base
       return self 
     end
     
-    self.is_cleared = true 
-    self.cleared_at = params[:cleared_at]
-    
-    if self.cleared_at.nil?
+    if params[:cleared_at].nil? or not params[:cleared_at].is_a?(DateTime)
       self.errors.add(:cleared_at, "Harus ada tanggal penutupan")
       return self 
     end
     
+    self.is_cleared = true 
+    self.cleared_at = params[:cleared_at]
   
     if self.save 
       self.group_loan.update_bad_debt_allowance(  -1 * self.principal)
       # update the journal posting 
     end
+  end
+  
+  def clear_end_of_cycle
+    self.is_cleared = true 
+    self.cleared_at = self.group_loan.closed_at 
+    self.save
   end
   
 end
