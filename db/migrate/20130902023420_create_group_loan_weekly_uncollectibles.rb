@@ -8,10 +8,18 @@ class CreateGroupLoanWeeklyUncollectibles < ActiveRecord::Migration
       t.decimal :amount , :default        => 0,  :precision => 12, :scale => 2 
       t.decimal :principal , :default        => 0,  :precision => 12, :scale => 2 
       
+      t.boolean :is_collected, :default => false 
+      t.datetime :collected_at 
+      
+      t.integer :clearance_case, :default => UNCOLLECTIBLE_CLEARANCE_CASE[:in_cycle]
+      
       t.boolean :is_cleared, :default => false 
       t.datetime :cleared_at   # (independent)
       
       
+      
+      # how is the clearance mechanism?
+      # field officer collect payment.. produce receipt. And cashier confirm. 
       
        
 

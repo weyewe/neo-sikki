@@ -1,16 +1,17 @@
-# Case 1: member pass away mid shite 
-
 =begin
-1. Handle the UncollectibleWeekly Payment Case 
-    Branch Submit the form (written + double signed by Loan Officer + Branch Manager ), so that it will be deactivated by the central command. 
- 
-    When it is not collected, just let it go. Mark it as a bad debt material. 
+  UncollectiblePayment: can be paid in 2 mode: 
+    1. in_cycle  : member passes $$ in the weekly collection
+    2. end_of_cycle: will be deducted from the group's compulsory savings
     
-    When it is payable on the additional default payment: do it. 
-    
-    Since it is a black swan, so put a heavy punishment on that. We don't want that to happen anyway. 
-
+    Mechanism for in_cycle payment:
+    1. Field Officer collects from member => mark as collected.. produce receipt. 
+    2. Field officer passes $$ to the cashier. Cashier  clears the uncollectible .
+      
+    For corner cases, always check:
+    1. 
 =end
+
+ 
 
 require 'spec_helper'
 
@@ -371,5 +372,4 @@ describe GroupLoan do
   end
 end
 
-# there are only 2 cases of default: uncollectible and run_away 
 

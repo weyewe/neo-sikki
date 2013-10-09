@@ -30,20 +30,31 @@ class CreateGroupLoans < ActiveRecord::Migration
       # why do we need it? Won't it all be encompassed inside the default_payment? 
       
       # fuck it.. just leave it as it is.. I can't recall why it was coded 
-      t.decimal :run_away_amount_receivable, :default       => 0, :precision => 10, :scale => 2
-      t.decimal :run_away_amount_received , :default       => 0, :precision => 10, :scale => 2
+      # t.decimal :run_away_amount_receivable, :default       => 0, :precision => 10, :scale => 2
+      # t.decimal :run_away_amount_received , :default       => 0, :precision => 10, :scale => 2
       
       
       # these new shite... use it
       t.decimal :remaining_premature_clearance_deposit, :default       => 0, :precision => 10, :scale => 2
       t.decimal :premature_clearance_deposit, :default       => 0, :precision => 10, :scale => 2
       
+      
+      # compulsory savings returned  = total_compulsory_savings-pre_closure - 
+      # => default amount + 
+      # => remaining_premature_clearance_deposit
+      
+      
       t.decimal :total_compulsory_savings_pre_closure, :default       => 0, :precision => 10, :scale => 2
       
       
       # default amount: principal/loan portfolio at risk 
-      t.decimal :default_amount, :default       => 0, :precision => 10, :scale => 2
+      # t.decimal :default_amount, :default       => 0, :precision => 10, :scale => 2
+      
+      t.decimal :bad_debt_allowance, :default       => 0, :precision => 10, :scale => 2
+      t.decimal :bad_debt_expense, :default       => 0, :precision => 10, :scale => 2
       # t.decimal :recovered_default_amount, :default       => 0, :precision => 10, :scale => 2
+      
+      t.decimal :round_down_compulsory_savings_return_revenue, :default       => 0, :precision => 10, :scale => 2
       
       
       

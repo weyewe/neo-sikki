@@ -1,0 +1,19 @@
+1. deceased
+2. run_away declaration
+3. uncollectibles
+4. premature_clearance 
+
+That's it. 
+
+
+
+
+hard data => deceased can't be created if there is premature clearance
+run_away can't be created if there is premature clearance..
+
+Then, how can we do it? Delete the premature clearance
+Then, create deceased and run away
+Finally, re-create the premature clearance. 
+
+
+=> Then, we have to test that post premature clearance creation, can't create deceased or run_away.

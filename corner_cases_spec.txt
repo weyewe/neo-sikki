@@ -1,0 +1,91 @@
+1. spec member_run_away weekly_collection   ( weekly_resolution )
+
+	=> it should change the weekly_collection.amount_receivable on the run_away week onwards. 
+	
+	=> there should be excess compulsory_savings_return  ($$ returned at the end of the week) 
+		=> active_glm + compulsory_savings from the run_away member minus principal of uncollectibles,
+			end of cycle collection 
+		=> excess $$ come from run_away previous compulsory savings. 
+		
+	=> run_away can't be edited if the weekly collection is confirmed  => DONE
+
+
+Modification: transaction_activity is used to track the member's activity.
+ 	(not now) 
+
+
+	=> Add if there are 2 run_away , weekly_resolution
+	
+	
+	
+2. spec member run_away, end_of_cycle collection.. create 2 (different weeks)
+
+
+
+3. Mix it.. first weekly resolution, after several weeks, add end_of_cycle resolution 
+		reverse the order. 
+		
+4. introduce the premature clearance => repeat all those 3 cases
+
+5. introduce deceased => repeat all those previous cases. Fuck and we haven't done the accounting journal
+			posting 
+			
+			
+			 
+#  spec/model/group_loan will only check the generic condition => whether such run away is created. or what soever. 
+
+
+For all corner cases, we need to check on its creation and its implications
+Creation:
+1. it has to follow the order: run_away, deceased, uncollectible, premature_clearance
+2. run_away or deceased can't be created if there is premature clearance 
+
+but, spec/model/corner_cases will check on these implications:
+1. weekly_collection.amount_receivable on that week, previous week, and future week 
+2. bad_debt_allowance
+3. compulsory_savings_returned   => total_compulsory_savings - 
+																		bad_debt_allowance + 
+																		remaining_premature_clearance_deposit
+
+
+
+
+The steps:
+
+weekly collection in n weeks
+perform normal collection in m weeks
+on week c1, where c1 > m, introduce the corner case
+on week c2, where c2 > c1, introduce the corner case
+.. so on...
+continue to close the group loan 
+=> Check the compulsory savings returned (compulsory_savings_return_amount)
+ 		remaining_premature_clearance_deposit + 
+		total_compulsory_savings -
+		default_amount. If there are more defaults, then return == 0.. bad debt is absorbed by the company. 
+		
+things to be done:
+1. on premature clearance successful, port the remaining compulsory_savings(if any) to savings_account 
+2. on deceased member => port the compulsory savings to savings_account... hence deducting the total
+	compulsory_savings 
+3. on run_away member => no changes in the compulsory savings. it is treated as if nothing has happened. 
+	
+ 	pay for the run_away_member's loan_portfolio + interest.. 
+		no need to deduct for compulsory_savings' portion
+
+
+======== FUCKING important:: make an entry to do premature_clearance_deposit_usage (for weekly payment)
+
+
+uncollectible: default clearance case is in_cycle.. 
+Group Loan can't be closed if there is uncollectible with clearance_case is in_cycle,
+ 	and is_cleared.eq false 
+
+uncollectible can't be cleared if clearance_case == end_of_cycle 
+uncollectible can't be updated if the group_loan is closed. 
+
+
+	
+	
+	
+	
+ 

@@ -307,6 +307,14 @@ Phase: loan disbursement finalization
     end  
   end
   
+  def self.rounding_down(amount, nearest_amount)
+    total = amount
+    # total_amount
+
+    multiplication_of_500 = ( total.to_i/nearest_amount.to_i ) .to_i
+    return nearest_amount *( multiplication_of_500  ) 
+  end
+  
   
   def deduct_compulsory_savings_for_unsettled_default
     # if the member's compulsory savings is not sufficient, calculate that as office's bad debt expense 
@@ -383,10 +391,18 @@ Phase: loan disbursement finalization
   # glm.group_loan_default_payment.amount_receivable => total split must be paid 
   # glm.group_loan_default_payment.amount_received == payment 
   
-  def update_default_amount( amount ) 
-    self.default_amount += amount
+  # def update_default_amount( amount ) 
+  #   self.default_amount += amount
+  #   self.save 
+  # end
+  
+
+  def update_bad_debt_allowance( amount ) 
+    self.bad_debt_allowance += amount 
     self.save 
   end
+  
+  
   
   def update_default_payment_amount_receivable  
     # update the sum in the group_loan 
@@ -463,7 +479,9 @@ Phase: loan disbursement finalization
       return self 
     end
     
-    if self.group_loan_weekly_uncollectibles.where(:is_cleared => false).count != 0 
+    if self.group_loan_weekly_uncollectibles.where(
+          :is_cleared => false, 
+          :clearance_case => UNCOLLECTIBLE_CLEARANCE_CASE[:in_cycle] ).count != 0 
       self.errors.add(:generic_errors, "Ada pembayaran tak tertagih")
       return self 
     end
@@ -493,11 +511,27 @@ Phase: loan disbursement finalization
     self.deduct_compulsory_savings_for_unsettled_default 
     self.deactivate_group_loan_memberships_due_to_group_closed
     
-     
+    # self.update_bad_debt_allowance
+    # self.update_bad_debt_expense 
     
     self.is_closed = true 
     self.save
   end
+  
+  def compulsory_savings_return_amount
+    return BigDecimal('0') if not self.is_closed?
+    
+    amount =   self.total_compulsory_savings  + 
+              self.remaining_premature_clearance_deposit  -
+              self.bad_debt_allowance  # uncleared uncollectibles, run_away end_of_cycle resolution 
+              
+    return BigDecimal('0') if amount <= BigDecimal('0')
+    
+    return amount 
+  end
+  
+  
+  
   
   def withdraw_compulsory_savings(params)
     
@@ -518,9 +552,32 @@ Phase: loan disbursement finalization
     
     self.compulsory_savings_withdrawn_at = params[:compulsory_savings_withdrawn_at]
     self.is_compulsory_savings_withdrawn = true
+   
+    self.round_down_compulsory_savings_return_revenue = self.compulsory_savings_return_amount -  
+                GroupLoan.rounding_down(  
+                            self.compulsory_savings_return_amount,
+                            DEFAULT_PAYMENT_ROUND_UP_VALUE
+                )
+                
     self.save 
+    
+    # create the journal posting.
+    # 1. to record deduction of amount_payable
+    # 2. to record extra revenue from rounding_down
   end
-
+  
+  
+  
+  
+  
+  # bad_debt_allowance should be updated on uncollectible creation, uncollectible clearance,
+  # and on the run_away end_of_cycle resolution 
+  
+  # it should be updated on group loan close: we use member's compulsory savings to cover for bad debt
+  # if there is still bad debt: mark it as expense 
+  
+  
+  
  
  
 end

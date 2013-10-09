@@ -136,3 +136,9 @@ PORT_GROUP_LOAN_COMPULSORY_SAVINGS_CASE = {
   :premature_clearance => 3, 
   # :run_away_member => 4   # nope, run away member , the compulsory savings will be counted as "Other Revenue"
 }
+
+
+UNCOLLECTIBLE_CLEARANCE_CASE = {
+  :end_of_cycle => 1, 
+  :in_cycle => 2 
+}

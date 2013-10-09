@@ -34,12 +34,12 @@ class GroupLoanRunAwayReceivable < ActiveRecord::Base
     group_loan.group_loan_run_away_receivables.each do |x|
       amount += x.amount_receivable 
     end
-    group_loan.run_away_amount_receivable =  amount 
+    # group_loan.run_away_amount_receivable =  amount 
     group_loan.save
     
     # self.amount_receivable
     
-    group_loan.update_default_payment_amount_receivable   
+    # group_loan.update_default_payment_amount_receivable   
      # by default, it is weekly. So, there is no need to update default_loan amount 
   end
   
@@ -59,9 +59,7 @@ class GroupLoanRunAwayReceivable < ActiveRecord::Base
     # you can't change anymore 
     
     self.payment_case = params[:payment_case]
-    if  self.save 
-      group_loan.update_default_payment_amount_receivable   
-    end 
+    self.save  
   end
   
   

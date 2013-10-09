@@ -56,52 +56,60 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
   def create_group_loan_weekly_payments
     # do weekly payment for all active members
     # minus those that can't pay  (the dead and running away is considered as non active)    
-    active_glm_id_list = group_loan.active_group_loan_memberships.map {|x| x.id }
-    no_payment_id_list = [] 
-    run_away_glm_list = group_loan.
+    active_glm_id_list = self.active_group_loan_memberships.map {|x| x.id }
+    run_away_glm_id_list = group_loan.
                           group_loan_memberships.joins(:group_loan_run_away_receivable).
                           where{
                             (deactivation_case.eq  GROUP_LOAN_DEACTIVATION_CASE[:run_away] ) & 
                             (group_loan_run_away_receivable.payment_case.eq GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:weekly])
-                          }
+                          }.map{|x| x.id }
                           
                           
     
     
-    active_glm_id_list -= no_payment_id_list 
+    # active_glm_id_list = (active_glm_id_list + run_away_glm_list ).uniq
     
     
     # for the normal payment 
     active_glm_id_list.each do |glm_id|
       GroupLoanWeeklyPayment.create :group_loan_membership_id => glm_id,
                                     :group_loan_id => self.group_loan_id,
-                                    :group_loan_weekly_collection_id => self.id 
+                                    :group_loan_weekly_collection_id => self.id ,
+                                    :is_run_away_weekly_bailout => false 
+    end
+    
+    
+    run_away_glm_id_list.each do |glm_id|
+      GroupLoanWeeklyPayment.create :group_loan_membership_id => glm_id,
+                                    :group_loan_id => self.group_loan_id,
+                                    :group_loan_weekly_collection_id => self.id ,
+                                    :is_run_away_weekly_bailout => true
     end
     
     # for the run_away_payment 
-    run_away_glm_list.each do |glm|
-      GroupLoanRunAwayReceivablePayment.create({
-        # the link to the member, glm, or group_loan_run_away_receivable is a bonus
-        # we don't know what it is for yet. but, just better to dump it.
-        # we can optimize later. 
-        # The core info needed: group_loan_id, weekly_collection_id, amount
-        :group_loan_run_away_receivable_id => glm.group_loan_run_away_receivable.id ,
-        :group_loan_weekly_collection_id   => self.id ,
-        :group_loan_membership_id          => glm.id  ,
-        :group_loan_id                     => self.group_loan_id ,
-        :amount                            =>  glm.group_loan_product.weekly_payment_amount   ,
-        :payment_case                      => GROUP_LOAN_RUN_AWAY_RECEIVABLE_PAYMENT_CASE[:weekly]
-      })
-      
-      
-    end
+    # run_away_glm_list.each do |glm|
+    #   GroupLoanRunAwayReceivablePayment.create({
+    #     # the link to the member, glm, or group_loan_run_away_receivable is a bonus
+    #     # we don't know what it is for yet. but, just better to dump it.
+    #     # we can optimize later. 
+    #     # The core info needed: group_loan_id, weekly_collection_id, amount
+    #     :group_loan_run_away_receivable_id => glm.group_loan_run_away_receivable.id ,
+    #     :group_loan_weekly_collection_id   => self.id ,
+    #     :group_loan_membership_id          => glm.id  ,
+    #     :group_loan_id                     => self.group_loan_id ,
+    #     :amount                            =>  glm.group_loan_product.weekly_payment_amount   ,
+    #     :payment_case                      => GROUP_LOAN_RUN_AWAY_RECEIVABLE_PAYMENT_CASE[:weekly]
+    #   })
+    #   
+    #   
+    # end
     
   end
   
   
   
-  def update_group_loan_default_payment 
-    group_loan.update_default_amount(                 
+  def update_group_loan_bad_debt_allowance
+    group_loan.update_bad_debt_allowance(                 
                       self.extract_uncollectible_weekly_payment_default_amount + 
                       self.extract_run_away_end_of_cycle_resolution_default_amount
     )
@@ -133,12 +141,14 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
     
     self.create_group_loan_weekly_payments 
     # self.group_loan.update_default_payment_amount_receivable
-    self.update_group_loan_default_payment  # from uncollectible +  run_away_member
     self.confirm_premature_clearances
+    self.update_group_loan_bad_debt_allowance  # from uncollectible +  run_away_member
   end
   
   
   def unconfirm
+    
+    # reverse the confirm 
     # if it is unconfirmable (the next group loan weekly collection is not confirmed?)
     # and there is no corner cases created for the next group 
   end

@@ -104,6 +104,7 @@ ActiveRecord::Schema.define(version: 20130902112630) do
     t.integer  "group_loan_membership_id"
     t.integer  "group_loan_id"
     t.integer  "group_loan_weekly_collection_id"
+    t.boolean  "is_run_away_bail_out",            default: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -114,6 +115,7 @@ ActiveRecord::Schema.define(version: 20130902112630) do
     t.integer  "group_loan_id"
     t.decimal  "amount",                          precision: 12, scale: 2, default: 0.0
     t.decimal  "principal",                       precision: 12, scale: 2, default: 0.0
+    t.integer  "clearance_case",                                           default: 2
     t.boolean  "is_cleared",                                               default: false
     t.datetime "cleared_at"
     t.datetime "created_at"
@@ -124,22 +126,22 @@ ActiveRecord::Schema.define(version: 20130902112630) do
     t.string   "name"
     t.integer  "number_of_meetings"
     t.integer  "number_of_collections"
-    t.boolean  "is_started",                                                     default: false
+    t.boolean  "is_started",                                                            default: false
     t.datetime "started_at"
-    t.boolean  "is_loan_disbursement_prepared",                                  default: false
-    t.boolean  "is_loan_disbursed",                                              default: false
+    t.boolean  "is_loan_disbursement_prepared",                                         default: false
+    t.boolean  "is_loan_disbursed",                                                     default: false
     t.datetime "disbursed_at"
-    t.boolean  "is_closed",                                                      default: false
+    t.boolean  "is_closed",                                                             default: false
     t.datetime "closed_at"
-    t.boolean  "is_compulsory_savings_withdrawn",                                default: false
+    t.boolean  "is_compulsory_savings_withdrawn",                                       default: false
     t.datetime "compulsory_savings_withdrawn_at"
     t.integer  "group_leader_id"
-    t.decimal  "run_away_amount_receivable",            precision: 10, scale: 2, default: 0.0
-    t.decimal  "run_away_amount_received",              precision: 10, scale: 2, default: 0.0
-    t.decimal  "remaining_premature_clearance_deposit", precision: 10, scale: 2, default: 0.0
-    t.decimal  "premature_clearance_deposit",           precision: 10, scale: 2, default: 0.0
-    t.decimal  "total_compulsory_savings_pre_closure",  precision: 10, scale: 2, default: 0.0
-    t.decimal  "default_amount",                        precision: 10, scale: 2, default: 0.0
+    t.decimal  "remaining_premature_clearance_deposit",        precision: 10, scale: 2, default: 0.0
+    t.decimal  "premature_clearance_deposit",                  precision: 10, scale: 2, default: 0.0
+    t.decimal  "total_compulsory_savings_pre_closure",         precision: 10, scale: 2, default: 0.0
+    t.decimal  "bad_debt_allowance",                           precision: 10, scale: 2, default: 0.0
+    t.decimal  "bad_debt_expense",                             precision: 10, scale: 2, default: 0.0
+    t.decimal  "round_down_compulsory_savings_return_revenue", precision: 10, scale: 2, default: 0.0
     t.datetime "created_at"
     t.datetime "updated_at"
   end

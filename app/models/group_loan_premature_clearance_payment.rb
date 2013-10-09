@@ -139,7 +139,7 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
       self.amount = BigDecimal('0')
     else
       self.remaining_compulsory_savings = BigDecimal('0')
-      self.amount = GroupLoan.rounding_up( amount_payable - available_compulsory_savings ) 
+      self.amount = GroupLoan.rounding_up( amount_payable - available_compulsory_savings , DEFAULT_PAYMENT_ROUND_UP_VALUE) 
     end               
      
     self.save 

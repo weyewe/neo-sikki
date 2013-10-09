@@ -4,6 +4,8 @@ class CreateGroupLoanWeeklyPayments < ActiveRecord::Migration
       t.integer :group_loan_membership_id
       t.integer :group_loan_id
       t.integer :group_loan_weekly_collection_id 
+      
+      t.boolean :is_run_away_bail_out, :default => false 
 
       t.timestamps
     end
