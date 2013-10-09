@@ -233,96 +233,137 @@ describe GroupLoan do
             x.collect(:collected_at => DateTime.now)
             x.confirm(:confirmed_at => DateTime.now )
           end
-      
-          @group_loan.reload
-          @group_loan.close(:closed_at => @closed_at )
-          @group_loan.reload
-          @gl_rar.reload 
+          @second_group_loan_weekly_collection.reload 
         end
         
-        it 'should create incomplete group_loan_weekly_collection' do
-          @second_group_loan_weekly_collection.group_loan_weekly_payments.count.should_not == @group_loan.group_loan_memberships.count 
-          @second_group_loan_weekly_collection.group_loan_weekly_payments.count.should == ( @group_loan.group_loan_memberships.count - 1 )
-        end
-        
-        it 'should reduce the weekly_collection amount receivable' do
-          weekly_compulsory_savings_increment = BigDecimal('0')
-          
-          @group_loan.group_loan_memberships.joins(:group_loan_product).each do |glm|
-            weekly_compulsory_savings_increment += glm.group_loan_product.weekly_payment_amount 
+        it 'should create correct amount receivable' do
+          @amount= BigDecimal('0')
+          @group_loan.group_loan_memberships.each do |glm|
+            next if @run_away_glm.id == glm.id 
+            @amount += glm.group_loan_product.weekly_payment_amount
           end
           
-          adjustment_amount = @run_away_glm.group_loan_product.weekly_payment_amount
-          @adjusted_amount_receivable = weekly_compulsory_savings_increment - adjustment_amount
-          puts "\n\n ======> "
-          puts "adjustment_amount : #{adjustment_amount}"
-          puts "weekly_compulsory_savings_increment: #{weekly_compulsory_savings_increment}"
-          puts "adjusted_amount_receivable: #{@adjusted_amount_receivable}"
-          puts "::actual_amount_receivable: #{@second_group_loan_weekly_collection.amount_receivable}"
-          puts "\n<==\n"
-          
-          @second_group_loan_weekly_collection.amount_receivable.should == @adjusted_amount_receivable
+          @second_group_loan_weekly_collection.amount_receivable.should == @amount
         end
         
-        
-        it 'should create journal posting showing deduction of compulsory savings by the default amount'
-        
-        
-        it 'should return less compulsory savings, thanks to end_of_cycle run_away clearance' do
-          normal_total_compulsory_savings = BigDecimal('0')
-          
-          weekly_compulsory_savings_increment = BigDecimal('0')
-          
-          @group_loan.group_loan_memberships.joins(:group_loan_product).each do |glm|
-            weekly_compulsory_savings_increment += glm.group_loan_product.compulsory_savings 
-          end
-          
-          normal_total_compulsory_savings = weekly_compulsory_savings_increment*@group_loan.loan_duration 
-          
+        it 'should produce bad debt allowance equal to principal*remaining_weeks' do
+          @group_loan.reload
           run_away_week_number = @gl_rar.group_loan_weekly_collection.week_number
-          remaining_week = @group_loan.loan_duration - run_away_week_number + 1 
+          remaining_week = @group_loan.loan_duration - run_away_week_number + 1
           
-          diff = ( @gl_rar.group_loan_membership.group_loan_product.principal +
-                  @gl_rar.group_loan_membership.group_loan_product.interest)*remaining_week
-                  
-          @group_loan.compulsory_savings_return_amount.should_not == normal_total_compulsory_savings
-          
-          actual_diff = normal_total_compulsory_savings - @group_loan.compulsory_savings_return_amount
-          
-          actual_diff.should > BigDecimal('0')
-          #         
-          # puts "normal total compulsory_savings: #{normal_total_compulsory_savings}"      
-          # puts "actual_total_compulsory_savings: #{@group_loan.total_compulsory_savings}"
-          # puts "remaining_premature_clearance_deposit: #{@group_loan.remaining_premature_clearance_deposit}"
-          # puts "bad_debt_allowance: #{@group_loan.bad_debt_allowance}"
-          # puts "expected_revenue_from_run_away_member_end_of_cycle_resolution: #{@group_loan.expected_revenue_from_run_away_member_end_of_cycle_resolution}"
-          # 
-          # puts "compulsory_savings_return_amount: #{@group_loan.compulsory_savings_return_amount}"
-          # 
-          # 
-          # puts "actual_diff: #{actual_diff}"
-          # puts "The diff: #{diff}"
-          
-          
-          
-            
-          # actual_diff.should == diff
+          principal_amount  = @run_away_glm.group_loan_product.principal
+          @group_loan.bad_debt_allowance.should == remaining_week * principal_amount
         end
         
-        it 'should close the group loan' do
-          @group_loan.is_closed.should be_true 
-        end
-        
-        it 'should confirm all group loan weekly collections' do
-          @group_loan.group_loan_weekly_collections.order("id ASC").each do |x|
-            x.is_collected.should be_true 
-            x.is_confirmed.should be_true 
+        context "closing group loan" do
+          before(:each) do
+            @group_loan.reload
+            @group_loan.close(:closed_at => @closed_at )
+            @group_loan.reload
+            @gl_rar.reload
           end
+          
+          it 'should create incomplete group_loan_weekly_collection' do
+            @second_group_loan_weekly_collection.group_loan_weekly_payments.count.should_not == @group_loan.group_loan_memberships.count 
+            @second_group_loan_weekly_collection.group_loan_weekly_payments.count.should == ( @group_loan.group_loan_memberships.count - 1 )
+          end
+
+          it 'should reduce the weekly_collection amount receivable' do
+            weekly_compulsory_savings_increment = BigDecimal('0')
+
+            @group_loan.group_loan_memberships.joins(:group_loan_product).each do |glm|
+              weekly_compulsory_savings_increment += glm.group_loan_product.weekly_payment_amount 
+            end
+
+            adjustment_amount = @run_away_glm.group_loan_product.weekly_payment_amount
+            @adjusted_amount_receivable = weekly_compulsory_savings_increment - adjustment_amount
+            # puts "\n\n ======> "
+            # puts "adjustment_amount : #{adjustment_amount}"
+            # puts "weekly_compulsory_savings_increment: #{weekly_compulsory_savings_increment}"
+            # puts "adjusted_amount_receivable: #{@adjusted_amount_receivable}"
+            # puts "::actual_amount_receivable: #{@second_group_loan_weekly_collection.amount_receivable}"
+            # puts "\n<==\n"
+
+            @second_group_loan_weekly_collection.amount_receivable.should == @adjusted_amount_receivable
+          end
+
+
+          it 'should create journal posting showing deduction of compulsory savings by the default amount'
+
+
+          it 'should return reduce compulsory_savings_return_amount by the bail_out amount' do
+
+          end
+
+          it 'should create bad debt allowance' do
+
+          end
+
+
+          it 'should return less compulsory savings, thanks to end_of_cycle run_away clearance' do
+
+            weekly_compulsory_savings_increment = BigDecimal('0')
+
+            @group_loan.group_loan_memberships.joins(:group_loan_product).each do |glm|
+              weekly_compulsory_savings_increment += glm.group_loan_product.compulsory_savings 
+            end
+
+            normal_total_compulsory_savings = weekly_compulsory_savings_increment*@group_loan.loan_duration 
+
+            run_away_week_number = @gl_rar.group_loan_weekly_collection.week_number
+            remaining_week = @group_loan.loan_duration - run_away_week_number + 1 
+
+            diff = ( @gl_rar.group_loan_membership.group_loan_product.principal +
+                    @gl_rar.group_loan_membership.group_loan_product.interest)*remaining_week
+
+            @group_loan.compulsory_savings_return_amount.should_not == normal_total_compulsory_savings
+
+            actual_diff = normal_total_compulsory_savings - @group_loan.compulsory_savings_return_amount
+
+            actual_diff.should > BigDecimal('0')
+
+            puts "loan_duration: #{@group_loan.loan_duration}"
+            puts "\n ==== inspect run_away_glm ====\n"
+            puts "principal: #{@run_away_glm.group_loan_product.principal}"
+            puts "interest: #{@run_away_glm.group_loan_product.interest}"
+            puts "compulsory savings: #{@run_away_glm.group_loan_product.compulsory_savings}"
+
+            puts "\n ====== done group_loan_product_inspect\n\n"
+
+            puts "normal total compulsory_savings: #{normal_total_compulsory_savings}"      
+            puts "actual_total_compulsory_savings: #{@group_loan.total_compulsory_savings}"
+            puts "remaining_premature_clearance_deposit: #{@group_loan.remaining_premature_clearance_deposit}"
+            puts "bad_debt_allowance: #{@group_loan.bad_debt_allowance}"
+            puts "expected_revenue_from_run_away_member_end_of_cycle_resolution: #{@group_loan.expected_revenue_from_run_away_member_end_of_cycle_resolution}"
+
+            puts "compulsory_savings_return_amount: #{@group_loan.compulsory_savings_return_amount}"
+
+
+            puts "actual_diff: #{actual_diff}"
+            puts "The diff: #{diff}"
+
+
+
+
+            # actual_diff.should == diff
+          end
+
+          it 'should close the group loan' do
+            @group_loan.is_closed.should be_true 
+          end
+
+          it 'should confirm all group loan weekly collections' do
+            @group_loan.group_loan_weekly_collections.order("id ASC").each do |x|
+              x.is_collected.should be_true 
+              x.is_confirmed.should be_true 
+            end
+          end
+
+          # it 'should create  0 run_away_receivable_payment' do
+          #   @gl_rar.group_loan_run_away_receivable_payments.count.should == 0
+          # end
         end
         
-        # it 'should create  0 run_away_receivable_payment' do
-        #   @gl_rar.group_loan_run_away_receivable_payments.count.should == 0
-        # end
       end
 
     end
