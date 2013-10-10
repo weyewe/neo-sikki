@@ -61,12 +61,11 @@ class Member < ActiveRecord::Base
     end
     
     self.is_deceased = true 
-    self.death_datetime = params[:death_datetime]
+    self.deceased_at = params[:deceased_at]
   
-    if self.save 
+    if self.save  
       
-      # group loan
-      pending_receivable = BigDecimal('0')
+      # loop across all financial products : for now , it is only group loan
       
       self.group_loan_memberships.where(:is_active => true ).each do |glm|
         # deactivate group loan membership
@@ -79,28 +78,27 @@ class Member < ActiveRecord::Base
           glm.deactivation_week_number = group_loan.first_uncollected_weekly_collection.week_number
           glm.save  
           # puts "THe deactivation week number: #{glm.deactivation_week_number}"
-          pending_receivable += glm.remaining_deceased_principal_payment    
+          # bad_debt_allowance =   
           
-          group_loan.update_default_payment_amount_receivable
+          # group_loan.update_default_payment_amount_receivable
           
-          GroupLoanPortCompulsorySavings.create :group_loan_id => group_loan.id, 
-                                      :group_loan_membership_id => glm.id ,
-                                      :member_id => glm.member_id ,
-                                      :case =>PORT_GROUP_LOAN_COMPULSORY_SAVINGS_CASE[:deceased_member]
-                                      
+          description = "Deceased Clearance for group loan: #{glm.group_loan.name}" + 
+              " for member: #{glm.member.name}, #{glm.member.id_number}"
+          DeceasedClearance.create(
+            :financial_product_id  => glm.group_loan.id,
+            :financial_product_type => glm.group_loan.class.to_s, 
+            :principal_return => glm.remaining_deceased_principal_payment,
+            :member_id => glm.member_id, 
+            :description => description,
+            :additional_savings_account => glm.total_compulsory_savings 
+          )
+                                         
                                       
         else
           glm.destroy
         end                                 
       end
       
-      # personal loan 
-      
-      # Create DeceasedPrincipalPendingPayment  ( from multiple group loans ) 
-      DeceasedPrincipalReceivable.create :member_id => self.id,  
-                                              :amount_receivable => pending_receivable
-                                              
-      # Write Off Interest Receivable 
     end
   end
   

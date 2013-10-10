@@ -89,8 +89,9 @@ class GroupLoanMembership < ActiveRecord::Base
 
   def remaining_deceased_principal_payment
     
-      remaining_number_of_weeks = self.group_loan.number_of_collections - 
-                                  self.group_loan_weekly_payments.count 
+      remaining_number_of_weeks = self.group_loan.loan_duration - 
+                                  self.deactivation_week_number + 
+                                  1 # for the week where deceased is declared
                                   
       return remaining_number_of_weeks * self.group_loan_product.principal 
     

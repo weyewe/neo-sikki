@@ -330,8 +330,7 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
     total_amount =  extract_base_amount +  # from all still active member 
                     extract_run_away_weekly_bail_out_amount +  # amount used to bail out the run_away weekly_resolution
                     extract_premature_clearance_payment_amount -  #premature clearance for that week 
-                    extract_uncollectible_weekly_payment_amount   #-
-                    # extract_weekly_run_away_premature_clearance_paid_amount
+                    extract_uncollectible_weekly_payment_amount    
                      
     
     return total_amount 

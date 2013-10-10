@@ -11,14 +11,26 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20130902112630) do
+ActiveRecord::Schema.define(version: 20131010083300) do
 
-  create_table "deceased_principal_receivables", force: true do |t|
+  create_table "deceased_clearances", force: true do |t|
+    t.boolean  "is_insurance_claimable",                                   default: false
+    t.datetime "insurance_claimable_declared_at"
+    t.boolean  "is_written_off",                                           default: false
+    t.datetime "written_off_at"
+    t.boolean  "is_insurance_claim_approved",                              default: false
+    t.datetime "insurance_claim_approved_at"
+    t.decimal  "principal_return",                precision: 10, scale: 2, default: 0.0
+    t.decimal  "donation",                        precision: 10, scale: 2, default: 0.0
+    t.boolean  "is_claim_received",                                        default: false
+    t.datetime "claim_received_at"
+    t.boolean  "is_donation_disbursed",                                    default: false
+    t.datetime "donation_disbursed_at"
     t.integer  "member_id"
-    t.decimal  "amount_receivable", precision: 12, scale: 2, default: 0.0
-    t.decimal  "amount_received",   precision: 12, scale: 2, default: 0.0
-    t.boolean  "is_closed",                                  default: false
-    t.string   "payment_document"
+    t.integer  "financial_product_id"
+    t.string   "financial_product_type"
+    t.text     "description"
+    t.decimal  "additional_savings_account",      precision: 10, scale: 2, default: 0.0
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -145,7 +157,7 @@ ActiveRecord::Schema.define(version: 20130902112630) do
     t.string   "id_number"
     t.decimal  "total_savings_account", precision: 12, scale: 2, default: 0.0
     t.boolean  "is_deceased",                                    default: false
-    t.datetime "death_datetime"
+    t.datetime "deceased_at"
     t.boolean  "is_run_away",                                    default: false
     t.datetime "created_at"
     t.datetime "updated_at"

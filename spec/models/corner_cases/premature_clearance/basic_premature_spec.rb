@@ -248,11 +248,11 @@ describe GroupLoan do
       
       total_compulsory_savings.should == @premature_clearance_glm.total_compulsory_savings
       
-      puts "weekly compulsory savings : #{@premature_clearance_glm.group_loan_product.compulsory_savings}"
-      puts "total compulsory savings: #{@premature_clearance_glm.total_compulsory_savings}"
-      puts "remaining principal payable: #{remaining_principal_amount}"
+      # puts "weekly compulsory savings : #{@premature_clearance_glm.group_loan_product.compulsory_savings}"
+      # puts "total compulsory savings: #{@premature_clearance_glm.total_compulsory_savings}"
+      # puts "remaining principal payable: #{remaining_principal_amount}"
       
-      puts "calculated premature clearance amount payable: #{@first_gl_pc.amount}"
+      # puts "calculated premature clearance amount payable: #{@first_gl_pc.amount}"
       
       current_week_compulsory_savings = @premature_clearance_glm.group_loan_product.compulsory_savings
       

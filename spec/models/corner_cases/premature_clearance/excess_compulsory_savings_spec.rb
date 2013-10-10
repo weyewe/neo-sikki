@@ -135,9 +135,9 @@ describe GroupLoan do
       
       remaining_principal_amount =  remaining_week * @premature_clearance_glm.group_loan_product.principal 
       
-      puts "current_week_number: #{@group_loan.first_uncollected_weekly_collection.week_number}"
-      puts "remaining_principal_amount: #{remaining_principal_amount}"
-      puts "total_compulsory_savings: #{@premature_clearance_glm.total_compulsory_savings}"
+      # puts "current_week_number: #{@group_loan.first_uncollected_weekly_collection.week_number}"
+      # puts "remaining_principal_amount: #{remaining_principal_amount}"
+      # puts "total_compulsory_savings: #{@premature_clearance_glm.total_compulsory_savings}"
       @premature_clearance_glm.total_compulsory_savings.should > remaining_principal_amount
     end
       
@@ -158,7 +158,7 @@ describe GroupLoan do
         
   
       it 'should produce amount receivable per normal' do
-        puts "awesome bitch"
+        # puts "awesome bitch"
         # since there is more compulsory savings than payable 
         expected_amount = BigDecimal('0')
         @group_loan.group_loan_memberships.each do |glm|
@@ -202,15 +202,7 @@ describe GroupLoan do
           @savings_account_addition_savings_entry.direction.should == FUND_TRANSFER_DIRECTION[:incoming]
         end
       end
-      
-      
-      
-      
     end
-      
-  
   end
-
-
 end
 

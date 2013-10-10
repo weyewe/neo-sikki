@@ -10,9 +10,11 @@ class CreateMembers < ActiveRecord::Migration
       t.decimal :total_savings_account , :default        => 0,  :precision => 12, :scale => 2
       
       t.boolean :is_deceased, :default => false
-      t.datetime :death_datetime 
+      t.datetime :deceased_at  
       
       t.boolean :is_run_away, :default => false 
+      
+      
       
 
       t.timestamps
