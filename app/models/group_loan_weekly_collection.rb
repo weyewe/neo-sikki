@@ -55,6 +55,7 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
   end
   
   def create_group_loan_weekly_payments
+    # puts "inside weekly_collection: create_group_loan_weekly_payments"
     # do weekly payment for all active members
     # minus those that can't pay  (the dead and running away is considered as non active)    
     active_glm_id_list = self.active_group_loan_memberships.map {|x| x.id }
@@ -87,23 +88,6 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
                                     :is_run_away_weekly_bailout => true
     end
     
-    # for the run_away_payment 
-    # run_away_glm_list.each do |glm|
-    #   GroupLoanRunAwayReceivablePayment.create({
-    #     # the link to the member, glm, or group_loan_run_away_receivable is a bonus
-    #     # we don't know what it is for yet. but, just better to dump it.
-    #     # we can optimize later. 
-    #     # The core info needed: group_loan_id, weekly_collection_id, amount
-    #     :group_loan_run_away_receivable_id => glm.group_loan_run_away_receivable.id ,
-    #     :group_loan_weekly_collection_id   => self.id ,
-    #     :group_loan_membership_id          => glm.id  ,
-    #     :group_loan_id                     => self.group_loan_id ,
-    #     :amount                            =>  glm.group_loan_product.weekly_payment_amount   ,
-    #     :payment_case                      => GROUP_LOAN_RUN_AWAY_RECEIVABLE_PAYMENT_CASE[:weekly]
-    #   })
-    #   
-    #   
-    # end
     
   end
   
@@ -118,6 +102,7 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
   
   
   def confirm(params)
+    # puts "gonna confirm week #{self.week_number}"
     if not self.is_collected?
       self.errors.add(:generic_errors, "Belum melakukan pengumpulan di minggu ini")
       return self 

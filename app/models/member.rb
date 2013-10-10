@@ -35,18 +35,18 @@ class Member < ActiveRecord::Base
 =begin
   Savings Related 
 =end
-  def update_total_savings_account
-    incoming = self.savings_entries.where(
-      :savings_status => SAVINGS_STATUS[:savings_account],
-      :direction => FUND_TRANSFER_DIRECTION[:incoming]
-    ).sum("amount")   
-    
-    outgoing = self.savings_entries.where(
-      :savings_status => SAVINGS_STATUS[:savings_account],
-      :direction => FUND_TRANSFER_DIRECTION[:outgoing]
-    ).sum("amount")
-    
-    self.total_savings_account  = incoming - outgoing 
+  def update_total_savings_account(amount)
+    # incoming = self.savings_entries.where(
+    #   :savings_status => SAVINGS_STATUS[:savings_account],
+    #   :direction => FUND_TRANSFER_DIRECTION[:incoming]
+    # ).sum("amount")   
+    # 
+    # outgoing = self.savings_entries.where(
+    #   :savings_status => SAVINGS_STATUS[:savings_account],
+    #   :direction => FUND_TRANSFER_DIRECTION[:outgoing]
+    # ).sum("amount")
+    # 
+    self.total_savings_account  +=  amount 
     self.save
   end
   

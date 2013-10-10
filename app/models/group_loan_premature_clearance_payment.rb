@@ -16,6 +16,8 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
   belongs_to :group_loan_membership
   belongs_to :group_loan_weekly_collection
   
+  has_many :savings_entries, :as => :savings_source
+  
   validates_presence_of :group_loan_id, :group_loan_membership_id , :group_loan_weekly_collection_id
   
   validates_uniqueness_of :group_loan_membership_id 
@@ -223,7 +225,10 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
   #   return GroupLoan.rounding_up( share_amount, DEFAULT_PAYMENT_ROUND_UP_VALUE)
   # end
   
-  
+  # requirement for savings_entry creation
+  def member
+    self.group_loan_membership.member 
+  end
   
   def confirm
     if self.is_confirmed?
@@ -240,10 +245,16 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
     glm.is_active = false 
     glm.deactivation_case =  GROUP_LOAN_DEACTIVATION_CASE[:premature_clearance]
     glm.deactivation_week_number = self.group_loan_weekly_collection.week_number + 1 
-    glm.save 
+    if glm.save  
+      SavingsEntry.create_group_loan_compulsory_savings_withdrawal( self , self.group_loan_membership.total_compulsory_savings )  
+      
+      if remaining_compulsory_savings > BigDecimal('0')
+        SavingsEntry.create_savings_account_group_loan_premature_clearance_addition( self , self.remaining_compulsory_savings )  
+      end 
+    end
     
-    puts "premature_clearance#confirm: transaction activities and saving_entries must be created"
-    puts "=> not implemented"
+    # puts "premature_clearance#confirm: transaction activities and saving_entries must be created"
+    # puts "=> not implemented"
     
     # puts "premature_clearance#confirm \nshould create transaction activity to take the default payment money and the remaining principal payment"
     # puts "premature_clearance#confirm \nshould create savings entry to absorb compulsory savings => What should be done to the compulsory savings?"

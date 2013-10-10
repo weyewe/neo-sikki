@@ -59,24 +59,29 @@ class GroupLoanMembership < ActiveRecord::Base
   end
     
   
-  def update_total_compulsory_savings
-    incoming = member.savings_entries.where(
-      :savings_status => SAVINGS_STATUS[:group_loan_compulsory_savings],
-      :financial_product_type => GroupLoan.to_s, 
-      :financial_product_id => self.group_loan_id ,
-      :direction => FUND_TRANSFER_DIRECTION[:incoming]
-    ).sum("amount")   
-    
-    outgoing = member.savings_entries.where(
-      :savings_status => SAVINGS_STATUS[:group_loan_compulsory_savings],
-      :financial_product_type => GroupLoan.to_s, 
-      :financial_product_id => self.group_loan_id ,
-      :direction => FUND_TRANSFER_DIRECTION[:outgoing]
-    ).sum("amount")
-    
-    self.total_compulsory_savings = incoming - outgoing 
+  
+  def update_total_compulsory_savings(amount)
+    self.total_compulsory_savings += amount 
     self.save 
   end
+  # def update_total_compulsory_savings
+  #   incoming = member.savings_entries.where(
+  #     :savings_status => SAVINGS_STATUS[:group_loan_compulsory_savings],
+  #     :financial_product_type => GroupLoan.to_s, 
+  #     :financial_product_id => self.group_loan_id ,
+  #     :direction => FUND_TRANSFER_DIRECTION[:incoming]
+  #   ).sum("amount")   
+  #   
+  #   outgoing = member.savings_entries.where(
+  #     :savings_status => SAVINGS_STATUS[:group_loan_compulsory_savings],
+  #     :financial_product_type => GroupLoan.to_s, 
+  #     :financial_product_id => self.group_loan_id ,
+  #     :direction => FUND_TRANSFER_DIRECTION[:outgoing]
+  #   ).sum("amount")
+  #   
+  #   self.total_compulsory_savings = incoming - outgoing 
+  #   self.save 
+  # end
   
 =begin
   Corner Case : Deceased member 

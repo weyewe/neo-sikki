@@ -12,6 +12,8 @@ class CreateSavingsEntries < ActiveRecord::Migration
       
       t.integer :member_id 
       
+      t.text :description 
+      
 
       t.timestamps
     end

@@ -133,7 +133,7 @@ describe GroupLoan do
       @group_loan.reload 
       @run_away_glm.reload 
       @second_group_loan_weekly_collection = @group_loan.group_loan_weekly_collections.order("id ASC")[1]
-      
+      @third_group_loan_weekly_collection = @group_loan.group_loan_weekly_collections.order("id ASC")[2]
     end
      
     
@@ -189,36 +189,27 @@ describe GroupLoan do
           @gl_rar.reload 
         end
         
+        it 'should preserve the amount_receivable in week 1,2,3' do
+          expected_amount = BigDecimal('0')
+          @group_loan.group_loan_memberships.each do |glm|
+            expected_amount += glm.group_loan_product.weekly_payment_amount
+          end
+          
+          @first_group_loan_weekly_collection.reload
+          @second_group_loan_weekly_collection.reload
+          @third_group_loan_weekly_collection.reload
+          
+          @first_group_loan_weekly_collection.amount_receivable.should == expected_amount
+          @second_group_loan_weekly_collection.amount_receivable.should == expected_amount
+          @third_group_loan_weekly_collection.amount_receivable.should == expected_amount
+        end
+        
         it 'should not close group loan' do
           @group_loan.errors.size.should_not ==0 
           @group_loan.is_closed.should be_false 
         end
          
-        
-        # it 'should increase group_loan run_away_amount_received' do
-        #   final_amount = @group_loan.run_away_amount_received 
-        #   diff = final_amount - @initial_run_away_amount_received 
-        #   diff.should == @run_away_glm.group_loan_product.weekly_payment_amount
-        # end
-        
-        # it 'should create group_loan_run_away_receivable_payment' do
-        #   @gl_rar.group_loan_run_away_receivable_payments.count.should == 1 
-        # end
-        
-        # it 'should use weekly as payment case' do
-        #   @gl_rar_payment = @gl_rar.group_loan_run_away_receivable_payments.first
-        #   @gl_rar_payment.payment_case.should == GROUP_LOAN_RUN_AWAY_RECEIVABLE_PAYMENT_CASE[:weekly]
-        # end
-        
-        # it 'should update amount_received' do
-        #   @group_loan.run_away_amount_received.should == @run_away_glm.group_loan_product.weekly_payment_amount
-        #   # @gl_rar.amount_received.should == @run_away_glm.group_loan_product.weekly_payment_amount
-        # end
-        
-        # it 'should create transaction activity based on this run away receivable payment' do
-        #   @gl_rar_payment = @gl_rar.group_loan_run_away_receivable_payments.first
-        #   @gl_rar_payment.transaction_activities.count.should == 1 
-        # end
+      
         
         it "can't change payment case  after a payment has been made" do
           @gl_rar.set_payment_case({

@@ -288,8 +288,12 @@ Phase: loan disbursement finalization
     end
   end
 
-  def total_compulsory_savings 
-    self.glm_eligible_for_compulsory_savings_calculation.sum("total_compulsory_savings")
+  # def total_compulsory_savings 
+  #   self.glm_eligible_for_compulsory_savings_calculation.sum("total_compulsory_savings")
+  # end
+  
+  def total_compulsory_savings
+    self.group_loan_memberships.sum("total_compulsory_savings")
   end
 
 

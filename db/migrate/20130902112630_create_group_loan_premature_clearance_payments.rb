@@ -16,7 +16,13 @@ class CreateGroupLoanPrematureClearancePayments < ActiveRecord::Migration
       
       t.decimal :premature_clearance_deposit , :default        => 0,  :precision => 12, :scale => 2 
       
-
+      
+      
+      # on premature clearance, the payment amount is deducted by compulsory savings
+      # if there is remaining compulsory savings, it will be ported to savings_account
+      # withdrawn separately. 
+      t.decimal :remaining_compulsory_savings , :default        => 0,  :precision => 12, :scale => 2 
+      
       t.timestamps
     end
   end

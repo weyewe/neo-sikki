@@ -27,6 +27,7 @@ class GroupLoanWeeklyPayment < ActiveRecord::Base
   
   def create_compulsory_savings 
     
+    # puts "Calling compulsory savings"
     if group_loan_membership.group_loan_product.compulsory_savings != BigDecimal('0')
       SavingsEntry.create_weekly_payment_compulsory_savings( self )
     end

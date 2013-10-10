@@ -49,6 +49,7 @@ ActiveRecord::Schema.define(version: 20130902112630) do
     t.decimal  "amount",                          precision: 12, scale: 2, default: 0.0
     t.boolean  "is_confirmed",                                             default: false
     t.decimal  "premature_clearance_deposit",     precision: 12, scale: 2, default: 0.0
+    t.decimal  "remaining_compulsory_savings",    precision: 12, scale: 2, default: 0.0
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -133,6 +134,7 @@ ActiveRecord::Schema.define(version: 20130902112630) do
     t.decimal  "bad_debt_allowance",                           precision: 10, scale: 2, default: 0.0
     t.decimal  "bad_debt_expense",                             precision: 10, scale: 2, default: 0.0
     t.decimal  "round_down_compulsory_savings_return_revenue", precision: 10, scale: 2, default: 0.0
+    t.decimal  "interest_revenue",                             precision: 10, scale: 2, default: 0.0
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -167,6 +169,7 @@ ActiveRecord::Schema.define(version: 20130902112630) do
     t.integer  "financial_product_id"
     t.string   "financial_product_type"
     t.integer  "member_id"
+    t.text     "description"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
