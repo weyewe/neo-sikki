@@ -259,13 +259,13 @@ describe GroupLoan do
           
           diff =  BigDecimal('0')
           
-          puts "\n\n========\n"
-          puts "total compulsory savings: #{@group_loan.total_compulsory_savings}"
-          puts "remaining premature_clearance : #{@group_loan.remaining_premature_clearance_deposit}"
-          puts "bad_debt allowance : #{@group_loan.bad_debt_allowance}"
-          puts "===========>\n"
-          puts "normal_compulsory-savings = #{normal_total_compulsory_savings} "
-          puts "compulsory_savings-return amount: #{@group_loan.compulsory_savings_return_amount}"
+          # puts "\n\n========\n"
+          # puts "total compulsory savings: #{@group_loan.total_compulsory_savings}"
+          # puts "remaining premature_clearance : #{@group_loan.remaining_premature_clearance_deposit}"
+          # puts "bad_debt allowance : #{@group_loan.bad_debt_allowance}"
+          # puts "===========>\n"
+          # puts "normal_compulsory-savings = #{normal_total_compulsory_savings} "
+          # puts "compulsory_savings-return amount: #{@group_loan.compulsory_savings_return_amount}"
                   
           (normal_total_compulsory_savings - @group_loan.compulsory_savings_return_amount).should == diff
         end

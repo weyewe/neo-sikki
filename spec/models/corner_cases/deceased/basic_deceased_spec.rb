@@ -229,6 +229,11 @@ describe DeceasedClearance do
       
       @final_compulsory_savings.should == BigDecimal('0')
     end
+    
+    it 'should not introduce bad debt ' do
+      @group_loan.reload
+      @group_loan.bad_debt_allowance.should == BigDecimal('0')
+    end
 
 
     context "perform collection and confirmation" do
@@ -269,12 +274,10 @@ describe DeceasedClearance do
         @group_loan.group_loan_memberships.where(:is_active => true).count.should == 0 
         
         week_2_active_glm_count = @second_group_loan_weekly_collection.active_group_loan_memberships.count 
-        week_2_active_glm_count.should == (@initial_active_glm_count - 1 )
+        week_2_active_glm_count.should == ( @initial_active_glm_count - 1 )
         
         week_1_active_glm_count = @first_group_loan_weekly_collection.active_group_loan_memberships.count 
-        week_1_active_glm_count.should == (@initial_active_glm_count  )
-        
-        
+        week_1_active_glm_count.should == ( @initial_active_glm_count )
       end
       
       it 'should return the compulsory savings, not including the deceased member' do
@@ -287,10 +290,7 @@ describe DeceasedClearance do
         @group_loan.compulsory_savings_return_amount.should == expected_amount*@group_loan.loan_duration
       end
     end
-     
- 
+
   end
-   
-  
 end
 
