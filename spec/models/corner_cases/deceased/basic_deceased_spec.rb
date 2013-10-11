@@ -1,4 +1,4 @@
-# Case 1: member pass away mid shite 
+# Case 1: member deceased mid shite 
 
 # WE HAVE A PROBLEM: what if there is uncollectible payment.. and member deceased.. the group
 # has to pay for the uncollectible 
@@ -112,6 +112,7 @@ describe DeceasedClearance do
     
     @started_at = DateTime.new(2013,10,5,0,0,0)
     @disbursed_at = DateTime.new(2013,10,10,0,0,0)
+    @closed_at = DateTime.new(2013,12,5,0,0,0)
     
     # start group loan 
     @group_loan.start(:started_at => @started_at )
@@ -144,26 +145,31 @@ describe DeceasedClearance do
    
   context "a member is passed away ( week 2 ) "  do
     before(:each) do
-      @passed_away_glm = @group_loan.active_group_loan_memberships.first 
-      @passed_away_member = @passed_away_glm.member 
+       
+      @deceased_glm = @group_loan.active_group_loan_memberships.first 
+      @deceased_glm.reload
+      @deceased_member = @deceased_glm.member 
       @initial_active_glm_count = @group_loan.active_group_loan_memberships.count 
       @first_week_amount_receivable=   @first_group_loan_weekly_collection.amount_receivable
-      
-      @passed_away_member.mark_as_deceased(:deceased_at => DateTime.now )
+
+      @initial_savings_account = @deceased_member.total_savings_account
+      @initial_compulsory_savings = @deceased_glm.total_compulsory_savings
+      @deceased_member.mark_as_deceased(:deceased_at => DateTime.now )
       @group_loan.reload 
-      @passed_away_glm.reload 
+      @deceased_glm.reload 
       @second_group_loan_weekly_collection = @group_loan.group_loan_weekly_collections.order("id ASC")[1]
+      @deceased_member.reload 
     end
     
     it 'should create one DeceasedPrincipalReceivable' do
       DeceasedClearance.count.should == 1 
       dc = DeceasedClearance.first 
       
-      @passed_away_glm.reload 
+      @deceased_glm.reload 
       # dpr.week_number.should == @second_group_loan_weekly_collection.week_number 
-      @passed_away_glm.is_active.should be_false 
-      @passed_away_glm.deactivation_week_number.should == @second_group_loan_weekly_collection.week_number
-      @passed_away_glm.deactivation_case.should == GROUP_LOAN_DEACTIVATION_CASE[:deceased]
+      @deceased_glm.is_active.should be_false 
+      @deceased_glm.deactivation_week_number.should == @second_group_loan_weekly_collection.week_number
+      @deceased_glm.deactivation_case.should == GROUP_LOAN_DEACTIVATION_CASE[:deceased]
     end
     
     it 'should extract the glm that is active at that particular week' do
@@ -173,26 +179,21 @@ describe DeceasedClearance do
     
     it 'should create diff from first week amount receivable' do
       diff = @first_week_amount_receivable -  @second_group_loan_weekly_collection.amount_receivable
-      diff.should  == @passed_away_glm.group_loan_product.weekly_payment_amount
+      diff.should  == @deceased_glm.group_loan_product.weekly_payment_amount
     end
     
-    it 'should preserve the active glm in week 1 (including the deceased in week 2)' do
-      # puts "\n\n"
-      # puts "====================Testing the weekly_collection.active_group_loan_memberships===========\n"
-      # puts "The week number of passed away glm: #{@passed_away_glm.deactivation_week_number}"
+    it 'should preserve the active glm in week 1 (including the deceased in week 2)' do 
       active_glm_id_list = @first_group_loan_weekly_collection.active_group_loan_memberships.map {|x| x.id }
       active_glm_id_list.count.should == @initial_active_glm_count 
     end
     
     
-    it 'should reduce the amount receivable(different from collection#1)' do
-      
-      
+    it 'should reduce the amount receivable(different from collection#1)' do 
       @first_collection_amount  = @first_group_loan_weekly_collection.amount_receivable
       @second_collection_amount = @second_group_loan_weekly_collection.amount_receivable
       
       diff = @first_collection_amount - @second_collection_amount
-      diff.should == @passed_away_glm.group_loan_product.weekly_payment_amount
+      diff.should == @deceased_glm.group_loan_product.weekly_payment_amount
     end
     
     it 'should reduce the active_glm count' do
@@ -203,56 +204,90 @@ describe DeceasedClearance do
     
     it 'should not contain the deceased glm in the active_glm' do 
       @active_glm_id_list = @group_loan.active_group_loan_memberships.map{|x| x.id }
-      @active_glm_id_list.include?(@passed_away_glm.id).should be_false 
+      @active_glm_id_list.include?(@deceased_glm.id).should be_false 
     end
-    # 
-    # context "perform collection and confirmation" do
-    #   before(:each) do
-    #     @second_group_loan_weekly_collection.collect(:collected_at => DateTime.now)
-    #     @second_group_loan_weekly_collection.confirm
-    #   end
-    #   
-    #   it 'should not create GroupLoanWeeklyPayment to the deceased member' do
-    #     GroupLoanWeeklyPayment.where(:group_loan_weekly_collection_id => @second_group_loan_weekly_collection.id,
-    #             :group_loan_membership_id => @passed_away_glm.id ).count.should == 0 
-    #   end
-    # end
-    #  
-    # 
-    # context "finishing the payment collection cycle" do
-    #   before(:each) do
-    #     @group_loan.group_loan_weekly_collections.order("id ASC").each do |x|
-    #       next if x.is_collected? and x.is_confirmed? 
-    #       
-    #       x.collect(:collected_at => DateTime.now)
-    #       x.confirm 
-    #     end
-    #     
-    #     @group_loan.reload
-    #     @group_loan.close
-    #     @group_loan.reload
-    #     @second_group_loan_weekly_collection.reload 
-    #     @first_group_loan_weekly_collection.reload 
-    #   end
-    #   
-    #   it 'should close the group loan' do
-    #      @group_loan.is_closed.should be_true 
-    #    end
-    #   
-    #   it 'should give the correct number of active group_loan_membership (though it is closed)' do
-    #     @group_loan.active_group_loan_memberships.count.should == @initial_active_glm_count -1 # (1 deceased)
-    #     @group_loan.group_loan_memberships.where(:is_active => true).count.should == 0 
-    #     
-    #     week_2_active_glm_count = @second_group_loan_weekly_collection.active_group_loan_memberships.count 
-    #     week_2_active_glm_count.should == (@initial_active_glm_count - 1 )
-    #     
-    #     week_1_active_glm_count = @first_group_loan_weekly_collection.active_group_loan_memberships.count 
-    #     week_1_active_glm_count.should == (@initial_active_glm_count  )
-    #     
-    #     
-    #   end
-    # end
-    #  
+    
+    it 'should only create 1 group_loan_weekly_payment for deceased_glm' do
+      @deceased_glm.group_loan_weekly_payments.count.should == 1 
+    end
+    
+    it 'should empty out the compulsory savings, ported to savings account' do
+      
+      @deceased_glm.total_compulsory_savings.should == BigDecimal('0')
+    end
+    
+    it 'should increase the savings_account according to the flushed out savings account' do
+      # @initial_savings_account = @deceased_member.total_savings_account
+      # @initial_compulsory_savings = @deceased_glm.total_compulsory_savings
+      # @deceased_member.reload 
+      
+      @final_savings_account = @deceased_member.total_savings_account
+      @final_compulsory_savings = @deceased_glm.total_compulsory_savings
+      
+      diff_savings_account = @final_savings_account - @initial_savings_account
+      diff_savings_account.should == @initial_compulsory_savings
+      
+      @final_compulsory_savings.should == BigDecimal('0')
+    end
+
+
+    context "perform collection and confirmation" do
+      before(:each) do
+        @second_group_loan_weekly_collection.collect(:collected_at => DateTime.now)
+        @second_group_loan_weekly_collection.confirm(:confirmed_at => DateTime.now )
+      end
+      
+      it 'should not create GroupLoanWeeklyPayment to the deceased member' do
+        GroupLoanWeeklyPayment.where(:group_loan_weekly_collection_id => @second_group_loan_weekly_collection.id,
+                :group_loan_membership_id => @deceased_glm.id ).count.should == 0 
+      end
+    end
+     
+    
+    context "finishing the payment collection cycle" do
+      before(:each) do
+        @group_loan.group_loan_weekly_collections.order("id ASC").each do |x|
+          next if x.is_collected? and x.is_confirmed? 
+          
+          x.collect(:collected_at => DateTime.now)
+          x.confirm(:confirmed_at => DateTime.now )
+        end
+        
+        @group_loan.reload
+        @group_loan.close(:closed_at => @closed_at )
+        @group_loan.reload
+        @second_group_loan_weekly_collection.reload 
+        @first_group_loan_weekly_collection.reload 
+      end
+      
+      it 'should close the group loan' do
+         @group_loan.is_closed.should be_true 
+       end
+      
+      it 'should give the correct number of active group_loan_membership (though it is closed)' do
+        @group_loan.active_group_loan_memberships.count.should == @initial_active_glm_count -1 # (1 deceased)
+        @group_loan.group_loan_memberships.where(:is_active => true).count.should == 0 
+        
+        week_2_active_glm_count = @second_group_loan_weekly_collection.active_group_loan_memberships.count 
+        week_2_active_glm_count.should == (@initial_active_glm_count - 1 )
+        
+        week_1_active_glm_count = @first_group_loan_weekly_collection.active_group_loan_memberships.count 
+        week_1_active_glm_count.should == (@initial_active_glm_count  )
+        
+        
+      end
+      
+      it 'should return the compulsory savings, not including the deceased member' do
+        expected_amount = BigDecimal('0')
+        @group_loan.group_loan_memberships.each do |x|
+          next if x.id == @deceased_glm.id 
+          expected_amount += x.group_loan_product.compulsory_savings
+        end
+        
+        @group_loan.compulsory_savings_return_amount.should == expected_amount*@group_loan.loan_duration
+      end
+    end
+     
  
   end
    

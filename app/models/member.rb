@@ -6,12 +6,16 @@ class Member < ActiveRecord::Base
   has_many :group_loan_memberships 
   
   has_many :savings_entries 
-  has_many :savings_account_payments 
+  # has_many :savings_account_payments 
   
-  has_many :group_loan_port_compulsory_savings 
+  # has_many :group_loan_port_compulsory_savings 
+  
+  has_many :deceased_clearances
   
   validates_uniqueness_of :id_number 
-  validates_presence_of :name, :id_number  
+  validates_presence_of :name, :id_number 
+  
+   
   
   def self.create_object(params)
     new_object           = self.new
@@ -84,7 +88,7 @@ class Member < ActiveRecord::Base
           
           description = "Deceased Clearance for group loan: #{glm.group_loan.name}" + 
               " for member: #{glm.member.name}, #{glm.member.id_number}"
-          DeceasedClearance.create(
+          new_object = DeceasedClearance.create(
             :financial_product_id  => glm.group_loan.id,
             :financial_product_type => glm.group_loan.class.to_s, 
             :principal_return => glm.remaining_deceased_principal_payment,
@@ -92,8 +96,12 @@ class Member < ActiveRecord::Base
             :description => description,
             :additional_savings_account => glm.total_compulsory_savings 
           )
-                                         
-                                      
+          
+          if glm.total_compulsory_savings > BigDecimal('0')
+            SavingsEntry.create_group_loan_compulsory_savings_withdrawal( new_object , glm.total_compulsory_savings )  
+            SavingsEntry.create_savings_account_group_loan_deceased_addition( new_object , new_object.additional_savings_account)  
+          end
+                                  
         else
           glm.destroy
         end                                 

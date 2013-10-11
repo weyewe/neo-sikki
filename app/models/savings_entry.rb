@@ -79,6 +79,7 @@ class SavingsEntry < ActiveRecord::Base
   end
   
   def self.create_group_loan_compulsory_savings_withdrawal( savings_source, amount ) 
+    # puts "The savings_source: #{savings_source.inspect}"
     group_loan_membership = savings_source.group_loan_membership
     member = group_loan_membership.member
     
@@ -110,6 +111,23 @@ class SavingsEntry < ActiveRecord::Base
 
     member.update_total_savings_account( new_object.amount)
   end
+  
+  def self.create_savings_account_group_loan_deceased_addition( savings_source, amount ) 
+    # puts "creating savings_account addition because of deceased member"
+    member = savings_source.member
+
+    new_object = self.create :savings_source_id => savings_source.id,
+      :savings_source_type => savings_source.class.to_s,
+      :amount => amount  ,
+      :savings_status => SAVINGS_STATUS[:savings_account],
+      :direction => FUND_TRANSFER_DIRECTION[:incoming],
+      :financial_product_id =>  savings_source.group_loan.id  ,
+      :financial_product_type => savings_source.group_loan.class.to_s ,
+      :member_id => member.id
+
+    member.update_total_savings_account( new_object.amount)
+  end
+  
   
   def delete_object
     if not self.financial_product_id.nil?
