@@ -1,7 +1,190 @@
-# This file should contain all the record creation needed to seed the database with its default values.
-# The data can then be loaded with the rake db:seed (or created alongside the db with db:setup).
-#
-# Examples:
-#
-#   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
-#   Mayor.create(name: 'Emanuel', city: cities.first)
+role = {
+  :system => {
+    :administrator => true
+  }
+}
+
+admin_role = Role.create!(
+  :name        => ROLE_NAME[:admin],
+  :title       => 'Administrator',
+  :description => 'Role for administrator',
+  :the_role    => role.to_json
+)
+
+role = {
+  :passwords => {
+    :update => true 
+  },
+  :works => {
+    :index => true, 
+    :create => true,
+    :update => true,
+    :destroy => true,
+    :work_reports => true ,
+    :project_reports => true ,
+    :category_reports => true 
+  },
+  :projects => {
+    :search => true 
+  },
+  :categories => {
+    :search => true 
+  }
+}
+
+data_entry_role = Role.create!(
+  :name        => ROLE_NAME[:data_entry],
+  :title       => 'Data Entry',
+  :description => 'Role for data_entry',
+  :the_role    => role.to_json
+)
+
+
+
+if Rails.env.development?
+
+=begin
+  CREATING THE USER 
+=end
+
+  admin = User.create_main_user(  :name => "Admin", :email => "admin@gmail.com" ,:password => "willy1234", :password_confirmation => "willy1234") 
+  admin.set_as_main_user
+
+
+  data_entry1 = User.create_object(:name => "Data Entry", :email => "data_entry1@gmail.com", 
+                :password => 'willy1234', 
+                :password_confirmation => 'willy1234',
+                :role_id => data_entry_role.id )
+              
+  data_entry1.password = 'willy1234'
+  data_entry1.password_confirmation = 'willy1234'
+  data_entry1.save
+
+  data_entry2 = User.create_object(:name => "Data Entry", :email => "data_entry2@gmail.com", 
+                :password => 'willy1234', 
+                :password_confirmation => 'willy1234',
+                :role_id => data_entry_role.id )
+              
+  data_entry2.password = 'willy1234'
+  data_entry2.password_confirmation = 'willy1234'
+  data_entry2.save
+
+
+  user_array = [admin, data_entry1, data_entry2]
+
+
+
+=begin
+  CREATING THE Member 
+=end
+
+  (1..20).each do |number|
+    Member.create_object({
+      :name =>  "Member #{number}",
+      :address => "Address alamat #{number}" ,
+      :id_number => "342432#{number}"
+    })
+  end
+
+ 
+  # customer_array = [cust_1, cust_2, cust_3, cust_4] 
+  
+  member_array = Member.all 
+
+=begin
+  Create GroupLoanProduct
+=end
+
+  @total_weeks_1        = 8 
+  @principal_1          = BigDecimal('20000')
+  @interest_1           = BigDecimal("4000")
+  @compulsory_savings_1 = BigDecimal("6000")
+  @admin_fee_1          = BigDecimal('10000')
+  @initial_savings_1          = BigDecimal('0')
+
+  @group_loan_product_1 = GroupLoanProduct.create_object({
+    :name => "Produk 1, 500 Ribu",
+    :total_weeks        =>  @total_weeks_1              ,
+    :principal          =>  @principal_1                ,
+    :interest           =>  @interest_1                 , 
+    :compulsory_savings        =>  @compulsory_savings_1       , 
+    :admin_fee          =>  @admin_fee_1,
+    :initial_savings          => @initial_savings_1
+  }) 
+
+  @total_weeks_2        = 8 
+  @principal_2          = BigDecimal('15000')
+  @interest_2           = BigDecimal("5000")
+  @compulsory_savings_2 = BigDecimal("4000")
+  @admin_fee_2          = BigDecimal('10000')
+  @initial_savings_2          = BigDecimal('0')
+
+  @group_loan_product_2 = GroupLoanProduct.create_object({
+    :name => "Product 2, 800ribu",
+    :total_weeks        =>  @total_weeks_2              ,
+    :principal          =>  @principal_2                ,
+    :interest           =>  @interest_2                 , 
+    :compulsory_savings        =>  @compulsory_savings_2       , 
+    :admin_fee          =>  @admin_fee_2     ,
+    :initial_savings          => @initial_savings_2           
+  })
+
+=begin
+  Create seed group_loan 
+=end
+
+  @group_loan_1 = GroupLoan.create_object({
+    :name                             => "Group Loan 1" ,
+    :number_of_meetings => 3 
+  })
+  
+  @group_loan_2 = GroupLoan.create_object({
+    :name                             => "Group Loan 2" ,
+    :number_of_meetings => 5
+  })
+
+
+
+
+  def make_date(*args)
+    now = DateTime.now  
+  
+    d = ( args[0] || 0 )
+    h = (args[1]  || 0)  
+    m = (args[2] || 0)  
+    s = (args[3] || 0)  
+  
+  
+    target_date = ( now  + d.days + h.hours + m.minutes + s.seconds   ) .new_offset( Rational(0,24) ) 
+  
+    adjusted_date = DateTime.new( target_date.year, target_date.month, target_date.day, 
+                                  h, 0 , 0 
+              ) .new_offset( Rational(0,24) ) 
+  
+    # return ( now  + d.days + h.hours + m.minutes + s.seconds   ) .new_offset( Rational(0,24) ) 
+    return adjusted_date 
+  end
+
+  def make_date_mins(*args)
+    now = DateTime.now  
+  
+    d = ( args[0] || 0 )
+    h = (args[1]  || 0)  
+    m = (args[2] || 0)  
+    s = (args[3] || 0)  
+  
+  
+    target_date = ( now  + d.days + h.hours + m.minutes + s.seconds   ) .new_offset( Rational(0,24) ) 
+  
+  
+    # what is being adjusted 
+    adjusted_date = DateTime.new( target_date.year, target_date.month, target_date.day, 
+                                  target_date.hour, target_date.minute , target_date.second
+              ) .new_offset( Rational(0,24) ) 
+  
+    return adjusted_date
+  end
+    
+ 
+end
+

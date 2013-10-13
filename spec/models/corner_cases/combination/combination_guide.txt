@@ -34,6 +34,27 @@ So, in the field: if there is deceased, run_away and premature clearance on the 
 Scenarios:
 1. multiple Premature clearances happening on a given week
 2. multiple premature clearances happening on different week
+3. run_away (weekly resolution) 			+ premature (different week)  
+4. run_away (weekly resolution) 			+ premature (same week)
+5. run_away (end_of_cycle resolution) + premature (different week)  
+6. run_away (end_of_cycle resolution) + premature (same week)
+3. premature (different week)  	+ 	run_away (weekly resolution) 			
+4. premature (same week)        +   run_away (weekly resolution) 			
+5. premature (different week)   +   run_away (end_of_cycle resolution) 
+6. premature (same week)        +   run_away (end_of_cycle resolution) 
+
+
+7. run_away( weekly_resolution ) + deceased 
+8. run_away( end_of_cycle ) + deceased 
+9. deceased  + run_away ( weekly_resolution )
+10. deceased + run_away ( end_of_cycle )
+
+
+11. deceased + premature
+12. premature + deceased
+
+
+
 3. 2 run_away, premature_clearance, deceased, 1 uncollectible on a single week  << ultimate
 4. run_away (weekly), premature_clearance, run_away (weekly), premature_clearance (one after another)
 5. run_away (weekly), premature_clearance, run_away (end_of_cycle), premature_clearance (one after another)
