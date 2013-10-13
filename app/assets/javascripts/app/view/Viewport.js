@@ -6,7 +6,7 @@ Ext.define("AM.view.Viewport" , {
 		type : 'card'
 	},
 	
-	items  : [
+	items  : [ 
 		{
 			xtype : 'authform'
 		},
