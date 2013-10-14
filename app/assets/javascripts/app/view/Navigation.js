@@ -18,15 +18,15 @@ Ext.define('AM.view.Navigation', {
 			)
 		},
 		
-		addWorkLogButton: function(){
+		addOperationButton: function(){
 			this.items.push(
 				{
 					iconCls: 'tasks-mark-complete',
 					disabled: false,
-					tooltip: 'Work Log',
+					tooltip: 'Operation',
 					xtype: 'button',
-					text : "Work Log",
-					action : "switchWorkLog",
+					text : "Operation",
+					action : "switchOperation",
 					pressed : true,
 					toggleGroup: this.id+'-nav-views' 
 				}
@@ -82,7 +82,7 @@ Ext.define('AM.view.Navigation', {
 			
 			this.items = [];
 			this.addPersonalReportButton();
-			this.addWorkLogButton();
+			this.addOperationButton();
 			this.addMasterButton();
 			
 			

@@ -12,6 +12,7 @@ NeoSikki::Application.routes.draw do
     
     resources :app_users
     resources :members
+    resources :group_loans 
     resources :group_loan_products
      
   end

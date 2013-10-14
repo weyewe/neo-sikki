@@ -47,6 +47,15 @@ class GroupLoan < ActiveRecord::Base
     return self
   end
   
+  def delete_object
+    if self.is_started? or self.group_loan_memberships.count != 0
+      self.errors.add(:generic_errors, "Sudah ada keanggotaan pinjaman group")
+      return self 
+    end
+    
+    self.destroy 
+  end
+  
   
   def has_membership?( group_loan_membership)
     active_glm_id_list = self.active_group_loan_memberships.map {|x| x.id }

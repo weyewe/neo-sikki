@@ -17,8 +17,9 @@ Ext.define('AM.view.Content', {
 				xtype : 'container'
 			},
 			{
-				html : "Work Awesome Banzai",
-				xtype : 'container'
+				html : "Operation",
+				xtype : 'operationProcessPanel'
+				// xtype : 'container'
 			},
 			{
 				html : "Master",

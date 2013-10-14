@@ -25,7 +25,7 @@ Ext.define("AM.controller.Navigation", {
 		var me = this; 
 		
 		me.control({  
-			'navigation	button[action=switchPersonalReport], navigation button[action=switchWorkLog], navigation button[action=switchMaster]' : {
+			'navigation	button[action=switchPersonalReport], navigation button[action=switchOperation], navigation button[action=switchMaster]' : {
 				click : me.switchScreen
 			},
 			
