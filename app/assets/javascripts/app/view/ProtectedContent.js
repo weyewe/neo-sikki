@@ -11,16 +11,10 @@ Ext.define('AM.view.ProtectedContent', {
     items: [
 				{
 					xtype : 'navigation',
-				},
-				
+				}, 
 				{
-					xtype : 'container',
-					html : "Awesome content"
+					xtype : 'content',
+					flex :  1
 				}
-				
-				// {
-				// 	xtype : 'content',
-				// 	flex :  1
-				// }
     ]
 });

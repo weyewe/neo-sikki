@@ -33,6 +33,7 @@ Ext.define("AM.controller.Authorization", {
 	},
 	
 	onAuthenticateSuccess: function(){
+		console.log("Inside authorization: onAuthenticateSuccess");
 		var me  = this;
 		// reconstruct all view elements 
 		if(	AM.currentUser.hasRole('system', 'administrator')	){

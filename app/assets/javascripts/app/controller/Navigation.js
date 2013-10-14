@@ -28,10 +28,11 @@ Ext.define("AM.controller.Navigation", {
 			'navigation	button[action=switchPersonalReport], navigation button[action=switchWorkLog], navigation button[action=switchMaster]' : {
 				click : me.switchScreen
 			},
+			
+ 
 		});
 	},
-	
-	
+	 
 
 	switchScreen: function(btn){ 
 		var me = this; 
