@@ -78,7 +78,7 @@ if Rails.env.development?
   CREATING THE Member 
 =end
 
-  (1..20).each do |number|
+  (1..80).each do |number|
     Member.create_object({
       :name =>  "Member #{number}",
       :address => "Address alamat #{number}" ,

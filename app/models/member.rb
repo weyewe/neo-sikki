@@ -16,6 +16,9 @@ class Member < ActiveRecord::Base
   validates_presence_of :name, :id_number 
   
    
+  def self.active_objects
+    self.where(:is_deceased => false).order("id DESC")
+  end
   
   def self.create_object(params)
     new_object           = self.new
@@ -34,6 +37,15 @@ class Member < ActiveRecord::Base
     self.id_number = params[:id_number]
 
     self.save 
+  end
+  
+  def delete_object
+    if self.group_loan_memberships.count != 0
+      self.errors.add(:generic_errors, "Tidak bisa dihapus. Sudah ada pendaftaran produk")
+      return self 
+    end
+    
+    self.destroy 
   end
   
 =begin

@@ -22,7 +22,7 @@ Ext.define('AM.view.Content', {
 			},
 			{
 				html : "Master",
-				xtype : 'container'
+				xtype : 'masterProcessPanel'
 			},
 			// {
 			// 	xtype : 'personalProcessPanel'
@@ -32,10 +32,7 @@ Ext.define('AM.view.Content', {
 			// {
 			// 	xtype : "workProcess",
 			// },
-			// {
-			// 	html : "Master Data",
-			// 	xtype : 'masterProcessPanel'
-			// },
+
 			// {
 			// 	html : "Third",
 			// 	xtype : 'container'

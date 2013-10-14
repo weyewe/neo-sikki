@@ -10,7 +10,9 @@ NeoSikki::Application.routes.draw do
     
     get 'search_role' => 'roles#search', :as => :search_role 
     
-    resources :app_users 
+    resources :app_users
+    resources :members
+    resources :group_loan_products
      
   end
 end

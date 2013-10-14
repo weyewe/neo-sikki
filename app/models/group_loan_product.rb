@@ -66,6 +66,7 @@ class GroupLoanProduct < ActiveRecord::Base
   end
   
   
+  
   def self.create_object(   params) 
     new_object                 = self.new 
     new_object.name            = params[:name]
