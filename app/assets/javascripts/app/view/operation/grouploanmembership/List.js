@@ -1,8 +1,8 @@
-Ext.define('AM.view.operation.grouploan.List' ,{
+Ext.define('AM.view.operation.grouploanmembership.List' ,{
   	extend: 'Ext.grid.Panel',
-  	alias : 'widget.grouploanlist',
+  	alias : 'widget.grouploanmembershiplist',
 
-  	store: 'GroupLoans', 
+  	store: 'GroupLoanMemberships', 
  
 
 		// { name: 'id', type: 'int' },
@@ -16,28 +16,45 @@ Ext.define('AM.view.operation.grouploan.List' ,{
 
 	initComponent: function() {
 		this.columns = [
-			{ header: 'Nama', dataIndex: 'name' , flex : 1 },
-			{ header: 'Jumlah Meeting',  dataIndex: 'number_of_meetings', flex : 1  },
-			{	header: 'Jumlah Pengumpulan', dataIndex: 'number_of_collections', flex : 1   } ,
-			{	header: 'Dimulai?', dataIndex: 'is_started', flex : 1   } ,
-			{	header: 'Cair?', dataIndex: 'is_loan_disbursed', flex : 1   } ,
-			{	header: 'Selesai?', dataIndex: 'is_closed'   } ,
-			{	header: 'Tabungan Dikembalikan?', dataIndex: 'is_compulsory_savings_withdrawn', flex : 1   } ,
+			// { header: 'Member', dataIndex: 'member_name' , flex : 1 },
+			{
+				xtype : 'templatecolumn',
+				text : "Member",
+				flex : 1,
+				tpl : '<b>{member_id_number}</b>' + '<br />' + 
+							'Nama: <b>{member_name}</b>' + '<br />' + 
+							'Alamat: {member_address}'  
+			},
+			
+			{
+				xtype : 'templatecolumn',
+				text : "Produk",
+				flex : 1,
+				tpl : '<b>{group_loan_product_name}</b>' + '<br />' + 
+							'Durasi: <b>{group_loan_product_total_weeks}</b>' + '<br />' + 
+							'Pokok: <b>{group_loan_product_principal}</b>' + '<br />' + 
+							'Bunga: <b>{group_loan_product_interest}</b>' + '<br />' + 
+							'Tabungan Wajib: <b>{group_loan_product_compulsory_savings}</b>' + '<br />' + 
+							'Admin fee: <b>{group_loan_product_admin_fee}</b>' 
+			},
+			
+			
+			{ header: 'Total Tabungan Wajib',  dataIndex: 'total_compulsory_savings', flex : 1  }, 
 		];
 
 		this.addObjectButton = new Ext.Button({
-			text: 'Add GroupLoan',
+			text: 'Add GroupLoanMembership',
 			action: 'addObject'
 		});
 
 		this.editObjectButton = new Ext.Button({
-			text: 'Edit GroupLoan',
+			text: 'Edit GroupLoanMembership',
 			action: 'editObject',
 			disabled: true
 		});
 
 		this.deleteObjectButton = new Ext.Button({
-			text: 'Delete GroupLoan',
+			text: 'Delete GroupLoanMembership',
 			action: 'deleteObject',
 			disabled: true
 		});

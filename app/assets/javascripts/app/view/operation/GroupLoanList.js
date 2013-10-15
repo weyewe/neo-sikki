@@ -7,13 +7,14 @@ Ext.define('AM.view.operation.GroupLoanList' ,{
 
 	initComponent: function() {
 		this.columns = [
-			{ header: 'Nama', dataIndex: 'name' , flex : 1 },
-			// { header: 'Jumlah Meeting',  dataIndex: 'number_of_meetings', flex : 1  },
-			// {	header: 'Jumlah Pengumpulan', dataIndex: 'number_of_collections', flex : 1   } ,
-			// {	header: 'Dimulai?', dataIndex: 'is_started', flex : 1   } ,
-			// {	header: 'Cair?', dataIndex: 'is_loan_disbursed', flex : 1   } ,
-			// {	header: 'Selesai?', dataIndex: 'is_closed'   } ,
-			// {	header: 'Tabungan Dikembalikan?', dataIndex: 'is_compulsory_savings_withdrawn', flex : 1   } ,
+		
+			{
+				xtype : 'templatecolumn',
+				text : "Group Loan",
+				flex : 1,
+				tpl : '<b>{name}</b>' + '<br />' + 
+							'Jumlah Meeting: <b>{number_of_meetings}</b>' 
+			}, 
 		];
 
 	 

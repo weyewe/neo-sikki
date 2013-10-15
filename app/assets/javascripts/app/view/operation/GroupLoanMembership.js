@@ -17,11 +17,16 @@ Ext.define('AM.view.operation.GroupLoanMembership', {
 				// html : "wrapper for group loan list", 
 				flex : 1
 			},
+			
 			{
-				xtype : 'container',
-				html : "wrapper for the group loan membership list",
+				xtype : 'grouploanmembershiplist',
 				flex : 2 
-			}
+			},
+			// {
+			// 	xtype : 'container',
+			// 	html : "wrapper for the group loan membership list",
+			// 	flex : 2 
+			// }
 			// {
 			// 	xtype : 'operationgrouploanList' ,
 			// 	flex : 1 

@@ -110,4 +110,27 @@ class GroupLoanMembership < ActiveRecord::Base
     # for the default payment, will be recalculated, reducing the pool of default bearer. 
   end
   
+  def deactivation_case_name
+    # GROUP_LOAN_DEACTIVATION_CASE = {
+    #   :financial_education_absent => 1, 
+    #   :loan_disbursement_absent => 2 ,
+    #   :finished_group_loan => 3 ,
+    # 
+    # 
+    #   :deceased => 10,
+    #   :run_away => 11,
+    #   :premature_clearance => 12 
+    # }
+    
+    return "Financial Education Absent" if self.deactivation_case == GROUP_LOAN_DEACTIVATION_CASE[:financial_education_absent]
+    return "Loan Disbursement Absent" if self.deactivation_case == GROUP_LOAN_DEACTIVATION_CASE[:loan_disbursement_absent]
+    return "Group Loan Selesai" if self.deactivation_case == GROUP_LOAN_DEACTIVATION_CASE[:finished_group_loan]
+    
+    return "Meninggal" if self.deactivation_case == GROUP_LOAN_DEACTIVATION_CASE[:deceased]
+    return "Kabur" if self.deactivation_case == GROUP_LOAN_DEACTIVATION_CASE[:run_away]
+    return "Premature Clearance" if self.deactivation_case == GROUP_LOAN_DEACTIVATION_CASE[:premature_clearance]
+    
+
+  end
+  
 end

@@ -128,6 +128,11 @@ if Rails.env.development?
     :admin_fee          =>  @admin_fee_2     ,
     :initial_savings          => @initial_savings_2           
   })
+  
+  glp_array = [
+    @group_loan_product_1,
+    @group_loan_product_2
+    ]
 
 =begin
   Create seed group_loan 
@@ -142,9 +147,24 @@ if Rails.env.development?
     :name                             => "Group Loan 2" ,
     :number_of_meetings => 5
   })
-
-
-
+  
+  
+=begin
+  Create seed glm
+=end
+  # Member.order("ASC")limit(10).
+  Member.order("id DESC").limit(10).each do |member|
+    selected_index=  rand(0..1)
+    selected_glp = glp_array[selected_index]
+    GroupLoanMembership.create_object({
+      :group_loan_id => @group_loan_1.id,
+      :member_id => member.id ,
+      :group_loan_product_id => selected_glp.id
+    })
+  end
+  
+  
+  
 
   def make_date(*args)
     now = DateTime.now  

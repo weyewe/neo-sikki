@@ -7,13 +7,18 @@ Ext.define('AM.controller.GroupLoanMemberships', {
   views: [
     'operation.grouploanmembership.List',
     'operation.grouploanmembership.Form',
-		'operation.GroupLoanMembership'
+		'operation.GroupLoanMembership',
+		'operation.GroupLoanList'
   ],
 
   	refs: [
 		{
-			ref : 'wrapper',
-			selector : 'grouploanmembershipProcess'
+			ref : "wrapper",
+			selector : "grouploanmembershipProcess"
+		},
+		{
+			ref : 'parentList',
+			selector : 'grouploanmembershipProcess operationgrouploanList'
 		},
 		{
 			ref: 'list',
@@ -27,7 +32,7 @@ Ext.define('AM.controller.GroupLoanMemberships', {
 
   init: function() {
     this.control({
-			'wrapper operationgrouploanList' : {
+			'grouploanmembershipProcess operationgrouploanList' : {
 				afterrender : this.loadParentObjectList,
 				selectionchange: this.parentSelectionChange,
 			},
@@ -72,6 +77,7 @@ Ext.define('AM.controller.GroupLoanMemberships', {
 	},
 	
 	loadParentObjectList: function(me){
+		// console.log("after render the group_loan list");
 		me.getStore().load(); 
 	},
 
@@ -85,6 +91,8 @@ Ext.define('AM.controller.GroupLoanMemberships', {
     var record = this.getList().getSelectedObject();
     var view = Ext.widget('grouploanmembershipform');
 
+		view.setComboBoxData( record );
+
 		
 
     view.down('form').loadRecord(record);
@@ -94,6 +102,7 @@ Ext.define('AM.controller.GroupLoanMemberships', {
 		var me = this; 
     var win = button.up('window');
     var form = win.down('form');
+		var parentList = this.getParentList();
 		var wrapper = this.getWrapper();
 
     var store = this.getGroupLoanMembershipsStore();
@@ -192,8 +201,12 @@ Ext.define('AM.controller.GroupLoanMemberships', {
 	parentSelectionChange: function(selectionModel, selections) {
 		var me = this; 
     var grid = me.getList();
+		var parentList = me.getParentList();
 		var wrapper = me.getWrapper();
-
+		
+		// console.log("parent selection change");
+		// console.log("The wrapper");
+		// console.log( wrapper ) ;
 
     if (selections.length > 0) {
       grid.enableRecordButtons();
@@ -202,21 +215,23 @@ Ext.define('AM.controller.GroupLoanMemberships', {
     }
 		
 		 
-		if (grid.getSelectionModel().hasSelection()) {
-			var row = grid.getSelectionModel().getSelection()[0];
+		if (parentList.getSelectionModel().hasSelection()) {
+			var row = parentList.getSelectionModel().getSelection()[0];
 			var id = row.get("id"); 
 			wrapper.selectedParentId = id ; 
 		}
 		
 		
 		
-		me.setLoading(true);
-		grid.getStore.load({
+		console.log("The parent ID: "+ wrapper.selectedParentId );
+		
+		grid.setLoading(true);
+		grid.getStore().load({
 			params: {
 				parent_id : wrapper.selectedParentId 
 			},
 			callback : function(records, options, success){
-				me.setLoading(false); 
+				grid.setLoading(false); 
 			}
 		});
   },

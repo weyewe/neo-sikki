@@ -102,26 +102,22 @@ class Api::GroupLoansController < Api::BaseApiController
     # on PostGre SQL, it is ignoring lower case or upper case 
     
     if  selected_id.nil?
-      @objects = GroupLoan.where{ (name =~ query)   & 
-                                (is_deleted.eq false )
+      @objects = GroupLoan.where{ (name =~ query)    
                               }.
                         page(params[:page]).
                         per(params[:limit]).
                         order("id DESC")
                         
-      @total = GroupLoan.where{ (name =~ query)   & 
-                                (is_deleted.eq false )
+      @total = GroupLoan.where{ (name =~ query)    
                               }.count
     else
-      @objects = GroupLoan.where{ (id.eq selected_id)  & 
-                                (is_deleted.eq false )
+      @objects = GroupLoan.where{ (id.eq selected_id)   
                               }.
                         page(params[:page]).
                         per(params[:limit]).
                         order("id DESC")
    
-      @objects = GroupLoan.where{ (id.eq selected_id)  & 
-                                (is_deleted.eq false )
+      @objects = GroupLoan.where{ (id.eq selected_id)   
                               }.count 
     end
     
