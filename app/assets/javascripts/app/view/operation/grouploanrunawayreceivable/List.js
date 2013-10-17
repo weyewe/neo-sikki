@@ -94,7 +94,7 @@ Ext.define('AM.view.operation.grouploanrunawayreceivable.List' ,{
 		this.addObjectButton.enable();
 	},
 	
-	disableAddButtons : function(){
+	disableAddButton : function(){
 		this.addObjectButton.disable();
 	},
 

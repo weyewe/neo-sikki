@@ -83,7 +83,7 @@ Ext.define('AM.view.operation.grouploanprematureclearancepayment.List' ,{
 		this.addObjectButton.enable();
 	},
 	
-	disableAddButtons : function(){
+	disableAddButton : function(){
 		this.addObjectButton.disable();
 	},
 

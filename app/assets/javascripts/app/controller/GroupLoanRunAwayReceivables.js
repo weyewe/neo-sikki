@@ -77,11 +77,9 @@ Ext.define('AM.controller.GroupLoanRunAwayReceivables', {
 	},
 	
 	loadParentObjectList: function(me){
-		me.getStore().load({
-			params: {
-				is_run_away : true
-			}
-		}); 
+		me.getStore().getProxy().extraParams.is_run_away =  true ;
+		
+		me.getStore().load(); 
 	},
  
 

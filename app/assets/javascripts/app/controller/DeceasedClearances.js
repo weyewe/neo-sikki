@@ -77,11 +77,9 @@ Ext.define('AM.controller.DeceasedClearances', {
 	},
 	
 	loadParentObjectList: function(me){
-		me.getStore().load({
-			params: {
-				is_deceased : true
-			}
-		}); 
+		me.getStore().getProxy().extraParams.is_deceased =  true ;
+		
+		me.getStore().load(); 
 	},
  
 

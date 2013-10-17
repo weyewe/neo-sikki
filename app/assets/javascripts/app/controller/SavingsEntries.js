@@ -77,11 +77,7 @@ Ext.define('AM.controller.SavingsEntries', {
 	},
 	
 	loadParentObjectList: function(me){
-		me.getStore().load({
-			params: {
-				is_deceased : true
-			}
-		}); 
+		me.getStore().load(); 
 	},
  
 
@@ -139,6 +135,7 @@ Ext.define('AM.controller.SavingsEntries', {
 		
 		// grid.setLoading(true); 
 		grid.getStore().getProxy().extraParams.parent_id =  wrapper.selectedParentId ;
+		grid.getStore().getProxy().extraParams.is_savings_account =  true ;
 		grid.getStore().load(); 
   },
 

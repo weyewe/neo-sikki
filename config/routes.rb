@@ -26,6 +26,7 @@ NeoSikki::Application.routes.draw do
     
     resources :deceased_clearances 
     resources :group_loan_run_away_receivables 
+    resources :savings_entries 
      
   end
 end

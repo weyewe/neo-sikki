@@ -5,25 +5,17 @@ Ext.define('AM.model.SavingsEntry', {
 		 
   	fields: [
     	{ name: 'id', type: 'int' },
-			{ name: 'financial_product_id', type: 'int' },
-			{ name: 'financial_product_name', type: 'string' },
-			{ name: 'financial_product_type', type: 'string' },
-			
-    	{ name: 'principal_return', type: 'string' },
-			{ name: 'additional_savings_account', type: 'string' },
-			
 			{ name: 'member_id', type: 'int' },
 			{ name: 'member_name', type: 'string' },  
-			{ name: 'donation', type: 'string'},
+			{ name: 'member_id_number', type: 'string'},
 			
-			//                  other proxy info
+			{ name: 'direction', type: 'int'},
+			{ name: 'direction_text', type: 'string'},
 			
-			{ name: 'is_insurance_claimable', type: 'boolean' },  
-			{ name: 'is_confirmed', type: 'boolean' }, 
-			{ name: 'is_insurance_claim_submitted', type: 'boolean' }, 
-			{ name: 'is_insurance_claim_approved', type: 'boolean' }, 
-			{ name: 'is_claim_received', type: 'boolean' },
-			{ name: 'is_donation_disbursed', type: 'boolean' },  
+			{ name: 'amount', type: 'string'},
+			
+			{ name: 'is_confirmed', type: 'boolean'},
+			{ name: 'confirmed_at', type: 'string'}
   	],
 
   	idProperty: 'id' ,

@@ -90,7 +90,7 @@ Ext.define('AM.view.operation.grouploanmembership.List' ,{
 	enableAddButton: function(){
 		this.addObjectButton.enable();
 	},
-	disableAddButtons : function(){
+	disableAddButton : function(){
 		this.addObjectButton.disable();
 	},
 

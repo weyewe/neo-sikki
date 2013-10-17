@@ -7,31 +7,19 @@ Ext.define('AM.view.operation.savingsentry.List' ,{
 	initComponent: function() {
 		this.columns = [
 		
+			{ header: 'ID', dataIndex: 'id' , flex : 1 },
 			{
 				xtype : 'templatecolumn',
-				text : "Produk",
-				flex : 1,
-				tpl : '<b>{financial_product_name}</b>' + '<br />' + '<br />' + 
-							'Jenis Produk: <b>{financial_product_type}</b>'  + '<br />' + '<br />' + 
-							'Sisa Pokok: <b>{principal_return}</b>'  + '<br />' + '<br />' + 
-							'Donasi: <b>{donation}</b>'   + '<br />' + '<br />' + 
-							'Migrasi Tabungan: <b>{additional_savings_account}</b>'
+				text : "Jumlah",
+				flex : 2,
+				tpl : '<b>{amount}</b>' + '<br />'  + '<br />'  + 
+							'Kondisi: <b>{direction_text}</b>' 
 			},
 			{
 				xtype : 'templatecolumn',
-				text : "Penyelesaian",
+				text : "Status",
 				flex : 2,
-				tpl : 'Ditanggung Asuransi: <b>{is_insurance_claimable}</b>' + '<br />'  + '<br />'  + 
-							'Konfirmasi: <b>{is_confirmed}</b>' +  '<br />'  + '<br />'   
-			},
-			{
-				xtype : 'templatecolumn',
-				text : "Progress",
-				flex : 2,
-				tpl : 'Claim di submit: <b>{is_insurance_claim_submitted}</b>' + '<br />'  + '<br />'  +  
-							'Submisi Claim di Approve: <b>{is_insurance_claim_submitted}</b>' + '<br />'  + '<br />'  +  
-							'Uang claim di terima: <b>{is_claim_received}</b>' + '<br />'  + '<br />'  +  
-							'Donasi diberikan: <b>{is_donation_disbursed}</b>'  
+				tpl : 'Konfirmasi: <b>{is_confirmed}</b>' 
 			},
 			 
 		];
@@ -85,7 +73,7 @@ Ext.define('AM.view.operation.savingsentry.List' ,{
 		this.addObjectButton.enable();
 	},
 	
-	disableAddButtons : function(){
+	disableAddButton : function(){
 		this.addObjectButton.disable();
 	},
 

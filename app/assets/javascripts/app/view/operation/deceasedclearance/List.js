@@ -85,7 +85,7 @@ Ext.define('AM.view.operation.deceasedclearance.List' ,{
 		this.addObjectButton.enable();
 	},
 	
-	disableAddButtons : function(){
+	disableAddButton : function(){
 		this.addObjectButton.disable();
 	},
 
