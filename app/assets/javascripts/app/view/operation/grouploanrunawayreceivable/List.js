@@ -1,7 +1,7 @@
-Ext.define('AM.view.operation.deceasedclearance.List' ,{
+Ext.define('AM.view.operation.grouploanrunawayreceivable.List' ,{
   	extend: 'Ext.grid.Panel',
-  	alias : 'widget.deceasedclearancelist',
-  	store: 'DeceasedClearances', 
+  	alias : 'widget.grouploanrunawayreceivablelist',
+  	store: 'GroupLoanRunAwayReceivables', 
  
  
 	initComponent: function() {

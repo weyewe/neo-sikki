@@ -179,6 +179,10 @@ if Rails.env.development?
   
   @deceased_member.mark_as_deceased(:deceased_at => DateTime.now )
   
+  @run_away_glm = @group_loan_1.group_loan_memberships[2]
+  @run_away_member = @run_away_glm.member
+  @run_away_member.mark_as_run_away( :run_away_at => DateTime.now )
+  
   
   
   

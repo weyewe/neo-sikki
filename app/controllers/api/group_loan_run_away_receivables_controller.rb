@@ -1,27 +1,17 @@
-class Api::MembersController < Api::BaseApiController
+class Api::GroupLoanRunAwayReceivablessController < Api::BaseApiController
   
   def index
     
-    is_deceased_value = false 
-    is_run_away_value = false 
-    
-    is_deceased_value = true if params[:is_deceased].present?
-    is_run_away_value = true if params[:is_run_away].present?
-    
     if params[:livesearch].present? 
       livesearch = "%#{params[:livesearch]}%"
-      @objects = Member.where{
-        (is_deceased.eq is_deceased_value) & 
-        (is_run_away.eq is_run_away_value ) & 
+      @objects = GroupLoanRunAwayReceivables.where{
         (
           (name =~  livesearch )
         )
         
       }.page(params[:page]).per(params[:limit]).order("id DESC")
       
-      @total = Member.where{
-        (is_deceased.eq is_deceased_value) & 
-        (is_run_away.eq is_run_away_value ) & 
+      @total = GroupLoanRunAwayReceivables.where{ 
         (
           (name =~  livesearch )
         )
@@ -29,29 +19,26 @@ class Api::MembersController < Api::BaseApiController
       
       # calendar
       
-    elsif params[:is_deceased].present? 
-      @objects = Member.where(:is_deceased => true ).page(params[:page]).per(params[:limit]).order("deceased_at DESC")
-      @total = Member.where(:is_deceased => true ).count
-    elsif params[:is_run_away].present? 
-      @objects = Member.where(:is_run_away => true ).page(params[:page]).per(params[:limit]).order("run_away_at DESC")
-      @total = Member.where(:is_run_away => true ).count
-    else
-      @objects = Member.active_objects.page(params[:page]).per(params[:limit]).order("id DESC")
-      @total = Member.active_objects.count 
+    elsif params[:parent_id].present?
+      @objects = GroupLoanRunAwayReceivables.joins(:member, :group_loan_membership, :group_loan, :group_loan_weekly_collection).
+                  where(:member_id => params[:parent_id]).
+                  page(params[:page]).per(params[:limit]).order("id ASC")
+      @total = GroupLoanRunAwayReceivables.where(:member_id => params[:parent_id]).count 
+    elsif
+      @objects = []
+      @total = 0 
     end
     
-    
-    render :json => { :members => @objects , :total => @total , :success => true }
+    # render :json => { :group_loan_run_away_receivables => @objects , :total => @total , :success => true }
   end
+  
 
   def create
-    # @object = Member.new(params[:member])
- 
-    @object = Member.create_object( params[:member] )
+    @object = GroupLoanRunAwayReceivables.create_object( params[:group_loan_run_away_receivable] )
     if @object.errors.size == 0 
       render :json => { :success => true, 
-                        :members => [@object] , 
-                        :total => Member.active_objects.count }  
+                        :group_loan_run_away_receivables => [@object] , 
+                        :total => GroupLoanRunAwayReceivables.count }  
     else
       msg = {
         :success => false, 
@@ -65,13 +52,13 @@ class Api::MembersController < Api::BaseApiController
   end
 
   def update
-    @object = Member.find(params[:id])
+    @object = GroupLoanRunAwayReceivables.find(params[:id])
     
-    @object.update_object( params[:member] )
+    @object.update_object( params[:group_loan_run_away_receivable] )
     if @object.errors.size == 0 
       render :json => { :success => true,   
-                        :members => [@object],
-                        :total => Member.active_objects.count  } 
+                        :group_loan_run_away_receivables => [@object],
+                        :total => GroupLoanRunAwayReceivables.count  } 
     else
       msg = {
         :success => false, 
@@ -87,11 +74,11 @@ class Api::MembersController < Api::BaseApiController
   end
 
   def destroy
-    @object = Member.find(params[:id])
+    @object = GroupLoanRunAwayReceivables.find(params[:id])
     @object.delete_object 
 
     if ( not @object.persisted?  or @object.is_deleted ) and @object.errors.size == 0 
-      render :json => { :success => true, :total => Member.active_objects.count }  
+      render :json => { :success => true, :total => GroupLoanRunAwayReceivables.count }  
     else
       msg = {
         :success => false, 
@@ -116,26 +103,26 @@ class Api::MembersController < Api::BaseApiController
     # on PostGre SQL, it is ignoring lower case or upper case 
     
     if  selected_id.nil?
-      @objects = Member.where{ (name =~ query)   
+      @objects = GroupLoanRunAwayReceivables.where{ (week_number =~ query)    
                               }.
                         page(params[:page]).
                         per(params[:limit]).
                         order("id DESC")
                         
-      @total = Member.where{ (name =~ query)  
+      @total = GroupLoanRunAwayReceivables.where{ (week_number =~ query)   
                               }.count
     else
-      @objects = Member.where{ (id.eq selected_id)  
+      @objects = GroupLoanRunAwayReceivables.where{ (id.eq selected_id)  
                               }.
                         page(params[:page]).
                         per(params[:limit]).
-                        order("id DESC")
+                        order("id ASC")
    
-      @total = Member.where{ (id.eq selected_id)   
+      @total = GroupLoanRunAwayReceivables.where{ (id.eq selected_id)  
                               }.count 
     end
     
     
-    render :json => { :records => @objects , :total => @total, :success => true }
+    # render :json => { :records => @objects , :total => @total, :success => true }
   end
 end

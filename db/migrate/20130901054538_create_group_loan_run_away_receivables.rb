@@ -16,7 +16,7 @@ class CreateGroupLoanRunAwayReceivables < ActiveRecord::Migration
       t.boolean :is_closed, :default => false 
       
       # they can choose whether it is paid weekly or @end_of_cycle. 
-      t.integer :payment_case  
+      t.integer :payment_case   
       
 
       t.timestamps
