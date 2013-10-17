@@ -23,6 +23,8 @@ NeoSikki::Application.routes.draw do
     resources :group_loan_weekly_collections
     resources :group_loan_weekly_uncollectibles 
     resources :group_loan_premature_clearance_payments
+    
+    resources :deceased_clearances 
      
   end
 end

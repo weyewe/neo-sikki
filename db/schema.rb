@@ -14,23 +14,24 @@
 ActiveRecord::Schema.define(version: 20131010083300) do
 
   create_table "deceased_clearances", force: true do |t|
-    t.boolean  "is_insurance_claimable",                                   default: false
-    t.datetime "insurance_claimable_declared_at"
-    t.boolean  "is_written_off",                                           default: false
-    t.datetime "written_off_at"
-    t.boolean  "is_insurance_claim_approved",                              default: false
+    t.boolean  "is_insurance_claimable",                                default: false
+    t.boolean  "is_confirmed",                                          default: false
+    t.datetime "confirmed_at"
+    t.boolean  "is_insurance_claim_submitted",                          default: false
+    t.datetime "insurance_claim_submitted_at"
+    t.boolean  "is_insurance_claim_approved",                           default: false
     t.datetime "insurance_claim_approved_at"
-    t.decimal  "principal_return",                precision: 10, scale: 2, default: 0.0
-    t.decimal  "donation",                        precision: 10, scale: 2, default: 0.0
-    t.boolean  "is_claim_received",                                        default: false
+    t.decimal  "principal_return",             precision: 10, scale: 2, default: 0.0
+    t.decimal  "donation",                     precision: 10, scale: 2, default: 0.0
+    t.boolean  "is_claim_received",                                     default: false
     t.datetime "claim_received_at"
-    t.boolean  "is_donation_disbursed",                                    default: false
+    t.boolean  "is_donation_disbursed",                                 default: false
     t.datetime "donation_disbursed_at"
     t.integer  "member_id"
     t.integer  "financial_product_id"
     t.string   "financial_product_type"
     t.text     "description"
-    t.decimal  "additional_savings_account",      precision: 10, scale: 2, default: 0.0
+    t.decimal  "additional_savings_account",   precision: 10, scale: 2, default: 0.0
     t.datetime "created_at"
     t.datetime "updated_at"
   end

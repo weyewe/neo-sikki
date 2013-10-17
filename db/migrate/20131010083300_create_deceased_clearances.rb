@@ -3,13 +3,21 @@ class CreateDeceasedClearances < ActiveRecord::Migration
     create_table :deceased_clearances do |t|
       
       # First, mark each deceased clearance whether it is insurance claimable
-      
+      # if it is yes, then, next step can be done:
+        # 1. submit claim
+        # 2. mark claim approved
+        # 3. receive claim
+        # 4. disburse_donation 
+        
+      # if it is NO, next step: write off as bad debt 
       t.boolean :is_insurance_claimable, :default => false 
-      t.datetime :insurance_claimable_declared_at 
       
-        # for non insurance claimable deceased clearance.. it can be written off directly. 
-        t.boolean :is_written_off, :default => false 
-        t.datetime :written_off_at 
+      t.boolean :is_confirmed, :default => false 
+      t.datetime :confirmed_at  
+      
+      t.boolean :is_insurance_claim_submitted, :default => false 
+      t.datetime :insurance_claim_submitted_at 
+      
       
         # for insurance claimable, on approval, mark the reimbursement detail
         t.boolean :is_insurance_claim_approved, :default => false 

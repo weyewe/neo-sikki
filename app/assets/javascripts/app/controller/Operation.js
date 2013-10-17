@@ -100,31 +100,7 @@ Ext.define("AM.controller.Operation", {
 						action : 'index'
 					}
 				]
-			},
-			{ 
-				text:'Deceased', 
-				viewClass:'AM.view.operation.GroupLoanWeeklyCollection', 
-				leaf:true, 
-				iconCls:'text' ,
-				conditions : [
-					{
-						controller : 'group_loan_weekly_collections',
-						action : 'index'
-					}
-				]
-			},
-			{ 
-				text:'Run Away', 
-				viewClass:'AM.view.operation.GroupLoanWeeklyCollection', 
-				leaf:true, 
-				iconCls:'text' ,
-				conditions : [
-					{
-						controller : 'group_loan_weekly_collections',
-						action : 'index'
-					}
-				]
-			},
+			}, 
 			{ 
 				text:'PrematureClearance', 
 				viewClass:'AM.view.operation.GroupLoanPrematureClearancePayment', 
@@ -140,13 +116,59 @@ Ext.define("AM.controller.Operation", {
     ]
 	}, 
 	
+	deceasedFolder : {
+		text 			: "Meninggal", 
+		viewClass : '',
+		iconCls		: 'text-folder', 
+    expanded	: true,
+		children 	: [
+        
+      { 
+          text:'Insurance Claim', 
+          viewClass:'AM.view.operation.DeceasedClearance', 
+          leaf:true, 
+          iconCls:'text',
+ 					conditions : [
+						{
+							controller : "deceased_clearances",
+							action  : 'index'
+						}
+					]
+      } 
+    ]
+	},
+	
+	runAwayFolder : {
+		text 			: "Kabur", 
+		viewClass : '',
+		iconCls		: 'text-folder', 
+    expanded	: true,
+		children 	: [
+        
+      { 
+          text:'GroupLoan', 
+          viewClass:'AM.view.operation.GroupLoanRunAwayReceivable', 
+          leaf:true, 
+          iconCls:'text',
+ 					conditions : [
+						{
+							controller : "group_loan_run_away_receivables",
+							action  : 'index'
+						}
+					]
+      } 
+    ]
+	},
+	
 	onActiveProtectedContent: function( panel, options) {
 		var me  = this; 
 		var currentUser = Ext.decode( localStorage.getItem('currentUser'));
 		var email = currentUser['email'];
 		
 		me.folderList = [
-			this.setupFolder 
+			this.setupFolder ,
+			this.deceasedFolder,
+			this.runAwayFolder
 		];
 		
 		var processList = panel.down('operationProcessList');

@@ -1,19 +1,17 @@
-class Api::MembersController < Api::BaseApiController
+class Api::DeceasedClearancesController < Api::BaseApiController
   
   def index
     
     if params[:livesearch].present? 
       livesearch = "%#{params[:livesearch]}%"
-      @objects = Member.where{
-        (is_deleted.eq false) & 
+      @objects = DeceasedClearance.where{
         (
           (name =~  livesearch )
         )
         
       }.page(params[:page]).per(params[:limit]).order("id DESC")
       
-      @total = Member.where{
-        (is_deleted.eq false) & 
+      @total = DeceasedClearance.where{ 
         (
           (name =~  livesearch )
         )
@@ -21,26 +19,26 @@ class Api::MembersController < Api::BaseApiController
       
       # calendar
       
-    elsif params[:is_deceased].present? 
-      @objects = Member.where(:is_deceased => true ).page(params[:page]).per(params[:limit]).order("deceased_at DESC")
-      @total = Member.where(:is_deceased => true ).count
-    else
-      @objects = Member.active_objects.page(params[:page]).per(params[:limit]).order("id DESC")
-      @total = Member.active_objects.count 
+    elsif params[:parent_id].present?
+      @objects = DeceasedClearance.joins(:member).
+                  where(:member_id => params[:parent_id]).
+                  page(params[:page]).per(params[:limit]).order("id ASC")
+      @total = DeceasedClearance.where(:member_id => params[:parent_id]).count 
+    elsif
+      @objects = []
+      @total = 0 
     end
     
-    
-    render :json => { :members => @objects , :total => @total , :success => true }
+    # render :json => { :deceased_clearances => @objects , :total => @total , :success => true }
   end
+  
 
   def create
-    # @object = Member.new(params[:member])
- 
-    @object = Member.create_object( params[:member] )
+    @object = DeceasedClearance.create_object( params[:deceased_clearance] )
     if @object.errors.size == 0 
       render :json => { :success => true, 
-                        :members => [@object] , 
-                        :total => Member.active_objects.count }  
+                        :deceased_clearances => [@object] , 
+                        :total => DeceasedClearance.count }  
     else
       msg = {
         :success => false, 
@@ -54,13 +52,13 @@ class Api::MembersController < Api::BaseApiController
   end
 
   def update
-    @object = Member.find(params[:id])
+    @object = DeceasedClearance.find(params[:id])
     
-    @object.update_object( params[:member] )
+    @object.update_object( params[:deceased_clearance] )
     if @object.errors.size == 0 
       render :json => { :success => true,   
-                        :members => [@object],
-                        :total => Member.active_objects.count  } 
+                        :deceased_clearances => [@object],
+                        :total => DeceasedClearance.count  } 
     else
       msg = {
         :success => false, 
@@ -76,11 +74,11 @@ class Api::MembersController < Api::BaseApiController
   end
 
   def destroy
-    @object = Member.find(params[:id])
+    @object = DeceasedClearance.find(params[:id])
     @object.delete_object 
 
     if ( not @object.persisted?  or @object.is_deleted ) and @object.errors.size == 0 
-      render :json => { :success => true, :total => Member.active_objects.count }  
+      render :json => { :success => true, :total => DeceasedClearance.count }  
     else
       msg = {
         :success => false, 
@@ -105,26 +103,26 @@ class Api::MembersController < Api::BaseApiController
     # on PostGre SQL, it is ignoring lower case or upper case 
     
     if  selected_id.nil?
-      @objects = Member.where{ (name =~ query)   
+      @objects = DeceasedClearance.where{ (week_number =~ query)    
                               }.
                         page(params[:page]).
                         per(params[:limit]).
                         order("id DESC")
                         
-      @total = Member.where{ (name =~ query)  
+      @total = DeceasedClearance.where{ (week_number =~ query)   
                               }.count
     else
-      @objects = Member.where{ (id.eq selected_id)  
+      @objects = DeceasedClearance.where{ (id.eq selected_id)  
                               }.
                         page(params[:page]).
                         per(params[:limit]).
-                        order("id DESC")
+                        order("id ASC")
    
-      @total = Member.where{ (id.eq selected_id)   
+      @total = DeceasedClearance.where{ (id.eq selected_id)  
                               }.count 
     end
     
     
-    render :json => { :records => @objects , :total => @total, :success => true }
+    # render :json => { :records => @objects , :total => @total, :success => true }
   end
 end

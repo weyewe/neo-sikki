@@ -77,13 +77,14 @@ if Rails.env.development?
 =begin
   CREATING THE Member 
 =end
-
+  member_array = []
   (1..80).each do |number|
-    Member.create_object({
+    member = Member.create_object({
       :name =>  "Member #{number}",
       :address => "Address alamat #{number}" ,
       :id_number => "342432#{number}"
     })
+    member_array << member 
   end
 
  
@@ -148,12 +149,14 @@ if Rails.env.development?
     :number_of_meetings => 5
   })
   
+   
+  
   
 =begin
   Create seed glm
 =end
   # Member.order("ASC")limit(10).
-  Member.order("id DESC").limit(10).each do |member|
+  member_array[0..9].each do |member|
     selected_index=  rand(0..1)
     selected_glp = glp_array[selected_index]
     GroupLoanMembership.create_object({
@@ -170,6 +173,11 @@ if Rails.env.development?
   @group_loan_1.start(:started_at => DateTime.now )
   
   @group_loan_1.disburse_loan(:disbursed_at => DateTime.now )
+  
+  @deceased_glm = @group_loan_1.group_loan_memberships.first 
+  @deceased_member = @deceased_glm.member 
+  
+  @deceased_member.mark_as_deceased(:deceased_at => DateTime.now )
   
   
   

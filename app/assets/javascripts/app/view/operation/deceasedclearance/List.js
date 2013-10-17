@@ -1,7 +1,7 @@
-Ext.define('AM.view.operation.grouploanprematureclearancepayment.List' ,{
+Ext.define('AM.view.operation.deceasedclearance.List' ,{
   	extend: 'Ext.grid.Panel',
-  	alias : 'widget.grouploanprematureclearancepaymentlist',
-  	store: 'GroupLoanPrematureClearancePayments', 
+  	alias : 'widget.deceasedclearancelist',
+  	store: 'DeceasedClearances', 
  
  
 	initComponent: function() {
@@ -9,29 +9,31 @@ Ext.define('AM.view.operation.grouploanprematureclearancepayment.List' ,{
 		
 			{
 				xtype : 'templatecolumn',
-				text : "Info",
+				text : "Produk",
 				flex : 1,
-				tpl : '<b>{group_loan_membership_member_name}</b>' + '<br />' + 
-							'Id: {group_loan_membership_member_id_number}' + '<br />' + 
-							'Alamat: {group_loan_membership_member_address}'  + '<br />' + '<br />' + 
-							'Minggu Pengajuan: {group_loan_weekly_collection_week_number}'  + '<br />' + 
-							'Status Konfirmasi: <b>{is_confirmed}</b>'
+				tpl : '<b>{financial_product_name}</b>' + '<br />' + '<br />' + 
+							'Jenis Produk: <b>{financial_product_type}</b>'  + '<br />' + '<br />' + 
+							'Sisa Pokok: <b>{principal_return}</b>'  + '<br />' + '<br />' + 
+							'Donasi: <b>{donation}</b>'   + '<br />' + '<br />' + 
+							'Migrasi Tabungan: <b>{additional_savings_account}</b>'
 			},
 			{
 				xtype : 'templatecolumn',
-				text : "Jumlah",
+				text : "Penyelesaian",
 				flex : 2,
-				tpl : 'Pengembalian Pokok: {total_principal_return}' + '<br />'  +  
-							'Tanggungan Kabur bayar mingguan: {run_away_weekly_resolution_bail_out}' + '<br />'  +  
-							'Tanggunan Kabur bayar di akhir: {run_away_end_of_cycle_resolution_bail_out}' + '<br />'  +  '<br />' +
-							'( Tabungan Wajib : {available_compulsory_savings} )' + '<br />'  +  '<br />' + 
-							'Total : <b>{amount}</b>' + '<br />'  +  '<br />' + 
-							
-							'Pengembalian Sisa Tabungan Wajib: {remaining_compulsory_savings}'
-			}, 
+				tpl : 'Ditanggung Asuransi: <b>{is_insurance_claimable}</b>' + '<br />'  + '<br />'  + 
+							'Konfirmasi: {is_confirmed}' +  '<br />'  + '<br />'   
+			},
+			{
+				xtype : 'templatecolumn',
+				text : "Progress",
+				flex : 2,
+				tpl : 'Claim di submit: <b>{is_insurance_claim_submitted}</b>' + '<br />'  + '<br />'  +  
+							'Submisi Claim di Approve: <b>{is_insurance_claim_submitted}</b>' + '<br />'  + '<br />'  +  
+							'Uang claim di terima: <b>{is_claim_received}</b>' + '<br />'  + '<br />'  +  
+							'Donasi diberikan: <b>{is_donation_disbursed}</b>'  
+			},
 			 
-			
-			
 		];
 
 		this.addObjectButton = new Ext.Button({
