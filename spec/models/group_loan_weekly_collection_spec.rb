@@ -51,6 +51,7 @@ describe GroupLoanWeeklyCollection do
     
     @started_at = DateTime.new(2013,9,5,0,0,0)
     @closed_at = DateTime.new(2013,12,5,0,0,0)
+    @disbursed_at = DateTime.new(2013,10,10,0,0,0)
     @withdrawn_at = DateTime.new(2013,12,6,0,0,0)
   end
   
@@ -126,7 +127,7 @@ describe GroupLoanWeeklyCollection do
         
         context "execute loan disbursement" do
           before(:each) do
-            @group_loan.disburse_loan 
+            @group_loan.disburse_loan(:disbursed_at => @disbursed_at )
           end
           
           it 'should not allow collection if collected at is not a valid datetime' do

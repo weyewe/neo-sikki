@@ -34,7 +34,8 @@ class CreateGroupLoans < ActiveRecord::Migration
       # t.decimal :run_away_amount_received , :default       => 0, :precision => 10, :scale => 2
       
       
-      # these new shite... use it
+      # these new shite... use it.
+      # haven't been coded 
       t.decimal :remaining_premature_clearance_deposit, :default       => 0, :precision => 10, :scale => 2
       t.decimal :premature_clearance_deposit, :default       => 0, :precision => 10, :scale => 2
       

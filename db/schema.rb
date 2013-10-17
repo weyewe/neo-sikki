@@ -60,7 +60,6 @@ ActiveRecord::Schema.define(version: 20131010083300) do
     t.integer  "group_loan_weekly_collection_id"
     t.decimal  "amount",                          precision: 12, scale: 2, default: 0.0
     t.boolean  "is_confirmed",                                             default: false
-    t.decimal  "premature_clearance_deposit",     precision: 12, scale: 2, default: 0.0
     t.decimal  "remaining_compulsory_savings",    precision: 12, scale: 2, default: 0.0
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -159,6 +158,7 @@ ActiveRecord::Schema.define(version: 20131010083300) do
     t.boolean  "is_deceased",                                    default: false
     t.datetime "deceased_at"
     t.boolean  "is_run_away",                                    default: false
+    t.datetime "run_away_at"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

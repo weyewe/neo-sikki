@@ -1,8 +1,8 @@
-Ext.define('AM.view.operation.grouploanweeklyuncollectible.Form', {
+Ext.define('AM.view.operation.grouploanprematureclearancepayment.Form', {
   extend: 'Ext.window.Window',
-  alias : 'widget.grouploanweeklyuncollectibleform',
+  alias : 'widget.grouploanprematureclearancepaymentform',
 
-  title : 'Add / Edit GroupLoanWeeklyUncollectible',
+  title : 'Add / Edit GroupLoanPrematureClearancePayment',
   layout: 'fit',
 	width	: 500,
   autoShow: true,  // does it need to be called?
@@ -120,7 +120,7 @@ Ext.define('AM.view.operation.grouploanweeklyuncollectible.Form', {
 					value : '10' 
 				},
 				{
-					fieldLabel: 'Minggu Pengumpulan',
+					fieldLabel: 'Minggu Pengajuan',
 					xtype: 'combo',
 					queryMode: 'remote',
 					forceSelection: true, 
@@ -162,28 +162,7 @@ Ext.define('AM.view.operation.grouploanweeklyuncollectible.Form', {
 						}
 					},
 					name : 'group_loan_membership_id' 
-				}, 
-				{
-					fieldLabel: 'Clearance Case',
-					xtype: 'combo',
-					queryMode: 'remote',
-					forceSelection: true, 
-					displayField : 'clearance_case_text',
-					valueField : 'clearance_case',
-					pageSize : 5,
-					minChars : 1, 
-					allowBlank : false, 
-					triggerAction: 'all',
-					store : localJsonStoreClearanceCase, 
-					listConfig : {
-						getInnerTpl: function(){
-							return  	'<div data-qtip="{clearance_case_text}">' +  
-													'<div class="combo-name">{clearance_case_text}</div>' +
-							 					'</div>';
-						}
-					},
-					name : 'clearance_case' 
-				},
+				} 
 				
 			]
     }];

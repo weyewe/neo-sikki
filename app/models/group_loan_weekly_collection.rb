@@ -34,7 +34,7 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
     end
     
     
-    self.premature_clearance_deposit_usage = BigDecimal( params[:premature_clearance_deposit_usage] ||  '0' )
+    # self.premature_clearance_deposit_usage = BigDecimal( params[:premature_clearance_deposit_usage] ||  '0' )
     
     if params[:collected_at].nil? or not params[:collected_at].is_a?(DateTime)
       self.errors.add(:collected_at, "Harus ada tanggal penerimaan pembayaran")
@@ -45,11 +45,11 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
     self.is_collected = true  
     
     
-    if self.premature_clearance_deposit_usage > self.group_loan.remaining_premature_clearance_deposit
-      msg = "Jumlah uang titipan tersisa: #{self.group_loan.remaining_premature_clearance_deposit.to_s}"
-      self.errors.add(:premature_clearance_deposit_usage, msg )
-      return self
-    end
+    # if self.premature_clearance_deposit_usage > self.group_loan.remaining_premature_clearance_deposit
+    #   msg = "Jumlah uang titipan tersisa: #{self.group_loan.remaining_premature_clearance_deposit.to_s}"
+    #   self.errors.add(:premature_clearance_deposit_usage, msg )
+    #   return self
+    # end
     
     self.save 
   end
@@ -300,19 +300,7 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
     return sum
   end
   
-  # def extract_weekly_run_away_premature_clearance_paid_amount
-  #   offset_amount = BigDecimal('0')
-  #   current_week_number = self.week_number
-  #   group_loan.group_loan_memberships.where{
-  #     ( is_active.eq false) & 
-  #     ( deactivation_week_number.lte current_week_number) & 
-  #     ( deactivation_case.eq GROUP_LOAN_DEACTIVATION_CASE[:premature_clearance] ) 
-  #   }.each do |glm|
-  #     offset_amount += glm.group_loan_premature_clearance_payment.extract_run_away_default_weekly_payment_share
-  #   end
-  #   
-  #   return offset_amount
-  # end
+  
   
   def extract_uncollectible_weekly_payment_amount 
     self.group_loan_weekly_uncollectibles.sum("amount")

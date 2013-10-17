@@ -34,9 +34,8 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
   
   def group_loan_weekly_collection_must_be_uncollected
     return if not all_fields_present?
-    # puts "is it confirmed?"
     return if self.group_loan_weekly_collection.is_confirmed?   
-    # puts "the group loan weekly collection is not confirmed "
+    
     first_uncollected = group_loan.first_uncollected_weekly_collection
     
     if not first_uncollected.present?
@@ -48,7 +47,6 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
       self.errors.add(:group_loan_weekly_collection_id, "Tidak valid. Harus minggu ke #{first_uncollected.week_number}")
       return self 
     end
-    
   end
   
   def next_weekly_collection_must_be_available
@@ -110,6 +108,17 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
   end
   
   
+  def total_principal_return
+    total_unpaid_week = group_loan.number_of_collections - 
+                    group_loan_weekly_collection.week_number 
+    return  group_loan_membership.group_loan_product.principal * total_unpaid_week
+  end
+  
+  # including the current week that will be confirmed along with the premature clearance
+  def available_compulsory_savings
+    group_loan_weekly_collection.week_number  * group_loan_membership.group_loan_product.compulsory_savings 
+  end
+  
   # manifested in the group loan clearance payment 
   def update_amount
     # the current week is not counted. it has to be paid in full.
@@ -117,9 +126,9 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
     # example: premature_clearance is applied@week_2. If there are total 8 installments,
     # then, week 2 has to be paid full. and 6*principal has to be returned
     # plus + default payment 
-    total_unpaid_week = group_loan.number_of_collections - 
-                    group_loan_weekly_collection.week_number 
-    total_principal_return =  group_loan_membership.group_loan_product.principal * total_unpaid_week
+    # total_unpaid_week = group_loan.number_of_collections - 
+    #                 group_loan_weekly_collection.week_number 
+    # total_principal_return =  group_loan_membership.group_loan_product.principal * total_unpaid_week
     
     # minus compulsory savings ... ? 
     # if compulsory savings > amount => amount == 0 
@@ -127,7 +136,9 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
     
     
     # premature clearance can't be created if there is uncollectible weekly payment on the name of this member. 
-    available_compulsory_savings = group_loan_weekly_collection.week_number  * group_loan_membership.group_loan_product.compulsory_savings 
+    # there is nothing can be used to deduct the compulsory_savings
+    # other than end_of_cycle default payment or premature clearance
+    # available_compulsory_savings = group_loan_weekly_collection.week_number  * group_loan_membership.group_loan_product.compulsory_savings 
     
     
     
@@ -135,7 +146,8 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
                     run_away_weekly_resolved_bail_out_contribution +
                     run_away_end_of_cycle_resolved_bail_out_contribution 
        
-                 
+   
+   
     if available_compulsory_savings >= amount_payable
       self.remaining_compulsory_savings = available_compulsory_savings - amount_payable
       self.amount = BigDecimal('0')
@@ -145,7 +157,6 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
     end               
      
     self.save 
-    # on confirm, port the compulsory savings using to savings_account using this document. 
   end
   
   def run_away_weekly_resolved_bail_out_contribution
@@ -253,10 +264,5 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
       end 
     end
     
-    # puts "premature_clearance#confirm: transaction activities and saving_entries must be created"
-    # puts "=> not implemented"
-    
-    # puts "premature_clearance#confirm \nshould create transaction activity to take the default payment money and the remaining principal payment"
-    # puts "premature_clearance#confirm \nshould create savings entry to absorb compulsory savings => What should be done to the compulsory savings?"
   end
 end

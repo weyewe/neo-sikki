@@ -127,12 +127,12 @@ Ext.define("AM.controller.Operation", {
 			},
 			{ 
 				text:'PrematureClearance', 
-				viewClass:'AM.view.operation.GroupLoanWeeklyCollection', 
+				viewClass:'AM.view.operation.GroupLoanPrematureClearancePayment', 
 				leaf:true, 
 				iconCls:'text' ,
 				conditions : [
 					{
-						controller : 'group_loan_weekly_collections',
+						controller : 'group_loan_premature_clearance_payments',
 						action : 'index'
 					}
 				]

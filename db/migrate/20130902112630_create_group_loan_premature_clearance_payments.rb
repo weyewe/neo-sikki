@@ -14,7 +14,8 @@ class CreateGroupLoanPrematureClearancePayments < ActiveRecord::Migration
       
       t.boolean :is_confirmed, :default => false 
       
-      t.decimal :premature_clearance_deposit , :default        => 0,  :precision => 12, :scale => 2 
+      # maybe there is nothing useful on this
+      # t.decimal :premature_clearance_deposit , :default        => 0,  :precision => 12, :scale => 2 
       
       
       
