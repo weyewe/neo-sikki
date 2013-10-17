@@ -1,17 +1,17 @@
-class Api::GroupLoanRunAwayReceivablessController < Api::BaseApiController
+class Api::GroupLoanRunAwayReceivablesController < Api::BaseApiController
   
   def index
     
     if params[:livesearch].present? 
       livesearch = "%#{params[:livesearch]}%"
-      @objects = GroupLoanRunAwayReceivables.where{
+      @objects = GroupLoanRunAwayReceivable.where{
         (
           (name =~  livesearch )
         )
         
       }.page(params[:page]).per(params[:limit]).order("id DESC")
       
-      @total = GroupLoanRunAwayReceivables.where{ 
+      @total = GroupLoanRunAwayReceivable.where{ 
         (
           (name =~  livesearch )
         )
@@ -20,10 +20,10 @@ class Api::GroupLoanRunAwayReceivablessController < Api::BaseApiController
       # calendar
       
     elsif params[:parent_id].present?
-      @objects = GroupLoanRunAwayReceivables.joins(:member, :group_loan_membership, :group_loan, :group_loan_weekly_collection).
+      @objects = GroupLoanRunAwayReceivable.joins(:member, :group_loan_membership, :group_loan, :group_loan_weekly_collection).
                   where(:member_id => params[:parent_id]).
                   page(params[:page]).per(params[:limit]).order("id ASC")
-      @total = GroupLoanRunAwayReceivables.where(:member_id => params[:parent_id]).count 
+      @total = GroupLoanRunAwayReceivable.where(:member_id => params[:parent_id]).count 
     elsif
       @objects = []
       @total = 0 
@@ -34,11 +34,11 @@ class Api::GroupLoanRunAwayReceivablessController < Api::BaseApiController
   
 
   def create
-    @object = GroupLoanRunAwayReceivables.create_object( params[:group_loan_run_away_receivable] )
+    @object = GroupLoanRunAwayReceivable.create_object( params[:group_loan_run_away_receivable] )
     if @object.errors.size == 0 
       render :json => { :success => true, 
                         :group_loan_run_away_receivables => [@object] , 
-                        :total => GroupLoanRunAwayReceivables.count }  
+                        :total => GroupLoanRunAwayReceivable.count }  
     else
       msg = {
         :success => false, 
@@ -52,13 +52,13 @@ class Api::GroupLoanRunAwayReceivablessController < Api::BaseApiController
   end
 
   def update
-    @object = GroupLoanRunAwayReceivables.find(params[:id])
+    @object = GroupLoanRunAwayReceivable.find(params[:id])
     
     @object.update_object( params[:group_loan_run_away_receivable] )
     if @object.errors.size == 0 
       render :json => { :success => true,   
                         :group_loan_run_away_receivables => [@object],
-                        :total => GroupLoanRunAwayReceivables.count  } 
+                        :total => GroupLoanRunAwayReceivable.count  } 
     else
       msg = {
         :success => false, 
@@ -74,11 +74,11 @@ class Api::GroupLoanRunAwayReceivablessController < Api::BaseApiController
   end
 
   def destroy
-    @object = GroupLoanRunAwayReceivables.find(params[:id])
+    @object = GroupLoanRunAwayReceivable.find(params[:id])
     @object.delete_object 
 
     if ( not @object.persisted?  or @object.is_deleted ) and @object.errors.size == 0 
-      render :json => { :success => true, :total => GroupLoanRunAwayReceivables.count }  
+      render :json => { :success => true, :total => GroupLoanRunAwayReceivable.count }  
     else
       msg = {
         :success => false, 
@@ -103,22 +103,22 @@ class Api::GroupLoanRunAwayReceivablessController < Api::BaseApiController
     # on PostGre SQL, it is ignoring lower case or upper case 
     
     if  selected_id.nil?
-      @objects = GroupLoanRunAwayReceivables.where{ (week_number =~ query)    
+      @objects = GroupLoanRunAwayReceivable.where{ (week_number =~ query)    
                               }.
                         page(params[:page]).
                         per(params[:limit]).
                         order("id DESC")
                         
-      @total = GroupLoanRunAwayReceivables.where{ (week_number =~ query)   
+      @total = GroupLoanRunAwayReceivable.where{ (week_number =~ query)   
                               }.count
     else
-      @objects = GroupLoanRunAwayReceivables.where{ (id.eq selected_id)  
+      @objects = GroupLoanRunAwayReceivable.where{ (id.eq selected_id)  
                               }.
                         page(params[:page]).
                         per(params[:limit]).
                         order("id ASC")
    
-      @total = GroupLoanRunAwayReceivables.where{ (id.eq selected_id)  
+      @total = GroupLoanRunAwayReceivable.where{ (id.eq selected_id)  
                               }.count 
     end
     

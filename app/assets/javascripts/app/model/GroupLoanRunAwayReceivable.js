@@ -14,8 +14,6 @@ Ext.define('AM.model.GroupLoanRunAwayReceivable', {
 			{ name: 'group_loan_weekly_collection_week_number', type: 'int' },  
 			{ name: 'group_loan_membership_id', type: 'int'},
 			
-			//                  other proxy info
-			
 			{ name: 'payment_case', type: 'int' },  
 			{ name: 'payment_case_text', type: 'string' },   
   	],

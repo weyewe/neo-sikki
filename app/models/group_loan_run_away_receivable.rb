@@ -5,6 +5,7 @@ class GroupLoanRunAwayReceivable < ActiveRecord::Base
   has_many :group_loan_run_away_receivable_payments
   belongs_to :group_loan_membership 
   belongs_to :group_loan_weekly_collection
+  belongs_to :member
   
   validate :valid_payment_case
   validates_presence_of :payment_case
