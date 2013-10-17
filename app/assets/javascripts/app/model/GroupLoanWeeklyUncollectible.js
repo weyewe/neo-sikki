@@ -20,7 +20,8 @@ Ext.define('AM.model.GroupLoanWeeklyUncollectible', {
 			
 			{ name: 'is_cleared', type: 'boolean' }   				,
 			{ name: 'cleared_at', type: 'string' } ,
-			{ name: 'clearance_case', type: 'int' }                           
+			{ name: 'clearance_case', type: 'int' },
+			{ name: 'clearance_case_text', type: 'string' }                             
   	],
 
   	idProperty: 'id' ,

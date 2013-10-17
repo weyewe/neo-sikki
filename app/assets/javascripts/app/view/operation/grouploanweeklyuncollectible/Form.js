@@ -233,6 +233,21 @@ Ext.define('AM.view.operation.grouploanweeklyuncollectible.Form', {
 		});
 	},
 	
+	// setSelectedClearanceCase: function( clearance_case ){
+	// 	var comboBox = this.down('form').getForm().findField('clearance_case'); 
+	// 	var me = this; 
+	// 	var store = comboBox.store;  
+	// 	store.load({
+	// 		params: {
+	// 			selected_id : group_loan_membership_id 
+	// 		},
+	// 		callback : function(records, options, success){
+	// 			me.setLoading(false);
+	// 			comboBox.setValue( group_loan_membership_id );
+	// 		}
+	// 	});
+	// },
+	
 	setExtraParamInGroupLoanMembershipComboBox: function( parent_id ){
 		var comboBox = this.down('form').getForm().findField('group_loan_membership_id'); 
 		var store = comboBox.store;
@@ -253,12 +268,15 @@ Ext.define('AM.view.operation.grouploanweeklyuncollectible.Form', {
 		me.setExtraParamInGroupLoanMembershipComboBox( parent_id );
 		me.setExtraParamInGroupLoanWeeklyCollectionComboBox( parent_id );
 	},
+	
+	
 
 	setComboBoxData : function( record){ 
 		var me = this; 
 		me.setLoading(true);
 		me.setSelectedGroupLoanMembership( record.get("group_loan_membership_id")  ) ;
 		me.setSelectedGroupLoanWeeklyCollection( record.get("group_loan_weekly_collection_id")  ) ;
+		// me.setSelectedClearanceCase( record.get("clearance_case")  ) ;
 	},
 	
 	setParentData: function( record ){

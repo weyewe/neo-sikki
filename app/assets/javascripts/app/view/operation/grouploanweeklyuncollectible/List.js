@@ -21,7 +21,8 @@ Ext.define('AM.view.operation.grouploanweeklyuncollectible.List' ,{
 				text : "Jumlah",
 				flex : 1,
 				tpl : '<b>{amount}</b>' + '<br />' + 
-							'Pokok: <b>{principal}</b>' + '<br />'  
+							'Pokok: <b>{principal}</b>' + '<br />'  + '<br />'  + 
+							'{clearance_case_text}'
 			},
 			
 			{

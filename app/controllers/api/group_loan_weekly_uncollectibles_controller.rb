@@ -118,11 +118,11 @@ class Api::GroupLoanWeeklyUncollectiblesController < Api::BaseApiController
                         per(params[:limit]).
                         order("id ASC")
    
-      @objects = GroupLoanWeeklyUncollectible.where{ (id.eq selected_id)  
+      @total = GroupLoanWeeklyUncollectible.where{ (id.eq selected_id)  
                               }.count 
     end
     
     
-    render :json => { :records => @objects , :total => @total, :success => true }
+    # render :json => { :records => @objects , :total => @total, :success => true }
   end
 end

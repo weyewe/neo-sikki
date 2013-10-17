@@ -116,7 +116,7 @@ class Api::GroupLoanWeeklyCollectionsController < Api::BaseApiController
                         per(params[:limit]).
                         order("id ASC")
    
-      @objects = GroupLoanWeeklyCollection.where{ (id.eq selected_id)  
+      @total = GroupLoanWeeklyCollection.where{ (id.eq selected_id)  
                               }.count 
     end
     

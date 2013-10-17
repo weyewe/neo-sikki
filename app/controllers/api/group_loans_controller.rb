@@ -117,7 +117,7 @@ class Api::GroupLoansController < Api::BaseApiController
                         per(params[:limit]).
                         order("id DESC")
    
-      @objects = GroupLoan.where{ (id.eq selected_id)   
+      @total = GroupLoan.where{ (id.eq selected_id)   
                               }.count 
     end
     

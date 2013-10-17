@@ -105,13 +105,15 @@ class Api::GroupLoanMembershipsController < Api::BaseApiController
     
     if  selected_id.nil?
       @objects = GroupLoanMembership.joins(:member).where{
-                                  (member.name =~ query)    
+                                  (member.name =~ query)  & 
+                                  (group_loan_id.eq params[:parent_id])  
                               }.
                         page(params[:page]).
                         per(params[:limit]).
                         order("id DESC")
                         
-      @total = GroupLoanMembership.joins(:member).where{ (member.name =~ query)  
+      @total = GroupLoanMembership.joins(:member).where{ (member.name =~ query)  & 
+                        (group_loan_id.eq params[:parent_id]) 
                               }.count
     else
       @objects = GroupLoanMembership.where{ (id.eq selected_id)   
@@ -120,11 +122,10 @@ class Api::GroupLoanMembershipsController < Api::BaseApiController
                         per(params[:limit]).
                         order("id DESC")
    
-      @objects = GroupLoanMembership.where{ (id.eq selected_id)  
+      @total = GroupLoanMembership.where{ (id.eq selected_id)  
                               }.count 
     end
     
     
-    # render :json => { :records => @objects , :total => @total, :success => true }
   end
 end

@@ -88,11 +88,7 @@ Ext.define('AM.controller.GroupLoanWeeklyUncollectibles', {
 			var view = Ext.widget('grouploanweeklyuncollectibleform');
 			view.show();
 			
-			view.setComboBoxExtraParams(parentObject.get("id"));
-			console.log("The parentObject");
-			console.log( parentObject );
-			console.log( parentObject.get('name') );
-			console.log( parentObject.get('id') );
+			view.setComboBoxExtraParams(parentObject.get("id")); 
 			view.setParentData(parentObject);
 		}
   },
@@ -105,9 +101,11 @@ Ext.define('AM.controller.GroupLoanWeeklyUncollectibles', {
 			var record = this.getList().getSelectedObject();
 	    var view = Ext.widget('grouploanweeklyuncollectibleform');
 			view.show();
-			view.updateExtraParamsInComboBox( parentObject.get("id") );
+			view.setComboBoxExtraParams(parentObject.get("id")); 
+			// view.updateExtraParamsInComboBox( parentObject.get("id") );
 			
 			view.setComboBoxData( record );
+			// view.setParentData(parentObject);
 	    view.down('form').loadRecord(record);
 		}
     
