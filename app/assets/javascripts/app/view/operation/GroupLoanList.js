@@ -13,7 +13,8 @@ Ext.define('AM.view.operation.GroupLoanList' ,{
 				text : "Group Loan",
 				flex : 1,
 				tpl : '<b>{name}</b>' + '<br />' + 
-							'Jumlah Meeting: <b>{number_of_meetings}</b>' 
+							'Jumlah Meeting: <b>{number_of_meetings}</b>' + '<br />'  + 
+							'Jumlah Pengumpulan: <b>{number_of_collections}</b>'
 			}, 
 		];
 

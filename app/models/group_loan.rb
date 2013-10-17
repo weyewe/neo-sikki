@@ -16,7 +16,8 @@ class GroupLoan < ActiveRecord::Base
   
   # has_many :group_loan_default_payments
   
-  has_many :group_loan_premature_clearance_payments 
+  has_many :group_loan_premature_clearance_payments
+  has_many :deceased_clearances 
   
   has_many :group_loan_weekly_tasks # weekly payment, weekly attendance  
   validates_presence_of   :name,

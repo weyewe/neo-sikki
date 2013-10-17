@@ -51,17 +51,7 @@ class Member < ActiveRecord::Base
 =begin
   Savings Related 
 =end
-  def update_total_savings_account(amount)
-    # incoming = self.savings_entries.where(
-    #   :savings_status => SAVINGS_STATUS[:savings_account],
-    #   :direction => FUND_TRANSFER_DIRECTION[:incoming]
-    # ).sum("amount")   
-    # 
-    # outgoing = self.savings_entries.where(
-    #   :savings_status => SAVINGS_STATUS[:savings_account],
-    #   :direction => FUND_TRANSFER_DIRECTION[:outgoing]
-    # ).sum("amount")
-    # 
+  def update_total_savings_account(amount) 
     self.total_savings_account  +=  amount 
     self.save
   end
@@ -75,6 +65,13 @@ class Member < ActiveRecord::Base
       self.errors.add(:generic_errors, "#{self.name} sudah dinyatakan meninggal")
       return self 
     end
+    
+    
+    if params[:deceased_at].nil? or not params[:deceased_at].is_a?(DateTime)
+      self.errors.add(:deceased_at, "Harus ada tanggal meninggal")
+      return self 
+    end
+    
     
     self.is_deceased = true 
     self.deceased_at = params[:deceased_at]
@@ -122,13 +119,21 @@ class Member < ActiveRecord::Base
     end
   end
   
-  def mark_as_run_away
+  def mark_as_run_away(params)
     if self.is_run_away? 
       self.errors.add(:generic_errors, "#{self.name} sudah dinyatakan kabur")
       return self 
     end
     
+    
+    if params[:run_away_at].nil? or not params[:run_away_at].is_a?(DateTime)
+      self.errors.add(:run_away_at, "Harus ada tanggal kabur")
+      return self 
+    end
+    
+    
     self.is_run_away = true  
+    self.run_away_at = params[:run_away_at]
     
     if self.save 
       pending_receivable = BigDecimal('0')

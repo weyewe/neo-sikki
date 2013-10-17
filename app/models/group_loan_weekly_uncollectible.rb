@@ -84,7 +84,7 @@ class GroupLoanWeeklyUncollectible < ActiveRecord::Base
     return if self.persisted? 
     
     if group_loan.first_uncollected_weekly_collection.id != self.group_loan_weekly_collection_id 
-      msg = "Pengumpulan minggu #{group_loan_weekly_collection.week_number} telah ditutup"
+      msg = "Pengumpulan minggu #{group_loan_weekly_collection.week_number} tidak valid"
       self.errors.add(:group_loan_weekly_collection_id , msg  )
       return self 
     end

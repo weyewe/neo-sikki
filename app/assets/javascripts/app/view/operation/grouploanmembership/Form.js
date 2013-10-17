@@ -236,6 +236,7 @@ Ext.define('AM.view.operation.grouploanmembership.Form', {
 	
 	setParentData: function( record ){
 		this.down('form').getForm().findField('group_loan_name').setValue(record.get('name')); 
+		this.down('form').getForm().findField('group_loan_id').setValue(record.get('id')); 
 	},
 });
 

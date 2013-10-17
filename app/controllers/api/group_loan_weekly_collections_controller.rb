@@ -1,17 +1,17 @@
-class Api::GroupLoanMembershipsController < Api::BaseApiController
+class Api::GroupLoanWeeklyCollectionsController < Api::BaseApiController
   
   def index
     
     if params[:livesearch].present? 
       livesearch = "%#{params[:livesearch]}%"
-      @objects = GroupLoanMembership.where{ 
+      @objects = GroupLoanWeeklyCollection.where{
         (
           (name =~  livesearch )
         )
         
       }.page(params[:page]).per(params[:limit]).order("id DESC")
       
-      @total = GroupLoanMembership.where{ 
+      @total = GroupLoanWeeklyCollection.where{ 
         (
           (name =~  livesearch )
         )
@@ -20,26 +20,25 @@ class Api::GroupLoanMembershipsController < Api::BaseApiController
       # calendar
       
     elsif params[:parent_id].present?
-      # @group_loan = GroupLoan.find_by_id params[:parent_id]
-      @objects = GroupLoanMembership.joins(:group_loan_product, :member, :group_loan).
+      @objects = GroupLoanWeeklyCollection. 
                   where(:group_loan_id => params[:parent_id]).
-                  page(params[:page]).per(params[:limit]).order("id DESC")
-      @total = GroupLoanMembership.where(:group_loan_id => params[:parent_id]).count 
+                  page(params[:page]).per(params[:limit]).order("id ASC")
+      @total = GroupLoanWeeklyCollection.where(:group_loan_id => params[:parent_id]).count 
     elsif
       @objects = []
       @total = 0 
     end
     
-    # render :json => { :group_loan_memberships => @objects , :total => @total , :success => true }
+    # render :json => { :group_loan_weekly_collections => @objects , :total => @total , :success => true }
   end
   
 
   def create
-    @object = GroupLoanMembership.create_object( params[:group_loan_membership] )
+    @object = GroupLoanWeeklyCollection.create_object( params[:group_loan_weekly_collection] )
     if @object.errors.size == 0 
       render :json => { :success => true, 
-                        :group_loan_memberships => [@object] , 
-                        :total => GroupLoanMembership.count }  
+                        :group_loan_weekly_collections => [@object] , 
+                        :total => GroupLoanWeeklyCollection.count }  
     else
       msg = {
         :success => false, 
@@ -53,13 +52,13 @@ class Api::GroupLoanMembershipsController < Api::BaseApiController
   end
 
   def update
-    @object = GroupLoanMembership.find(params[:id])
+    @object = GroupLoanWeeklyCollection.find(params[:id])
     
-    @object.update_object( params[:group_loan_membership] )
+    @object.update_object( params[:group_loan_weekly_collection] )
     if @object.errors.size == 0 
       render :json => { :success => true,   
-                        :group_loan_memberships => [@object],
-                        :total => GroupLoanMembership.count  } 
+                        :group_loan_weekly_collections => [@object],
+                        :total => GroupLoanWeeklyCollection.count  } 
     else
       msg = {
         :success => false, 
@@ -75,11 +74,11 @@ class Api::GroupLoanMembershipsController < Api::BaseApiController
   end
 
   def destroy
-    @object = GroupLoanMembership.find(params[:id])
+    @object = GroupLoanWeeklyCollection.find(params[:id])
     @object.delete_object 
 
     if ( not @object.persisted?  or @object.is_deleted ) and @object.errors.size == 0 
-      render :json => { :success => true, :total => GroupLoanMembership.count }  
+      render :json => { :success => true, :total => GroupLoanWeeklyCollection.count }  
     else
       msg = {
         :success => false, 
@@ -104,23 +103,20 @@ class Api::GroupLoanMembershipsController < Api::BaseApiController
     # on PostGre SQL, it is ignoring lower case or upper case 
     
     if  selected_id.nil?
-      @objects = GroupLoanMembership.joins(:member).where{
-                                  (member.name =~ query)    
-                              }.
+      @objects = GroupLoanWeeklyCollection.where(:group_loan_id => params[:parent_id]).
                         page(params[:page]).
                         per(params[:limit]).
                         order("id DESC")
                         
-      @total = GroupLoanMembership.joins(:member).where{ (member.name =~ query)  
-                              }.count
+      @total = GroupLoanWeeklyCollection.where(:group_loan_id =>  params[:parent_id]) .count
     else
-      @objects = GroupLoanMembership.where{ (id.eq selected_id)   
+      @objects = GroupLoanWeeklyCollection.where{ (id.eq selected_id)  
                               }.
                         page(params[:page]).
                         per(params[:limit]).
-                        order("id DESC")
+                        order("id ASC")
    
-      @objects = GroupLoanMembership.where{ (id.eq selected_id)  
+      @objects = GroupLoanWeeklyCollection.where{ (id.eq selected_id)  
                               }.count 
     end
     

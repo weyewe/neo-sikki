@@ -13,10 +13,8 @@ class CreateMembers < ActiveRecord::Migration
       t.datetime :deceased_at  
       
       t.boolean :is_run_away, :default => false 
+      t.datetime :run_away_at 
       
-      
-      
-
       t.timestamps
     end
   end

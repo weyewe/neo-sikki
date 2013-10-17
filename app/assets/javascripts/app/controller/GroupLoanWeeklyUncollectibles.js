@@ -1,60 +1,60 @@
-Ext.define('AM.controller.GroupLoanMemberships', {
+Ext.define('AM.controller.GroupLoanWeeklyUncollectibles', {
   extend: 'Ext.app.Controller',
 
-  stores: ['GroupLoanMemberships'],
-  models: ['GroupLoanMembership'],
+  stores: ['GroupLoanWeeklyUncollectibles'],
+  models: ['GroupLoanWeeklyUncollectible'],
 
   views: [
-    'operation.grouploanmembership.List',
-    'operation.grouploanmembership.Form',
-		'operation.GroupLoanMembership',
+    'operation.grouploanweeklyuncollectible.List',
+    'operation.grouploanweeklyuncollectible.Form',
+		'operation.GroupLoanWeeklyUncollectible',
 		'operation.GroupLoanList'
   ],
 
   	refs: [
 		{
 			ref : "wrapper",
-			selector : "grouploanmembershipProcess"
+			selector : "grouploanweeklyuncollectibleProcess"
 		},
 		{
 			ref : 'parentList',
-			selector : 'grouploanmembershipProcess operationgrouploanList'
+			selector : 'grouploanweeklyuncollectibleProcess operationgrouploanList'
 		},
 		{
 			ref: 'list',
-			selector: 'grouploanmembershiplist'
+			selector: 'grouploanweeklyuncollectiblelist'
 		},
 		{
 			ref : 'searchField',
-			selector: 'grouploanmembershiplist textfield[name=searchField]'
+			selector: 'grouploanweeklyuncollectiblelist textfield[name=searchField]'
 		}
 	],
 
   init: function() {
     this.control({
-			'grouploanmembershipProcess operationgrouploanList' : {
+			'grouploanweeklyuncollectibleProcess operationgrouploanList' : {
 				afterrender : this.loadParentObjectList,
 				selectionchange: this.parentSelectionChange,
 			},
 	
-      'grouploanmembershiplist': {
+      'grouploanweeklyuncollectiblelist': {
         itemdblclick: this.editObject,
         selectionchange: this.selectionChange,
 				// afterrender : this.loadObjectList,
       },
-      'grouploanmembershipform button[action=save]': {
+      'grouploanweeklyuncollectibleform button[action=save]': {
         click: this.updateObject
       },
-      'grouploanmembershiplist button[action=addObject]': {
+      'grouploanweeklyuncollectiblelist button[action=addObject]': {
         click: this.addObject
       },
-      'grouploanmembershiplist button[action=editObject]': {
+      'grouploanweeklyuncollectiblelist button[action=editObject]': {
         click: this.editObject
       },
-      'grouploanmembershiplist button[action=deleteObject]': {
+      'grouploanweeklyuncollectiblelist button[action=deleteObject]': {
         click: this.deleteObject
       },
-			'grouploanmembershiplist textfield[name=searchField]': {
+			'grouploanweeklyuncollectiblelist textfield[name=searchField]': {
         change: this.liveSearch
       }
 		
@@ -64,11 +64,11 @@ Ext.define('AM.controller.GroupLoanMemberships', {
 	liveSearch : function(grid, newValue, oldValue, options){
 		var me = this;
 
-		me.getGroupLoanMembershipsStore().getProxy().extraParams = {
+		me.getGroupLoanWeeklyUncollectiblesStore().getProxy().extraParams = {
 		    livesearch: newValue
 		};
 	 
-		me.getGroupLoanMembershipsStore().load();
+		me.getGroupLoanWeeklyUncollectiblesStore().load();
 	},
  
 
@@ -85,22 +85,32 @@ Ext.define('AM.controller.GroupLoanMemberships', {
     
 		var parentObject  = this.getParentList().getSelectedObject();
 		if( parentObject) {
-			var view = Ext.widget('grouploanmembershipform');
+			var view = Ext.widget('grouploanweeklyuncollectibleform');
 			view.show();
+			
+			view.setComboBoxExtraParams(parentObject.get("id"));
+			console.log("The parentObject");
+			console.log( parentObject );
+			console.log( parentObject.get('name') );
+			console.log( parentObject.get('id') );
 			view.setParentData(parentObject);
 		}
   },
 
   editObject: function() {
 		var me = this; 
-    var record = this.getList().getSelectedObject();
-    var view = Ext.widget('grouploanmembershipform');
-
-		view.setComboBoxData( record );
-
 		
-
-    view.down('form').loadRecord(record);
+		var parentObject  = this.getParentList().getSelectedObject();
+		if( parentObject) {
+			var record = this.getList().getSelectedObject();
+	    var view = Ext.widget('grouploanweeklyuncollectibleform');
+			view.show();
+			view.updateExtraParamsInComboBox( parentObject.get("id") );
+			
+			view.setComboBoxData( record );
+	    view.down('form').loadRecord(record);
+		}
+    
   },
 
   updateObject: function(button) {
@@ -110,7 +120,7 @@ Ext.define('AM.controller.GroupLoanMemberships', {
 		var parentList = this.getParentList();
 		var wrapper = this.getWrapper();
 
-    var store = this.getGroupLoanMembershipsStore();
+    var store = this.getGroupLoanWeeklyUncollectiblesStore();
     var record = form.getRecord();
     var values = form.getValues();
 
@@ -150,7 +160,7 @@ Ext.define('AM.controller.GroupLoanMemberships', {
 		}else{
 			//  no record at all  => gonna create the new one 
 			var me  = this; 
-			var newObject = new AM.model.GroupLoanMembership( values ) ;
+			var newObject = new AM.model.GroupLoanWeeklyUncollectible( values ) ;
 			
 			// learnt from here
 			// http://www.sencha.com/forum/showthread.php?137580-ExtJS-4-Sync-and-success-failure-processing
@@ -184,7 +194,7 @@ Ext.define('AM.controller.GroupLoanMemberships', {
     var record = this.getList().getSelectedObject();
 
     if (record) {
-      var store = this.getGroupLoanMembershipsStore();
+      var store = this.getGroupLoanWeeklyUncollectiblesStore();
       store.remove(record);
       store.sync();
 // to do refresh programmatically

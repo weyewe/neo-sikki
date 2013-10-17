@@ -1,6 +1,6 @@
-Ext.define('AM.view.operation.GroupLoanMembership', {
+Ext.define('AM.view.operation.GroupLoanWeeklyUncollectible', {
     extend: 'AM.view.Worksheet',
-    alias: 'widget.grouploanmembershipProcess',
+    alias: 'widget.grouploanweeklyuncollectibleProcess',
 	 
 		layout : {
 			type : 'hbox',
@@ -11,15 +11,15 @@ Ext.define('AM.view.operation.GroupLoanMembership', {
 		selectedParentId : null,
 		
 		items : [
-		// list of group loan.. just the list.. no CRUD etc
+		// just the list
 			{
 				xtype : 'operationgrouploanList',
 				flex : 1
 			},
-			
 			{
-				xtype : 'grouploanmembershiplist',
+				xtype : 'grouploanweeklyuncollectiblelist',
 				flex : 2
 			}, 
+			 
 		]
 });

@@ -336,6 +336,33 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
     return total_amount 
   end
   
+  def group_loan_weekly_uncollectible_count
+    self.group_loan_weekly_uncollectibles.count 
+  end
+  
+  def group_loan_deceased_clearance_count
+    group_loan.group_loan_memberships.where(
+      :is_active => false,
+      :deactivation_case => GROUP_LOAN_DEACTIVATION_CASE[:deceased],
+      :deactivation_week_number =>  self.week_number 
+    ).count
+  end
+  
+  def group_loan_run_away_receivable_count
+    group_loan.group_loan_memberships.where(
+      :is_active => false,
+      :deactivation_case => GROUP_LOAN_DEACTIVATION_CASE[:run_away],
+      :deactivation_week_number =>  self.week_number 
+    ).count
+  end
+  
+  def group_loan_premature_clearance_payment_count 
+    group_loan.group_loan_memberships.where(
+      :is_active => false,
+      :deactivation_case => GROUP_LOAN_DEACTIVATION_CASE[:premature_clearance],
+      :deactivation_week_number =>  self.week_number 
+    ).count
+  end
   
    
 end

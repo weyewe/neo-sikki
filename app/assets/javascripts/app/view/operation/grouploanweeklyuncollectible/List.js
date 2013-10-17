@@ -1,45 +1,38 @@
-Ext.define('AM.view.operation.grouploanmembership.List' ,{
+Ext.define('AM.view.operation.grouploanweeklyuncollectible.List' ,{
   	extend: 'Ext.grid.Panel',
-  	alias : 'widget.grouploanmembershiplist',
-
-  	store: 'GroupLoanMemberships', 
+  	alias : 'widget.grouploanweeklyuncollectiblelist',
+  	store: 'GroupLoanWeeklyUncollectibles', 
  
-
-		// { name: 'id', type: 'int' },
-		//   	{ name: 'number_of_meetings', type: 'int' },
-		// { name: 'number_of_collections', type: 'int' } ,
-		// { name: 'is_started', type: 'boolean' }   ,
-		// { name: 'is_loan_disbursed', type: 'boolean' }   ,
-		// { name: 'is_closed', type: 'boolean' }   ,
-		// { name: 'is_compulsory_savings_withdrawn', type: 'boolean' }
-		// 
-
+ 
 	initComponent: function() {
 		this.columns = [
-			// { header: 'Member', dataIndex: 'member_name' , flex : 1 },
+		
 			{
 				xtype : 'templatecolumn',
 				text : "Member",
 				flex : 1,
-				tpl : '<b>{member_id_number}</b>' + '<br />' + 
-							'Nama: <b>{member_name}</b>' + '<br />' + 
-							'Alamat: {member_address}'  
+				tpl : '<b>{group_loan_membership_member_name}</b>' + '<br />' + 
+							'Nama: <b>{group_loan_membership_member_name}</b>' + '<br />' + 
+							'Alamat: {group_loan_membership_member_address}'  
+			},
+			{ header: 'Minggu', dataIndex: 'group_loan_weekly_collection_week_number' , flex : 1 },
+			{
+				xtype : 'templatecolumn',
+				text : "Jumlah",
+				flex : 1,
+				tpl : '<b>{amount}</b>' + '<br />' + 
+							'Pokok: <b>{principal}</b>' + '<br />'  
 			},
 			
 			{
 				xtype : 'templatecolumn',
-				text : "Produk",
+				text : "Status Pembayaran",
 				flex : 1,
-				tpl : '<b>{group_loan_product_name}</b>' + '<br />' + 
-							'Durasi: <b>{group_loan_product_total_weeks}</b>' + '<br />' + 
-							'Pokok: <b>{group_loan_product_principal}</b>' + '<br />' + 
-							'Bunga: <b>{group_loan_product_interest}</b>' + '<br />' + 
-							'Tabungan Wajib: <b>{group_loan_product_compulsory_savings}</b>' + '<br />' + 
-							'Admin fee: <b>{group_loan_product_admin_fee}</b>' 
+				tpl : 'Terkumpul: <b>{is_collected}</b>' + '<br />' + 
+							'Terkonfirmasi: <b>{is_cleared}</b>'   
 			},
 			
 			
-			{ header: 'Total Tabungan Wajib',  dataIndex: 'total_compulsory_savings', flex : 1  }, 
 		];
 
 		this.addObjectButton = new Ext.Button({
@@ -80,7 +73,7 @@ Ext.define('AM.view.operation.grouploanmembership.List' ,{
 
 		this.callParent(arguments);
 	},
- 
+  
 	loadMask	: true,
 	
 	getSelectedObject: function() {
@@ -90,6 +83,7 @@ Ext.define('AM.view.operation.grouploanmembership.List' ,{
 	enableAddButton: function(){
 		this.addObjectButton.enable();
 	},
+	
 	disableAddButtons : function(){
 		this.addObjectButton.disable();
 	},

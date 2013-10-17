@@ -129,7 +129,7 @@ describe GroupLoan do
       
       # @initial_group_loan_run_away_amount_receivable = @group_loan.run_away_amount_receivable
       
-      @run_away_member.mark_as_run_away
+      @run_away_member.mark_as_run_away(:run_away_at => DateTime.now)
       @group_loan.reload 
       @run_away_glm.reload 
       @second_group_loan_weekly_collection = @group_loan.group_loan_weekly_collections.order("id ASC")[1]

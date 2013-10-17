@@ -1,6 +1,7 @@
 class DeceasedClearance < ActiveRecord::Base
   belongs_to :member 
   
+  belongs_to :financial_product, :polymorphic => true 
   attr_accessible :financial_product_id                   ,
                   :financial_product_type                ,
                   :principal_return                      ,

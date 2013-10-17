@@ -164,6 +164,19 @@ if Rails.env.development?
   end
   
   
+=begin
+  Start the group loan 
+=end
+  @group_loan_1.start(:started_at => DateTime.now )
+  
+  @group_loan_1.disburse_loan(:disbursed_at => DateTime.now )
+  
+  
+  
+  
+  
+  
+  
   
 
   def make_date(*args)

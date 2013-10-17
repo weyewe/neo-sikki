@@ -54,7 +54,7 @@ Ext.define("AM.controller.Operation", {
 		children 	: [
         
       { 
-          text:'GroupLoan', 
+          text:'Management', 
           viewClass:'AM.view.operation.GroupLoan', 
           leaf:true, 
           iconCls:'text',
@@ -66,7 +66,7 @@ Ext.define("AM.controller.Operation", {
 					]
       },
       { 
-				text:'GroupLoan Membership', 
+				text:'Membership', 
 				viewClass:'AM.view.operation.GroupLoanMembership', 
 				leaf:true, 
 				iconCls:'text' ,
@@ -77,6 +77,66 @@ Ext.define("AM.controller.Operation", {
 					}
 				]
 			}, 
+			{ 
+				text:'Collection', 
+				viewClass:'AM.view.operation.GroupLoanWeeklyCollection', 
+				leaf:true, 
+				iconCls:'text' ,
+				conditions : [
+					{
+						controller : 'group_loan_weekly_collections',
+						action : 'index'
+					}
+				]
+			},
+			{ 
+				text:'Uncollectible', 
+				viewClass:'AM.view.operation.GroupLoanWeeklyUncollectible', 
+				leaf:true, 
+				iconCls:'text' ,
+				conditions : [
+					{
+						controller : 'group_loan_weekly_uncollectibles',
+						action : 'index'
+					}
+				]
+			},
+			{ 
+				text:'Deceased', 
+				viewClass:'AM.view.operation.GroupLoanWeeklyCollection', 
+				leaf:true, 
+				iconCls:'text' ,
+				conditions : [
+					{
+						controller : 'group_loan_weekly_collections',
+						action : 'index'
+					}
+				]
+			},
+			{ 
+				text:'Run Away', 
+				viewClass:'AM.view.operation.GroupLoanWeeklyCollection', 
+				leaf:true, 
+				iconCls:'text' ,
+				conditions : [
+					{
+						controller : 'group_loan_weekly_collections',
+						action : 'index'
+					}
+				]
+			},
+			{ 
+				text:'PrematureClearance', 
+				viewClass:'AM.view.operation.GroupLoanWeeklyCollection', 
+				leaf:true, 
+				iconCls:'text' ,
+				conditions : [
+					{
+						controller : 'group_loan_weekly_collections',
+						action : 'index'
+					}
+				]
+			},
     ]
 	}, 
 	
