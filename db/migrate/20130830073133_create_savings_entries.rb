@@ -14,6 +14,9 @@ class CreateSavingsEntries < ActiveRecord::Migration
       
       t.text :description 
       
+      
+      t.boolean :is_confirmed, :default => false 
+      t.datetime :confirmed_at 
 
       t.timestamps
     end

@@ -183,6 +183,8 @@ ActiveRecord::Schema.define(version: 20131010083300) do
     t.string   "financial_product_type"
     t.integer  "member_id"
     t.text     "description"
+    t.boolean  "is_confirmed",                                    default: false
+    t.datetime "confirmed_at"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

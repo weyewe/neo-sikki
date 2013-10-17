@@ -146,13 +146,35 @@ Ext.define("AM.controller.Operation", {
 		children 	: [
         
       { 
-          text:'GroupLoan', 
+          text:'Clearance', 
           viewClass:'AM.view.operation.GroupLoanRunAwayReceivable', 
           leaf:true, 
           iconCls:'text',
  					conditions : [
 						{
 							controller : "group_loan_run_away_receivables",
+							action  : 'index'
+						}
+					]
+      } 
+    ]
+	},
+	
+	savingsFolder : {
+		text 			: "Tabungan", 
+		viewClass : '',
+		iconCls		: 'text-folder', 
+    expanded	: true,
+		children 	: [
+        
+      { 
+          text:'Savings', 
+          viewClass:'AM.view.operation.SavingsEntry', 
+          leaf:true, 
+          iconCls:'text',
+ 					conditions : [
+						{
+							controller : "savings_entries",
 							action  : 'index'
 						}
 					]
@@ -168,7 +190,8 @@ Ext.define("AM.controller.Operation", {
 		me.folderList = [
 			this.setupFolder ,
 			this.deceasedFolder,
-			this.runAwayFolder
+			this.runAwayFolder,
+			this.savingsFolder
 		];
 		
 		var processList = panel.down('operationProcessList');
