@@ -4,7 +4,9 @@ Ext.define('AM.model.Member', {
     	{ name: 'id', type: 'int' },
     	{ name: 'name', type: 'string' },
 			{ name: 'address', type: 'string' } ,
-			{ name: 'id_number', type: 'string' }   
+			{ name: 'id_number', type: 'string' } ,
+			
+			{ name: 'total_savings_account', type: 'string' }     
   	],
 
 	 

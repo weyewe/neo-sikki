@@ -133,8 +133,8 @@ class SavingsEntry < ActiveRecord::Base
     self.is_confirmed = true
     self.confirmed_at = params[:confirmed_at]
     if self.save
-      multiplier = 1 if new_object.direction == FUND_TRANSFER_DIRECTION[:incoming]
-      multiplier = -1 if new_object.direction == FUND_TRANSFER_DIRECTION[:outgoing]
+      multiplier = 1 if self.direction == FUND_TRANSFER_DIRECTION[:incoming]
+      multiplier = -1 if self.direction == FUND_TRANSFER_DIRECTION[:outgoing]
       member.update_total_savings_account( multiplier  *self.amount )
     end
   end

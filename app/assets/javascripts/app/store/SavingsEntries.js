@@ -11,7 +11,7 @@ Ext.define('AM.store.SavingsEntries', {
 	sorters : [
 		{
 			property	: 'id',
-			direction	: 'ASC'
+			direction	: 'DESC'
 		}
 	], 
 

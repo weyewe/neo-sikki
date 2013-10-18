@@ -184,6 +184,22 @@ if Rails.env.development?
   @run_away_member.mark_as_run_away( :run_away_at => DateTime.now )
   
   
+  @savings_member = Member.last
+  
+  
+  (1..10).each do |x|
+    
+    
+    se = SavingsEntry.create_object(
+      :amount => BigDecimal( (x*10000).to_s ),
+      :direction => FUND_TRANSFER_DIRECTION[:incoming],
+      :member_id => @savings_member.id 
+     )
+    se.confirm(:confirmed_at => DateTime.now )
+  end
+  
+  
+  
   
   
   

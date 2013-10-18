@@ -14,7 +14,8 @@ Ext.define('AM.view.operation.SavingsEntry', {
 		// just the list
 			{
 				xtype : 'operationmemberList',
-				flex : 1
+				flex : 1,
+				showTotalSavingsAmount: true
 			},
 			{
 				xtype : 'savingsentrylist',

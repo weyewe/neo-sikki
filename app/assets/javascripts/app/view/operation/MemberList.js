@@ -4,17 +4,30 @@ Ext.define('AM.view.operation.MemberList' ,{
 
   	store: 'Members', 
    
+	showTotalSavingsAmount: false, 
 
 	initComponent: function() {
+		
+		var templateBuilder = '<b>{name}</b>' + '<br />' + 
+					'ID : <b>{id_number}</b>' + '<br />'  + 
+					'Alamat: <b>{address}</b>'; 
+					
+		if( this.showTotalSavingsAmount === true ){
+			templateBuilder += '<br />'  + 
+												'Total Savings: <b>{total_savings_account}</b>';
+		}
+					
 		this.columns = [
 		
 			{
 				xtype : 'templatecolumn',
 				text : "Member",
 				flex : 1,
-				tpl : '<b>{name}</b>' + '<br />' + 
-							'ID : <b>{id_number}</b>' + '<br />'  + 
-							'Alamat: <b>{address}</b>'
+				// tpl : '<b>{name}</b>' + '<br />' + 
+				// 			'ID : <b>{id_number}</b>' + '<br />'  + 
+				// 			'Alamat: <b>{address}</b>'
+				
+				tpl: templateBuilder
 			}, 
 		];
 

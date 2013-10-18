@@ -4,9 +4,9 @@ json.total @total
 
 json.savings_entries @objects do |object|
 	json.id 								object.id 
-	json.member_id 			 object.member_id   
-	json.member_name 			 object.member_name
-	json.member_id_number 			 object.member_id_number
+	json.member_id 			 object.member.id   
+	json.member_name 			 object.member.name
+	json.member_id_number 			 object.member.id_number
 	
 	json.direction 							object.direction
 	
@@ -19,5 +19,7 @@ json.savings_entries @objects do |object|
 	json.amount object.amount
 	json.is_confirmed object.is_confirmed
 	json.confirmed_at object.confirmed_at 
+	
+	 
 	
 end
