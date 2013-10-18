@@ -85,6 +85,13 @@ class Api::MembersController < Api::BaseApiController
       
     end
   end
+  
+  def show
+    @object = Member.find_by_id params[:id]
+    render :json => { :success => true, 
+                      :members => [@object] , 
+                      :total => Member.count }
+  end
 
   def destroy
     @object = Member.find(params[:id])

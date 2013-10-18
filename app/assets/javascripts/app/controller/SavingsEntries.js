@@ -6,12 +6,17 @@ Ext.define('AM.controller.SavingsEntries', {
 
   views: [
     'operation.savingsentry.List',
-    // 'operation.savingsentry.Form',
+    'operation.savingsentry.Form',
+		'operation.savingsentry.ConfirmationForm',
 		'operation.SavingsEntry',
 		'operation.GroupLoanList'
   ],
 
   	refs: [
+		{
+			ref : "viewport",
+			selector : "vp"
+		},
 		{
 			ref : "wrapper",
 			selector : "savingsentryProcess"
@@ -41,25 +46,78 @@ Ext.define('AM.controller.SavingsEntries', {
         itemdblclick: this.editObject,
         selectionchange: this.selectionChange,
 				// afterrender : this.loadObjectList,
+				'confirmed' : this.reloadParentRow,
       },
-      // 'savingsentryform button[action=save]': {
-      //   click: this.updateObject
-      // },
-      // 'savingsentrylist button[action=addObject]': {
-      //   click: this.addObject
-      // },
-      // 'savingsentrylist button[action=editObject]': {
-      //   click: this.editObject
-      // },
+      'savingsentryform button[action=save]': {
+        click: this.updateObject
+      },
+      'savingsentrylist button[action=addObject]': {
+        click: this.addObject
+      },
+      'savingsentrylist button[action=editObject]': {
+        click: this.editObject
+      },
       'savingsentrylist button[action=deleteObject]': {
         click: this.deleteObject
       },
+
+			'savingsentrylist button[action=confirmObject]': {
+        click: this.confirmObject
+			}	,
+			
+			'confirmsavingsentryform button[action=confirm]' : {
+				click : this.executeConfirm
+			},
+			
 			'savingsentrylist textfield[name=searchField]': {
         change: this.liveSearch
       }
 		
     });
   },
+
+	reloadParentRow: function(){
+		console.log("Gonna reload parent row");
+		// grid.getView().refreshRow(record);
+		
+		var parentList = this.getParentList();
+		// var record = parentList.getSelectionModel().getSelection()[0]; 
+		// parentList.getView().refreshRow(record);
+		
+		// if (parentList.getSelectionModel().hasSelection()) {
+		// 	var row = parentList.getSelectionModel().getSelection()[0];
+		// 	var id = row.get("id"); 
+		// 	wrapper.selectedParentId = id ; 
+		// }
+		var wrapper = this.getWrapper();
+		modifiedId = wrapper.selectedParentId;
+		
+		AM.model.Member.load( modifiedId , {
+		    scope: parentList,
+		    failure: function(record, operation) {
+		        //do something if the load failed
+		    },
+		    success: function(record, operation) {
+					// console.log("The record");
+					// console.log( record ); 
+					
+		        var store = parentList.getStore(),
+		            recToUpdate = store.getById(modifiedId);
+
+		         recToUpdate.set(record.getData());
+
+		     // Do commit if you need: if the data from
+		     // the server differs from last commit data
+		         recToUpdate.commit();
+
+		         parentList.getView().refreshNode(store.indexOfId(modifiedId));
+		    },
+		    callback: function(record, operation) {
+		        //do something whether the load succeeded or failed
+		    }
+		});
+		
+	},
 
 	liveSearch : function(grid, newValue, oldValue, options){
 		var me = this;
@@ -80,6 +138,105 @@ Ext.define('AM.controller.SavingsEntries', {
 		me.getStore().load(); 
 	},
  
+
+	addObject: function() {
+    
+		var parentObject  = this.getParentList().getSelectedObject();
+		if( parentObject) {
+			var view = Ext.widget('savingsentryform');
+			view.show();
+			view.setParentData(parentObject);
+		}
+  },
+
+	editObject: function() {
+		var me = this; 
+    var record = this.getList().getSelectedObject();
+    var view = Ext.widget('savingsentryform');
+
+		view.setComboBoxData( record );
+
+		
+
+    view.down('form').loadRecord(record);
+  },
+
+  updateObject: function(button) {
+		var me = this; 
+    var win = button.up('window');
+    var form = win.down('form');
+		var parentList = this.getParentList();
+		var wrapper = this.getWrapper();
+
+    var store = this.getSavingsEntriesStore();
+    var record = form.getRecord();
+    var values = form.getValues();
+
+		
+		if( record ){
+			record.set( values );
+			 
+			form.setLoading(true);
+			record.save({
+				success : function(record){
+					form.setLoading(false);
+					//  since the grid is backed by store, if store changes, it will be updated
+					
+					// store.getProxy().extraParams = {
+					//     livesearch: ''
+					// };
+	 
+					store.load({
+						params: {
+							parent_id : wrapper.selectedParentId 
+						}
+					});
+					 
+					
+					win.close();
+				},
+				failure : function(record,op ){
+					form.setLoading(false);
+					var message  = op.request.scope.reader.jsonData["message"];
+					var errors = message['errors'];
+					form.getForm().markInvalid(errors);
+					this.reject();
+				}
+			});
+				
+			 
+		}else{
+			//  no record at all  => gonna create the new one 
+			var me  = this; 
+			var newObject = new AM.model.SavingsEntry( values ) ;
+			
+			// learnt from here
+			// http://www.sencha.com/forum/showthread.php?137580-ExtJS-4-Sync-and-success-failure-processing
+			// form.mask("Loading....."); 
+			form.setLoading(true);
+			newObject.save({
+				success: function(record){
+	
+					store.load({
+						params: {
+							parent_id : wrapper.selectedParentId 
+						}
+					});
+					
+					form.setLoading(false);
+					win.close();
+					
+				},
+				failure: function( record, op){
+					form.setLoading(false);
+					var message  = op.request.scope.reader.jsonData["message"];
+					var errors = message['errors'];
+					form.getForm().markInvalid(errors);
+					this.reject();
+				}
+			});
+		} 
+  },
 
   deleteObject: function() {
     var record = this.getList().getSelectedObject();
@@ -104,6 +261,73 @@ Ext.define('AM.controller.SavingsEntries', {
     }
   },
 
+
+	confirmObject : function(){
+		var view = Ext.widget('confirmsavingsentryform');
+		var record = this.getList().getSelectedObject();
+		view.setParentData( record );
+    view.show();
+	},
+	
+	
+	 
+	
+	executeConfirm: function(button){
+		var win = button.up('window');
+    var form = win.down('form');
+
+		var me  = this;
+		var record = this.getList().getSelectedObject();
+		var list = this.getList();
+		me.getViewport().setLoading( true ) ;
+		
+		if(!record){return;}
+		
+		Ext.Ajax.request({
+		    url: 'api/confirm_savings_entry',
+		    method: 'PUT',
+		    params: {
+					id : record.get('id')
+		    },
+		    jsonData: {},
+		    success: function(result, request ) {
+						me.getViewport().setLoading( false );
+						list.getStore().load({
+							callback : function(records, options, success){
+								// this => refers to a store 
+								record = this.getById(record.get('id'));
+								// record = records.getById( record.get('id'))
+								list.fireEvent('confirmed', record);
+							}
+						});
+						win.close();
+						
+		    },
+		    // failure: function(result, request ) {
+		    // 						me.getViewport().setLoading( false ) ;
+		    // 						
+		    // 						
+		    // }
+				failure : function(record,op ){
+					list.setLoading(false);
+					
+					var message  = op.request.scope.reader.jsonData["message"];
+					var errors = message['errors'];
+					
+					if( errors["generic_errors"] ){
+						Ext.MessageBox.show({
+						           title: 'FAIL',
+						           msg: errors["generic_errors"],
+						           buttons: Ext.MessageBox.OK, 
+						           icon: Ext.MessageBox.ERROR
+						       });
+					}
+					
+				}
+		});
+	},
+	
+	
 	parentSelectionChange: function(selectionModel, selections) {
 		var me = this; 
     var grid = me.getList();
@@ -114,13 +338,13 @@ Ext.define('AM.controller.SavingsEntries', {
 		// console.log("The wrapper");
 		// console.log( wrapper ) ;
 
-			//     if (selections.length > 0) {
-			// grid.enableAddButton();
-			//       // grid.enableRecordButtons();
-			//     } else {
-			// grid.disableAddButton();
-			//       // grid.disableRecordButtons();
-			//     }
+		if (selections.length > 0) {
+			grid.enableAddButton();
+			// grid.enableRecordButtons();
+		} else {
+			grid.disableAddButton();
+			// grid.disableRecordButtons();
+		}
 		
 		 
 		if (parentList.getSelectionModel().hasSelection()) {

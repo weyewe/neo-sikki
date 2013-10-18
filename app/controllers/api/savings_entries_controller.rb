@@ -74,6 +74,8 @@ class Api::SavingsEntriesController < Api::BaseApiController
       
     end
   end
+  
+  
 
   def destroy
     @object = SavingsEntry.find(params[:id])
@@ -90,6 +92,27 @@ class Api::SavingsEntriesController < Api::BaseApiController
       }
       
       render :json => msg
+    end
+  end
+  
+  
+  def confirm
+    @object = SavingsEntry.find_by_id params[:id]
+    # add some defensive programming.. current user has role admin, and current_user is indeed belongs to the company 
+    @object.confirm(:confirmed_at => DateTime.now )
+    
+    if @object.errors.size == 0  and @object.is_confirmed? 
+      render :json => { :success => true, :total => SavingsEntry.count }  
+    else
+      # render :json => { :success => false, :total => Delivery.active_objects.count } 
+      msg = {
+        :success => false, 
+        :message => {
+          :errors => extjs_error_format( @object.errors )  
+        }
+      }
+      
+      render :json => msg 
     end
   end
   
