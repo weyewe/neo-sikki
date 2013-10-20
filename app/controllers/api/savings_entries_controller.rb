@@ -56,10 +56,37 @@ class Api::SavingsEntriesController < Api::BaseApiController
   def update
     @object = SavingsEntry.find(params[:id])
     
-    @object.update_object( params[:savings_entry] )
+    if params[:confirm].present?  
+      @object.confirm(:confirmed_at => DateTime.now )
+    else
+      @object.update_object( params[:savings_entry] )
+    end
+      
+    
+    
+     direction_text = ""
+    if @object.direction == FUND_TRANSFER_DIRECTION[:incoming] 
+  		direction_text		=		"Penambahan" 
+  	elsif @object.direction == FUND_TRANSFER_DIRECTION[:outgoing]
+  		direction_text		=		"Penarikan" 
+  	end
+    
     if @object.errors.size == 0 
       render :json => { :success => true,   
-                        :savings_entries => [@object],
+                        :savings_entries =>[{
+                          
+                          :id 							=>  	@object.id                  ,
+                        	:member_id 		    =>	  @object.member.id           ,
+                        	:member_name 		  =>	  @object.member.name         ,
+                        	:member_id_number =>	  @object.member.id_number    ,
+                        	:direction 				=>		@object.direction           ,
+                          :direction_text   =>    direction_text              ,
+                        	:amount       => @object.amount,
+                        	:is_confirmed => @object.is_confirmed,
+                        	:confirmed_at => format_datetime_friendly( @object.confirmed_at ) 
+                        	
+                        	 
+                        }],
                         :total => SavingsEntry.count  } 
     else
       msg = {

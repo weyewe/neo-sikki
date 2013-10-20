@@ -3,14 +3,22 @@ Ext.define('AM.view.operation.savingsentry.List' ,{
   	alias : 'widget.savingsentrylist',
   	store: 'SavingsEntries', 
  
- 
+ 		// sortable : false,
+		// defaults: {
+		// 	sortable: false
+		// 	// hidden: true,
+		// 	// 		            width: 100
+		// },
+		
 	initComponent: function() {
 		this.columns = [
 		
-			{ header: 'ID', dataIndex: 'id' , flex : 1 },
+			{ header: 'ID', dataIndex: 'id' , flex : 1, sortable: false },
+			
 			{
 				xtype : 'templatecolumn',
 				text : "Jumlah",
+				sortable: false, 
 				flex : 2,
 				tpl : '<b>{amount}</b>' + '<br />'  + '<br />'  + 
 							'Kondisi: <b>{direction_text}</b>' 
@@ -18,11 +26,16 @@ Ext.define('AM.view.operation.savingsentry.List' ,{
 			{
 				xtype : 'templatecolumn',
 				text : "Status",
+				sortable: false, 
 				flex : 2,
 				tpl : 'Konfirmasi: <b>{is_confirmed}</b>' 
 			},
 			 
 		];
+	 
+		// this.defaults = {
+		// 	sortable : false
+		// };
 
 		this.addObjectButton = new Ext.Button({
 			text: 'Add',

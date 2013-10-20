@@ -26,6 +26,7 @@ class SavingsEntry < ActiveRecord::Base
   
   validate :valid_direction_if_independent_savings
   validate :valid_amount 
+  validate :valid_withdrawal_amount
   
   def all_fields_for_independent_savings_present?
     direction.present? and 
@@ -58,10 +59,19 @@ class SavingsEntry < ActiveRecord::Base
   end
   
   def valid_withdrawal_amount
+    
+    puts "Checking valid withdrawal amount\n"*5
+    
     return if not financial_product_id.nil?
+    puts "financial product id is nil"
     return if not all_fields_for_independent_savings_present?
+    puts "Every needed data is present"
+    
+    
     
     if direction == FUND_TRANSFER_DIRECTION[:outgoing]
+      puts "Amount: #{amount}"
+      puts "Total savings: #{member.total_savings_account}"
       if amount > member.total_savings_account
         self.errors.add(:amount, "Tidak boleh lebih besar dari #{member.total_savings_account}")
         return self 
@@ -74,6 +84,7 @@ class SavingsEntry < ActiveRecord::Base
 =end
   def self.create_object( params ) 
     
+    puts "Inside self.create_object\n"
     new_object = self.new 
     
     new_object.savings_source_id      = nil  
@@ -126,6 +137,13 @@ class SavingsEntry < ActiveRecord::Base
     
     if params[:confirmed_at].nil? or not params[:confirmed_at].is_a?(DateTime)
       self.errors.add(:confirmed_at, "Harus ada tanggal konfirmasi pembayaran")
+      return self 
+    end
+    
+    self.valid_withdrawal_amount
+    
+    if self.errors.size != 0 
+      self.errors.add(:generic_errors, "Tidak cukup untuk melakukan penarikan: #{member.total_savings_account}")
       return self 
     end
     

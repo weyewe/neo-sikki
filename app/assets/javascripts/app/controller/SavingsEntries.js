@@ -77,7 +77,9 @@ Ext.define('AM.controller.SavingsEntries', {
   },
 
 	reloadParentRow: function(){
-		console.log("Gonna reload parent row");
+		
+		// http://vadimpopa.com/reload-a-single-record-and-refresh-its-extjs-grid-row/
+		// console.log("Gonna reload parent row");
 		// grid.getView().refreshRow(record);
 		
 		var parentList = this.getParentList();
@@ -135,6 +137,8 @@ Ext.define('AM.controller.SavingsEntries', {
 	},
 	
 	loadParentObjectList: function(me){
+		// delete me.getStore().getProxy().extraParams ;
+		me.getStore().getProxy().extraParams = {}
 		me.getStore().load(); 
 	},
  
@@ -152,13 +156,18 @@ Ext.define('AM.controller.SavingsEntries', {
 	editObject: function() {
 		var me = this; 
     var record = this.getList().getSelectedObject();
-    var view = Ext.widget('savingsentryform');
-
-		view.setComboBoxData( record );
-
+		var parentObject  = this.getParentList().getSelectedObject();
 		
-
-    view.down('form').loadRecord(record);
+		if( parentObject) {
+			var view = Ext.widget('savingsentryform');
+			view.show();
+			view.down('form').loadRecord(record);
+			view.setParentData(parentObject);
+		}
+		
+		
+    // var view = Ext.widget('savingsentryform');
+    
   },
 
   updateObject: function(button) {
@@ -272,60 +281,112 @@ Ext.define('AM.controller.SavingsEntries', {
 	
 	 
 	
-	executeConfirm: function(button){
+	// executeConfirm: function(button){
+	// 	var win = button.up('window');
+	//     var form = win.down('form');
+	// 
+	// 	var me  = this;
+	// 	var record = this.getList().getSelectedObject();
+	// 	var list = this.getList();
+	// 	me.getViewport().setLoading( true ) ;
+	// 	
+	// 	if(!record){return;}
+	// 	
+	// 	Ext.Ajax.request({
+	// 	    url: 'api/confirm_savings_entry',
+	// 	    method: 'PUT',
+	// 	    params: {
+	// 				id : record.get('id')
+	// 	    },
+	// 	    jsonData: {},
+	// 	    success: function(result, request ) {
+	// 					me.getViewport().setLoading( false );
+	// 					list.getStore().load({
+	// 						callback : function(records, options, success){
+	// 							// this => refers to a store 
+	// 							record = this.getById(record.get('id'));
+	// 							// record = records.getById( record.get('id'))
+	// 							list.fireEvent('confirmed', record);
+	// 						}
+	// 					});
+	// 					win.close();
+	// 					
+	// 	    },
+	// 	    // failure: function(result, request ) {
+	// 	    // 						me.getViewport().setLoading( false ) ;
+	// 	    // 						
+	// 	    // 						
+	// 	    // }
+	// 			failure : function(record,op ){
+	// 				list.setLoading(false);
+	// 				
+	// 				var message  = op.request.scope.reader.jsonData["message"];
+	// 				var errors = message['errors'];
+	// 				
+	// 				if( errors["generic_errors"] ){
+	// 					Ext.MessageBox.show({
+	// 					           title: 'FAIL',
+	// 					           msg: errors["generic_errors"],
+	// 					           buttons: Ext.MessageBox.OK, 
+	// 					           icon: Ext.MessageBox.ERROR
+	// 					       });
+	// 				}
+	// 				
+	// 			}
+	// 	});
+	// },
+	
+	
+	executeConfirm : function(button){
+		var me = this; 
 		var win = button.up('window');
     var form = win.down('form');
-
-		var me  = this;
-		var record = this.getList().getSelectedObject();
 		var list = this.getList();
-		me.getViewport().setLoading( true ) ;
-		
-		if(!record){return;}
-		
-		Ext.Ajax.request({
-		    url: 'api/confirm_savings_entry',
-		    method: 'PUT',
-		    params: {
-					id : record.get('id')
-		    },
-		    jsonData: {},
-		    success: function(result, request ) {
-						me.getViewport().setLoading( false );
-						list.getStore().load({
-							callback : function(records, options, success){
-								// this => refers to a store 
-								record = this.getById(record.get('id'));
-								// record = records.getById( record.get('id'))
-								list.fireEvent('confirmed', record);
-							}
-						});
-						win.close();
-						
-		    },
-		    // failure: function(result, request ) {
-		    // 						me.getViewport().setLoading( false ) ;
-		    // 						
-		    // 						
-		    // }
-				failure : function(record,op ){
-					list.setLoading(false);
+
+    var store = this.getSavingsEntriesStore();
+		var record = this.getList().getSelectedObject();
+    var values = form.getValues();
+		// form.setLoading( true ) ;
+ 
+		if(record){
+			var rec_id = record.get("id");
+			record.set( values );
+			 
+			// form.query('checkbox').forEach(function(checkbox){
+			// 	record.set( checkbox['name']  ,checkbox['checked'] ) ;
+			// });
+			// 
+			form.setLoading(true);
+			record.save({
+				params : {
+					confirm: true 
+				},
+				success : function(record){
+					form.setLoading(false);
 					
+					list.fireEvent('confirmed', record);
+					
+					// store.load({
+					// 	params: {
+					// 		booking_id : rec_id
+					// 	}
+					// });
+					
+					win.close();
+				},
+				failure : function(record,op ){
+					// console.log("Fail update");
+					form.setLoading(false);
 					var message  = op.request.scope.reader.jsonData["message"];
 					var errors = message['errors'];
-					
-					if( errors["generic_errors"] ){
-						Ext.MessageBox.show({
-						           title: 'FAIL',
-						           msg: errors["generic_errors"],
-						           buttons: Ext.MessageBox.OK, 
-						           icon: Ext.MessageBox.ERROR
-						       });
-					}
-					
+					form.getForm().markInvalid(errors);
+					record.reject(); 
+					// this.reject(); 
 				}
-		});
+			});
+		}
 	},
+	
 	
 	
 	parentSelectionChange: function(selectionModel, selections) {

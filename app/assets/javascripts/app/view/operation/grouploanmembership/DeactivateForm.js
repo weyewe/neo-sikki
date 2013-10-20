@@ -1,8 +1,8 @@
-Ext.define('AM.view.operation.savingsentry.ConfirmationForm', {
+Ext.define('AM.view.operation.grouploanmembership.DeactivateationForm', {
   extend: 'Ext.window.Window',
-  alias : 'widget.confirmsavingsentryform',
+  alias : 'widget.deactivategrouploanmembershipform',
 
-  title : 'Confirm SavingsEntry',
+  title : 'Deactivate SavingsEntry',
   layout: 'fit',
 	width	: 400,
   autoShow: true,  // does it need to be called?
@@ -24,18 +24,18 @@ Ext.define('AM.view.operation.savingsentry.ConfirmationForm', {
 
 				{
 					xtype: 'displayfield',
-					fieldLabel: 'Member',
+					fieldLabel: 'Group Loan',
+					name: 'group_loan_name' 
+				},
+				{
+					xtype: 'displayfield',
+					fieldLabel: 'Member Name',
 					name: 'member_name' 
 				},
 				{
 					xtype: 'displayfield',
-					fieldLabel: 'ID',
+					fieldLabel: 'Member ID',
 					name: 'member_id_number' 
-				},
-				{
-					xtype: 'displayfield',
-					fieldLabel: 'Jumlah Tabungan',
-					name: 'amount' 
 				},
 				{
 					xtype: 'displayfield',
@@ -47,8 +47,8 @@ Ext.define('AM.view.operation.savingsentry.ConfirmationForm', {
     }];
 
     this.buttons = [{
-      text: 'Confirm',
-      action: 'confirm'
+      text: 'Deactivate',
+      action: 'deactivate'
     }, {
       text: 'Cancel',
       scope: this,

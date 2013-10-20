@@ -7,15 +7,16 @@ Ext.define('AM.view.operation.grouploanweeklycollection.List' ,{
  
 	initComponent: function() {
 		this.columns = [
-			{ header: 'Week', dataIndex: 'week_number'  }, 
+			{ header: 'Week', dataIndex: 'week_number' , sortable : false }, 
 			
-			{ header: 'Terkumpul', dataIndex: 'is_collected'  },
-			{ header: 'Terkonfirmasi', dataIndex: 'is_confirmed'   },
+			{ header: 'Terkumpul', dataIndex: 'is_collected' , sortable : false },
+			{ header: 'Terkonfirmasi', dataIndex: 'is_confirmed'  , sortable : false },
 		 
 			
 			{
 				xtype : 'templatecolumn',
 				text : "Kasus khusus",
+				sortable : false,
 				flex : 1,
 				tpl : 'Tak Tertagih: <b>{group_loan_weekly_uncollectible_count}</b>' + '<br />' + 
 							'Meninggal: <b>{group_loan_deceased_clearance_count}</b>' + '<br />' + 

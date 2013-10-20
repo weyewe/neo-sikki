@@ -77,6 +77,8 @@ Ext.define('AM.controller.GroupLoanRunAwayReceivables', {
 	},
 	
 	loadParentObjectList: function(me){
+		// delete store.getProxy().extraParams ;
+		me.getStore().getProxy().extraParams = {}
 		me.getStore().getProxy().extraParams.is_run_away =  true ;
 		
 		me.getStore().load(); 
@@ -136,6 +138,7 @@ Ext.define('AM.controller.GroupLoanRunAwayReceivables', {
 		// console.log("The parent ID: "+ wrapper.selectedParentId );
 		
 		// grid.setLoading(true); 
+		// delete store.getProxy().extraParams ;
 		grid.getStore().getProxy().extraParams.parent_id =  wrapper.selectedParentId ;
 		grid.getStore().load(); 
   },
