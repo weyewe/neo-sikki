@@ -37,6 +37,7 @@ class Api::SavingsEntriesController < Api::BaseApiController
 
   def create
     @object = SavingsEntry.create_object( params[:savings_entry] )
+    params[:savings_entry][:confirmed_at] =  parse_date( params[:savings_entry][:confirmed_at] )
     if @object.errors.size == 0 
       render :json => { :success => true, 
                         :savings_entries => [@object] , 
@@ -55,9 +56,10 @@ class Api::SavingsEntriesController < Api::BaseApiController
 
   def update
     @object = SavingsEntry.find(params[:id])
+    params[:savings_entry][:confirmed_at] =  parse_date( params[:savings_entry][:confirmed_at] )
     
     if params[:confirm].present?  
-      @object.confirm(:confirmed_at => DateTime.now )
+      @object.confirm(:confirmed_at => params[:savings_entry][:confirmed_at] )
     else
       @object.update_object( params[:savings_entry] )
     end

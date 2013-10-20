@@ -28,7 +28,8 @@ Ext.define('AM.view.operation.savingsentry.List' ,{
 				text : "Status",
 				sortable: false, 
 				flex : 2,
-				tpl : 'Konfirmasi: <b>{is_confirmed}</b>' 
+				tpl : 'Konfirmasi: <b>{is_confirmed}</b>'  + '<br />' + 
+							'Tanggal Konfirm: {confirmed_at} '
 			},
 			 
 		];

@@ -18,8 +18,7 @@ json.savings_entries @objects do |object|
 	
 	json.amount object.amount
 	json.is_confirmed object.is_confirmed
-	json.confirmed_at object.confirmed_at 
-	
+	json.confirmed_at format_date_friendly( object.confirmed_at )
 	 
 	
 end

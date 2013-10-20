@@ -127,6 +127,30 @@ class Api::BaseApiController < ApplicationController
     return datetime.utc
   end
   
+  def parse_date( date_string) 
+    return nil if not date_string.present?
+    puts "'The date_string: ' :#{date_string}"
+    date_array = date_string.split('-').map{|x| x.to_i}
+     
+     
+    puts "inside parse date\n"*10
+    puts "0: #{date_array[0]}"
+    puts "0: #{date_array[1]}"
+    puts "0: #{date_array[2]}"
+    puts "\n\n"
+   
+    datetime = DateTime.new( date_array[0], 
+                              date_array[1], 
+                              date_array[2], 
+                               0, 
+                               0, 
+                               0,
+                  Rational( UTC_OFFSET , 24) )
+                  
+                  
+    return datetime.utc
+  end
+  
   def extract_date( date ) 
     if date.nil? or date.length == 0 
       return nil 

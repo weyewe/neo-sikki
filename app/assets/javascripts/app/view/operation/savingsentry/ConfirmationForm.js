@@ -41,6 +41,12 @@ Ext.define('AM.view.operation.savingsentry.ConfirmationForm', {
 					xtype: 'displayfield',
 					fieldLabel: 'Tipe Transaksi',
 					name: 'direction_text' 
+				},
+				{
+					xtype: 'datefield',
+					name : 'confirmed_at',
+					fieldLabel: 'Tanggal Transaksi',
+					format: 'Y-m-d',
 				}
 		 
 			]

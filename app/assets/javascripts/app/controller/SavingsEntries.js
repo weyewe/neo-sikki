@@ -275,6 +275,7 @@ Ext.define('AM.controller.SavingsEntries', {
 		var view = Ext.widget('confirmsavingsentryform');
 		var record = this.getList().getSelectedObject();
 		view.setParentData( record );
+		view.down('form').getForm().findField('confirmed_at').setValue(record.get('confirmed_at')); 
     view.show();
 	},
 	
@@ -346,11 +347,16 @@ Ext.define('AM.controller.SavingsEntries', {
     var store = this.getSavingsEntriesStore();
 		var record = this.getList().getSelectedObject();
     var values = form.getValues();
+		console.log("the values from form");
+		console.log( values );
 		// form.setLoading( true ) ;
+		console.log(values['confirmed_at']);
  
 		if(record){
+			console.log("The record");
+			console.log( record );
 			var rec_id = record.get("id");
-			record.set( values );
+			record.set( 'confirmed_at' , values['confirmed_at'] );
 			 
 			// form.query('checkbox').forEach(function(checkbox){
 			// 	record.set( checkbox['name']  ,checkbox['checked'] ) ;
