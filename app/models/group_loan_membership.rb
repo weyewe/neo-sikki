@@ -19,6 +19,8 @@ class GroupLoanMembership < ActiveRecord::Base
   validates_presence_of :group_loan_id, :member_id , :group_loan_product_id 
   
   validate :no_active_membership_of_another_group_loan
+  validate :no_deceased_or_run_away_member
+  validate :ensure_group_loan_is_not_started
   
   def no_active_membership_of_another_group_loan
     return if self.persisted? or not self.member_id.present? 
@@ -27,6 +29,32 @@ class GroupLoanMembership < ActiveRecord::Base
       self.errors.add(:member_id , "Sudah ada pinjaman di group lainnya")
     end
   end
+  
+  def no_deceased_or_run_away_member
+    return if self.persisted? or not self.member_id.present?
+    
+    if member.is_run_away? 
+      self.errors.add(:generic_errors, "Member #{member.name} kabur")
+      return self 
+    end
+    
+    if member.is_deceased?
+      self.errors.add(:generic_errors, "Member #{member.name} meninggal")
+      return self 
+    end
+  end
+  
+  def ensure_group_loan_is_not_started
+    return if not self.group_loan_id.present?
+    
+    if self.group_loan.is_started? 
+      self.errors.add(:generic_errors, "Group Loan sudah dimulai")
+      return self 
+    end
+  end
+  
+  
+ 
   
   def self.create_object( params ) 
     new_object = self.new 

@@ -615,6 +615,77 @@ Phase: loan disbursement finalization
   end
   
   
+=begin
+  Start Group Loan
+=end
+  def total_members_count
+    self.group_loan_memberships.count 
+  end
+  
+  def start_fund
+    amount = BigDecimal("0")
+    self.group_loan_memberships.joins(:group_loan_product).each do |glm|
+      amount += glm.group_loan_product.weekly_payment_amount * glm.group_loan_product.total_weeks
+    end
+    
+    return amount 
+  end
+
+=begin
+  Disburse Group Loan
+=end 
+
+  def non_disbursed_fund
+    start_fund - disbursed_fund 
+  end
+  
+  def disbursed_group_loan_memberships
+     
+    if self.is_closed?
+      return self.group_loan_memberships.where(:deactivation_case => [
+          GROUP_LOAN_DEACTIVATION_CASE[:finished_group_loan],
+          GROUP_LOAN_DEACTIVATION_CASE[:deceased],
+          GROUP_LOAN_DEACTIVATION_CASE[:run_away],
+          GROUP_LOAN_DEACTIVATION_CASE[:premature_clearance]
+        ]) 
+    else
+      return self.group_loan_memberships.where{
+        (is_active.eq true) | 
+        (
+          (is_active.eq false) & 
+          (deactivation_case.in [
+              GROUP_LOAN_DEACTIVATION_CASE[:deceased],
+              GROUP_LOAN_DEACTIVATION_CASE[:run_away],
+              GROUP_LOAN_DEACTIVATION_CASE[:premature_clearance]
+            ])
+        )
+      } 
+    end
+  end
+  
+  def disbursed_group_loan_memberships_count
+    return 0 if not self.is_loan_disbursed? 
+    
+    disbursed_group_loan_memberships.count 
+  end
+  
+  def disbursed_fund
+    amount = BigDecimal('0')
+    # return amount if not self.is_loan_disbursed? 
+    
+    disbursed_group_loan_memberships.joins(:group_loan_product).each do |glm|
+      amount += glm.group_loan_product.weekly_payment_amount * glm.group_loan_product.total_weeks
+    end
+    return amount 
+  end
+  
+=begin
+  Close GroupLoan
+=end
+  # return the active_group_loan_memberships.count (always changing weekly) 
+  
+  
+  
   
   
   

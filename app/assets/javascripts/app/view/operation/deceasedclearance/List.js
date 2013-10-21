@@ -54,6 +54,8 @@ Ext.define('AM.view.operation.deceasedclearance.List' ,{
 			disabled: true
 		});
 		
+	 
+		
 		this.searchField = new Ext.form.field.Text({
 			name: 'searchField',
 			hideLabel: true,

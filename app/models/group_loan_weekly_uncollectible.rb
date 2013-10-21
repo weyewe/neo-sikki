@@ -141,7 +141,6 @@ class GroupLoanWeeklyUncollectible < ActiveRecord::Base
     
     
     self.update_amount if self.save  
-    
   end
   
   def delete_object

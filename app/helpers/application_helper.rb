@@ -10,7 +10,7 @@ module ApplicationHelper
   end
   
   def format_datetime_friendly( datetime ) 
-    return nil if datetime.nil? 
+    return nil if not datetime.present? 
      
     
     a = datetime.in_time_zone("Jakarta")
@@ -46,7 +46,7 @@ module ApplicationHelper
   end
   
   def format_date_friendly( datetime ) 
-    return nil if datetime.nil? 
+    return nil if not datetime.present?
      
     
     a = datetime.in_time_zone("Jakarta")

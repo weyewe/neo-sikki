@@ -58,6 +58,7 @@ Ext.define('AM.controller.Members', {
  
 
 	loadObjectList : function(me){
+		me.getStore().getProxy().extraParams = {}
 		me.getStore().load();
 	},
 

@@ -73,7 +73,7 @@ Ext.define('AM.view.operation.grouploanrunawayreceivable.List' ,{
 
 
 
-		this.tbar = [this.addObjectButton, this.editObjectButton, this.deleteObjectButton  ];
+		this.tbar = [  this.editObjectButton, this.deleteObjectButton  ];
 		this.bbar = Ext.create("Ext.PagingToolbar", {
 			store	: this.store, 
 			displayInfo: true,

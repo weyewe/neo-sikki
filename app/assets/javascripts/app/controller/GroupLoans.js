@@ -41,7 +41,24 @@ Ext.define('AM.controller.GroupLoans', {
       },
 			'grouploanlist textfield[name=searchField]': {
         change: this.liveSearch
-      }
+      },
+
+
+			'grouploanlist button[action=startObject]': {
+        click: this.startObject
+			}	,
+			
+			'startgrouploanform button[action=start]' : {
+				click : this.executeStart
+			},
+			
+			'grouploanlist button[action=disburseObject]': {
+        click: this.disburseObject
+			}	,
+			
+			'disbursegrouploanform button[action=disburse]' : {
+				click : this.executeDisburse
+			},
 		
     });
   },
@@ -161,6 +178,155 @@ Ext.define('AM.controller.GroupLoans', {
     } else {
       grid.disableRecordButtons();
     }
-  }
+  },
+
+
+	startObject: function(){
+		var view = Ext.widget('startgrouploanform');
+		var record = this.getList().getSelectedObject();
+		this.reloadRecordView( record, view ) ; 
+	},
+	
+	executeStart: function(button){
+		var me = this; 
+		var win = button.up('window');
+    var form = win.down('form');
+		var list = this.getList();
+
+    var store = this.getGroupLoansStore();
+		var record = this.getList().getSelectedObject();
+    var values = form.getValues();
+ 
+		if(record){
+			var rec_id = record.get("id");
+			record.set( 'started_at' , values['started_at'] );
+			 
+			// form.query('checkbox').forEach(function(checkbox){
+			// 	record.set( checkbox['name']  ,checkbox['checked'] ) ;
+			// });
+			// 
+			form.setLoading(true);
+			record.save({
+				params : {
+					start: true 
+				},
+				success : function(record){
+					form.setLoading(false);
+					
+					me.reloadRecord( record ) ; 
+					
+					
+					win.close();
+				},
+				failure : function(record,op ){
+					// console.log("Fail update");
+					form.setLoading(false);
+					var message  = op.request.scope.reader.jsonData["message"];
+					var errors = message['errors'];
+					form.getForm().markInvalid(errors);
+					record.reject(); 
+					// this.reject(); 
+				}
+			});
+		}
+	},
+	
+	disburseObject: function(){
+		var view = Ext.widget('disbursegrouploanform');
+		var record = this.getList().getSelectedObject();
+		this.reloadRecordView( record, view ) ; 
+	},
+	
+	executeDisburse: function(button){
+		var me = this; 
+		var win = button.up('window');
+    var form = win.down('form');
+		var list = this.getList();
+
+    var store = this.getGroupLoansStore();
+		var record = this.getList().getSelectedObject();
+    var values = form.getValues();
+ 
+		if(record){
+			var rec_id = record.get("id");
+			record.set( 'disbursed_at' , values['disbursed_at'] );
+			 
+			// form.query('checkbox').forEach(function(checkbox){
+			// 	record.set( checkbox['name']  ,checkbox['checked'] ) ;
+			// });
+			// 
+			form.setLoading(true);
+			record.save({
+				params : {
+					disburse: true 
+				},
+				success : function(record){
+					form.setLoading(false);
+					me.reloadRecord( record ) ; 
+					win.close();
+				},
+				failure : function(record,op ){
+					// console.log("Fail update");
+					form.setLoading(false);
+					var message  = op.request.scope.reader.jsonData["message"];
+					var errors = message['errors'];
+					form.getForm().markInvalid(errors);
+					record.reject(); 
+					// this.reject(); 
+				}
+			});
+		}
+	},
+	
+	reloadRecordView: function(record, view){
+		var list = this.getList();
+		var store = this.getList().getStore();
+		var modifiedId = record.get('id');
+		view.setLoading(true);
+		
+		AM.model.GroupLoan.load( modifiedId , {
+		    scope: list,
+		    failure: function(record, operation) {
+		        //do something if the load failed
+		    },
+		    success: function(record, operation) {
+					view.setLoading(false);
+					recToUpdate = store.getById(modifiedId);
+					recToUpdate.set(record.getData());
+					recToUpdate.commit();
+					// list.getView().refreshNode(store.indexOfId(modifiedId));
+					
+					view.setParentData( record );
+			    view.show();
+		    },
+		    callback: function(record, operation) {
+					view.setLoading(false);
+		        //do something whether the load succeeded or failed
+		    }
+		});
+	},
+	
+	reloadRecord: function(record){
+		
+		var list = this.getList();
+		var store = this.getList().getStore();
+		var modifiedId = record.get('id');
+		
+		AM.model.GroupLoan.load( modifiedId , {
+		    scope: list,
+		    failure: function(record, operation) {
+		        //do something if the load failed
+		    },
+		    success: function(record, operation) {
+					recToUpdate = store.getById(modifiedId);
+					recToUpdate.set(record.getData());
+					recToUpdate.commit();
+					list.getView().refreshNode(store.indexOfId(modifiedId));
+		    },
+		    callback: function(record, operation) {
+		        //do something whether the load succeeded or failed
+		    }
+		});
+	},
 
 });

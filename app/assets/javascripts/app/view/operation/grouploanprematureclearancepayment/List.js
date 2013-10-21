@@ -52,6 +52,12 @@ Ext.define('AM.view.operation.grouploanprematureclearancepayment.List' ,{
 			disabled: true
 		});
 		
+		this.confirmObjectButton = new Ext.Button({
+			text: 'Confirm',
+			action: 'confirmObject',
+			disabled: true
+		});
+		
 		this.searchField = new Ext.form.field.Text({
 			name: 'searchField',
 			hideLabel: true,
@@ -62,7 +68,9 @@ Ext.define('AM.view.operation.grouploanprematureclearancepayment.List' ,{
 
 
 
-		this.tbar = [this.addObjectButton, this.editObjectButton, this.deleteObjectButton  ];
+		this.tbar = [this.addObjectButton, this.editObjectButton, this.deleteObjectButton ,
+		 							'-',
+									this.confirmObjectButton ];
 		this.bbar = Ext.create("Ext.PagingToolbar", {
 			store	: this.store, 
 			displayInfo: true,

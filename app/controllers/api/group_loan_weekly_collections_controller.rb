@@ -54,10 +54,37 @@ class Api::GroupLoanWeeklyCollectionsController < Api::BaseApiController
   def update
     @object = GroupLoanWeeklyCollection.find(params[:id])
     
-    @object.update_object( params[:group_loan_weekly_collection] )
+    
+    params[:group_loan_weekly_collection][:collected_at] =  parse_date( params[:group_loan_weekly_collection][:collected_at] ) 
+    params[:group_loan_weekly_collection][:confirmed_at] =  parse_date( params[:group_loan_weekly_collection][:confirmed_at] ) 
+
+    if params[:collect].present?  
+      @object.collect(:collected_at => params[:group_loan_weekly_collection][:collected_at] )
+    elsif params[:confirm].present?
+      @object.confirm( :confirmed_at => params[:group_loan_weekly_collection][:confirmed_at] )
+    else
+      @object.update_object(params[:group_loan])
+    end
+    
+    # @object.update_object( params[:group_loan] )
     if @object.errors.size == 0 
       render :json => { :success => true,   
-                        :group_loan_weekly_collections => [@object],
+                        :group_loan_weekly_collections => [
+                            :id 							=>  	@object.id                  ,
+                          	:group_loan_id 			=>     object.group_loan_id   ,
+                          	:group_loan_name 		=> 	  object.group_loan.name  ,
+                          	:week_number 				=> 	  object.week_number      ,
+                          	:is_collected			  =>   	object.is_collected     ,
+                          	:is_confirmed		    =>   	object.is_confirmed     ,
+                          	:collected_at       =>   	format_date_friendly( object.collected_at )   ,
+                          	:confirmed_at       =>     format_date_friendly( object.confirmed_at )  ,
+                          	:group_loan_weekly_uncollectible_count 				=> object.group_loan_weekly_uncollectible_count,
+                          	:group_loan_deceased_clearance_count 					=> object.group_loan_deceased_clearance_count  ,
+                          	:group_loan_run_away_receivable_count 				=> object.group_loan_run_away_receivable_count ,
+                          	:group_loan_premature_clearance_payment_count => object.group_loan_premature_clearance_payment_count
+                          	
+                          	 
+                          ],
                         :total => GroupLoanWeeklyCollection.count  } 
     else
       msg = {
@@ -68,27 +95,25 @@ class Api::GroupLoanWeeklyCollectionsController < Api::BaseApiController
       }
       
       render :json => msg
-      
-      
     end
   end
 
   def destroy
-    @object = GroupLoanWeeklyCollection.find(params[:id])
-    @object.delete_object 
-
-    if ( not @object.persisted?  or @object.is_deleted ) and @object.errors.size == 0 
-      render :json => { :success => true, :total => GroupLoanWeeklyCollection.count }  
-    else
-      msg = {
-        :success => false, 
-        :message => {
-          :errors => extjs_error_format( @object.errors )  
-        }
-      }
-      
-      render :json => msg
-    end
+    # @object = GroupLoanWeeklyCollection.find(params[:id])
+    # @object.delete_object 
+    # 
+    # if ( not @object.persisted?  or @object.is_deleted ) and @object.errors.size == 0 
+    #   render :json => { :success => true, :total => GroupLoanWeeklyCollection.count }  
+    # else
+    #   msg = {
+    #     :success => false, 
+    #     :message => {
+    #       :errors => extjs_error_format( @object.errors )  
+    #     }
+    #   }
+    #   
+    #   render :json => msg
+    # end
   end
   
   

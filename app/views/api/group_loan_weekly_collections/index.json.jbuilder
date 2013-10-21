@@ -9,8 +9,8 @@ json.group_loan_weekly_collections @objects do |object|
 	json.is_collected				object.is_collected 
 	json.is_confirmed				object.is_confirmed
 	
-	json.collected_at object.collected_at
-	json.confirmed_at  object.confirmed_at
+	json.collected_at 	format_date_friendly( object.collected_at ) 
+	json.confirmed_at  format_date_friendly( object.confirmed_at ) 
 	 
 	
 	json.group_loan_weekly_uncollectible_count 				object.group_loan_weekly_uncollectible_count

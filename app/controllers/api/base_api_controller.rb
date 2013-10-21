@@ -222,7 +222,7 @@ class Api::BaseApiController < ApplicationController
   
   # port from application_helper
   def format_datetime_friendly( datetime ) 
-    return nil if datetime.nil? 
+    return nil if not datetime.present? 
      
     
     a = datetime.in_time_zone("Jakarta")
@@ -258,7 +258,7 @@ class Api::BaseApiController < ApplicationController
   end
   
   def format_date_friendly( datetime ) 
-    return nil if datetime.nil? 
+    return nil if not datetime.present?
      
     
     a = datetime.in_time_zone("Jakarta")
