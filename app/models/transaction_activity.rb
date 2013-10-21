@@ -31,7 +31,9 @@ class TransactionActivity < ActiveRecord::Base
                   :savings_direction, 
                   :savings, 
                   :member_id, 
-                  :office_id
+                  :office_id,
+                  :amount, :direction, :fund_case
+                  
                   
   belongs_to :transaction_source, :polymorphic => true 
 end
