@@ -41,7 +41,7 @@ data_entry_role = Role.create!(
 
 
 
-if Rails.env.development?
+# if Rails.env.development?
 
 =begin
   CREATING THE USER 
@@ -247,5 +247,5 @@ if Rails.env.development?
   end
     
  
-end
+# end
 

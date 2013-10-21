@@ -319,7 +319,7 @@ Ext.define('AM.controller.GroupLoanWeeklyUncollectibles', {
 	
 	clearObject: function(){
 		// console.log("inside clearObject");
-		// var view = Ext.widget('cleargrouploanweeklyuncollectibleform');
+		var view = Ext.widget('cleargrouploanweeklyuncollectibleform');
 		var record = this.getList().getSelectedObject();
 		view.setParentData( record );
     view.show();
@@ -336,12 +336,15 @@ Ext.define('AM.controller.GroupLoanWeeklyUncollectibles', {
 		var record = this.getList().getSelectedObject();
     var values = form.getValues();
 
-		console.log("Inside executeClear:");
-		console.log( record ) ;
+		// console.log("Inside executeClear:");
+		// console.log( record ) ;
+		
+		console.log("inside execute clear");
  
 		if(record){
 			var rec_id = record.get("id");
 			record.set( 'cleared_at' , values['cleared_at'] );
+			console.log("The cleared_at : " + record.get("cleared_at"));
 			 
 			// form.query('checkbox').forEach(function(checkbox){
 			// 	record.set( checkbox['name']  ,checkbox['checked'] ) ;
