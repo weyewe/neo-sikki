@@ -54,10 +54,48 @@ class Api::GroupLoanWeeklyUncollectiblesController < Api::BaseApiController
   def update
     @object = GroupLoanWeeklyUncollectible.find(params[:id])
     
-    @object.update_object( params[:group_loan_weekly_uncollectible] )
+    
+    params[:group_loan_weekly_uncollectible][:collected_at] =  parse_date( params[:group_loan_weekly_uncollectible][:collected_at] ) 
+    params[:group_loan_weekly_uncollectible][:confirmed_at] =  parse_date( params[:group_loan_weekly_uncollectible][:confirmed_at] ) 
+
+    if params[:collect].present?  
+      @object.collect(:collected_at => params[:group_loan_weekly_uncollectible][:collected_at] )
+    elsif params[:clear].present?
+      @object.clear( :cleared_at => params[:group_loan_weekly_uncollectible][:cleared_at] )
+    else
+      @object.update_object(params[:group_loan_weekly_uncollectible])
+    end
+    
+    clearance_case_text = "" 
+    if @object.clearance_case  ==  UNCOLLECTIBLE_CLEARANCE_CASE[:end_of_cycle]
+  		clearance_case_text =  "Pemotongan Tabungan Wajib"
+  	elsif  @object.clearance_case  ==  UNCOLLECTIBLE_CLEARANCE_CASE[:in_cycle]
+  		clearance_case_text  = "Tunai"
+  	end
+  	
     if @object.errors.size == 0 
       render :json => { :success => true,   
-                        :group_loan_weekly_uncollectibles => [@object],
+                        :group_loan_weekly_uncollectibles => [
+                          :id 			=>					@object.id ,
+                        	:group_loan_weekly_collection_id 			 		=>				@object.group_loan_weekly_collection_id          ,
+                        	:group_loan_weekly_collection_week_number =>		  	@object.group_loan_weekly_collection.week_number ,
+                        	:group_loan_id 							              =>        @object.group_loan_id                            ,
+                        	:group_loan_name 					                =>      	@object.group_loan.name                          ,
+                        	:group_loan_membership_id			            =>        @object.group_loan_membership.id                 ,
+                        	:group_loan_membership_member_name 		    =>      	@object.group_loan_membership.member.name        ,
+                        	:group_loan_membership_member_id_number 	=>		    @object.group_loan_membership.member.id_number   ,
+                        	:group_loan_membership_member_address 		=>	      @object.group_loan_membership.member.address     ,
+                        	:amount 							                    =>        @object.amount                                   ,
+                        	:principal						                    =>        @object.principal                                ,
+                        	:is_collected					                    =>        @object.is_collected                             ,
+                        	:collected_at					                    =>        @object.collected_at                             ,
+                        	:is_cleared						                    =>        @object.is_cleared                               ,
+                        	:cleared_at						                    =>        @object.cleared_at                               ,
+                        	:clearance_case                           =>        @object.clearance_case                           ,
+                          :clearance_case_text => clearance_case_text
+                        	
+                          
+                          ],
                         :total => GroupLoanWeeklyUncollectible.count  } 
     else
       msg = {

@@ -63,7 +63,7 @@ class Api::GroupLoanWeeklyCollectionsController < Api::BaseApiController
     elsif params[:confirm].present?
       @object.confirm( :confirmed_at => params[:group_loan_weekly_collection][:confirmed_at] )
     else
-      @object.update_object(params[:group_loan])
+      @object.update_object(params[:group_loan_weekly_collection])
     end
     
     # @object.update_object( params[:group_loan] )

@@ -105,10 +105,14 @@ Ext.define('AM.view.operation.grouploanweeklyuncollectible.List' ,{
 	enableRecordButtons: function() {
 		this.editObjectButton.enable();
 		this.deleteObjectButton.enable();
+		this.collectObjectButton.enable(); 
+		this.clearObjectButton.enable();
 	},
 
 	disableRecordButtons: function() {
 		this.editObjectButton.disable();
 		this.deleteObjectButton.disable();
+		this.collectObjectButton.disable(); 
+		this.clearObjectButton.disable();
 	}
 });
