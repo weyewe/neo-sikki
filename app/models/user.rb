@@ -76,7 +76,7 @@ class User < ActiveRecord::Base
      
     
     if new_object.valid? and Rails.env.production? 
-      UserMailer.notify_new_user_registration( new_object , password    ).deliver 
+      # UserMailer.notify_new_user_registration( new_object , password    ).deliver 
     end
     return new_object
     
@@ -117,7 +117,7 @@ class User < ActiveRecord::Base
     self.password_confirmation = password 
     
     if self.save
-      UserMailer.notify_reset_password( employee, self , password    ).deliver
+      # UserMailer.notify_reset_password( employee, self , password    ).deliver
     end
     
     return self
