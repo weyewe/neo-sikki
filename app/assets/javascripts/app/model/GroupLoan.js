@@ -17,15 +17,15 @@ Ext.define('AM.model.GroupLoan', {
 			{ name: 'compulsory_savings_withdrawn_at', type: 'string' },
 			
 			//  analysis
-			
-			
 			{ name: 'start_fund', type: 'string' },
-			
 			{ name: 'disbursed_group_loan_memberships_count', type: 'int' },
 			{ name: 'disbursed_fund', type: 'string' },
 			{ name: 'non_disbursed_fund', type: 'string' },
-			
 			{ name: 'active_group_loan_memberships_count', type: 'int' },
+			
+			{ name: 'compulsory_savings_return_amount', type: 'string' },
+			{ name: 'bad_debt_allowance', type: 'string' },
+			{ name: 'bad_debt_expense', type: 'string' },
   	],
 
 	 

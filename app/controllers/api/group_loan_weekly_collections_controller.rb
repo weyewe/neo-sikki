@@ -97,6 +97,29 @@ class Api::GroupLoanWeeklyCollectionsController < Api::BaseApiController
       render :json => msg
     end
   end
+  
+  def show
+    @object = GroupLoanWeeklyCollection.find_by_id params[:id] 
+    render :json => { :success => true, 
+                      :group_loan_weekly_collections => [
+                          :id 							=>  	@object.id                  ,
+                        	:group_loan_id 			=>     @object.group_loan_id   ,
+                        	:group_loan_name 		=> 	  @object.group_loan.name  ,
+                        	:week_number 				=> 	  @object.week_number      ,
+                        	:is_collected			  =>   	@object.is_collected     ,
+                        	:is_confirmed		    =>   	@object.is_confirmed     ,
+                        	:collected_at       =>   	format_date_friendly( @object.collected_at )   ,
+                        	:confirmed_at       =>     format_date_friendly( @object.confirmed_at )  ,
+                        	:group_loan_weekly_uncollectible_count 				=> @object.group_loan_weekly_uncollectible_count,
+                        	:group_loan_deceased_clearance_count 					=> @object.group_loan_deceased_clearance_count  ,
+                        	:group_loan_run_away_receivable_count 				=> @object.group_loan_run_away_receivable_count ,
+                        	:group_loan_premature_clearance_payment_count => @object.group_loan_premature_clearance_payment_count,
+                        	:amount_receivable => @object.amount_receivable
+                        	
+                        	
+                        ] , 
+                      :total => GroupLoanWeeklyCollection.count }
+  end
 
   def destroy
     # @object = GroupLoanWeeklyCollection.find(params[:id])

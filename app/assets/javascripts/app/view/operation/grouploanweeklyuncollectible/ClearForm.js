@@ -1,8 +1,8 @@
-Ext.define('AM.view.operation.grouploanweeklyuncollectible.CollectForm', {
+Ext.define('AM.view.operation.grouploanweeklyuncollectible.ClearForm', {
   extend: 'Ext.window.Window',
-  alias : 'widget.collectgrouploanweeklyuncollectibleform',
+  alias : 'widget.cleargrouploanweeklyuncollectibleform',
 
-  title : 'Collect GroupLoanWeeklyUncollectible',
+  title : 'Clear GroupLoanWeeklyUncollectible',
   layout: 'fit',
 	width	: 400,
   autoShow: true,  // does it need to be called?
@@ -41,8 +41,8 @@ Ext.define('AM.view.operation.grouploanweeklyuncollectible.CollectForm', {
 			
 				{
 					xtype: 'datefield',
-					name : 'collected_at',
-					fieldLabel: 'Tanggal Penerimaan',
+					name : 'cleared_at',
+					fieldLabel: 'Tanggal Konfirmasi',
 					format: 'Y-m-d',
 				}
 		 
@@ -50,8 +50,8 @@ Ext.define('AM.view.operation.grouploanweeklyuncollectible.CollectForm', {
     }];
 
     this.buttons = [{
-      text: 'Collect',
-      action: 'collect'
+      text: 'Clear',
+      action: 'clear'
     }, {
       text: 'Cancel',
       scope: this,
@@ -68,6 +68,6 @@ Ext.define('AM.view.operation.grouploanweeklyuncollectible.CollectForm', {
 		this.down('form').getForm().findField('group_loan_name').setValue(record.get('group_loan_name')); 
 		this.down('form').getForm().findField('week_number').setValue(record.get('group_loan_weekly_collection_week_number')); 
 		this.down('form').getForm().findField('amount').setValue(record.get('amount')); 
-		this.down('form').getForm().findField('collected_at').setValue(record.get('collected_at')); 
+		this.down('form').getForm().findField('cleared_at').setValue(record.get('cleared_at')); 
 	}
 });

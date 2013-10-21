@@ -241,17 +241,19 @@ Ext.define('AM.controller.GroupLoanWeeklyCollections', {
 	},
 	
 	reloadRecord: function(record){
-		
+		console.log("Inside reload record");
+		console.log( record );
 		var list = this.getList();
 		var store = this.getList().getStore();
 		var modifiedId = record.get('id');
 		
-		AM.model.GroupLoan.load( modifiedId , {
+		AM.model.GroupLoanWeeklyCollection.load( modifiedId , {
 		    scope: list,
 		    failure: function(record, operation) {
 		        //do something if the load failed
 		    },
 		    success: function(record, operation) {
+			
 					recToUpdate = store.getById(modifiedId);
 					recToUpdate.set(record.getData());
 					recToUpdate.commit();

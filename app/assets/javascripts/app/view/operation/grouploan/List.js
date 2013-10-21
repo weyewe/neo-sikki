@@ -49,18 +49,21 @@ Ext.define('AM.view.operation.grouploan.List' ,{
 			
 			{
 				xtype : 'templatecolumn',
-				text : "Monitor",
+				text : "Selesai",
 				flex : 1,
 				tpl : 'Status: <b>{is_closed}</b>' + '<br />' + '<br />' + 
+							'Bad Debt Allowance: <br /><b>{bad_debt_allowance}</b>' + '<br />' + '<br />' + 
+							'Bad Debt Expense:  <br /><b>{bad_debt_expense}</b>' + '<br />' + '<br />' + 
 							'Tanggal Selesai: <br /><b>{closed_at}</b>'     
 			},
 			
 			{
 				xtype : 'templatecolumn',
-				text : "Monitor",
+				text : "Savings Return",
 				flex : 1,
 				tpl : 'Status: <b>{is_compulsory_savings_withdrawn}</b>' + '<br />' + '<br />' + 
-							'Pengembalian: <br /><b>{compulsory_savings_withdrawn_at}</b>'     
+							'Pengembalian: <br /><b>{compulsory_savings_return_amount}</b>' + '<br />' + '<br />' +
+							'TanggalPengembalian: <br /><b>{compulsory_savings_withdrawn_at}</b>'     
 			},
 			
 		];

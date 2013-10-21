@@ -65,6 +65,14 @@ Ext.define('AM.controller.GroupLoanWeeklyUncollectibles', {
 			'collectgrouploanweeklyuncollectibleform button[action=collect]' : {
 				click : this.executeCollect
 			},
+			
+			'grouploanweeklyuncollectiblelist button[action=clearObject]': {
+        click: this.clearObject
+			}	,
+			
+			'cleargrouploanweeklyuncollectibleform button[action=clear]' : {
+				click : this.executeClear
+			},
 		
     });
   },
@@ -254,7 +262,8 @@ Ext.define('AM.controller.GroupLoanWeeklyUncollectibles', {
   },
 
 	collectObject: function(){
-		var view = Ext.widget('collectgrouploanweeklycollectionform');
+		// console.log("inside collectObject");
+		var view = Ext.widget('collectgrouploanweeklyuncollectibleform');
 		var record = this.getList().getSelectedObject();
 		view.setParentData( record );
     view.show();
@@ -267,9 +276,12 @@ Ext.define('AM.controller.GroupLoanWeeklyUncollectibles', {
     var form = win.down('form');
 		var list = this.getList();
 
-    var store = this.getGroupLoanWeeklyCollectionsStore();
+    var store = this.getGroupLoanWeeklyUncollectiblesStore();
 		var record = this.getList().getSelectedObject();
     var values = form.getValues();
+
+		// console.log("Inside executeCollect:");
+		// console.log( record ) ;
  
 		if(record){
 			var rec_id = record.get("id");
@@ -304,14 +316,71 @@ Ext.define('AM.controller.GroupLoanWeeklyUncollectibles', {
 			});
 		}
 	},
+	
+	clearObject: function(){
+		// console.log("inside clearObject");
+		// var view = Ext.widget('cleargrouploanweeklyuncollectibleform');
+		var record = this.getList().getSelectedObject();
+		view.setParentData( record );
+    view.show();
+		// this.reloadRecordView( record, view ) ; 
+	},
+	
+	executeClear: function(button){
+		var me = this; 
+		var win = button.up('window');
+    var form = win.down('form');
+		var list = this.getList();
+
+    var store = this.getGroupLoanWeeklyUncollectiblesStore();
+		var record = this.getList().getSelectedObject();
+    var values = form.getValues();
+
+		console.log("Inside executeClear:");
+		console.log( record ) ;
+ 
+		if(record){
+			var rec_id = record.get("id");
+			record.set( 'cleared_at' , values['cleared_at'] );
+			 
+			// form.query('checkbox').forEach(function(checkbox){
+			// 	record.set( checkbox['name']  ,checkbox['checked'] ) ;
+			// });
+			// 
+			form.setLoading(true);
+			record.save({
+				params : {
+					clear: true 
+				},
+				success : function(record){
+					form.setLoading(false);
+					
+					me.reloadRecord( record ) ; 
+					
+					
+					win.close();
+				},
+				failure : function(record,op ){
+					// console.log("Fail update");
+					form.setLoading(false);
+					var message  = op.request.scope.reader.jsonData["message"];
+					var errors = message['errors'];
+					form.getForm().markInvalid(errors);
+					record.reject(); 
+					// this.reject(); 
+				}
+			});
+		}
+	},
 
 	reloadRecord: function(record){
+		console.log("Inside reloadRecord");
 		
 		var list = this.getList();
 		var store = this.getList().getStore();
 		var modifiedId = record.get('id');
 		
-		AM.model.GroupLoan.load( modifiedId , {
+		AM.model.GroupLoanWeeklyUncollectible.load( modifiedId , {
 		    scope: list,
 		    failure: function(record, operation) {
 		        //do something if the load failed

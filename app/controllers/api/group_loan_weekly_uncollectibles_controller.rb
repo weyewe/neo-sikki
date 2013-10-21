@@ -87,10 +87,10 @@ class Api::GroupLoanWeeklyUncollectiblesController < Api::BaseApiController
                         	:group_loan_membership_member_address 		=>	      @object.group_loan_membership.member.address     ,
                         	:amount 							                    =>        @object.amount                                   ,
                         	:principal						                    =>        @object.principal                                ,
-                        	:is_collected					                    =>        @object.is_collected                             ,
-                        	:collected_at					                    =>        @object.collected_at                             ,
+                        	:is_collected					                    =>         @object.is_collected  ,
+                        	:collected_at					                    =>        format_date_friendly(@object.collected_at  )     ,
                         	:is_cleared						                    =>        @object.is_cleared                               ,
-                        	:cleared_at						                    =>        @object.cleared_at                               ,
+                        	:cleared_at						                    =>        format_date_friendly( @object.cleared_at   )   ,
                         	:clearance_case                           =>        @object.clearance_case                           ,
                           :clearance_case_text => clearance_case_text
                         	

@@ -92,7 +92,10 @@ class Api::GroupLoansController < Api::BaseApiController
                             :disbursed_group_loan_memberships_count   => @object.disbursed_group_loan_memberships_count,
                             :disbursed_fund                           => @object.disbursed_fund,
                             :active_group_loan_memberships_count      => @object.active_group_loan_memberships.count,
-                          	:non_disbursed_fund => @object.non_disbursed_fund
+                          	:non_disbursed_fund => @object.non_disbursed_fund,
+                          	:compulsory_savings_return_amount => @object.compulsory_savings_return_amount,
+                          	:bad_debt_allowance => @object.bad_debt_allowance,
+                          	:bad_debt_expense => @object.bad_debt_expense
                           ],
                         :total => GroupLoan.count  } 
     else
@@ -110,7 +113,12 @@ class Api::GroupLoansController < Api::BaseApiController
   end
   
   def show
+    puts "inside the show"
+    puts "=============\n"*5
+    puts "The params: #{params}"
     @object = GroupLoan.find_by_id params[:id]
+    puts "The params[:id]: #{params[:id]}"
+    puts "The object: #{@object}"
     render :json => { :success => true, 
                       :group_loans => [
                           :id 						                 =>  	@object.id                  ,
@@ -130,7 +138,10 @@ class Api::GroupLoansController < Api::BaseApiController
                           :disbursed_group_loan_memberships_count   => @object.disbursed_group_loan_memberships_count,
                           :disbursed_fund                           => @object.disbursed_fund,
                         	:active_group_loan_memberships_count		  => @object.active_group_loan_memberships.count,
-                        	:non_disbursed_fund => @object.non_disbursed_fund
+                        	:non_disbursed_fund => @object.non_disbursed_fund,
+                        	:compulsory_savings_return_amount => @object.compulsory_savings_return_amount,
+                        	:bad_debt_allowance => @object.bad_debt_allowance,
+                        	:bad_debt_expense => @object.bad_debt_expense
                         	
                         	
                         ] , 

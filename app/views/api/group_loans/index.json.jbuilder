@@ -22,4 +22,8 @@ json.group_loans @objects do |object|
 	json.disbursed_fund													object.disbursed_fund
 	json.non_disbursed_fund											object.non_disbursed_fund
 	json.active_group_loan_memberships_count		object.active_group_loan_memberships.count
+	
+	json.compulsory_savings_return_amount		object.compulsory_savings_return_amount
+	json.bad_debt_allowance 								object.bad_debt_allowance
+	json.bad_debt_expense										object.bad_debt_expense
 end
