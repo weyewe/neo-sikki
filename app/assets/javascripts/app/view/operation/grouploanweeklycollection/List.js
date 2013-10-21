@@ -9,9 +9,23 @@ Ext.define('AM.view.operation.grouploanweeklycollection.List' ,{
 		this.columns = [
 			{ header: 'Week', dataIndex: 'week_number' , sortable : false }, 
 			
-			{ header: 'Terkumpul', dataIndex: 'is_collected' , sortable : false },
-			{ header: 'Terkonfirmasi', dataIndex: 'is_confirmed'  , sortable : false },
 		 
+			{
+				xtype : 'templatecolumn',
+				text : "Pengumpulan",
+				sortable : false,
+				flex : 1,
+				tpl : '<b>{is_collected}</b>'   + '<br /><br />' + 
+							'Waktu Pengumpulan: <br />{collected_at}'
+			},
+			{
+				xtype : 'templatecolumn',
+				text : "Konfirmasi",
+				sortable : false,
+				flex : 1,
+				tpl : '<b>{is_confirmed}</b>'   + '<br /><br />' + 
+							'Waktu Konfirmasi: <br />{confirmed_at}'
+			},
 			
 			{
 				xtype : 'templatecolumn',
@@ -22,6 +36,14 @@ Ext.define('AM.view.operation.grouploanweeklycollection.List' ,{
 							'Meninggal: <b>{group_loan_deceased_clearance_count}</b>' + '<br />' + 
 							'Kabur: <b>{group_loan_run_away_receivable_count}</b>' + '<br />' + 
 							'Premature Clearance: <b>{group_loan_premature_clearance_payment_count}</b>' 
+			},
+			
+			{
+				xtype : 'templatecolumn',
+				text : "Jumlah Penerimaan",
+				sortable : false,
+				flex : 1,
+				tpl : '<b>{amount_receivable}</b>'   
 			},
 			
 			

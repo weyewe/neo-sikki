@@ -227,7 +227,7 @@ Phase: loan disbursement finalization
     end
     
     if self.is_loan_disbursed?
-      errors.add(:generic_errors, "Pinjaman keuangan sudah di finalisasi")
+      errors.add(:generic_errors, "Pinjaman sudah dicairkan")
       return self
     end
     

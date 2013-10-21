@@ -74,7 +74,10 @@ class GroupLoanMembership < ActiveRecord::Base
   end
   
   def delete_object
-    return nil if self.group_loan.is_started? 
+    if self.group_loan.is_started? 
+      self.errors.add(:generic_errors, "Group Loan sudah dimulai. tidak bisa delete")
+      return self 
+    end
     
     self.destroy 
   end 

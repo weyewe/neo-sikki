@@ -17,8 +17,9 @@ json.group_loans @objects do |object|
 	json.compulsory_savings_withdrawn_at	 	format_date_friendly( object.compulsory_savings_withdrawn_at )
 	
 	
-#	json.start_fund 														object.start_fund
+	json.start_fund 														object.start_fund
 	json.disbursed_group_loan_memberships_count object.disbursed_group_loan_memberships_count
-#	json.disbursed_fund													object.disbursed_fund
+	json.disbursed_fund													object.disbursed_fund
+	json.non_disbursed_fund											object.non_disbursed_fund
 	json.active_group_loan_memberships_count		object.active_group_loan_memberships.count
 end

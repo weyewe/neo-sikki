@@ -16,7 +16,8 @@ Ext.define('AM.model.GroupLoanWeeklyCollection', {
 			{ name: 'group_loan_weekly_uncollectible_count', type: 'int' }   				,
 			{ name: 'group_loan_deceased_clearance_count', type: 'int' }            ,
 			{ name: 'group_loan_run_away_receivable_count', type: 'int' }           ,
-			{ name: 'group_loan_premature_clearance_payment_count', type: 'int' }   
+			{ name: 'group_loan_premature_clearance_payment_count', type: 'int' }   ,
+			{ name: 'amount_receivable', type: 'string' }   ,
   	],
 
   	idProperty: 'id' ,

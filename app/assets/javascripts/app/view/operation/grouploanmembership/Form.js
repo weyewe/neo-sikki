@@ -191,8 +191,8 @@ Ext.define('AM.view.operation.grouploanmembership.Form', {
 		var comboBox = this.down('form').getForm().findField('group_loan_product_id'); 
 		var me = this; 
 		var store = comboBox.store; 
-		console.log( 'setSelectedGLP');
-		console.log( store ) ;
+		// console.log( 'setSelectedGLP');
+		// console.log( store ) ;
 		store.load({
 			params: {
 				selected_id : group_loan_product_id 
@@ -208,8 +208,8 @@ Ext.define('AM.view.operation.grouploanmembership.Form', {
 		var comboBox = this.down('form').getForm().findField('member_id'); 
 		var me = this; 
 		var store = comboBox.store; 
-		console.log( 'setSelectedMember');
-		console.log( store ) ;
+		// console.log( 'setSelectedMember');
+		// console.log( store ) ;
 		store.load({
 			params: {
 				selected_id : member_id 
@@ -222,14 +222,14 @@ Ext.define('AM.view.operation.grouploanmembership.Form', {
 	},
 
 	setComboBoxData : function( record){
-		console.log("gonna set combo box data");
+		// console.log("gonna set combo box data");
 		var me = this; 
 		me.setLoading(true);
 		
 		
 		
-		console.log("member_id: "+ record.get("member_id") );
-		console.log( "glp_id: " + record.get("group_loan_product_id") );
+		// console.log("member_id: "+ record.get("member_id") );
+		// console.log( "glp_id: " + record.get("group_loan_product_id") );
 		me.setSelectedMember( record.get("member_id")  ) ;
 		me.setSelectedGroupLoanProduct( record.get("group_loan_product_id")  ) ;
 	},

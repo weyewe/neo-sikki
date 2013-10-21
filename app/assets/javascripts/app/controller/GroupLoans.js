@@ -184,7 +184,9 @@ Ext.define('AM.controller.GroupLoans', {
 	startObject: function(){
 		var view = Ext.widget('startgrouploanform');
 		var record = this.getList().getSelectedObject();
-		this.reloadRecordView( record, view ) ; 
+		view.setParentData( record );
+    view.show();
+		// this.reloadRecordView( record, view ) ; 
 	},
 	
 	executeStart: function(button){
@@ -234,7 +236,10 @@ Ext.define('AM.controller.GroupLoans', {
 	disburseObject: function(){
 		var view = Ext.widget('disbursegrouploanform');
 		var record = this.getList().getSelectedObject();
-		this.reloadRecordView( record, view ) ; 
+		view.setParentData( record );
+    view.show();
+
+		// this.reloadRecordView( record, view ) ; 
 	},
 	
 	executeDisburse: function(button){
@@ -278,34 +283,34 @@ Ext.define('AM.controller.GroupLoans', {
 		}
 	},
 	
-	reloadRecordView: function(record, view){
-		var list = this.getList();
-		var store = this.getList().getStore();
-		var modifiedId = record.get('id');
-		view.setLoading(true);
-		
-		AM.model.GroupLoan.load( modifiedId , {
-		    scope: list,
-		    failure: function(record, operation) {
-		        //do something if the load failed
-		    },
-		    success: function(record, operation) {
-					view.setLoading(false);
-					recToUpdate = store.getById(modifiedId);
-					recToUpdate.set(record.getData());
-					recToUpdate.commit();
-					// list.getView().refreshNode(store.indexOfId(modifiedId));
-					
-					view.setParentData( record );
-			    view.show();
-		    },
-		    callback: function(record, operation) {
-					view.setLoading(false);
-		        //do something whether the load succeeded or failed
-		    }
-		});
-	},
-	
+	// reloadRecordView: function(record, view){
+	// 	var list = this.getList();
+	// 	var store = this.getList().getStore();
+	// 	var modifiedId = record.get('id');
+	// 	view.setLoading(true);
+	// 	
+	// 	AM.model.GroupLoan.load( modifiedId , {
+	// 	    scope: list,
+	// 	    failure: function(record, operation) {
+	// 	        //do something if the load failed
+	// 	    },
+	// 	    success: function(record, operation) {
+	// 				view.setLoading(false);
+	// 				recToUpdate = store.getById(modifiedId);
+	// 				recToUpdate.set(record.getData());
+	// 				recToUpdate.commit();
+	// 				// list.getView().refreshNode(store.indexOfId(modifiedId));
+	// 				
+	// 				view.setParentData( record );
+	// 		    view.show();
+	// 	    },
+	// 	    callback: function(record, operation) {
+	// 				view.setLoading(false);
+	// 	        //do something whether the load succeeded or failed
+	// 	    }
+	// 	});
+	// },
+	// 
 	reloadRecord: function(record){
 		
 		var list = this.getList();

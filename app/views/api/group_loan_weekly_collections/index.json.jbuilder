@@ -11,6 +11,8 @@ json.group_loan_weekly_collections @objects do |object|
 	
 	json.collected_at 	format_date_friendly( object.collected_at ) 
 	json.confirmed_at  format_date_friendly( object.confirmed_at ) 
+	
+	json.amount_receivable object.amount_receivable
 	 
 	
 	json.group_loan_weekly_uncollectible_count 				object.group_loan_weekly_uncollectible_count

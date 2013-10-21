@@ -87,11 +87,12 @@ class Api::GroupLoansController < Api::BaseApiController
                           	:is_closed 											 =>   @object.is_closed                           ,
                           	:closed_at 											 =>   format_date_friendly( @object.closed_at )   ,
                           	:is_compulsory_savings_withdrawn =>   @object.is_compulsory_savings_withdrawn     ,
-                          	:compulsory_savings_withdrawn_at =>   format_date_friendly( @object.compulsory_savings_withdrawn_at),                            # 
-                          	                           # :start_fund                               => @object.start_fund,
-                          	                           # :disbursed_group_loan_memberships_count   => @object.disbursed_group_loan_memberships_count,
-                          	                           # :disbursed_fund                           => @object.disbursed_fund,
-                          	                           # :active_group_loan_memberships_count      => @object.active_group_loan_memberships.count
+                            :compulsory_savings_withdrawn_at =>   format_date_friendly( @object.compulsory_savings_withdrawn_at),                            # 
+                            :start_fund                               => @object.start_fund,
+                            :disbursed_group_loan_memberships_count   => @object.disbursed_group_loan_memberships_count,
+                            :disbursed_fund                           => @object.disbursed_fund,
+                            :active_group_loan_memberships_count      => @object.active_group_loan_memberships.count,
+                          	:non_disbursed_fund => @object.non_disbursed_fund
                           ],
                         :total => GroupLoan.count  } 
     else

@@ -60,18 +60,18 @@ class SavingsEntry < ActiveRecord::Base
   
   def valid_withdrawal_amount
     
-    puts "Checking valid withdrawal amount\n"*5
+    # puts "Checking valid withdrawal amount\n"*5
     
     return if not financial_product_id.nil?
-    puts "financial product id is nil"
+    # puts "financial product id is nil"
     return if not all_fields_for_independent_savings_present?
-    puts "Every needed data is present"
+    # puts "Every needed data is present"
     
     
     
     if direction == FUND_TRANSFER_DIRECTION[:outgoing]
-      puts "Amount: #{amount}"
-      puts "Total savings: #{member.total_savings_account}"
+      # puts "Amount: #{amount}"
+      # puts "Total savings: #{member.total_savings_account}"
       if amount > member.total_savings_account
         self.errors.add(:amount, "Tidak boleh lebih besar dari #{member.total_savings_account}")
         return self 
@@ -84,7 +84,7 @@ class SavingsEntry < ActiveRecord::Base
 =end
   def self.create_object( params ) 
     
-    puts "Inside self.create_object\n"
+    # puts "Inside self.create_object\n"
     new_object = self.new 
     
     new_object.savings_source_id      = nil  

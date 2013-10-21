@@ -21,7 +21,7 @@ Ext.define('AM.view.operation.grouploan.List' ,{
 				xtype : 'templatecolumn',
 				text : "Info",
 				flex : 1,
-				tpl : '<b>{name}</b>' + '<br />' + '<br />' + 
+				tpl : 'Status: <b>{name}</b>' + '<br />' + '<br />' + 
 							'Jumlah Meeting: <br /><b>{number_of_meetings}</b>'  + '<br />' + '<br />' + 
 							'Jumlah Pengumpulan: <br /><b>{number_of_collections}</b>'  + '<br />' + '<br />' + 
 							'Anggota Aktif: <br /><b>{active_group_loan_memberships_count}</b>'
@@ -30,30 +30,39 @@ Ext.define('AM.view.operation.grouploan.List' ,{
 				xtype : 'templatecolumn',
 				text : "Start",
 				flex : 1,
-				tpl : '<b>{is_started}</b>' + '<br />' + '<br />' + 
-							'Tanggal Mulai: <br /><b>{started_at}</b>'  + '<br />' + '<br />' + 
-							'Anggota Terdaftar: <br /><b>{total_members_count}</b>'  
+				tpl : 'Status: <b>{is_started}</b>'+ '<br />' + '<br />' + 
+							'Dana harus disiapkan: <br /><b>{start_fund}</b>' + '<br />' + '<br />' + 
+							'Anggota Terdaftar: <br /><b>{total_members_count}</b>' + '<br />' + '<br />' + 
+							'Tanggal Mulai: <br /><b>{started_at}</b>'  
 			},
 			
 			{
 				xtype : 'templatecolumn',
 				text : "Disbursement",
 				flex : 1,
-				tpl : '<b>{is_loan_disbursed}</b>' + '<br />' + '<br />' + 
-							'Tanggal Mulai: <br /><b>{disbursed_at}</b>'  + '<br />' + '<br />' + 
-							'Anggota Penerima: <br /><b>{disbursed_group_loan_memberships_count}</b>'   
+				tpl : 'Status: <b>{is_loan_disbursed}</b>' + '<br />' + '<br />' +  
+							'Dana Dicairkan: <br /><b>{disbursed_fund}</b>'+ '<br />' + '<br />' + 
+							'Dana Tak Tercairkan: <br /><b>{non_disbursed_fund}</b>'+ '<br />' + '<br />' + 
+							'Anggota Penerima: <br /><b>{disbursed_group_loan_memberships_count}</b>'+ '<br />' + '<br />' +  
+							'Tanggal Mulai: <br /><b>{disbursed_at}</b>'     
 			},
 			
 			{
 				xtype : 'templatecolumn',
 				text : "Monitor",
 				flex : 1,
-				tpl : 'Close: <b>{is_closed}</b>' + '<br />' + '<br />' + 
+				tpl : 'Status: <b>{is_closed}</b>' + '<br />' + '<br />' + 
 							'Tanggal Selesai: <br /><b>{closed_at}</b>'     
 			},
 			
+			{
+				xtype : 'templatecolumn',
+				text : "Monitor",
+				flex : 1,
+				tpl : 'Status: <b>{is_compulsory_savings_withdrawn}</b>' + '<br />' + '<br />' + 
+							'Pengembalian: <br /><b>{compulsory_savings_withdrawn_at}</b>'     
+			},
 			
-			{	header: 'Tabungan Dikembalikan?', dataIndex: 'is_compulsory_savings_withdrawn', flex : 1   } ,
 		];
 
 		this.addObjectButton = new Ext.Button({
