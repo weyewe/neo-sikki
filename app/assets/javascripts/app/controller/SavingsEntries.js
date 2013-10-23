@@ -47,6 +47,7 @@ Ext.define('AM.controller.SavingsEntries', {
         selectionchange: this.selectionChange,
 				// afterrender : this.loadObjectList,
 				'confirmed' : this.reloadParentRow,
+				destroy : this.onDestroy
       },
       'savingsentryform button[action=save]': {
         click: this.updateObject
@@ -75,6 +76,11 @@ Ext.define('AM.controller.SavingsEntries', {
 		
     });
   },
+
+	onDestroy: function(){
+		// console.log("on Destroy the savings_entries list ");
+		this.getSavingsEntriesStore().loadData([],false);
+	},
 
 	reloadParentRow: function(){
 		

@@ -1,7 +1,7 @@
 Ext.define('AM.controller.GroupLoanWeeklyUncollectibles', {
   extend: 'Ext.app.Controller',
 
-  stores: ['GroupLoanWeeklyUncollectibles'],
+  stores: ['GroupLoanWeeklyUncollectibles', 'GroupLoans'],
   models: ['GroupLoanWeeklyUncollectible'],
 
   views: [
@@ -40,6 +40,7 @@ Ext.define('AM.controller.GroupLoanWeeklyUncollectibles', {
       'grouploanweeklyuncollectiblelist': {
         itemdblclick: this.editObject,
         selectionchange: this.selectionChange,
+				destroy : this.onDestroy
 				// afterrender : this.loadObjectList,
       },
       'grouploanweeklyuncollectibleform button[action=save]': {
@@ -54,7 +55,7 @@ Ext.define('AM.controller.GroupLoanWeeklyUncollectibles', {
       'grouploanweeklyuncollectiblelist button[action=deleteObject]': {
         click: this.deleteObject
       },
-			'grouploanweeklyuncollectiblelist textfield[name=searchField]': {
+			'grouploanweeklyuncollectibleProcess operationgrouploanList  textfield[name=searchField]': {
         change: this.liveSearch
       },
 
@@ -77,14 +78,20 @@ Ext.define('AM.controller.GroupLoanWeeklyUncollectibles', {
     });
   },
 
+
+	onDestroy: function(){
+		// console.log("on Destroy the savings_entries list ");
+		this.getGroupLoanWeeklyUncollectiblesStore().loadData([],false);
+	},
+	
 	liveSearch : function(grid, newValue, oldValue, options){
 		var me = this;
 
-		me.getGroupLoanWeeklyUncollectiblesStore().getProxy().extraParams = {
+		me.getGroupLoansStore().getProxy().extraParams = {
 		    livesearch: newValue
 		};
 	 
-		me.getGroupLoanWeeklyUncollectiblesStore().load();
+		me.getGroupLoansStore().load();
 	},
  
 
@@ -94,6 +101,7 @@ Ext.define('AM.controller.GroupLoanWeeklyUncollectibles', {
 	
 	loadParentObjectList: function(me){
 		// console.log("after render the group_loan list");
+		me.getStore().getProxy().extraParams = {};
 		me.getStore().load(); 
 	},
 

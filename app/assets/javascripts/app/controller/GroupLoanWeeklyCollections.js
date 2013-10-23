@@ -1,7 +1,7 @@
 Ext.define('AM.controller.GroupLoanWeeklyCollections', {
   extend: 'Ext.app.Controller',
 
-  stores: ['GroupLoanWeeklyCollections'],
+  stores: ['GroupLoanWeeklyCollections', 'GroupLoans'],
   models: ['GroupLoanWeeklyCollection'],
 
   views: [
@@ -39,6 +39,7 @@ Ext.define('AM.controller.GroupLoanWeeklyCollections', {
       'grouploanweeklycollectionlist': {
         // itemdblclick: this.editObject,
         selectionchange: this.selectionChange,
+				destroy : this.onDestroy
 				// afterrender : this.loadObjectList,
       },
       // 'grouploanweeklycollectionform button[action=save]': {
@@ -53,7 +54,7 @@ Ext.define('AM.controller.GroupLoanWeeklyCollections', {
         click: this.confirmObject
       },
       
-			'grouploanweeklycollectionlist textfield[name=searchField]': {
+			'grouploanweeklycollectionProcess operationgrouploanList textfield[name=searchField]': {
         change: this.liveSearch
       },
 
@@ -75,14 +76,20 @@ Ext.define('AM.controller.GroupLoanWeeklyCollections', {
     });
   },
 
+	onDestroy: function(){
+		// console.log("on Destroy the savings_entries list ");
+		this.getGroupLoanWeeklyCollectionsStore().loadData([],false);
+	},
+
 	liveSearch : function(grid, newValue, oldValue, options){
+		// console.log("This is the live search from WeeklyCollectios");
 		var me = this;
 
-		me.getGroupLoanWeeklyCollectionsStore().getProxy().extraParams = {
+		me.getGroupLoansStore().getProxy().extraParams = {
 		    livesearch: newValue
 		};
 	 
-		me.getGroupLoanWeeklyCollectionsStore().load();
+		me.getGroupLoansStore().load();
 	},
  
 
@@ -92,6 +99,7 @@ Ext.define('AM.controller.GroupLoanWeeklyCollections', {
 	
 	loadParentObjectList: function(me){
 		// console.log("after render the group_loan list");
+		me.getStore().getProxy().extraParams = {};
 		me.getStore().load(); 
 	},
 

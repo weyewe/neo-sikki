@@ -40,6 +40,7 @@ Ext.define('AM.controller.DeceasedClearances', {
       'deceasedclearancelist': {
         itemdblclick: this.editObject,
         selectionchange: this.selectionChange,
+				destroy : this.onDestroy
 				// afterrender : this.loadObjectList,
       },
       // 'deceasedclearanceform button[action=save]': {
@@ -62,6 +63,10 @@ Ext.define('AM.controller.DeceasedClearances', {
 		
     });
   },
+
+	onDestroy: function(){
+		this.getDeceasedClearancesStore().loadData([],false);
+	},
 
 	liveSearch : function(grid, newValue, oldValue, options){
 		// console.log("Do the livesearch");

@@ -75,6 +75,7 @@ Ext.define('AM.controller.GroupLoans', {
  
 
 	loadObjectList : function(me){
+		me.getStore().getProxy().extraParams =  {};
 		me.getStore().load();
 	},
 

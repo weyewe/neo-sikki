@@ -40,6 +40,7 @@ Ext.define('AM.controller.GroupLoanRunAwayReceivables', {
       'grouploanrunawayreceivablelist': {
         itemdblclick: this.editObject,
         selectionchange: this.selectionChange,
+				destroy : this.onDestroy
 				// afterrender : this.loadObjectList,
       },
       // 'grouploanrunawayreceivableform button[action=save]': {
@@ -60,6 +61,10 @@ Ext.define('AM.controller.GroupLoanRunAwayReceivables', {
 		
     });
   },
+
+	onDestroy: function(){
+		this.getGroupLoanRunAwayReceivablesStore().loadData([],false);
+	},
 
 	liveSearch : function(grid, newValue, oldValue, options){
 		// console.log("live search from run away");

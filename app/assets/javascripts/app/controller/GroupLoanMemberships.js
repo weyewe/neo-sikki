@@ -1,7 +1,7 @@
 Ext.define('AM.controller.GroupLoanMemberships', {
   extend: 'Ext.app.Controller',
 
-  stores: ['GroupLoanMemberships'],
+  stores: ['GroupLoanMemberships', 'GroupLoans'],
   models: ['GroupLoanMembership'],
 
   views: [
@@ -40,6 +40,7 @@ Ext.define('AM.controller.GroupLoanMemberships', {
       'grouploanmembershiplist': {
         itemdblclick: this.editObject,
         selectionchange: this.selectionChange,
+				destroy : this.onDestroy
 				// afterrender : this.loadObjectList,
       },
       'grouploanmembershipform button[action=save]': {
@@ -54,21 +55,25 @@ Ext.define('AM.controller.GroupLoanMemberships', {
       'grouploanmembershiplist button[action=deleteObject]': {
         click: this.deleteObject
       },
-			'grouploanmembershiplist textfield[name=searchField]': {
+			'grouploanmembershipProcess operationgrouploanList textfield[name=searchField]': {
         change: this.liveSearch
       }
 		
     });
   },
+	onDestroy: function(){
+		// console.log("on Destroy the savings_entries list ");
+		this.getGroupLoanMembershipsStore().loadData([],false);
+	},
 
 	liveSearch : function(grid, newValue, oldValue, options){
 		var me = this;
 
-		me.getGroupLoanMembershipsStore().getProxy().extraParams = {
+		me.getGroupLoansStore().getProxy().extraParams = {
 		    livesearch: newValue
 		};
 	 
-		me.getGroupLoanMembershipsStore().load();
+		me.getGroupLoansStore().load();
 	},
  
 
@@ -78,6 +83,7 @@ Ext.define('AM.controller.GroupLoanMemberships', {
 	
 	loadParentObjectList: function(me){
 		// console.log("after render the group_loan list");
+		me.getStore().getProxy().extraParams =  {};
 		me.getStore().load(); 
 	},
 

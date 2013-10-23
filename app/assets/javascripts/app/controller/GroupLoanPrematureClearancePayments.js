@@ -1,7 +1,7 @@
 Ext.define('AM.controller.GroupLoanPrematureClearancePayments', {
   extend: 'Ext.app.Controller',
 
-  stores: ['GroupLoanPrematureClearancePayments'],
+  stores: ['GroupLoanPrematureClearancePayments', 'GroupLoans'],
   models: ['GroupLoanPrematureClearancePayment'],
 
   views: [
@@ -40,6 +40,7 @@ Ext.define('AM.controller.GroupLoanPrematureClearancePayments', {
       'grouploanprematureclearancepaymentlist': {
         itemdblclick: this.editObject,
         selectionchange: this.selectionChange,
+				destroy : this.onDestroy
 				// afterrender : this.loadObjectList,
       },
       'grouploanprematureclearancepaymentform button[action=save]': {
@@ -54,21 +55,26 @@ Ext.define('AM.controller.GroupLoanPrematureClearancePayments', {
       'grouploanprematureclearancepaymentlist button[action=deleteObject]': {
         click: this.deleteObject
       },
-			'grouploanprematureclearancepaymentlist textfield[name=searchField]': {
+			'grouploanprematureclearancepaymentProcess operationgrouploanList  textfield[name=searchField]': {
         change: this.liveSearch
       }
 		
     });
   },
-
+	
+	onDestroy: function(){
+		// console.log("on Destroy the savings_entries list ");
+		this.getGroupLoanPrematureClearancePaymentsStore().loadData([],false);
+	},
+	
 	liveSearch : function(grid, newValue, oldValue, options){
 		var me = this;
 
-		me.getGroupLoanPrematureClearancePaymentsStore().getProxy().extraParams = {
+		me.getGroupLoansStore().getProxy().extraParams = {
 		    livesearch: newValue
 		};
 	 
-		me.getGroupLoanPrematureClearancePaymentsStore().load();
+		me.getGroupLoansStore().load();
 	},
  
 
@@ -78,6 +84,7 @@ Ext.define('AM.controller.GroupLoanPrematureClearancePayments', {
 	
 	loadParentObjectList: function(me){
 		// console.log("after render the group_loan list");
+		me.getStore().getProxy().extraParams = {};
 		me.getStore().load(); 
 	},
 

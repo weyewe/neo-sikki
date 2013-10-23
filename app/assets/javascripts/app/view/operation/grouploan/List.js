@@ -21,7 +21,7 @@ Ext.define('AM.view.operation.grouploan.List' ,{
 				xtype : 'templatecolumn',
 				text : "Info",
 				flex : 1,
-				tpl : 'Status: <b>{name}</b>' + '<br />' + '<br />' + 
+				tpl : '<b>{name}</b>' + '<br />' + '<br />' + 
 							'Jumlah Meeting: <br /><b>{number_of_meetings}</b>'  + '<br />' + '<br />' + 
 							'Jumlah Pengumpulan: <br /><b>{number_of_collections}</b>'  + '<br />' + '<br />' + 
 							'Anggota Aktif: <br /><b>{active_group_loan_memberships_count}</b>'
