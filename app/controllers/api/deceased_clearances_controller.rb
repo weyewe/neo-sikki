@@ -71,23 +71,23 @@ class Api::DeceasedClearancesController < Api::BaseApiController
     end
   end
 
-  def destroy
-    @object = DeceasedClearance.find(params[:id])
-    @object.delete_object 
-
-    if ( not @object.persisted?  or @object.is_deleted ) and @object.errors.size == 0 
-      render :json => { :success => true, :total => DeceasedClearance.count }  
-    else
-      msg = {
-        :success => false, 
-        :message => {
-          :errors => extjs_error_format( @object.errors )  
-        }
-      }
-      
-      render :json => msg
-    end
-  end
+  # def destroy
+  #   @object = DeceasedClearance.find(params[:id])
+  #   @object.delete_object 
+  # 
+  #   if ( not @object.persisted?  or @object.is_deleted ) and @object.errors.size == 0 
+  #     render :json => { :success => true, :total => DeceasedClearance.count }  
+  #   else
+  #     msg = {
+  #       :success => false, 
+  #       :message => {
+  #         :errors => extjs_error_format( @object.errors )  
+  #       }
+  #     }
+  #     
+  #     render :json => msg
+  #   end
+  # end
   
   
   def search

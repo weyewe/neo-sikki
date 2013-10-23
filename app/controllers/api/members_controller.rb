@@ -97,7 +97,7 @@ class Api::MembersController < Api::BaseApiController
     @object = Member.find(params[:id])
     @object.delete_object 
 
-    if ( not @object.persisted?  or @object.is_deleted ) and @object.errors.size == 0 
+    if not @object.persisted?  
       render :json => { :success => true, :total => Member.active_objects.count }  
     else
       msg = {

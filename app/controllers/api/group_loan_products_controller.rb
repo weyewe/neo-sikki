@@ -76,7 +76,7 @@ class Api::GroupLoanProductsController < Api::BaseApiController
     @object = GroupLoanProduct.find(params[:id])
     @object.delete_object 
 
-    if ( not @object.persisted?  or @object.is_deleted ) and @object.errors.size == 0 
+    if  not @object.persisted?  
       render :json => { :success => true, :total => GroupLoanProduct.count }  
     else
       msg = {

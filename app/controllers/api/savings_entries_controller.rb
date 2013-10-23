@@ -110,7 +110,7 @@ class Api::SavingsEntriesController < Api::BaseApiController
     @object = SavingsEntry.find(params[:id])
     @object.delete_object 
 
-    if ( not @object.persisted?  or @object.is_deleted ) and @object.errors.size == 0 
+    if  not @object.persisted?   
       render :json => { :success => true, :total => SavingsEntry.count }  
     else
       msg = {
