@@ -5,27 +5,52 @@ class Api::MembersController < Api::BaseApiController
     is_deceased_value = false 
     is_run_away_value = false 
     
-    is_deceased_value = true if params[:is_deceased].present?
+    is_deceased_value = true if params[:is_deceased].present?  
     is_run_away_value = true if params[:is_run_away].present?
     
     if params[:livesearch].present? 
       livesearch = "%#{params[:livesearch]}%"
-      @objects = Member.where{
-        (is_deceased.eq is_deceased_value) & 
-        (is_run_away.eq is_run_away_value ) & 
-        (
-          (name =~  livesearch )
-        )
-        
-      }.page(params[:page]).per(params[:limit]).order("id DESC")
       
-      @total = Member.where{
-        (is_deceased.eq is_deceased_value) & 
-        (is_run_away.eq is_run_away_value ) & 
-        (
-          (name =~  livesearch )
-        )
-      }.count
+      if params[:is_deceased].present? or params[:is_run_away].present?
+        @objects = Member.where{
+          (is_deceased.eq is_deceased_value) & 
+          (is_run_away.eq is_run_away_value ) & 
+          (
+            (name =~  livesearch ) | 
+            (id_number =~ livesearch)
+          )
+
+        }.page(params[:page]).per(params[:limit]).order("id DESC")
+
+        @total = Member.where{
+          (is_deceased.eq is_deceased_value) & 
+          (is_run_away.eq is_run_away_value ) & 
+          (
+            (name =~  livesearch ) | 
+            (id_number =~ livesearch )
+          )
+        }.count
+      else
+        @objects = Member.where{
+          # (is_deceased.eq is_deceased_value) & 
+          # (is_run_away.eq is_run_away_value ) & 
+          (
+            (name =~  livesearch ) | 
+            (id_number =~ livesearch)
+          )
+
+        }.page(params[:page]).per(params[:limit]).order("id DESC")
+
+        @total = Member.where{
+          # (is_deceased.eq is_deceased_value) & 
+          # (is_run_away.eq is_run_away_value ) & 
+          (
+            (name =~  livesearch ) | 
+            (id_number =~ livesearch )
+          )
+        }.count
+      end
+      
       
       # calendar
       

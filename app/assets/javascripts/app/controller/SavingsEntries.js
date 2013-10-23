@@ -1,7 +1,7 @@
 Ext.define('AM.controller.SavingsEntries', {
   extend: 'Ext.app.Controller',
 
-  stores: ['SavingsEntries'],
+  stores: ['SavingsEntries', 'Members'],
   models: ['SavingsEntry'],
 
   views: [
@@ -69,7 +69,7 @@ Ext.define('AM.controller.SavingsEntries', {
 				click : this.executeConfirm
 			},
 			
-			'savingsentrylist textfield[name=searchField]': {
+			'savingsentryProcess operationmemberList textfield[name=searchField]': {
         change: this.liveSearch
       }
 		
@@ -122,13 +122,16 @@ Ext.define('AM.controller.SavingsEntries', {
 	},
 
 	liveSearch : function(grid, newValue, oldValue, options){
+		// console.log("Live search is called");
 		var me = this;
 
-		me.getSavingsEntriesStore().getProxy().extraParams = {
-		    livesearch: newValue
+		me.getMembersStore().getProxy().extraParams = {
+		    livesearch: newValue,				// 
+		    				// is_deceased : true, 
+		    				// is_run_away : true 
 		};
 	 
-		me.getSavingsEntriesStore().load();
+		me.getMembersStore().load();
 	},
  
 

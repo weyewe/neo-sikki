@@ -1,7 +1,7 @@
 Ext.define('AM.controller.GroupLoanRunAwayReceivables', {
   extend: 'Ext.app.Controller',
 
-  stores: ['GroupLoanRunAwayReceivables'],
+  stores: ['GroupLoanRunAwayReceivables', 'Members'],
   models: ['GroupLoanRunAwayReceivable'],
 
   views: [
@@ -54,7 +54,7 @@ Ext.define('AM.controller.GroupLoanRunAwayReceivables', {
       'grouploanrunawayreceivablelist button[action=deleteObject]': {
         click: this.deleteObject
       },
-			'grouploanrunawayreceivablelist textfield[name=searchField]': {
+			'grouploanrunawayreceivableProcess operationmemberList textfield[name=searchField]': {
         change: this.liveSearch
       }
 		
@@ -62,13 +62,15 @@ Ext.define('AM.controller.GroupLoanRunAwayReceivables', {
   },
 
 	liveSearch : function(grid, newValue, oldValue, options){
+		// console.log("live search from run away");
 		var me = this;
 
-		me.getGroupLoanRunAwayReceivablesStore().getProxy().extraParams = {
-		    livesearch: newValue
+		me.getMembersStore().getProxy().extraParams = {
+		    livesearch: newValue,
+				is_run_away: true 
 		};
 	 
-		me.getGroupLoanRunAwayReceivablesStore().load();
+		me.getMembersStore().load();
 	},
  
 

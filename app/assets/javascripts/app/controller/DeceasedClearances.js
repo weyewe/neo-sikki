@@ -1,7 +1,7 @@
 Ext.define('AM.controller.DeceasedClearances', {
   extend: 'Ext.app.Controller',
 
-  stores: ['DeceasedClearances'],
+  stores: ['DeceasedClearances', 'Members'],
   models: ['DeceasedClearance'],
 
   views: [
@@ -54,21 +54,25 @@ Ext.define('AM.controller.DeceasedClearances', {
       'deceasedclearancelist button[action=deleteObject]': {
         click: this.deleteObject
       },
-			'deceasedclearancelist textfield[name=searchField]': {
+			'deceasedclearanceProcess operationmemberList textfield[name=searchField]': {
         change: this.liveSearch
       }
+
+// savingsentryProcess operationmemberList textfield[name=searchField]
 		
     });
   },
 
 	liveSearch : function(grid, newValue, oldValue, options){
+		// console.log("Do the livesearch");
 		var me = this;
 
-		me.getDeceasedClearancesStore().getProxy().extraParams = {
-		    livesearch: newValue
+		me.getMembersStore().getProxy().extraParams = {
+		    livesearch: newValue,
+				is_deceased: true
 		};
 	 
-		me.getDeceasedClearancesStore().load();
+		me.getMembersStore().load();
 	},
  
 
