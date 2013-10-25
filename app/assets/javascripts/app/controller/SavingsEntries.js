@@ -81,6 +81,8 @@ Ext.define('AM.controller.SavingsEntries', {
 		// console.log("on Destroy the savings_entries list ");
 		this.getSavingsEntriesStore().loadData([],false);
 	},
+	
+	// try this guy: http://www.learnsomethings.com/2012/02/01/re-selecting-the-last-selected-record-after-store-load-in-extjs4/
 
 	reloadParentRow: function(){
 		
@@ -99,6 +101,26 @@ Ext.define('AM.controller.SavingsEntries', {
 		// }
 		var wrapper = this.getWrapper();
 		modifiedId = wrapper.selectedParentId;
+		console.log("The store: " );
+		console.log( parentList.store );
+		var selectedIdx = parentList.store.indexOf(modifiedId);
+		console.log("The modified Id: " + modifiedId);
+		console.log("The selectedIdx: " + selectedIdx);
+		
+		var selectedRecord = parentList.getSelectionModel().getSelection()[0];
+		var row = parentList.store.indexOf(selectedRecord);
+		
+		console.log("The row" ) ;
+		console.log( row ) ;
+		
+		// var selectedRecord = grid.getSelectionModel().getSelection()[0];
+		// var row = grid.store.indexOf(selectedRecord);
+		
+		// var row = parentList.getView().getRow(0); // Getting HtmlElement here
+		// Ext.get(row).highlight();
+		
+		// console.log("The row");
+		// console.log( row ) ;
 		
 		AM.model.Member.load( modifiedId , {
 		    scope: parentList,
@@ -119,6 +141,32 @@ Ext.define('AM.controller.SavingsEntries', {
 		         recToUpdate.commit();
 
 		         parentList.getView().refreshNode(store.indexOfId(modifiedId));
+						// Ext.get(row).highlight();
+						
+						// parentList.getSelectionModel().select(row);
+						parentList.getView().focusRow( row );
+						
+		
+		// reselect the reloaded row 
+		
+							// var selectionModel = grid.getSelectionModel()
+							// 
+							// // get the selected record
+							// var selectedRecord = selectionModel.getSelection()[0]
+							// 
+							// // get the index of the selected record
+							// var selectedIdx = grid.store.indexOfId(selectedRecord.data.id);
+							
+							// var selectedIdx = record.get('id');
+
+							// select by index
+							// grid.getSelectionModel().select(selectedIdx);
+								// console.log("The modifiedId: " + modifiedId);
+							// parentList.getSelectionModel().select(modifiedId);
+							
+						// var row = grid.getView().getRow(0); // Getting HtmlElement here
+						// Ext.get(row).highlight(); // Getting element wrapper and using its "highlight" method
+						// 		
 		    },
 		    callback: function(record, operation) {
 		        //do something whether the load succeeded or failed
@@ -290,62 +338,7 @@ Ext.define('AM.controller.SavingsEntries', {
 	
 	
 	 
-	
-	// executeConfirm: function(button){
-	// 	var win = button.up('window');
-	//     var form = win.down('form');
-	// 
-	// 	var me  = this;
-	// 	var record = this.getList().getSelectedObject();
-	// 	var list = this.getList();
-	// 	me.getViewport().setLoading( true ) ;
-	// 	
-	// 	if(!record){return;}
-	// 	
-	// 	Ext.Ajax.request({
-	// 	    url: 'api/confirm_savings_entry',
-	// 	    method: 'PUT',
-	// 	    params: {
-	// 				id : record.get('id')
-	// 	    },
-	// 	    jsonData: {},
-	// 	    success: function(result, request ) {
-	// 					me.getViewport().setLoading( false );
-	// 					list.getStore().load({
-	// 						callback : function(records, options, success){
-	// 							// this => refers to a store 
-	// 							record = this.getById(record.get('id'));
-	// 							// record = records.getById( record.get('id'))
-	// 							list.fireEvent('confirmed', record);
-	// 						}
-	// 					});
-	// 					win.close();
-	// 					
-	// 	    },
-	// 	    // failure: function(result, request ) {
-	// 	    // 						me.getViewport().setLoading( false ) ;
-	// 	    // 						
-	// 	    // 						
-	// 	    // }
-	// 			failure : function(record,op ){
-	// 				list.setLoading(false);
-	// 				
-	// 				var message  = op.request.scope.reader.jsonData["message"];
-	// 				var errors = message['errors'];
-	// 				
-	// 				if( errors["generic_errors"] ){
-	// 					Ext.MessageBox.show({
-	// 					           title: 'FAIL',
-	// 					           msg: errors["generic_errors"],
-	// 					           buttons: Ext.MessageBox.OK, 
-	// 					           icon: Ext.MessageBox.ERROR
-	// 					       });
-	// 				}
-	// 				
-	// 			}
-	// 	});
-	// },
-	
+ 
 	
 	executeConfirm : function(button){
 		var me = this; 
