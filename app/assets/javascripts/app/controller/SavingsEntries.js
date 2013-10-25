@@ -87,40 +87,39 @@ Ext.define('AM.controller.SavingsEntries', {
 	reloadParentRow: function(){
 		
 		// http://vadimpopa.com/reload-a-single-record-and-refresh-its-extjs-grid-row/
-		// console.log("Gonna reload parent row");
-		// grid.getView().refreshRow(record);
 		
 		var parentList = this.getParentList();
-		// var record = parentList.getSelectionModel().getSelection()[0]; 
-		// parentList.getView().refreshRow(record);
-		
-		// if (parentList.getSelectionModel().hasSelection()) {
-		// 	var row = parentList.getSelectionModel().getSelection()[0];
-		// 	var id = row.get("id"); 
-		// 	wrapper.selectedParentId = id ; 
-		// }
+	
 		var wrapper = this.getWrapper();
 		modifiedId = wrapper.selectedParentId;
-		console.log("The store: " );
-		console.log( parentList.store );
-		var selectedIdx = parentList.store.indexOf(modifiedId);
-		console.log("The modified Id: " + modifiedId);
-		console.log("The selectedIdx: " + selectedIdx);
 		
+		
+	 
+		
+		
+/*
+	// parentList.getView().
+	// http://www.sencha.com/forum/showthread.php?258071-How-to-get-an-Element-of-a-grid-row-in-Ext-JS-4&p=945574
+	// awesome discussion
+	This shite is working.. but the effect is not selected effect
+	var node = parentList.getView().getNode(0);
+	console.log("The node: " );
+	console.log( node );
+	
+	console.log(parentList.getView().getXType());
+	
+	result = parentList.getView().highlightItem( node );
+*/
 		var selectedRecord = parentList.getSelectionModel().getSelection()[0];
 		var row = parentList.store.indexOf(selectedRecord);
-		
-		console.log("The row" ) ;
-		console.log( row ) ;
-		
-		// var selectedRecord = grid.getSelectionModel().getSelection()[0];
-		// var row = grid.store.indexOf(selectedRecord);
-		
-		// var row = parentList.getView().getRow(0); // Getting HtmlElement here
-		// Ext.get(row).highlight();
-		
-		// console.log("The row");
+
+		// console.log("The row" ) ;
 		// console.log( row ) ;
+
+		var node = parentList.getView().getNode(row);
+	
+		
+		
 		
 		AM.model.Member.load( modifiedId , {
 		    scope: parentList,
@@ -128,48 +127,19 @@ Ext.define('AM.controller.SavingsEntries', {
 		        //do something if the load failed
 		    },
 		    success: function(record, operation) {
-					// console.log("The record");
-					// console.log( record ); 
 					
-		        var store = parentList.getStore(),
-		            recToUpdate = store.getById(modifiedId);
+					var store = parentList.getStore(),
+					recToUpdate = store.getById(modifiedId);
 
-		         recToUpdate.set(record.getData());
+					recToUpdate.set(record.getData());
 
-		     // Do commit if you need: if the data from
-		     // the server differs from last commit data
-		         recToUpdate.commit();
+					recToUpdate.commit();
 
-		         parentList.getView().refreshNode(store.indexOfId(modifiedId));
-						// Ext.get(row).highlight();
-						
-						// parentList.getSelectionModel().select(row);
-						parentList.getView().focusRow( row );
-						
-		
-		// reselect the reloaded row 
-		
-							// var selectionModel = grid.getSelectionModel()
-							// 
-							// // get the selected record
-							// var selectedRecord = selectionModel.getSelection()[0]
-							// 
-							// // get the index of the selected record
-							// var selectedIdx = grid.store.indexOfId(selectedRecord.data.id);
-							
-							// var selectedIdx = record.get('id');
-
-							// select by index
-							// grid.getSelectionModel().select(selectedIdx);
-								// console.log("The modifiedId: " + modifiedId);
-							// parentList.getSelectionModel().select(modifiedId);
-							
-						// var row = grid.getView().getRow(0); // Getting HtmlElement here
-						// Ext.get(row).highlight(); // Getting element wrapper and using its "highlight" method
-						// 		
+					parentList.getView().refreshNode(store.indexOfId(modifiedId));
+					
 		    },
 		    callback: function(record, operation) {
-		        //do something whether the load succeeded or failed
+					result = parentList.getView().highlightItem( node );
 		    }
 		});
 		
@@ -381,6 +351,8 @@ Ext.define('AM.controller.SavingsEntries', {
 					// });
 					
 					win.close();
+					
+					// me.getParentList().getSelectionModel().selectFirstRow();
 				},
 				failure : function(record,op ){
 					// console.log("Fail update");
@@ -402,6 +374,9 @@ Ext.define('AM.controller.SavingsEntries', {
     var grid = me.getList();
 		var parentList = me.getParentList();
 		var wrapper = me.getWrapper();
+		
+		var selectedParentRecord = parentList.getSelectedObject();
+		grid.setTitle( selectedParentRecord.get("name"));
 		
 		// console.log("parent selection change");
 		// console.log("The wrapper");
