@@ -5,7 +5,6 @@ class Api::GroupLoanProductsController < Api::BaseApiController
     if params[:livesearch].present? 
       livesearch = "%#{params[:livesearch]}%"
       @objects = GroupLoanProduct.where{
-        (is_deleted.eq false) & 
         (
           (name =~  livesearch )
         )
@@ -13,7 +12,6 @@ class Api::GroupLoanProductsController < Api::BaseApiController
       }.page(params[:page]).per(params[:limit]).order("id DESC")
       
       @total = GroupLoanProduct.where{
-        (is_deleted.eq false) & 
         (
           (name =~  livesearch )
         )

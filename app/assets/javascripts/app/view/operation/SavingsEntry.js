@@ -19,7 +19,7 @@ Ext.define('AM.view.operation.SavingsEntry', {
 			},
 			{
 				xtype : 'savingsentrylist',
-				flex : 2
+				flex : 1
 			}, 
 			 
 		]

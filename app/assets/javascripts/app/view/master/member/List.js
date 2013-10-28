@@ -39,7 +39,10 @@ Ext.define('AM.view.master.member.List' ,{
 
 
 
-		this.tbar = [this.addObjectButton, this.editObjectButton, this.deleteObjectButton  ];
+		this.tbar = [this.addObjectButton, this.editObjectButton, this.deleteObjectButton ,
+		 				'-',
+						this.searchField
+		];
 		this.bbar = Ext.create("Ext.PagingToolbar", {
 			store	: this.store, 
 			displayInfo: true,

@@ -102,7 +102,7 @@ Ext.define("AM.controller.Operation", {
 				]
 			}, 
 			{ 
-				text:'PrematureClearance', 
+				text:'Premature Clearance', 
 				viewClass:'AM.view.operation.GroupLoanPrematureClearancePayment', 
 				leaf:true, 
 				iconCls:'text' ,

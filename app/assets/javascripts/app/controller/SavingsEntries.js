@@ -92,6 +92,7 @@ Ext.define('AM.controller.SavingsEntries', {
 	
 		var wrapper = this.getWrapper();
 		modifiedId = wrapper.selectedParentId;
+		var me = this; 
 		
 		
 	 
@@ -137,9 +138,40 @@ Ext.define('AM.controller.SavingsEntries', {
 
 					parentList.getView().refreshNode(store.indexOfId(modifiedId));
 					
+					
+					
 		    },
 		    callback: function(record, operation) {
-					result = parentList.getView().highlightItem( node );
+					// result = parentList.getView().highlightItem( node );
+					// console.log("The row: " + row);
+					
+					// 'savingsentryProcess operationmemberList'   << the selector 
+					
+					// var textfieldChangeObj = this.eventbus.bus.selectionchange['savingsentryProcess operationmemberList'].Login[0];
+					// var textfield = btn.up("form").down("textfield[name='username']");        
+					// textfieldChangeObj.suspend(true);
+					// textfield.setValue('asasas');
+					// textfieldChangeObj.resume(false);
+					
+					// Ext.util.Observable.suspendEvents(true);
+					
+					
+					// this.suspendEvents();
+					// 		node.collapseChildNodes(true);
+					// 		this.resumeEvents();
+					// 		
+					// 		
+					me.suspendEvents(  ) ;
+					// parentList.getSelectionModel().select( null );
+					// parentList.ClearSelection()
+					
+					parentList.getSelectionModel().clearSelections()
+					
+					parentList.getSelectionModel().select( row  );
+					me.resumeEvents(false);
+					
+					// var rowIndex = me.getMembersStore().find('id', record.getId());  //where 'id': the id field of your model, record.getId() is the method automatically created by Extjs. You can replace 'id' with your unique field.. And 'this' is your store.
+					// parentList.getView().select(rowIndex);
 		    }
 		});
 		
@@ -376,6 +408,18 @@ Ext.define('AM.controller.SavingsEntries', {
 		var wrapper = me.getWrapper();
 		
 		var selectedParentRecord = parentList.getSelectedObject();
+		
+		// console.log("The selectedParentRecord: " );
+		// console.log( selectedParentRecord);
+		// if( selectedParentRecord == undefined){
+		// 	return;
+		// }
+		
+		if (typeof(selectedParentRecord) == 'undefined' || selectedParentRecord == null)
+		{
+			return; 
+		}
+		
 		grid.setTitle( selectedParentRecord.get("name"));
 		
 		// console.log("parent selection change");

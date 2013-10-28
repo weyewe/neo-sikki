@@ -16,18 +16,18 @@ Ext.define('AM.view.master.grouploanproduct.List' ,{
 		];
 
 		this.addObjectButton = new Ext.Button({
-			text: 'Add GroupLoanProduct',
+			text: 'Add',
 			action: 'addObject'
 		});
 
 		this.editObjectButton = new Ext.Button({
-			text: 'Edit GroupLoanProduct',
+			text: 'Edit',
 			action: 'editObject',
 			disabled: true
 		});
 
 		this.deleteObjectButton = new Ext.Button({
-			text: 'Delete GroupLoanProduct',
+			text: 'Delete',
 			action: 'deleteObject',
 			disabled: true
 		});
@@ -42,7 +42,10 @@ Ext.define('AM.view.master.grouploanproduct.List' ,{
 
 
 
-		this.tbar = [this.addObjectButton, this.editObjectButton, this.deleteObjectButton  ];
+		this.tbar = [this.addObjectButton, this.editObjectButton, this.deleteObjectButton ,
+				'-',
+				this.searchField
+		 	];
 		this.bbar = Ext.create("Ext.PagingToolbar", {
 			store	: this.store, 
 			displayInfo: true,
