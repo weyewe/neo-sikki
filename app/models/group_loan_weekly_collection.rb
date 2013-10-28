@@ -74,6 +74,7 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
     
     # for the normal payment 
     active_glm_id_list.each do |glm_id|
+      
       GroupLoanWeeklyPayment.create :group_loan_membership_id => glm_id,
                                     :group_loan_id => self.group_loan_id,
                                     :group_loan_weekly_collection_id => self.id ,

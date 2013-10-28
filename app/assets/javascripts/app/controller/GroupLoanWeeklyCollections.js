@@ -121,6 +121,7 @@ Ext.define('AM.controller.GroupLoanWeeklyCollections', {
 		var parentList = me.getParentList();
 		var wrapper = me.getWrapper();
 		
+		
 		// console.log("parent selection change");
 		// console.log("The wrapper");
 		// console.log( wrapper ) ;
@@ -137,6 +138,7 @@ Ext.define('AM.controller.GroupLoanWeeklyCollections', {
 		if (parentList.getSelectionModel().hasSelection()) {
 			var row = parentList.getSelectionModel().getSelection()[0];
 			var id = row.get("id"); 
+			grid.setTitle( "GroupLoan: " + row.get("name"));
 			wrapper.selectedParentId = id ; 
 		}
 		

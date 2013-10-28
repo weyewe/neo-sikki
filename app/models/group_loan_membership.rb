@@ -20,7 +20,7 @@ class GroupLoanMembership < ActiveRecord::Base
   
   validate :no_active_membership_of_another_group_loan
   validate :no_deceased_or_run_away_member
-  validate :ensure_group_loan_is_not_started
+  # validate :ensure_group_loan_is_not_started
   
   def no_active_membership_of_another_group_loan
     return if self.persisted? or not self.member_id.present? 
@@ -92,27 +92,18 @@ class GroupLoanMembership < ActiveRecord::Base
   
   
   def update_total_compulsory_savings(amount)
+    puts "Gonna update total compulsory savings: #{amount}"
     self.total_compulsory_savings += amount 
     self.save 
+    
+    puts "The total_compulsory_savings: #{self.total_compulsory_savings}"
+    puts "is_valid: #{self.valid?}"
+    
+    self.errors.messages.each do |msg|
+      puts "The msg: #{msg}"
+    end
   end
-  # def update_total_compulsory_savings
-  #   incoming = member.savings_entries.where(
-  #     :savings_status => SAVINGS_STATUS[:group_loan_compulsory_savings],
-  #     :financial_product_type => GroupLoan.to_s, 
-  #     :financial_product_id => self.group_loan_id ,
-  #     :direction => FUND_TRANSFER_DIRECTION[:incoming]
-  #   ).sum("amount")   
-  #   
-  #   outgoing = member.savings_entries.where(
-  #     :savings_status => SAVINGS_STATUS[:group_loan_compulsory_savings],
-  #     :financial_product_type => GroupLoan.to_s, 
-  #     :financial_product_id => self.group_loan_id ,
-  #     :direction => FUND_TRANSFER_DIRECTION[:outgoing]
-  #   ).sum("amount")
-  #   
-  #   self.total_compulsory_savings = incoming - outgoing 
-  #   self.save 
-  # end
+   
   
 =begin
   Corner Case : Deceased member 
