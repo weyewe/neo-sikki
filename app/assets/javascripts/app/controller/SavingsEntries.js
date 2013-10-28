@@ -161,14 +161,14 @@ Ext.define('AM.controller.SavingsEntries', {
 					// 		this.resumeEvents();
 					// 		
 					// 		
-					me.suspendEvents(  ) ;
+					// me.suspendEvents(  ) ;
 					// parentList.getSelectionModel().select( null );
 					// parentList.ClearSelection()
 					
 					parentList.getSelectionModel().clearSelections()
 					
 					parentList.getSelectionModel().select( row  );
-					me.resumeEvents(false);
+					// me.resumeEvents(false);
 					
 					// var rowIndex = me.getMembersStore().find('id', record.getId());  //where 'id': the id field of your model, record.getId() is the method automatically created by Extjs. You can replace 'id' with your unique field.. And 'this' is your store.
 					// parentList.getView().select(rowIndex);
@@ -415,12 +415,12 @@ Ext.define('AM.controller.SavingsEntries', {
 		// 	return;
 		// }
 		
-		if (typeof(selectedParentRecord) == 'undefined' || selectedParentRecord == null)
-		{
-			return; 
-		}
+		// if (typeof(selectedParentRecord) == 'undefined' || selectedParentRecord == null)
+		// {
+		// 	return; 
+		// }
 		
-		grid.setTitle( selectedParentRecord.get("name"));
+		grid.setTitle( selectedParentRecord.get("name") + " | " + selectedParentRecord.get("id_number"));
 		
 		// console.log("parent selection change");
 		// console.log("The wrapper");

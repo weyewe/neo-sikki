@@ -121,9 +121,9 @@ class Api::GroupLoanProductsController < Api::BaseApiController
     end
     
     
-    puts "In the search of group loan products"
-    puts "=======================\n"*5
-    puts "the results: #{@objects}"
+    # puts "In the search of group loan products"
+    # puts "=======================\n"*5
+    # puts "the results: #{@objects}"
     render :json => { :records => @objects , :total => @total, :success => true }
   end
 end

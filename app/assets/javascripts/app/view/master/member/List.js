@@ -9,22 +9,24 @@ Ext.define('AM.view.master.member.List' ,{
 		this.columns = [
 			{ header: 'ID_NUMBER', dataIndex: 'id_number'},
 			{ header: 'Nama',  dataIndex: 'name', flex: 1},
-			{	header: 'Address', dataIndex: 'address', flex: 1 } 
+			{	header: 'Address', dataIndex: 'address', flex: 1 },
+			{	header: 'Kabur', dataIndex: 'is_run_away', flex: 1 } ,
+			{	header: 'Meninggal', dataIndex: 'is_deceased', flex: 1 }  
 		];
 
 		this.addObjectButton = new Ext.Button({
-			text: 'Add Member',
+			text: 'Add',
 			action: 'addObject'
 		});
 
 		this.editObjectButton = new Ext.Button({
-			text: 'Edit Member',
+			text: 'Edit',
 			action: 'editObject',
 			disabled: true
 		});
 
 		this.deleteObjectButton = new Ext.Button({
-			text: 'Delete Member',
+			text: 'Delete',
 			action: 'deleteObject',
 			disabled: true
 		});
@@ -36,12 +38,28 @@ Ext.define('AM.view.master.member.List' ,{
 			emptyText : "Search",
 			checkChangeBuffer: 300
 		});
+		
+		this.markAsDeceasedObjectButton = new Ext.Button({
+			text: 'Deceased',
+			action: 'markasdeceasedObject',
+			disabled: true
+		});
+		
+		this.markAsRunAwayObjectButton = new Ext.Button({
+			text: 'Run Away',
+			action: 'markasrunawayObject',
+			disabled: true
+		});
 
 
 
 		this.tbar = [this.addObjectButton, this.editObjectButton, this.deleteObjectButton ,
 		 				'-',
-						this.searchField
+						this.searchField,
+						'->',
+						this.markAsDeceasedObjectButton,
+						this.markAsRunAwayObjectButton
+						
 		];
 		this.bbar = Ext.create("Ext.PagingToolbar", {
 			store	: this.store, 
@@ -62,10 +80,15 @@ Ext.define('AM.view.master.member.List' ,{
 	enableRecordButtons: function() {
 		this.editObjectButton.enable();
 		this.deleteObjectButton.enable();
+		
+		this.markAsDeceasedObjectButton.enable();
+		this.markAsRunAwayObjectButton.enable();
 	},
 
 	disableRecordButtons: function() {
 		this.editObjectButton.disable();
 		this.deleteObjectButton.disable();
+		this.markAsDeceasedObjectButton.disable();
+		this.markAsRunAwayObjectButton.disable();
 	}
 });

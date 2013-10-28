@@ -6,7 +6,8 @@ Ext.define('AM.controller.Members', {
 
   views: [
     'master.member.List',
-    'master.member.Form'
+    'master.member.Form',
+		'master.member.DeceasedForm'
   ],
 
   	refs: [
@@ -41,7 +42,20 @@ Ext.define('AM.controller.Members', {
       },
 			'memberlist textfield[name=searchField]': {
         change: this.liveSearch
-      }
+      },
+			'memberlist button[action=markasdeceasedObject]': {
+        click: this.markAsDeceasedObject
+			}	,
+			'markmemberasdeceasedform button[action=confirmDeceased]' : {
+				click : this.executeConfirmDeceased
+			},
+			
+			'memberlist button[action=markasrunawayObject]': {
+        click: this.markAsRunAwayObject
+			}	,
+			'markmemberasrunawayform button[action=confirmRunAway]' : {
+				click : this.executeConfirmRunAway
+			},
 		
     });
   },
@@ -54,6 +68,118 @@ Ext.define('AM.controller.Members', {
 		};
 	 
 		me.getMembersStore().load();
+	},
+	
+	markAsDeceasedObject: function(){
+		// console.log("mark as Deceased is clicked");
+		var view = Ext.widget('markmemberasdeceasedform');
+		var record = this.getList().getSelectedObject();
+		view.setParentData( record );
+		view.down('form').getForm().findField('deceased_at').setValue(record.get('deceased_at')); 
+    view.show();
+	},
+	
+	executeConfirmDeceased : function(button){
+		var me = this; 
+		var win = button.up('window');
+    var form = win.down('form');
+		var list = this.getList();
+
+    var store = this.getMembersStore();
+		var record = this.getList().getSelectedObject();
+    var values = form.getValues();
+ 
+		if(record){
+			var rec_id = record.get("id");
+			record.set( 'deceased_at' , values['deceased_at'] );
+			 
+			// form.query('checkbox').forEach(function(checkbox){
+			// 	record.set( checkbox['name']  ,checkbox['checked'] ) ;
+			// });
+			// 
+			form.setLoading(true);
+			record.save({
+				params : {
+					mark_as_deceased: true 
+				},
+				success : function(record){
+					form.setLoading(false);
+					
+					list.fireEvent('confirmed', record);
+					
+					
+					store.load();
+					win.close();
+					
+				},
+				failure : function(record,op ){
+					// console.log("Fail update");
+					form.setLoading(false);
+					var message  = op.request.scope.reader.jsonData["message"];
+					var errors = message['errors'];
+					form.getForm().markInvalid(errors);
+					record.reject(); 
+					// this.reject(); 
+				}
+			});
+		}
+	},
+	
+	// RUN AWAY
+	
+	markAsRunAwayObject: function(){
+		// console.log("mark as Deceased is clicked");
+		var view = Ext.widget('markmemberasrunawayform');
+		var record = this.getList().getSelectedObject();
+		view.setParentData( record );
+		view.down('form').getForm().findField('run_away_at').setValue(record.get('run_away_at')); 
+    view.show();
+	},
+	
+	executeConfirmRunAway : function(button){
+		var me = this; 
+		var win = button.up('window');
+    var form = win.down('form');
+		var list = this.getList();
+
+    var store = this.getMembersStore();
+		var record = this.getList().getSelectedObject();
+    var values = form.getValues();
+ 
+		if(record){
+			var rec_id = record.get("id");
+			record.set( 'run_away_at' , values['run_away_at'] );
+			 
+			// form.query('checkbox').forEach(function(checkbox){
+			// 	record.set( checkbox['name']  ,checkbox['checked'] ) ;
+			// });
+			// 
+			form.setLoading(true);
+			record.save({
+				params : {
+					mark_as_run_away: true 
+				},
+				success : function(record){
+					form.setLoading(false);
+					
+					list.fireEvent('confirmed', record);
+					
+					
+					store.load();
+					win.close();
+					
+				},
+				failure : function(record,op ){
+					// console.log("Fail update");
+					form.setLoading(false);
+					var message  = op.request.scope.reader.jsonData["message"];
+					var errors = message['errors'];
+					form.getForm().markInvalid(errors);
+					record.reject(); 
+					// this.reject(); 
+				}
+			});
+		}
 	},
  
 

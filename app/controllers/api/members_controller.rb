@@ -61,8 +61,8 @@ class Api::MembersController < Api::BaseApiController
       @objects = Member.where(:is_run_away => true ).page(params[:page]).per(params[:limit]).order("run_away_at DESC")
       @total = Member.where(:is_run_away => true ).count
     else
-      @objects = Member.active_objects.page(params[:page]).per(params[:limit]).order("id DESC")
-      @total = Member.active_objects.count 
+      @objects = Member.page(params[:page]).per(params[:limit]).order("id DESC")
+      @total = Member.count 
     end
     
     
@@ -75,7 +75,17 @@ class Api::MembersController < Api::BaseApiController
     @object = Member.create_object( params[:member] )
     if @object.errors.size == 0 
       render :json => { :success => true, 
-                        :members => [@object] , 
+                        :members => [
+                          
+                            :id 							=>  	@object.id                  ,
+                          	:name 			=>     @object.name   ,
+                          	:id_number 		=> 	  @object.id_number  ,
+                          	:address 				=> 	  @object.address      ,
+                          	:is_deceased			  =>   	@object.is_deceased     ,
+                          	:is_run_away		    =>   	@object.is_run_away     ,
+                          	:deceased_at       =>   	format_date_friendly( @object.deceased_at )   ,
+                          	:run_away_at       =>     format_date_friendly( @object.run_away_at )   
+                          ] , 
                         :total => Member.active_objects.count }  
     else
       msg = {
@@ -91,11 +101,34 @@ class Api::MembersController < Api::BaseApiController
 
   def update
     @object = Member.find(params[:id])
+    params[:member][:deceased_at] =  parse_date( params[:member][:deceased_at] )
+    params[:member][:run_away_at] =  parse_date( params[:member][:run_away_at] )
     
-    @object.update_object( params[:member] )
+    if params[:mark_as_deceased].present?  
+      @object.mark_as_deceased(:deceased_at => params[:member][:deceased_at] )
+    elsif params[:mark_as_run_away].present?  
+      puts "\n\n"
+      puts "=========> GOnna mark as run away\n"*10
+      @object.mark_as_run_away(:run_away_at => params[:member][:run_away_at] )
+    else
+      @object.update_object( params[:member] )
+    end
+    
+     
     if @object.errors.size == 0 
       render :json => { :success => true,   
-                        :members => [@object],
+                        :members => [
+                          
+                          :id 							=>  	@object.id                  ,
+                        	:name 			=>     @object.name   ,
+                        	:id_number 		=> 	  @object.id_number  ,
+                        	:address 				=> 	  @object.address      ,
+                        	:is_deceased			  =>   	@object.is_deceased     ,
+                        	:is_run_away		    =>   	@object.is_run_away     ,
+                        	:deceased_at       =>   	format_date_friendly( @object.deceased_at )   ,
+                        	:run_away_at       =>     format_date_friendly( @object.run_away_at )
+                        	
+                        ],
                         :total => Member.active_objects.count  } 
     else
       msg = {

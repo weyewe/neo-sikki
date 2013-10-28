@@ -6,7 +6,9 @@ Ext.define('AM.model.Member', {
 			{ name: 'address', type: 'string' } ,
 			{ name: 'id_number', type: 'string' } ,
 			
-			{ name: 'total_savings_account', type: 'string' }     
+			{ name: 'total_savings_account', type: 'string' }     ,
+			{ name: 'is_run_away', type: 'boolean' }    ,
+			{ name: 'is_deceased', type: 'boolean' }    
   	],
 
 	 
