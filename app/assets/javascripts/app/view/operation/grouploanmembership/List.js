@@ -39,7 +39,14 @@ Ext.define('AM.view.operation.grouploanmembership.List' ,{
 			},
 			
 			
-			{ header: 'Total Tabungan Wajib',  dataIndex: 'total_compulsory_savings', flex : 1  }, 
+			{ header: 'Tabungan Wajib',  dataIndex: 'total_compulsory_savings', flex : 1  },
+			{
+				xtype : 'templatecolumn',
+				text : "Status",
+				flex : 1,
+				tpl : 'Is Active?<br /><b>{is_active}</b>' + '<br />' + 
+							'<b>{deactivation_case_name}</b>'  
+			},
 		];
 
 		this.addObjectButton = new Ext.Button({

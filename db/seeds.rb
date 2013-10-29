@@ -203,10 +203,10 @@ data_entry_role = Role.create!(
   Finish weekly collection on group_loan_1 
 =end
 
-  # @group_loan_1.group_loan_weekly_collections.order("id ASC").each do |x|
-  #   x.collect(:collected_at => DateTime.now)
-  #   x.confirm(:confirmed_at => DateTime.now)
-  # end
+  @group_loan_1.group_loan_weekly_collections.order("id ASC").each do |x|
+    x.collect(:collected_at => DateTime.now)
+    x.confirm(:confirmed_at => DateTime.now)
+  end
   
   
   

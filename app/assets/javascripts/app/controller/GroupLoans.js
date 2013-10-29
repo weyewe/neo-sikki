@@ -67,6 +67,14 @@ Ext.define('AM.controller.GroupLoans', {
 			'closegrouploanform button[action=confirmClose]' : {
 				click : this.executeClose
 			},
+			
+			'grouploanlist button[action=withdrawObject]': {
+        click: this.withdrawObject
+			}	,
+			
+			'withdrawgrouploanform button[action=confirmWithdraw]' : {
+				click : this.executeWithdraw
+			},
 		
     });
   },
@@ -324,6 +332,61 @@ Ext.define('AM.controller.GroupLoans', {
 			record.save({
 				params : {
 					close: true 
+				},
+				success : function(record){
+					form.setLoading(false);
+					
+					// list.fireEvent('confirmed', record);
+					
+					
+					store.load();
+					win.close();
+					
+				},
+				failure : function(record,op ){
+					// console.log("Fail update");
+					form.setLoading(false);
+					var message  = op.request.scope.reader.jsonData["message"];
+					var errors = message['errors'];
+					form.getForm().markInvalid(errors);
+					record.reject(); 
+					// this.reject(); 
+				}
+			});
+		}
+	},
+	
+	withdrawObject: function(){
+		// console.log("mark as Deceased is clicked");
+		var view = Ext.widget('withdrawgrouploanform');
+		var record = this.getList().getSelectedObject();
+		view.setParentData( record );
+		// view.down('form').getForm().findField('c').setValue(record.get('deceased_at')); 
+    view.show();
+	},
+	
+	executeWithdraw : function(button){
+		var me = this; 
+		var win = button.up('window');
+    var form = win.down('form');
+		var list = this.getList();
+
+    var store = this.getGroupLoansStore();
+		var record = this.getList().getSelectedObject();
+    var values = form.getValues();
+ 
+		if(record){
+			var rec_id = record.get("id");
+			record.set( 'compulsory_savings_withdrawn_at' , values['compulsory_savings_withdrawn_at'] );
+			 
+			// form.query('checkbox').forEach(function(checkbox){
+			// 	record.set( checkbox['name']  ,checkbox['checked'] ) ;
+			// });
+			// 
+			form.setLoading(true);
+			record.save({
+				params : {
+					withdraw: true 
 				},
 				success : function(record){
 					form.setLoading(false);

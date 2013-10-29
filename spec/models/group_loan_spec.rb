@@ -215,102 +215,102 @@ describe GroupLoan do
               diff.should == @first_glm.group_loan_product.compulsory_savings 
             end
             
-            # it 'should give the 2nd week collection for group_loan#first_uncollected_weekly_collection' do
-            #   second_group_loan_weekly_collection = @group_loan.group_loan_weekly_collections.order("id ASC")[1]
-            #   @group_loan.first_uncollected_weekly_collection.id.should == second_group_loan_weekly_collection.id 
-            # end
+            it 'should give the 2nd week collection for group_loan#first_uncollected_weekly_collection' do
+              second_group_loan_weekly_collection = @group_loan.group_loan_weekly_collections.order("id ASC")[1]
+              @group_loan.first_uncollected_weekly_collection.id.should == second_group_loan_weekly_collection.id 
+            end
             
             
           end
-          # 
-          # context "closing weekly loan: do all weekly payment collection" do
-          #   before(:each) do
-          #     @group_loan.group_loan_weekly_collections.order("id ASC").each do |x|
-          #       x.collect(:collected_at => DateTime.now)
-          #       x.confirm(:confirmed_at => DateTime.now)
-          #     end
-          #     
-          #     @group_loan.reload 
-          #   end
-          #   
-          #   it 'should have confirmed all group_loan weekly collections' do
-          #     @group_loan.group_loan_weekly_collections.where(:is_collected => true, :is_confirmed => true).count.should == @group_loan.number_of_collections 
-          #   end
-          #   
-          #   it 'should give nil to the next uncollected group_loan_weekly_collection' do
-          #     @group_loan.first_uncollected_weekly_collection.should be_nil 
-          #   end
-          #   
-          #   it 'should not allow compulsory savings withdrawal before closing group loan' do
-          #     @group_loan.withdraw_compulsory_savings(:compulsory_savings_withdrawn_at => @withdrawn_at)
-          #     @group_loan.errors.size.should_not == 0  
-          #   end
-          # 
-          #   context 'closing group loan' do
-          #     before(:each) do
-          #       @glm_list = @group_loan.active_group_loan_memberships
-          #       
-          #       @member_compulsory_savings_array = [] 
-          #        @glm_list.each do |glm|
-          #          @member_compulsory_savings_array << [
-          #             glm.member , 
-          #             glm.member.total_savings_account, 
-          #             glm.total_compulsory_savings 
-          #            ]
-          #        end
-          #       @group_loan.close(:closed_at => @closed_at)
-          #       @group_loan.reload 
-          #     end
-          #     
-          #     it 'should deactivate all glm' do
-          #       @glm_list.each do |glm|
-          #         glm.reload
-          #         glm.is_active.should be_false 
-          #         glm.deactivation_case.should == GROUP_LOAN_DEACTIVATION_CASE[:finished_group_loan]
-          #       end
-          #     end
-          #     
-          #     it 'should have increased the savings_account by the amount of compulsory_savings' do
-          #       @member_compulsory_savings_array.each do |pair|
-          #         member = pair.first
-          #         initial_savings =  pair[1]
-          #         total_compulsory_savings = pair.last 
-          #         
-          #         member.reload 
-          #         final_savings = member.total_savings_account 
-          #         diff = final_savings - initial_savings 
-          #         diff.should == BigDecimal('0')
-          #       end
-          #     end
-          #     
-          #     it 'should NOT produce 0 for total_compulsory_savings' do
-          #       
-          #       # it is the historical data... 
-          #       @glm_list.each do |glm|
-          #         glm.reload
-          #         # puts "the total compulsory savings: #{glm.total_compulsory_savings.to_s} "
-          #         glm.total_compulsory_savings.should_not == BigDecimal('0')
-          #       end
-          #       
-          #     end
-          #     
-          #     context 'withdrawing the remaining compulsory savings' do
-          #       before(:each) do
-          #         @group_loan.reload
-          #         @group_loan.withdraw_compulsory_savings(:compulsory_savings_withdrawn_at => @withdrawn_at)
-          #       end
-          #       
-          #       it 'should withdraw compulsory savings' do
-          #         @group_loan.is_compulsory_savings_withdrawn .should be_true 
-          #       end
-          #       
-          #       
-          #       it 'should create journal posting'
-          #     end
-          #     
-          #   end
-          # end
-          #        
+          
+          context "closing weekly loan: do all weekly payment collection" do
+            before(:each) do
+              @group_loan.group_loan_weekly_collections.order("id ASC").each do |x|
+                x.collect(:collected_at => DateTime.now)
+                x.confirm(:confirmed_at => DateTime.now)
+              end
+              
+              @group_loan.reload 
+            end
+            
+            it 'should have confirmed all group_loan weekly collections' do
+              @group_loan.group_loan_weekly_collections.where(:is_collected => true, :is_confirmed => true).count.should == @group_loan.number_of_collections 
+            end
+            
+            it 'should give nil to the next uncollected group_loan_weekly_collection' do
+              @group_loan.first_uncollected_weekly_collection.should be_nil 
+            end
+            
+            it 'should not allow compulsory savings withdrawal before closing group loan' do
+              @group_loan.withdraw_compulsory_savings(:compulsory_savings_withdrawn_at => @withdrawn_at)
+              @group_loan.errors.size.should_not == 0  
+            end
+          
+            context 'closing group loan' do
+              before(:each) do
+                @glm_list = @group_loan.active_group_loan_memberships
+                
+                @member_compulsory_savings_array = [] 
+                 @glm_list.each do |glm|
+                   @member_compulsory_savings_array << [
+                      glm.member , 
+                      glm.member.total_savings_account, 
+                      glm.total_compulsory_savings 
+                     ]
+                 end
+                @group_loan.close(:closed_at => @closed_at)
+                @group_loan.reload 
+              end
+              
+              it 'should deactivate all glm' do
+                @glm_list.each do |glm|
+                  glm.reload
+                  glm.is_active.should be_false 
+                  glm.deactivation_case.should == GROUP_LOAN_DEACTIVATION_CASE[:finished_group_loan]
+                end
+              end
+              
+              it 'should have increased the savings_account by the amount of compulsory_savings' do
+                @member_compulsory_savings_array.each do |pair|
+                  member = pair.first
+                  initial_savings =  pair[1]
+                  total_compulsory_savings = pair.last 
+                  
+                  member.reload 
+                  final_savings = member.total_savings_account 
+                  diff = final_savings - initial_savings 
+                  diff.should == BigDecimal('0')
+                end
+              end
+              
+              it 'should NOT produce 0 for total_compulsory_savings' do
+                
+                # it is the historical data... 
+                @glm_list.each do |glm|
+                  glm.reload
+                  # puts "the total compulsory savings: #{glm.total_compulsory_savings.to_s} "
+                  glm.total_compulsory_savings.should_not == BigDecimal('0')
+                end
+                
+              end
+              
+              context 'withdrawing the remaining compulsory savings' do
+                before(:each) do
+                  @group_loan.reload
+                  @group_loan.withdraw_compulsory_savings(:compulsory_savings_withdrawn_at => @withdrawn_at)
+                end
+                
+                it 'should withdraw compulsory savings' do
+                  @group_loan.is_compulsory_savings_withdrawn .should be_true 
+                end
+                
+                
+                it 'should create journal posting'
+              end
+              
+            end
+          end
+                 
        
        
         end
