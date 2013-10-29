@@ -170,43 +170,43 @@ data_entry_role = Role.create!(
 =begin
   Start the group loan 
 =end
-  @group_loan_1.start(:started_at => DateTime.now )
-  
-  @group_loan_1.disburse_loan(:disbursed_at => DateTime.now )
-  
-  @deceased_glm = @group_loan_1.group_loan_memberships.first 
-  @deceased_member = @deceased_glm.member 
-  
-  @deceased_member.mark_as_deceased(:deceased_at => DateTime.now )
-  
-  @run_away_glm = @group_loan_1.group_loan_memberships[2]
-  @run_away_member = @run_away_glm.member
-  @run_away_member.mark_as_run_away( :run_away_at => DateTime.now )
-  
-  
-  @savings_member = Member.last
-  
-  
-  (1..10).each do |x|
-    
-    
-    se = SavingsEntry.create_object(
-      :amount => BigDecimal( (x*10000).to_s ),
-      :direction => FUND_TRANSFER_DIRECTION[:incoming],
-      :member_id => @savings_member.id 
-     )
-    se.confirm(:confirmed_at => DateTime.now )
-  end
+  # @group_loan_1.start(:started_at => DateTime.now )
+  # 
+  # @group_loan_1.disburse_loan(:disbursed_at => DateTime.now )
+  # 
+  # @deceased_glm = @group_loan_1.group_loan_memberships.first 
+  # @deceased_member = @deceased_glm.member 
+  # 
+  # @deceased_member.mark_as_deceased(:deceased_at => DateTime.now )
+  # 
+  # @run_away_glm = @group_loan_1.group_loan_memberships[2]
+  # @run_away_member = @run_away_glm.member
+  # @run_away_member.mark_as_run_away( :run_away_at => DateTime.now )
+  # 
+  # 
+  # @savings_member = Member.last
+  # 
+  # 
+  # (1..10).each do |x|
+  #   
+  #   
+  #   se = SavingsEntry.create_object(
+  #     :amount => BigDecimal( (x*10000).to_s ),
+  #     :direction => FUND_TRANSFER_DIRECTION[:incoming],
+  #     :member_id => @savings_member.id 
+  #    )
+  #   se.confirm(:confirmed_at => DateTime.now )
+  # end
   
   
 =begin
   Finish weekly collection on group_loan_1 
 =end
 
-  @group_loan_1.group_loan_weekly_collections.order("id ASC").each do |x|
-    x.collect(:collected_at => DateTime.now)
-    x.confirm(:confirmed_at => DateTime.now)
-  end
+  # @group_loan_1.group_loan_weekly_collections.order("id ASC").each do |x|
+  #   x.collect(:collected_at => DateTime.now)
+  #   x.confirm(:confirmed_at => DateTime.now)
+  # end
   
   
   

@@ -25,6 +25,17 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
   validate :group_loan_weekly_collection_must_be_uncollected
   validate :next_weekly_collection_must_be_available # reason: the deactivation will start from next week
   validate :no_uncleared_weekly_uncollectible
+  validate :group_loan_must_not_be_closed
+  
+  def group_loan_must_not_be_closed
+    return if  not all_fields_present?
+    
+    if self.group_loan.is_closed?
+      self.errors.add(:generic_errors, "GroupLoan is closed")
+      return self 
+    end
+  end
+
   
   def all_fields_present?
     group_loan_id.present? and 
@@ -189,52 +200,7 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
     
     amount* remaining_weeks*1/group_loan_weekly_collection.active_group_loan_memberships.count.to_f
   end
-  
-  # def extract_run_away_default_weekly_payment_share 
-  #   # puts "************* inside the extraction of run_away_default_payment_share"
-  #   current_glm = group_loan_membership 
-  #   deactivation_week = group_loan_weekly_collection.week_number + 1 
-  #   amount = BigDecimal('0')
-  #   
-  #   
-  #   weekly_run_away_glm_list =  group_loan.group_loan_memberships.joins(:group_loan_run_away_receivable, :group_loan_product).where{
-  #     ( is_active.eq false ) & 
-  #     ( deactivation_case.eq GROUP_LOAN_DEACTIVATION_CASE[:run_away]) & 
-  #     ( deactivation_week_number.lt  deactivation_week) & 
-  #     ( group_loan_run_away_receivable.payment_case.eq GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:weekly]) 
-  #   }
-  #   
-  #   
-  #   # glm_count = group_loan.group_loan_memberships.joins(:group_loan_run_away_receivable, :group_loan_product).where{
-  #   #   ( is_active.eq false ) & 
-  #   #   ( deactivation_case.eq GROUP_LOAN_DEACTIVATION_CASE[:run_away]) & 
-  #   #   ( deactivation_week_number.lt  deactivation_week) & 
-  #   #   ( group_loan_run_away_receivable.payment_case.eq GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:weekly]) 
-  #   # }.count 
-  #   
-  #   glm_count = weekly_run_away_glm_list.count 
-  #   
-  #   # puts "The glm_count: #{glm_count}"
-  #   
-  #   # group_loan.group_loan_memberships.joins(:group_loan_run_away_receivable, :group_loan_product).where{
-  #   #   ( is_active.eq false ) & 
-  #   #   ( deactivation_case.eq GROUP_LOAN_DEACTIVATION_CASE[:run_away]) & 
-  #   #   ( deactivation_week_number.lt  deactivation_week ) & 
-  #   #   ( group_loan_run_away_receivable.payment_case.eq GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:weekly]) 
-  #   # }.each do |glm|
-  #   #   amount += glm.group_loan_product.weekly_payment_amount  
-  #   # end
-  #   
-  #   weekly_run_away_glm_list.each do |glm|
-  #     amount += glm.group_loan_product.weekly_payment_amount
-  #   end
-  #   
-  #   share_amount = amount / group_loan_weekly_collection.active_group_loan_memberships.count 
-  #   
-  #   # puts "***end of extraction"
-  #   
-  #   return GroupLoan.rounding_up( share_amount, DEFAULT_PAYMENT_ROUND_UP_VALUE)
-  # end
+ 
   
   # requirement for savings_entry creation
   def member
