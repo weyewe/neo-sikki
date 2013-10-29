@@ -55,7 +55,15 @@ class Api::GroupLoanMembershipsController < Api::BaseApiController
   def update
     @object = GroupLoanMembership.find(params[:id])
     
-    @object.update_object( params[:group_loan_membership] )
+    
+    if params[:deactivate].present?  
+      @object.deactivate(:deactivation_case => params[:group_loan_membership][:deactivation_case] )
+    else
+      @object.update_object( params[:group_loan_membership] )
+    end
+    
+    
+    
     if @object.errors.size == 0 
       render :json => { :success => true,   
                         :group_loan_memberships => [@object],

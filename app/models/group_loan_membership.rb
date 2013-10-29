@@ -132,6 +132,37 @@ class GroupLoanMembership < ActiveRecord::Base
     # for the default payment, will be recalculated, reducing the pool of default bearer. 
   end
   
+  def deactivate(params)
+    if not self.group_loan.is_started?
+      self.errors.add(:generic_errors, "GroupLoan belum dimulai. Silakan delete")
+      return self 
+    end
+    
+    if self.group_loan.is_loan_disbursed?
+      self.errors.add(:generic_errors, "Pinjaman sudah dicairkan")
+      return self 
+    end
+    
+    if not params[:deactivation_case].present? 
+      self.errors.add(:deactivation_case, "Harus memilih kondisi non-aktif")
+      return self 
+    end
+    
+    
+    if not [
+        GROUP_LOAN_DEACTIVATION_CASE[:financial_education_absent],
+        GROUP_LOAN_DEACTIVATION_CASE[:loan_disbursement_absent]
+      ].include?(params[:deactivation_case].to_i)
+      self.errors.add(:deactivation_case, "Harus memilih kondisi non-aktif")
+      return self
+    end
+    
+    
+    self.is_active = false 
+    self.deactivation_case = params[:deactivation_case].to_i
+    self.save 
+  end
+  
   def deactivation_case_name
     # GROUP_LOAN_DEACTIVATION_CASE = {
     #   :financial_education_absent => 1, 
