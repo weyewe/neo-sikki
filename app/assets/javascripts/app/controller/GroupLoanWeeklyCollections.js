@@ -233,7 +233,7 @@ Ext.define('AM.controller.GroupLoanWeeklyCollections', {
 					form.setLoading(false);
 					
 					me.reloadRecord( record ) ; 
-					
+					store.load();
 					
 					win.close();
 				},
@@ -251,8 +251,8 @@ Ext.define('AM.controller.GroupLoanWeeklyCollections', {
 	},
 	
 	reloadRecord: function(record){
-		console.log("Inside reload record");
-		console.log( record );
+		// console.log("Inside reload record");
+		// console.log( record );
 		var list = this.getList();
 		var store = this.getList().getStore();
 		var modifiedId = record.get('id');

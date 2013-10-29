@@ -26,12 +26,23 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
   validate :next_weekly_collection_must_be_available # reason: the deactivation will start from next week
   validate :no_uncleared_weekly_uncollectible
   validate :group_loan_must_not_be_closed
+  validate :member_must_be_active
   
   def group_loan_must_not_be_closed
     return if  not all_fields_present?
     
     if self.group_loan.is_closed?
       self.errors.add(:generic_errors, "GroupLoan is closed")
+      return self 
+    end
+  end
+  
+  def member_must_be_active
+    return if  not all_fields_present?
+    
+    member = self.group_loan_membership.member
+    if member.is_deceased? or member.is_run_away?
+      self.errors.add(:generic_errors, "Member #{member.name} tidak aktif")
       return self 
     end
   end

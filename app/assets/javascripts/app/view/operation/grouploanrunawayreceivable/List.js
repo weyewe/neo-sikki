@@ -73,7 +73,7 @@ Ext.define('AM.view.operation.grouploanrunawayreceivable.List' ,{
 
 
 
-		this.tbar = [  this.editObjectButton, this.deleteObjectButton  ];
+		this.tbar = [  this.editObjectButton  ];
 		this.bbar = Ext.create("Ext.PagingToolbar", {
 			store	: this.store, 
 			displayInfo: true,
@@ -100,11 +100,11 @@ Ext.define('AM.view.operation.grouploanrunawayreceivable.List' ,{
 
 	enableRecordButtons: function() {
 		this.editObjectButton.enable();
-		this.deleteObjectButton.enable();
+		// this.deleteObjectButton.enable();
 	},
 
 	disableRecordButtons: function() {
 		this.editObjectButton.disable();
-		this.deleteObjectButton.disable();
+		// this.deleteObjectButton.disable();
 	}
 });

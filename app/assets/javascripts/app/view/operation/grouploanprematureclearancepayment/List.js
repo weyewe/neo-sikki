@@ -22,8 +22,8 @@ Ext.define('AM.view.operation.grouploanprematureclearancepayment.List' ,{
 				text : "Jumlah",
 				flex : 2,
 				tpl : 'Pengembalian Pokok: {total_principal_return}' + '<br />'  +  
-							'Tanggungan Kabur bayar mingguan: {run_away_weekly_resolution_bail_out}' + '<br />'  +  
-							'Tanggunan Kabur bayar di akhir: {run_away_end_of_cycle_resolution_bail_out}' + '<br />'  +  '<br />' +
+							'Titipan Kabur bayar mingguan: {run_away_weekly_resolution_bail_out}' + '<br />'  +  
+							'Titipan Kabur bayar di akhir: {run_away_end_of_cycle_resolution_bail_out}' + '<br />'  +  '<br />' +
 							'( Tabungan Wajib : {available_compulsory_savings} )' + '<br />'  +  '<br />' + 
 							'Total : <b>{amount}</b>' + '<br />'  +  '<br />' + 
 							
@@ -68,9 +68,7 @@ Ext.define('AM.view.operation.grouploanprematureclearancepayment.List' ,{
 
 
 
-		this.tbar = [this.addObjectButton, this.editObjectButton, this.deleteObjectButton ,
-		 							'-',
-									this.confirmObjectButton ];
+		this.tbar = [this.addObjectButton, this.editObjectButton, this.deleteObjectButton ];
 		this.bbar = Ext.create("Ext.PagingToolbar", {
 			store	: this.store, 
 			displayInfo: true,
