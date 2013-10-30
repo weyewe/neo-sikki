@@ -1,5 +1,5 @@
 class GroupLoanWeeklyPayment < ActiveRecord::Base
-  attr_accessible :group_loan_membership_id, :group_loan_id, :group_loan_weekly_collection_id
+  attr_accessible :group_loan_membership_id, :group_loan_id, :group_loan_weekly_collection_id, :is_run_away_weekly_bailout
   
   has_many :transaction_activities, :as => :transaction_source 
   has_many :savings_entries, :as => :savings_source
