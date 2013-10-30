@@ -23,6 +23,9 @@ class GroupLoanWeeklyUncollectible < ActiveRecord::Base
   
   def valid_active_member
     return if not all_fields_present?
+    return if not self.group_loan.is_closed?
+      
+    
     member = self.group_loan_membership.member
     if not  self.group_loan_membership.is_active? 
       self.errors.add(:generic_errors, "Member #{member.name} tidak aktif")

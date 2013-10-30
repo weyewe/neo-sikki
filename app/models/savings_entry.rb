@@ -196,7 +196,7 @@ class SavingsEntry < ActiveRecord::Base
   end
   
   def self.create_weekly_payment_compulsory_savings( savings_source )
-    puts "Gonna create savings_entry"
+    # puts "Gonna create savings_entry"
     group_loan_membership = savings_source.group_loan_membership
     member = group_loan_membership.member 
     
@@ -211,7 +211,7 @@ class SavingsEntry < ActiveRecord::Base
                         :is_confirmed => true, 
                         :confirmed_at => savings_source.group_loan_weekly_collection.confirmed_at 
                         
-    puts "The amount: #{new_object.amount}"
+    # puts "The amount: #{new_object.amount}"
     group_loan_membership.update_total_compulsory_savings( new_object.amount)
   end
 

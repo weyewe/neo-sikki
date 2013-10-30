@@ -92,16 +92,16 @@ class GroupLoanMembership < ActiveRecord::Base
   
   
   def update_total_compulsory_savings(amount)
-    puts "Gonna update total compulsory savings: #{amount}"
+    # puts "Gonna update total compulsory savings: #{amount}"
     self.total_compulsory_savings += amount 
     self.save 
     
-    puts "The total_compulsory_savings: #{self.total_compulsory_savings}"
-    puts "is_valid: #{self.valid?}"
-    
-    self.errors.messages.each do |msg|
-      puts "The msg: #{msg}"
-    end
+    # puts "The total_compulsory_savings: #{self.total_compulsory_savings}"
+    # puts "is_valid: #{self.valid?}"
+    # 
+    # self.errors.messages.each do |msg|
+    #   puts "The msg: #{msg}"
+    # end
   end
    
   

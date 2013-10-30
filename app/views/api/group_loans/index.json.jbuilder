@@ -28,4 +28,6 @@ json.group_loans @objects do |object|
 	json.bad_debt_expense										object.bad_debt_expense
 	
 	json.premature_clearance_deposit										object.premature_clearance_deposit
+	json.expected_revenue_from_run_away_member_end_of_cycle_resolution object.expected_revenue_from_run_away_member_end_of_cycle_resolution
+	json.total_compulsory_savings_pre_closure object.total_compulsory_savings_pre_closure
 end

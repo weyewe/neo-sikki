@@ -52,7 +52,12 @@ Ext.define('AM.view.operation.grouploan.List' ,{
 				text : "Selesai",
 				flex : 1,
 				tpl : 'Status: <b>{is_closed}</b>' + '<br />' + '<br />' +
-							'Titipan premature clearance: <br /><b>{premature_clearance_deposit}</b>' + '<br />' + '<br />' +  
+							'Total Tabungan wajib sebelum penutupan: <br /><b>{total_compulsory_savings_pre_closure}</b>' + '<br />' + '<br />' +
+							'Titipan premature clearance: <br /><b>{premature_clearance_deposit}</b>' + '<br />' + '<hr />' +  
+							
+							
+							'Pendapatan bagi hasil dari member kabur, penyelesaian di akhir: <br /><b>{expected_revenue_from_run_away_member_end_of_cycle_resolution}</b>' + '<br />' + '<br />' + 
+							
 							'Bad Debt Allowance: <br /><b>{bad_debt_allowance}</b>' + '<br />' + '<br />' + 
 							'Bad Debt Expense:  <br /><b>{bad_debt_expense}</b>' + '<br />' + '<br />' + 
 							'Tanggal Selesai: <br /><b>{closed_at}</b>'     

@@ -206,7 +206,7 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
     return amount  if run_away_end_of_cycle_resolved.count == 0 
       
     run_away_end_of_cycle_resolved.each do |gl_rar|
-      amount << gl_rar.group_loan_membership.group_loan_product.weekly_payment_amount
+      amount +=  gl_rar.group_loan_membership.group_loan_product.weekly_payment_amount
     end
     
     contribution_amount = amount* remaining_weeks*1/group_loan_weekly_collection.active_group_loan_memberships.count.to_f
