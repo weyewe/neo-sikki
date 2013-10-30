@@ -51,7 +51,8 @@ Ext.define('AM.view.operation.grouploan.List' ,{
 				xtype : 'templatecolumn',
 				text : "Selesai",
 				flex : 1,
-				tpl : 'Status: <b>{is_closed}</b>' + '<br />' + '<br />' + 
+				tpl : 'Status: <b>{is_closed}</b>' + '<br />' + '<br />' +
+							'Titipan premature clearance: <br /><b>{premature_clearance_deposit}</b>' + '<br />' + '<br />' +  
 							'Bad Debt Allowance: <br /><b>{bad_debt_allowance}</b>' + '<br />' + '<br />' + 
 							'Bad Debt Expense:  <br /><b>{bad_debt_expense}</b>' + '<br />' + '<br />' + 
 							'Tanggal Selesai: <br /><b>{closed_at}</b>'     

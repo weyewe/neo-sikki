@@ -41,7 +41,7 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
     return if  not all_fields_present?
     
     member = self.group_loan_membership.member
-    if member.is_deceased? or member.is_run_away?
+    if not group_loan_membership.is_active? 
       self.errors.add(:generic_errors, "Member #{member.name} tidak aktif")
       return self 
     end
@@ -185,7 +185,9 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
     current_week_number = group_loan_weekly_collection.week_number
     remaining_weeks = group_loan.loan_duration -  current_week_number
     
-    group_loan_weekly_collection.extract_run_away_weekly_bail_out_amount* remaining_weeks*1 / group_loan_weekly_collection.active_group_loan_memberships.count.to_f
+    contribution_amount = group_loan_weekly_collection.extract_run_away_weekly_bail_out_amount* remaining_weeks*1 / group_loan_weekly_collection.active_group_loan_memberships.count.to_f
+    
+    GroupLoan.rounding_up( contribution_amount  , DEFAULT_PAYMENT_ROUND_UP_VALUE) 
   end
   
   def run_away_end_of_cycle_resolved_bail_out_contribution
@@ -203,19 +205,24 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
         
     return amount  if run_away_end_of_cycle_resolved.count == 0 
       
-        
-        
     run_away_end_of_cycle_resolved.each do |gl_rar|
       amount << gl_rar.group_loan_membership.group_loan_product.weekly_payment_amount
     end
     
-    amount* remaining_weeks*1/group_loan_weekly_collection.active_group_loan_memberships.count.to_f
+    contribution_amount = amount* remaining_weeks*1/group_loan_weekly_collection.active_group_loan_memberships.count.to_f
+    
+    GroupLoan.rounding_up( contribution_amount  , DEFAULT_PAYMENT_ROUND_UP_VALUE) 
   end
  
   
   # requirement for savings_entry creation
   def member
     self.group_loan_membership.member 
+  end
+  
+  
+  def premature_clearance_deposit_amount
+    run_away_end_of_cycle_resolved_bail_out_contribution + run_away_weekly_resolved_bail_out_contribution
   end
   
   def confirm
@@ -241,5 +248,11 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
       end 
     end
     
+    
+    # amount_for_premature_clearance_deposit = self.group_loan_weekly_collection.amount_receivable - normal_weekly_collection_without_deposit
+    self.group_loan.update_premature_clearance_deposit( premature_clearance_deposit_amount ) 
+    
   end
+  
+  
 end

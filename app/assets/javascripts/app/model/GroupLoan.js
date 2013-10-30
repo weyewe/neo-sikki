@@ -26,6 +26,7 @@ Ext.define('AM.model.GroupLoan', {
 			{ name: 'compulsory_savings_return_amount', type: 'string' },
 			{ name: 'bad_debt_allowance', type: 'string' },
 			{ name: 'bad_debt_expense', type: 'string' },
+			{ name: 'premature_clearance_deposit', type: 'string' },
   	],
 
 	 

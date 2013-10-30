@@ -12,6 +12,7 @@ class GroupLoanWeeklyUncollectible < ActiveRecord::Base
   validate :use_first_uncollected_weekly_collection
   validate :no_creation_if_weekly_collection_is_confirmed
   validate :valid_clearance_case
+  validate :valid_active_member 
   
   # after_create :update_group_loan_default_amount_receivable
   
@@ -19,6 +20,15 @@ class GroupLoanWeeklyUncollectible < ActiveRecord::Base
   #   group_loan.update_default_payment_amount_receivable
   #   
   # end
+  
+  def valid_active_member
+    return if not all_fields_present?
+    member = self.group_loan_membership.member
+    if not  self.group_loan_membership.is_active? 
+      self.errors.add(:generic_errors, "Member #{member.name} tidak aktif")
+      return self 
+    end
+  end
   
   def valid_clearance_case
     return if not all_fields_present?

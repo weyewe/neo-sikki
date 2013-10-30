@@ -60,6 +60,10 @@ class Member < ActiveRecord::Base
   Deceased member
 =end
 
+  def is_active?
+    not self.is_deceased and not self.is_run_away
+  end
+
   def mark_as_deceased( params ) 
     if self.is_deceased? 
       self.errors.add(:generic_errors, "#{self.name} sudah dinyatakan meninggal")

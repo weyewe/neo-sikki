@@ -140,7 +140,6 @@ ActiveRecord::Schema.define(version: 20131010083300) do
     t.boolean  "is_compulsory_savings_withdrawn",                                       default: false
     t.datetime "compulsory_savings_withdrawn_at"
     t.integer  "group_leader_id"
-    t.decimal  "remaining_premature_clearance_deposit",        precision: 10, scale: 2, default: 0.0
     t.decimal  "premature_clearance_deposit",                  precision: 10, scale: 2, default: 0.0
     t.decimal  "total_compulsory_savings_pre_closure",         precision: 10, scale: 2, default: 0.0
     t.decimal  "bad_debt_allowance",                           precision: 10, scale: 2, default: 0.0

@@ -45,12 +45,6 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
     self.is_collected = true  
     
     
-    # if self.premature_clearance_deposit_usage > self.group_loan.remaining_premature_clearance_deposit
-    #   msg = "Jumlah uang titipan tersisa: #{self.group_loan.remaining_premature_clearance_deposit.to_s}"
-    #   self.errors.add(:premature_clearance_deposit_usage, msg )
-    #   return self
-    # end
-    
     self.save 
   end
   
@@ -277,7 +271,6 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
     amount = BigDecimal('0')
     current_week_number = self.week_number
     
-    puts "\n\n======> Analytics: The current week: #{current_week_number}"
     
     run_away_bail_out_list = []
     group_loan.group_loan_weekly_collections.
@@ -290,8 +283,8 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
       end
       
       number_of_premature_clearance_starting_this_week = weekly_collection.premature_clearance_group_loan_memberships.count
-      puts "week : #{weekly_collection.week_number}"
-      puts "number_of_premature_clearance_starting_this_week: #{number_of_premature_clearance_starting_this_week}"
+      # puts "week : #{weekly_collection.week_number}"
+      # puts "number_of_premature_clearance_starting_this_week: #{number_of_premature_clearance_starting_this_week}"
       if number_of_premature_clearance_starting_this_week != 0 
         this_week_active_glm_count = self.active_group_loan_memberships.count 
         multiplier = this_week_active_glm_count /  (this_week_active_glm_count + number_of_premature_clearance_starting_this_week).to_f
@@ -332,32 +325,12 @@ fourth_collection.amount_receivable
 =end
   def amount_receivable 
     
-    # puts "The inspect:\n\n\n"
     total_amount =  extract_base_amount +  # from all still active member 
                     extract_run_away_weekly_bail_out_amount +  # amount used to bail out the run_away weekly_resolution
                     extract_premature_clearance_payment_amount -  #premature clearance for that week 
                     extract_uncollectible_weekly_payment_amount    
            
-    # base_amount                         = extract_base_amount 
-    # run_away_weekly_bail_out_amount     = extract_run_away_weekly_bail_out_amount 
-    # premature_clearance_payment_amount  = extract_premature_clearance_payment_amount  
-    # uncollectible_weekly_payment_amount = extract_uncollectible_weekly_payment_amount  
-    # 
-    #                  
-    #                  
-    # # GroupLoan.rounding_up( amount_payable - available_compulsory_savings , DEFAULT_PAYMENT_ROUND_UP_VALUE) 
-    #                  
-    #                  
-    # 
-    # puts "The details for amount_receivable: \n\n\n"
-    # puts "The base_amount: #{base_amount.to_s}"
-    # puts "The run_away_weekly_bail_out: #{run_away_weekly_bail_out_amount.to_s}"
-    # puts "The premature_clearance_payment: #{premature_clearance_payment_amount.to_s}"
-    # puts "The uncollectible payment: #{uncollectible_weekly_payment_amount.to_s}"
-    # 
-    # puts "Tadaaa\n\n\n"
     
-    # puts "The total_amount: #{GroupLoan.rounding_up( total_amount  , DEFAULT_PAYMENT_ROUND_UP_VALUE ) }"
     return GroupLoan.rounding_up( total_amount  , DEFAULT_PAYMENT_ROUND_UP_VALUE ) 
   end
   

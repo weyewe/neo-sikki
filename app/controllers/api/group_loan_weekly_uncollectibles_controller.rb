@@ -56,7 +56,7 @@ class Api::GroupLoanWeeklyUncollectiblesController < Api::BaseApiController
     
     
     params[:group_loan_weekly_uncollectible][:collected_at] =  parse_date( params[:group_loan_weekly_uncollectible][:collected_at] ) 
-    params[:group_loan_weekly_uncollectible][:confirmed_at] =  parse_date( params[:group_loan_weekly_uncollectible][:confirmed_at] ) 
+    params[:group_loan_weekly_uncollectible][:cleared_at] =  parse_date( params[:group_loan_weekly_uncollectible][:cleared_at] ) 
 
     if params[:collect].present?  
       @object.collect(:collected_at => params[:group_loan_weekly_uncollectible][:collected_at] )

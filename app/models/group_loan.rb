@@ -569,7 +569,7 @@ Phase: loan disbursement finalization
     return BigDecimal('0') if not self.is_closed?
     
     amount =   self.total_compulsory_savings  + 
-              self.remaining_premature_clearance_deposit  -
+              self.premature_clearance_deposit  -
               self.bad_debt_allowance - # uncleared uncollectibles, run_away end_of_cycle resolution 
               self.expected_revenue_from_run_away_member_end_of_cycle_resolution
               
@@ -677,6 +677,11 @@ Phase: loan disbursement finalization
       amount += glm.group_loan_product.weekly_payment_amount * glm.group_loan_product.total_weeks
     end
     return amount 
+  end
+  
+  def update_premature_clearance_deposit(amount)
+    self.premature_clearance_deposit += amount
+    self.save 
   end
   
 =begin
