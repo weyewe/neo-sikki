@@ -1,0 +1,32 @@
+Case 1
+1. RunAway (weekly resolution): it won't debit bad debt allowance
+2. RunAway (end_of_cycle resolution): it will debit bad debt allowance
+
+Case 2
+1. RunAway( weekly resolution ) + Premature Clearance 
+		There will be premature clearance deposit. However, such premature clearance deposit won't be kept. In fact, it is used to reduce the run_away bail_out : principal + interest + compulsory_savings 
+		
+		The compulsory savings element will be returned at the end of the cycle. So, we are only taking the bare minimum. 
+		
+2. RunAway( end_of_cycle resolution ) + PrematureClearance
+	WeeklyCollection won't include the payment for the run away member. 
+	PrematureClearance Deposit will be returned at the end of loan_cycle post bad_allowance deduction 
+	
+	
+Rule
+Rule 1
+If there is a run_away declared on a given week, the admin is able to change resolution method (weekly or end_of_cycle) if the weekly collection is not confirmed. 
+
+Rule 2
+At the end of loan_cycle, we will return a bulk amount of 
+compulsory_savings + 
+premature_clearance_deposit - 
+expected_interest_from_run_away, end_of_cycle resolution - 
+bad_debt_allowance
+
+Priority: 
+1. recover  expeceted_interest_revenue_from_run_away
+2. Recover BadDebt
+
+		
+		
