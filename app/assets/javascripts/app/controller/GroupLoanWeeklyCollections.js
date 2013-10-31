@@ -138,7 +138,15 @@ Ext.define('AM.controller.GroupLoanWeeklyCollections', {
 		if (parentList.getSelectionModel().hasSelection()) {
 			var row = parentList.getSelectionModel().getSelection()[0];
 			var id = row.get("id"); 
-			grid.setTitle( "GroupLoan: " + row.get("name"));
+			
+			var title = "";
+			if( row ){
+				title = "GroupLoan: " + row.get("name");
+			}else{
+				title = "";
+			}
+			grid.setTitle( title );
+			
 			wrapper.selectedParentId = id ; 
 		}
 		

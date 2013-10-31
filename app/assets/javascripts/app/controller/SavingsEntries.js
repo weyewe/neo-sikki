@@ -420,7 +420,17 @@ Ext.define('AM.controller.SavingsEntries', {
 		// 	return; 
 		// }
 		
-		grid.setTitle( selectedParentRecord.get("name") + " | " + selectedParentRecord.get("id_number"));
+		
+		var title = "";
+		if( selectedParentRecord ){
+			title = selectedParentRecord.get("name") + " | " + selectedParentRecord.get("id_number");
+		}else{
+			title = "";
+		}
+		grid.setTitle( title );
+		
+		
+		// grid.setTitle( selectedParentRecord.get("name") + " | " + selectedParentRecord.get("id_number"));
 		
 		// console.log("parent selection change");
 		// console.log("The wrapper");

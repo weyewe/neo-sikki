@@ -100,7 +100,7 @@ class SavingsEntry < ActiveRecord::Base
     return new_object
   end
   
-  def self.update_object( params ) 
+  def  update_object( params ) 
     
     if self.is_confirmed?
       self.errors.add(:generic_errors, 'Sudah dikonfirmasi. Silakan unconfirm')
