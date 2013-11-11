@@ -24,7 +24,7 @@ class Api::GroupLoanRunAwayReceivablesController < Api::BaseApiController
                   where(:member_id => params[:parent_id]).
                   page(params[:page]).per(params[:limit]).order("id ASC")
       @total = GroupLoanRunAwayReceivable.where(:member_id => params[:parent_id]).count 
-    elsif
+    else
       @objects = []
       @total = 0 
     end

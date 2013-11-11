@@ -25,7 +25,7 @@ class Api::GroupLoanMembershipsController < Api::BaseApiController
                   where(:group_loan_id => params[:parent_id]).
                   page(params[:page]).per(params[:limit]).order("id DESC")
       @total = GroupLoanMembership.where(:group_loan_id => params[:parent_id]).count 
-    elsif
+    else
       @objects = []
       @total = 0 
     end
