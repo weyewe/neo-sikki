@@ -45,6 +45,12 @@ data_entry_role = Role.create!(
 
 =begin
   CREATING THE USER 
+  
+  admin = User.create_main_user(  :name => "Admin2", :email => "admin2@gmail.com" ,:password => "willy1234", :password_confirmation => "willy1234") 
+  admin.set_as_main_user
+  
+  admin = User.create_main_user(  :name => "Admin4", :email => "admin4@gmail.com" ,:password => "willy1234", :password_confirmation => "willy1234") 
+  admin.set_as_main_user
 =end
 
   admin = User.create_main_user(  :name => "Admin", :email => "admin@gmail.com" ,:password => "willy1234", :password_confirmation => "willy1234") 
@@ -221,52 +227,52 @@ data_entry_role = Role.create!(
 =begin
   Finish weekly collection on group_loan_1 
 =end
-
-  @group_loan_1.group_loan_weekly_collections.order("id ASC").each do |x|
-    break if x.week_number == 2
-    x.collect(:collected_at => DateTime.now)
-    x.confirm(:confirmed_at => DateTime.now)
-  end
-  
-  # create deceased 
-  @deceased_member.mark_as_deceased(:deceased_at => DateTime.now )
-  
-  
-  @group_loan_1.group_loan_weekly_collections.order("id ASC").each do |x|
-    next if x.is_collected?   and x.is_collected?
-    break if x.week_number == 4
-    x.collect(:collected_at => DateTime.now)
-    x.confirm(:confirmed_at => DateTime.now)
-  end
-  
-  # create run_away 
-  @fourth_week_collection = @group_loan_1.group_loan_weekly_collections.where(:week_number => 4 ).first 
-  @run_away_member.mark_as_run_away( :run_away_at => DateTime.now )
-  
-  @group_loan_1.group_loan_weekly_collections.order("id ASC").each do |x|
-    next if x.is_collected?   and x.is_collected?
-    break if x.week_number == 6 
-    x.collect(:collected_at => DateTime.now)
-    x.confirm(:confirmed_at => DateTime.now)
-  end
-  
-  
-  # create premature clearance
-  @sixth_week_collection = @group_loan_1.group_loan_weekly_collections.where(:week_number => 6 ).first 
-  
-  @premature_clearance = GroupLoanPrematureClearancePayment.create_object(
-    :group_loan_id                    => @group_loan_1.id , 
-    :group_loan_membership_id         => @premature_clearance_glm.id , 
-    :group_loan_weekly_collection_id  => @sixth_week_collection.id 
-  )
-  
-  @group_loan_1.group_loan_weekly_collections.order("id ASC").each do |x|
-    next if x.is_collected?   and x.is_collected?
-    
-    x.collect(:collected_at => DateTime.now)
-    x.confirm(:confirmed_at => DateTime.now)
-  end
-  
+  # 
+  # @group_loan_1.group_loan_weekly_collections.order("id ASC").each do |x|
+  #   break if x.week_number == 2
+  #   x.collect(:collected_at => DateTime.now)
+  #   x.confirm(:confirmed_at => DateTime.now)
+  # end
+  # 
+  # # create deceased 
+  # @deceased_member.mark_as_deceased(:deceased_at => DateTime.now )
+  # 
+  # 
+  # @group_loan_1.group_loan_weekly_collections.order("id ASC").each do |x|
+  #   next if x.is_collected?   and x.is_collected?
+  #   break if x.week_number == 4
+  #   x.collect(:collected_at => DateTime.now)
+  #   x.confirm(:confirmed_at => DateTime.now)
+  # end
+  # 
+  # # create run_away 
+  # @fourth_week_collection = @group_loan_1.group_loan_weekly_collections.where(:week_number => 4 ).first 
+  # @run_away_member.mark_as_run_away( :run_away_at => DateTime.now )
+  # 
+  # @group_loan_1.group_loan_weekly_collections.order("id ASC").each do |x|
+  #   next if x.is_collected?   and x.is_collected?
+  #   break if x.week_number == 6 
+  #   x.collect(:collected_at => DateTime.now)
+  #   x.confirm(:confirmed_at => DateTime.now)
+  # end
+  # 
+  # 
+  # # create premature clearance
+  # @sixth_week_collection = @group_loan_1.group_loan_weekly_collections.where(:week_number => 6 ).first 
+  # 
+  # @premature_clearance = GroupLoanPrematureClearancePayment.create_object(
+  #   :group_loan_id                    => @group_loan_1.id , 
+  #   :group_loan_membership_id         => @premature_clearance_glm.id , 
+  #   :group_loan_weekly_collection_id  => @sixth_week_collection.id 
+  # )
+  # 
+  # @group_loan_1.group_loan_weekly_collections.order("id ASC").each do |x|
+  #   next if x.is_collected?   and x.is_collected?
+  #   
+  #   x.collect(:collected_at => DateTime.now)
+  #   x.confirm(:confirmed_at => DateTime.now)
+  # end
+  # 
   
 =begin
   ################## FOR Group Loan 3 
@@ -286,59 +292,59 @@ data_entry_role = Role.create!(
   @premature_clearance_glm = @group_loan_3.group_loan_memberships[5]
   @premature_clearance_member = @premature_clearance_glm.member 
 
-  
-  
-  @group_loan_3.group_loan_weekly_collections.order("id ASC").each do |x|
-    break if x.week_number == 2
-    x.collect(:collected_at => DateTime.now)
-    x.confirm(:confirmed_at => DateTime.now)
-  end
-  
-  # create deceased 
-  @deceased_member.mark_as_deceased(:deceased_at => DateTime.now )
-  
-  
-  @group_loan_3.group_loan_weekly_collections.order("id ASC").each do |x|
-    next if x.is_collected?   and x.is_collected?
-    break if x.week_number == 4
-    x.collect(:collected_at => DateTime.now)
-    x.confirm(:confirmed_at => DateTime.now)
-  end
-  
-  # create run_away 
-  @fourth_week_collection = @group_loan_3.group_loan_weekly_collections.where(:week_number => 4 ).first 
-  @run_away_member.mark_as_run_away( :run_away_at => DateTime.now )
-  
-  @group_loan_3.group_loan_run_away_receivables.each do |x|
-    x.set_payment_case(:payment_case =>  GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:end_of_cycle])
-  end
-  
-  @group_loan_3.group_loan_weekly_collections.order("id ASC").each do |x|
-    next if x.is_collected?   and x.is_collected?
-    break if x.week_number == 6 
-    x.collect(:collected_at => DateTime.now)
-    x.confirm(:confirmed_at => DateTime.now)
-  end
-  
-  
-  
-  
-  # # create premature clearance
-  @sixth_week_collection = @group_loan_3.group_loan_weekly_collections.where(:week_number => 6 ).first 
-  
-  @premature_clearance = GroupLoanPrematureClearancePayment.create_object(
-    :group_loan_id                    => @group_loan_3.id , 
-    :group_loan_membership_id         => @premature_clearance_glm.id , 
-    :group_loan_weekly_collection_id  => @sixth_week_collection.id 
-  )
-  
-  @group_loan_3.group_loan_weekly_collections.order("id ASC").each do |x|
-    next if x.is_collected?   and x.is_collected?
-    
-    x.collect(:collected_at => DateTime.now)
-    x.confirm(:confirmed_at => DateTime.now)
-  end
-  
+   #  
+   # 
+   # @group_loan_3.group_loan_weekly_collections.order("id ASC").each do |x|
+   #   break if x.week_number == 2
+   #   x.collect(:collected_at => DateTime.now)
+   #   x.confirm(:confirmed_at => DateTime.now)
+   # end
+   # 
+   # # create deceased 
+   # @deceased_member.mark_as_deceased(:deceased_at => DateTime.now )
+   # 
+   # 
+   # @group_loan_3.group_loan_weekly_collections.order("id ASC").each do |x|
+   #   next if x.is_collected?   and x.is_collected?
+   #   break if x.week_number == 4
+   #   x.collect(:collected_at => DateTime.now)
+   #   x.confirm(:confirmed_at => DateTime.now)
+   # end
+   # 
+   # # create run_away 
+   # @fourth_week_collection = @group_loan_3.group_loan_weekly_collections.where(:week_number => 4 ).first 
+   # @run_away_member.mark_as_run_away( :run_away_at => DateTime.now )
+   # 
+   # @group_loan_3.group_loan_run_away_receivables.each do |x|
+   #   x.set_payment_case(:payment_case =>  GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:end_of_cycle])
+   # end
+   # 
+   # @group_loan_3.group_loan_weekly_collections.order("id ASC").each do |x|
+   #   next if x.is_collected?   and x.is_collected?
+   #   break if x.week_number == 6 
+   #   x.collect(:collected_at => DateTime.now)
+   #   x.confirm(:confirmed_at => DateTime.now)
+   # end
+   # 
+   # 
+   # 
+   # 
+   # # # create premature clearance
+   # @sixth_week_collection = @group_loan_3.group_loan_weekly_collections.where(:week_number => 6 ).first 
+   # 
+   # @premature_clearance = GroupLoanPrematureClearancePayment.create_object(
+   #   :group_loan_id                    => @group_loan_3.id , 
+   #   :group_loan_membership_id         => @premature_clearance_glm.id , 
+   #   :group_loan_weekly_collection_id  => @sixth_week_collection.id 
+   # )
+   # 
+   # @group_loan_3.group_loan_weekly_collections.order("id ASC").each do |x|
+   #   next if x.is_collected?   and x.is_collected?
+   #   
+   #   x.collect(:collected_at => DateTime.now)
+   #   x.confirm(:confirmed_at => DateTime.now)
+   # end
+   # 
   
   
   # 

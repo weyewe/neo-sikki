@@ -114,7 +114,7 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
     self.group_loan_weekly_collection_id  = params[:group_loan_weekly_collection_id]
     
     
-    self.update_amount if new_object.save 
+    self.update_amount if self.save 
     
     return self 
   end
