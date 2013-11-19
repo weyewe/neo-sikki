@@ -9,10 +9,24 @@ Ext.define('AM.view.master.grouploanproduct.List' ,{
 		this.columns = [
 			{ header: 'Nama', dataIndex: 'name'},
 			{ header: 'Durasi',  dataIndex: 'total_weeks' },
+			
+			// {
+			// 	xtype : 'templatecolumn',
+			// 	text : "Weekly Installment",
+			// 	sortable : false,
+			// 	flex : 1,
+			// 	tpl : '<b>{weekly_payment_amount}</b>' + '<br /><br />' + 
+			// 				'<b>Principal</b>: <br />{principal}' + '<br /><br />' + 
+			// 				'<b>Interest</b>: <br />{interest}' + '<br /><br />' + 
+			// 				'<b>Tabungan Wajib</b>: <br />{compulsory_savings}'  
+			// },
+			{	header: 'Weekly Installment', dataIndex: 'weekly_payment_amount', flex: 1 } ,
 			{	header: 'Pokok Mingguan', dataIndex: 'principal', flex: 1 } ,
 			{	header: 'Bunga Mingguan', dataIndex: 'interest', flex: 1 } ,
 			{	header: 'Tabungan Wajib Mingguan', dataIndex: 'compulsory_savings', flex: 1 } ,
 			{	header: 'Biaya Admin', dataIndex: 'admin_fee', flex: 1 } ,
+			
+			
 		];
 
 		this.addObjectButton = new Ext.Button({

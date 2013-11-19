@@ -25,7 +25,7 @@ class Api::GroupLoanProductsController < Api::BaseApiController
     end
     
     
-    render :json => { :group_loan_products => @objects , :total => @total , :success => true }
+    # render :json => { :group_loan_products => @objects , :total => @total , :success => true }
   end
 
   def create

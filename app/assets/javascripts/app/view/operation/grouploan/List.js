@@ -16,7 +16,7 @@ Ext.define('AM.view.operation.grouploan.List' ,{
 
 	initComponent: function() {
 		this.columns = [
-			// { header: 'Nama', dataIndex: 'name' , flex : 1 },
+			{ header: 'GroupID', dataIndex: 'id'   },
 			{
 				xtype : 'templatecolumn',
 				text : "Info",
