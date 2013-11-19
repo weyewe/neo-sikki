@@ -24,7 +24,11 @@ class Member < ActiveRecord::Base
     new_object           = self.new
     new_object.name      = params[:name]
     new_object.address   = params[:address]
-    new_object.id_number = params[:id_number]
+    new_object.id_number = params[:id_number] 
+    # next modification
+    new_object.id_number = params[:id_card_number]  # KTP 
+    new_object.id_number = params[:birthday_date]
+    new_object.id_number = params[:is_data_complete]
 
     new_object.save
     
@@ -35,8 +39,18 @@ class Member < ActiveRecord::Base
     self.name      = params[:name]
     self.address   = params[:address]
     self.id_number = params[:id_number]
+    # next modification
+    self.id_card_number = params[:id_card_number]
+    self.birthday_date = params[:birthday_date]
+    self.is_data_complete = params[:is_data_complete]
 
     self.save 
+    if self.errors.size != 0 
+      puts "************** AWESOMe"
+      self.errors.messages.each do |msg|
+        puts "The message: #{msg}"
+      end
+    end
   end
   
   def delete_object

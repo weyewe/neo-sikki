@@ -66,12 +66,13 @@ class Api::MembersController < Api::BaseApiController
     end
     
     
-    render :json => { :members => @objects , :total => @total , :success => true }
+    # render :json => { :members => @objects , :total => @total , :success => true }
   end
 
   def create
     # @object = Member.new(params[:member])
  
+    params[:member][:birthday_date] =  parse_date( params[:member][:birthday_date] ) 
     @object = Member.create_object( params[:member] )
     if @object.errors.size == 0 
       render :json => { :success => true, 
@@ -103,6 +104,8 @@ class Api::MembersController < Api::BaseApiController
     @object = Member.find(params[:id])
     params[:member][:deceased_at] =  parse_date( params[:member][:deceased_at] )
     params[:member][:run_away_at] =  parse_date( params[:member][:run_away_at] )
+    
+    params[:member][:birthday_date] =  parse_date( params[:member][:birthday_date] ) 
     
     if params[:mark_as_deceased].present?  
       @object.mark_as_deceased(:deceased_at => params[:member][:deceased_at] )

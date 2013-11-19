@@ -8,10 +8,25 @@ Ext.define('AM.view.master.member.List' ,{
 	initComponent: function() {
 		this.columns = [
 			{ header: 'ID_NUMBER', dataIndex: 'id_number'},
-			{ header: 'Nama',  dataIndex: 'name', flex: 1},
+			// { header: 'Nama',  dataIndex: 'name', flex: 1},
+			
+			{
+				xtype : 'templatecolumn',
+				text : "Details",
+				sortable : false,
+				flex : 1,
+				tpl : '<b>Nama</b>: <br />{name}' + '<br /><br />' + 
+							'<b>KTP</b>: <br />{id_card_number}' + '<br /><br />' + 
+							'<b>Ultah</b>: <br />{birthday_date}'  
+			},
+			
+			
 			{	header: 'Address', dataIndex: 'address', flex: 1 },
 			{	header: 'Kabur', dataIndex: 'is_run_away', flex: 1 } ,
-			{	header: 'Meninggal', dataIndex: 'is_deceased', flex: 1 }  
+			{	header: 'Meninggal', dataIndex: 'is_deceased', flex: 1 }  ,
+			{	header: 'Complete?', dataIndex: 'is_data_complete', flex: 1 }  , 
+			
+			
 		];
 
 		this.addObjectButton = new Ext.Button({

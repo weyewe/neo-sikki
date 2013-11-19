@@ -64,27 +64,28 @@ Ext.define('AM.view.master.member.Form', {
 					name : 'address',
 					fieldLabel: 'Alamat'
 				},
-				// {
-				// 	fieldLabel: 'Role',
-				// 	xtype: 'combo',
-				// 	queryMode: 'remote',
-				// 	forceSelection: true, 
-				// 	displayField : 'role_name',
-				// 	valueField : 'role_id',
-				// 	pageSize : 5,
-				// 	minChars : 1, 
-				// 	allowBlank : false, 
-				// 	triggerAction: 'all',
-				// 	store : remoteJsonStore , 
-				// 	listConfig : {
-				// 		getInnerTpl: function(){
-				// 			return  	'<div data-qtip="{role_name}">' +  
-				// 									'<div class="combo-name">{role_name}</div>' +  
-				// 			 					'</div>';
-				// 		}
-				// 	},
-				// 	name : 'role_id' 
-				// }
+				
+				{
+					xtype: 'textfield',
+					name : 'id_card_number',
+					fieldLabel: 'KTP'
+				},
+				
+				{
+					xtype: 'datefield',
+					name : 'birthday_date',
+					fieldLabel: 'Ulang Tahun',
+					format: 'Y-m-d',
+				},
+				
+				
+				
+				
+				{
+					fieldLabel : 'Data Lengkap?',
+					name : 'is_data_complete',
+					xtype : 'checkbox'
+				},
 			]
     }];
 
