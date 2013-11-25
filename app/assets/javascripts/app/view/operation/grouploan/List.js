@@ -31,9 +31,9 @@ Ext.define('AM.view.operation.grouploan.List' ,{
 				text : "Start",
 				flex : 1,
 				tpl : 'Status: <b>{is_started}</b>'+ '<br />' + '<br />' + 
-							'Dana harus disiapkan: <br /><b>{start_fund}</b>' + '<br />' + '<br />' + 
+							'Dana harus disiapkan: <br /><b>{ start_fund}</b>' + '<br />' + '<br />' + 
 							'Anggota Terdaftar: <br /><b>{total_members_count}</b>' + '<br />' + '<br />' + 
-							'Tanggal Mulai: <br /><b>{started_at}</b>'  
+							'Tanggal Mulai: <br /><b>{started_at}</b>' 
 			},
 			
 			{

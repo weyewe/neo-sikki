@@ -26,9 +26,9 @@ class Member < ActiveRecord::Base
     new_object.address   = params[:address]
     new_object.id_number = params[:id_number] 
     # next modification
-    new_object.id_number = params[:id_card_number]  # KTP 
-    new_object.id_number = params[:birthday_date]
-    new_object.id_number = params[:is_data_complete]
+    new_object.id_card_number = params[:id_card_number]  # KTP 
+    new_object.birthday_date = params[:birthday_date]
+    new_object.is_data_complete = params[:is_data_complete]
 
     new_object.save
     
