@@ -18,6 +18,7 @@ Ext.define('AM.model.GroupLoan', {
 			
 			//  analysis
 			{ name: 'start_fund', type: 'string' },
+			{ name: 'group_number', type: 'string' },
 			{ name: 'disbursed_group_loan_memberships_count', type: 'int' },
 			{ name: 'disbursed_fund', type: 'string' },
 			{ name: 'non_disbursed_fund', type: 'string' },

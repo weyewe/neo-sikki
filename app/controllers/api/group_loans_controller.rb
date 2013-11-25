@@ -66,6 +66,8 @@ class Api::GroupLoansController < Api::BaseApiController
     elsif params[:withdraw].present?
       @object.withdraw_compulsory_savings( :compulsory_savings_withdrawn_at => params[:group_loan][:compulsory_savings_withdrawn_at] )
     else
+      # puts "==========> Inside the update object\n"*100
+      # puts "params[:group_loan][:group_number]: #{params[:group_loan][:group_number]}"
       @object.update_object(params[:group_loan])
     end
     
@@ -75,6 +77,7 @@ class Api::GroupLoansController < Api::BaseApiController
                         :group_loans => [
                             :id 							=>  	@object.id                  ,
                           	:name 			 										 =>   @object.name                                ,
+                          	:group_number                   => @object.group_number, 
                           	:number_of_meetings 						 =>   @object.number_of_meetings                  ,
                           	:number_of_collections					 =>   @object.number_of_collections               ,
                           	:total_members_count             =>   @object.total_members_count, 
@@ -121,6 +124,7 @@ class Api::GroupLoansController < Api::BaseApiController
                       :group_loans => [
                           :id 						                 =>  	@object.id                  ,
                         	:name 			 										 =>   @object.name                                ,
+                        	:group_number                   => @object.group_number, 
                         	:number_of_meetings 						 =>   @object.number_of_meetings                  ,
                         	:number_of_collections					 =>   @object.number_of_collections               ,
                         	:total_members_count             =>   @object.total_members_count, 

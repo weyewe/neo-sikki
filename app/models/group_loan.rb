@@ -31,6 +31,7 @@ class GroupLoan < ActiveRecord::Base
     
     new_object.name                            = params[:name] 
     new_object.number_of_meetings = params[:number_of_meetings]
+    new_object.group_number = params[:group_number]
     
     new_object.save
     
@@ -38,12 +39,18 @@ class GroupLoan < ActiveRecord::Base
   end
   
   def  update_object( params ) 
-    return nil if self.is_started?  
+    if self.is_started?  
+      self.errors.add(:generic_errors, "Sudah dimulai, tidak boleh update")
+      return self 
+    end
       
     self.name                            = params[:name] 
-    self.number_of_meetings = params[:number_of_meetings]
-    
+    self.number_of_meetings       = params[:number_of_meetings]
+    # puts "3321 The group_number : #{params[:group_number]}\n"*100
+    self.group_number             = params[:group_number]
     self.save
+    
+    # puts "5521 The error: #{self.errors.size}"
     
     return self
   end

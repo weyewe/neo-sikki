@@ -7,6 +7,8 @@ json.group_loans @objects do |object|
 	json.number_of_collections							object.number_of_collections 
 	json.total_members_count								object.total_members_count
 	
+	json.group_number                    object.group_number 
+	
 	json.is_started 												object.is_started
 	json.started_at 												format_date_friendly( object.started_at )
 	json.is_loan_disbursed 									object.is_loan_disbursed

@@ -58,6 +58,11 @@ Ext.define('AM.view.operation.grouploan.Form', {
 					xtype: 'numberfield',
 					name : 'number_of_meetings',
 					fieldLabel: 'Jumlah Meeting'
+				},
+				{
+					xtype: 'textfield',
+					name : 'group_number',
+					fieldLabel: 'Group No'
 				}, 
 				// {
 				// 	fieldLabel: 'Role',

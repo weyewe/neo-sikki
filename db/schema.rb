@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20131119130855) do
+ActiveRecord::Schema.define(version: 20131125140210) do
 
   create_table "deceased_clearances", force: true do |t|
     t.boolean  "is_insurance_claimable",                                default: false
@@ -148,6 +148,7 @@ ActiveRecord::Schema.define(version: 20131119130855) do
     t.decimal  "interest_revenue",                             precision: 10, scale: 2, default: 0.0
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "group_number"
   end
 
   create_table "members", force: true do |t|
@@ -164,7 +165,7 @@ ActiveRecord::Schema.define(version: 20131119130855) do
     t.string   "id_card_number"
     t.datetime "birthday_date"
     t.boolean  "is_data_complete",                                      default: false
-    t.decimal  "total_locked_savings_account", precision: 12, scale: 0, default: 0
+    t.decimal  "total_locked_savings_account", precision: 12, scale: 0
   end
 
   create_table "roles", force: true do |t|

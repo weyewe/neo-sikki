@@ -129,15 +129,15 @@ class Api::BaseApiController < ApplicationController
   
   def parse_date( date_string) 
     return nil if not date_string.present?
-    puts "'The date_string: ' :#{date_string}"
+    # puts "'The date_string: ' :#{date_string}"
     date_array = date_string.split('-').map{|x| x.to_i}
      
      
-    puts "inside parse date\n"*10
-    puts "0: #{date_array[0]}"
-    puts "0: #{date_array[1]}"
-    puts "0: #{date_array[2]}"
-    puts "\n\n"
+    # puts "inside parse date\n"*10
+    # puts "0: #{date_array[0]}"
+    # puts "0: #{date_array[1]}"
+    # puts "0: #{date_array[2]}"
+    # puts "\n\n"
    
     datetime = DateTime.new( date_array[0], 
                               date_array[1], 
