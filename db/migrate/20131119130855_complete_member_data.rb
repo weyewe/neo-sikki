@@ -6,6 +6,6 @@ class CompleteMemberData < ActiveRecord::Migration
     add_column :members,  :birthday_date, :datetime
     add_column :members, :is_data_complete, :boolean ,  :default => false
     
-    add_column :members, :total_locked_savings_account  , :decimal ,  :precision => 12 , :default => BigDecimal('0') 
+    add_column :members, :total_locked_savings_account  , :decimal ,  :precision => 12, :scale => 2  , :default => BigDecimal('0') 
   end
 end

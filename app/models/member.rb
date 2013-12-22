@@ -12,8 +12,8 @@ class Member < ActiveRecord::Base
   
   has_many :deceased_clearances
   
-  validates_uniqueness_of :id_number 
-  validates_presence_of :name, :id_number 
+  # validates_uniqueness_of :id_number 
+  validates_presence_of :name # , :id_number 
   
    
   def self.active_objects
@@ -67,6 +67,16 @@ class Member < ActiveRecord::Base
 =end
   def update_total_savings_account(amount) 
     self.total_savings_account  +=  amount 
+    self.save
+  end
+  
+  def update_total_membership_savings_account(amount) 
+    self.total_membership_savings  +=  amount 
+    self.save
+  end
+  
+  def update_total_locked_savings_account(amount) 
+    self.total_locked_savings_account  +=  amount 
     self.save
   end
   

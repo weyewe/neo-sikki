@@ -15,7 +15,8 @@ class SavingsEntry < ActiveRecord::Base
                   :member_id ,
                   :description,
                   :is_confirmed ,
-                  :confirmed_at 
+                  :confirmed_at ,
+                  :is_adjustment 
                   
   validates_presence_of :direction, :amount, :member_id 
   
@@ -72,15 +73,27 @@ class SavingsEntry < ActiveRecord::Base
     if direction == FUND_TRANSFER_DIRECTION[:outgoing]
       # puts "Amount: #{amount}"
       # puts "Total savings: #{member.total_savings_account}"
-      if amount > member.total_savings_account
+      if self.savings_status == SAVINGS_STATUS[:savings_account] and amount > member.total_savings_account
         self.errors.add(:amount, "Tidak boleh lebih besar dari #{member.total_savings_account}")
+        return self 
+      end
+      
+      
+      
+      if self.savings_status == SAVINGS_STATUS[:membership] and amount > member.total_membership_savings
+        self.errors.add(:amount, "Tidak boleh lebih besar dari #{member.total_membership_savings}")
+        return self 
+      end
+      
+      if self.savings_status == SAVINGS_STATUS[:locked] and amount > member.total_locked_savings_account
+        self.errors.add(:amount, "Tidak boleh lebih besar dari #{member.total_locked_savings_account}")
         return self 
       end
     end
   end
   
 =begin
-  # Independent savings
+  # Independent savings, 
 =end
   def self.create_object( params ) 
     
@@ -119,6 +132,156 @@ class SavingsEntry < ActiveRecord::Base
     self.save
   end
   
+  
+=begin
+  Variant permanent Savings: membership + locked
+=end
+  def self.create_variant_object( params, savings_status_case ) 
+    
+    
+    
+    # puts "Inside self.create_object\n"
+    new_object = self.new 
+    if not savings_status_case.present?
+      new_object.errors.add(:generic_errors , "Savings Status must be present")
+      return new_object
+    end
+    
+    savings_status_case = savings_status_case.to_i 
+    
+    if not [
+              SAVINGS_STATUS[:membership],
+              SAVINGS_STATUS[:locked] ].include?( savings_status_case ) 
+      new_object.errors.add(:generic_errors , "Savings Status must be present")
+      return new_object
+    end
+    
+    new_object.savings_source_id      = nil  
+    new_object.savings_source_type    = nil 
+    new_object.amount                 = BigDecimal(params[:amount] || '0')
+    new_object.savings_status         = savings_status_case
+    new_object.direction              = params[:direction]
+    new_object.financial_product_id   = nil 
+    new_object.financial_product_type = nil
+    new_object.member_id              = params[:member_id]
+    new_object.save 
+     
+    return new_object
+  end
+  
+  def  update_variant_object( params, savings_status_case ) 
+    
+    if self.is_confirmed?
+      self.errors.add(:generic_errors, 'Sudah dikonfirmasi. Silakan unconfirm')
+      return self 
+    end
+    
+    if not savings_status_case.present?
+      new_object.errors.add(:generic_errors , "Savings Status must be present")
+      return new_object
+    end
+    
+    savings_status_case = savings_status_case.to_i 
+    
+    if not [
+              SAVINGS_STATUS[:membership],
+              SAVINGS_STATUS[:locked] ].include?( savings_status_case ) 
+      new_object.errors.add(:generic_errors , "Savings Status must be present")
+      return new_object
+    end
+    
+    self.savings_source_id      = nil  
+    self.savings_source_type    = nil 
+    self.amount                 = BigDecimal(params[:amount] || '0')
+    self.savings_status         = savings_status_case
+    self.direction              = params[:direction]
+    self.financial_product_id   = nil 
+    self.financial_product_type = nil
+    self.member_id              = params[:member_id]
+    
+    self.save
+  end
+  
+  
+=begin
+  Admin edit. Ensure admin role 
+=end
+
+  def self.create_adustment_variant_object( params, savings_status_case ) 
+    
+    
+    
+    # puts "Inside self.create_object\n"
+    new_object = self.new 
+    if not savings_status_case.present?
+      new_object.errors.add(:generic_errors , "Savings Status must be present")
+      return new_object
+    end
+    
+    savings_status_case = savings_status_case.to_i 
+    
+    if not [  
+              SAVINGS_STATUS[:savings_account],
+              SAVINGS_STATUS[:membership],
+              SAVINGS_STATUS[:locked] ].include?( savings_status_case ) 
+      new_object.errors.add(:generic_errors , "Savings Status must be present")
+      return new_object
+    end
+    
+    new_object.savings_source_id      = nil  
+    new_object.savings_source_type    = nil 
+    new_object.amount                 = BigDecimal(params[:amount] || '0')
+    new_object.savings_status         = savings_status_case
+    new_object.direction              = params[:direction]
+    new_object.financial_product_id   = nil 
+    new_object.financial_product_type = nil
+    new_object.member_id              = params[:member_id]
+    new_object.is_adjustment = true 
+    new_object.save 
+     
+    return new_object
+  end
+  
+  def  update_adjustment_variant_object( params, savings_status_case ) 
+    
+    if self.is_confirmed?
+      self.errors.add(:generic_errors, 'Sudah dikonfirmasi. Silakan unconfirm')
+      return self 
+    end
+    
+    if not savings_status_case.present?
+      new_object.errors.add(:generic_errors , "Savings Status must be present")
+      return new_object
+    end
+    
+    savings_status_case = savings_status_case.to_i 
+    
+    if not [
+              SAVINGS_STATUS[:savings_account],
+              SAVINGS_STATUS[:membership],
+              SAVINGS_STATUS[:locked] ].include?( savings_status_case ) 
+      new_object.errors.add(:generic_errors , "Savings Status must be present")
+      return new_object
+    end
+    
+    self.savings_source_id      = nil  
+    self.savings_source_type    = nil 
+    self.amount                 = BigDecimal(params[:amount] || '0')
+    self.savings_status         = savings_status_case
+    self.direction              = params[:direction]
+    self.financial_product_id   = nil 
+    self.financial_product_type = nil
+    self.member_id              = params[:member_id]
+    
+    self.save
+  end
+  
+
+
+=begin
+  The rest 
+=end
+  
   def delete_object
     if self.is_confirmed?
       self.errors.add(:generic_errors, 'Sudah dikonfirmasi. Silakan unconfirm')
@@ -134,6 +297,8 @@ class SavingsEntry < ActiveRecord::Base
       self.errors.add(:generic_errors, 'Sudah dikonfirmasi.')
       return self
     end
+    
+    # validate that the final amount will never be negative 
     
     if params[:confirmed_at].nil? or not params[:confirmed_at].is_a?(DateTime)
       self.errors.add(:confirmed_at, "Harus ada tanggal konfirmasi pembayaran")
@@ -153,7 +318,18 @@ class SavingsEntry < ActiveRecord::Base
     if self.save
       multiplier = 1 if self.direction == FUND_TRANSFER_DIRECTION[:incoming]
       multiplier = -1 if self.direction == FUND_TRANSFER_DIRECTION[:outgoing]
-      member.update_total_savings_account( multiplier  *self.amount )
+      
+     
+      
+      
+      if self.savings_status == SAVINGS_STATUS[:savings_account]
+        member.update_total_savings_account( multiplier  *self.amount )
+      elsif  self.savings_status == SAVINGS_STATUS[:membership]
+        member.update_total_membership_savings_account( multiplier  *self.amount )
+      elsif self.savings_status == SAVINGS_STATUS[:locked]
+        member.update_total_locked_savings_account( multiplier  *self.amount )
+      end
+      
     end
   end
   
@@ -165,12 +341,23 @@ class SavingsEntry < ActiveRecord::Base
     end
     self.is_confirmed = false
     self.confirmed_at = nil 
+    self.save 
     
     member = self.member 
     multiplier = -1 
     multiplier = 1 if self.direction ==  FUND_TRANSFER_DIRECTION[:outgoing]
     
-    member.update_total_savings_account( multiplier  *self.amount )
+    
+    if self.savings_status == SAVINGS_STATUS[:savings_account]
+      member.update_total_savings_account( multiplier  *self.amount )
+    elsif  self.savings_status == SAVINGS_STATUS[:membership]
+      member.update_total_membership_savings_account( multiplier  *self.amount )
+    elsif self.savings_status == SAVINGS_STATUS[:locked]
+      member.update_total_locked_savings_account( multiplier  *self.amount )
+    end
+    
+    
+    # member.update_total_savings_account( multiplier  *self.amount )
   end
   
   

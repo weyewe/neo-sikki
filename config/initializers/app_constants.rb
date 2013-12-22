@@ -109,7 +109,8 @@ FUND_TRANSFER_CASE= {
 
 SAVINGS_STATUS = {
   :savings_account => 0 ,  # the base savings account. every member has it. 
-  
+  :membership => 1, 
+  :locked => 2, 
   
   :group_loan_compulsory_savings => 10,
   :group_loan_voluntary_savings => 11
@@ -141,4 +142,46 @@ PORT_GROUP_LOAN_COMPULSORY_SAVINGS_CASE = {
 UNCOLLECTIBLE_CLEARANCE_CASE = {
   :end_of_cycle => 1, 
   :in_cycle => 2 
+}
+
+# 
+# 
+# Example of “nomor rekening”: • 0001.0005.1.1 -> Rekening Pinjaman SEJAHERA Ibu Atun
+# 
+# • 0001.0005.1.2-> Rekening Pinjaman PRIBADI Ibu Atun
+# 
+# • 0001.0005.2.1-> Rekening Tabungan ANGGOTA Ibu Atun
+# 
+# • 0001.0005.2.2-> Rekening Tabungan WAJIB Ibu Atun
+# 
+# • 0001.0005.2.3-> Rekening Tabungan LATIHAN Ibu Atun
+# 
+# • 0001.0005.2.4-> Rekening Tabungan MASA DEPAN Ibu Atun
+
+# 
+# 
+# • Following is the allocation of code for each product (can be added in the 
+# 
+# future using other available digit): 
+# • 1.1 -> Pinjaman SEJAHTERA
+# 
+# • 1.2 -> Pinjaman PRIBADI 
+# • 2.1 -> Tabungan ANGGOTA (to become KKI member) 
+# • 2.2 -> Tabungan WAJIB (weekly compulsory savings) 
+# • 2.3 -> Tabungan LATIHAN (% of compulsory savings hold for xx period 
+# before disbursed altogether) 
+# • 2.4 -> Tabungan MASA DEPAN (stored and withdraw anytime)
+
+
+# 1 is for loan, 
+# 2 is for savings
+SAVINGS_PRODUCT_CODE = {
+  :membership => "2.1", # initial_savings payable
+  # total_membership_savings
+  :compulsory => "2.2", # the one attached to group loan 
+  :training => "2.3",  # % of compulsory savings hold for xx loan period 
+   # total_locked_savings_account
+  :future => "2.4"  # voluntary savings?
+  # total_savings_account
+  
 }
