@@ -23,19 +23,24 @@ class AttachEmail
     return nil if not date_string.present?
     # puts "'The date_string: ' :#{date_string}"
     # month/day/year
-    date_array = date_string.split('/').map{|x| x.to_i}
+    
+    begin 
+      date_array = date_string.split('/').map{|x| x.to_i}
      
       
-    datetime = DateTime.new( date_array[2], 
-                              date_array[0], 
-                              date_array[1], 
-                               0, 
-                               0, 
-                               0,
-                  Rational( UTC_OFFSET , 24) )
+      datetime = DateTime.new( date_array[2], 
+                                date_array[0], 
+                                date_array[1], 
+                                 0, 
+                                 0, 
+                                 0,
+                    Rational( UTC_OFFSET , 24) )
                   
                   
-    return datetime.utc
+      return datetime.utc
+    rescue Exception => e
+      return nil 
+    end
   end
   
   def update_fail_member_list(array ) 

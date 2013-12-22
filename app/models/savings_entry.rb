@@ -68,6 +68,7 @@ class SavingsEntry < ActiveRecord::Base
     return if not all_fields_for_independent_savings_present?
     # puts "Every needed data is present"
     
+    return if self.is_confirmed? 
     
     
     if direction == FUND_TRANSFER_DIRECTION[:outgoing]
