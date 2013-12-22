@@ -21,9 +21,30 @@ Ext.define('AM.view.master.member.List' ,{
 			},
 			
 			
-			{	header: 'Address', dataIndex: 'address', flex: 1 },
-			{	header: 'Kabur', dataIndex: 'is_run_away', flex: 1 } ,
-			{	header: 'Meninggal', dataIndex: 'is_deceased', flex: 1 }  ,
+			{	header: 'Address', dataIndex: 'address', flex: 1 }, 
+			
+			{
+				xtype : 'templatecolumn',
+				text : "Status",
+				sortable : false,
+				flex : 1,
+				tpl : '<b>Kabur</b>: <br />{is_run_away}' + '<br /><br />' + 
+							'<b>Meninggal</b>: <br />{is_deceased}' + '<br /><br />' + 
+							'<b>Ultah</b>: <br />{birthday_date}'  
+			},
+			
+			
+			{
+				xtype : 'templatecolumn',
+				text : "Tabungan",
+				sortable : false,
+				flex : 1,
+				tpl : '<b>Latihan</b>: <br />{total_locked_savings_account}' + '<br /><br />' + 
+							'<b>Keanggotaan</b>: <br />{total_membership_savings}' + '<br /><br />' + 
+							'<b>Masa Depan</b>: <br />{total_savings_account}'  
+			},
+			
+			
 			{	header: 'Complete?', dataIndex: 'is_data_complete', flex: 1 }  , 
 			
 			

@@ -18,6 +18,7 @@ json.members @objects do |object|
 	
 	json.total_savings_account object.total_savings_account
 	json.total_locked_savings_account object.total_locked_savings_account
+	json.total_membership_savings object.total_membership_savings
 	
 	
 	json.id_card_number object.id_card_number
