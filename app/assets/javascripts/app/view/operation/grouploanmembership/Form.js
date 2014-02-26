@@ -32,8 +32,19 @@ Ext.define('AM.view.operation.grouploanmembership.Form', {
 						name : 'member_id',
 						mapping : 'id'
 					},
+					{
+						name : 'display',
+						convert: function(v, rec){
+							var name = rec.get('member_name') ;
+							var id_number = rec.get("member_id_number");
+							
+							return name + "("+  id_number +    ")"; 
+						} 
+					}
 					
 			],
+			
+		 
 			proxy  	: {
 				type : 'ajax',
 				url : 'api/search_members',
@@ -77,6 +88,15 @@ Ext.define('AM.view.operation.grouploanmembership.Form', {
 						name : 'group_loan_product_id',
 						mapping : 'id'
 					},
+					{
+						name : 'display',
+						convert: function(v, rec){
+							var name = rec.get('group_loan_product_name') ;
+							var duration = rec.get("group_loan_product_total_weeks");
+							
+							return name + "("+  duration +    " weeks)"; 
+						} 
+					}
 					
 			],
 			proxy  	: {
@@ -125,7 +145,7 @@ Ext.define('AM.view.operation.grouploanmembership.Form', {
 					xtype: 'combo',
 					queryMode: 'remote',
 					forceSelection: true, 
-					displayField : 'group_loan_product_name',
+					displayField : 'display',
 					valueField : 'group_loan_product_id',
 					pageSize : 5,
 					minChars : 1, 
@@ -134,7 +154,7 @@ Ext.define('AM.view.operation.grouploanmembership.Form', {
 					store : remoteJsonStoreGroupLoanProduct , 
 					listConfig : {
 						getInnerTpl: function(){
-							return  	'<div data-qtip="{group_loan_product_name}">' +  
+							return  	'<div data-qtip="{group_loan_product_name}">' + 
 													'<div class="combo-name">{group_loan_product_name}</div>' + 
 													'<div class="combo-name">Principal: {group_loan_product_principal}</div>' + 
 													'<div class="combo-name">Interest: {group_loan_product_interest}</div>' +  
@@ -152,7 +172,7 @@ Ext.define('AM.view.operation.grouploanmembership.Form', {
 					xtype: 'combo',
 					queryMode: 'remote',
 					forceSelection: true, 
-					displayField : 'member_name',
+					displayField : 'display' ,
 					valueField : 'member_id',
 					pageSize : 5,
 					minChars : 1, 
@@ -161,14 +181,14 @@ Ext.define('AM.view.operation.grouploanmembership.Form', {
 					store : remoteJsonStoreMember, 
 					listConfig : {
 						getInnerTpl: function(){
-							return  	'<div data-qtip="{member_name}">' +  
+							return  	'<div data-qtip="{member_name}">' +   
 													'<div class="combo-name">{member_name}</div>' +  
 													'<div class="combo-name">{member_id_number}</div>' +  
 													'<div class="combo-name">{member_address}</div>' + 
 							 					'</div>';
 						}
 					},
-					name : 'member_id' 
+					name : 'member_id'  
 				}, 
 				
 			]
