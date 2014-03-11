@@ -28,6 +28,8 @@ NeoSikki::Application.routes.draw do
     resources :group_loan_run_away_receivables 
     resources :savings_entries 
     
+    resources :group_loan_weekly_collection_voluntary_savings_entries
+    
     put 'confirm_savings_entry' => 'savings_entries#confirm' , :as => :confirm_savings_entry
      
   end

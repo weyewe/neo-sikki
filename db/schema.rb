@@ -11,7 +11,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20131222152406) do
+ActiveRecord::Schema.define(version: 20140311011711) do
+
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
 
   create_table "deceased_clearances", force: true do |t|
     t.boolean  "is_insurance_claimable",                                default: false
@@ -86,6 +89,14 @@ ActiveRecord::Schema.define(version: 20131222152406) do
     t.decimal  "amount_receivable",               precision: 12, scale: 2, default: 0.0
     t.boolean  "is_closed",                                                default: false
     t.integer  "payment_case"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "group_loan_weekly_collection_voluntary_savings_entries", force: true do |t|
+    t.decimal  "amount",                          precision: 10, scale: 2, default: 0.0
+    t.integer  "group_loan_membership_id"
+    t.integer  "group_loan_weekly_collection_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

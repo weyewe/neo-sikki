@@ -23,6 +23,11 @@ Ext.define('AM.controller.GroupLoanWeeklyCollections', {
 			ref: 'list',
 			selector: 'grouploanweeklycollectionlist'
 		},
+		
+		{
+			ref: 'savingsList',
+			selector: 'grouploanweeklycollectionvoluntarysavingsentrylist'
+		},
 		{
 			ref : 'searchField',
 			selector: 'grouploanweeklycollectionlist textfield[name=searchField]'
@@ -106,13 +111,45 @@ Ext.define('AM.controller.GroupLoanWeeklyCollections', {
   
 
   selectionChange: function(selectionModel, selections) {
+		// alert("Selection change on the group loan weekly colelction");
+		
+		
     var grid = this.getList();
+		var savingsGrid = this.getSavingsList();
+		
+		// if( savingsGrid ){
+		// 	console.log( savingsGrid);
+		// 	alert("The savings grid is here");
+		// } 
   
     if (selections.length > 0) {
       grid.enableRecordButtons();
+			savingsGrid.addObjectButton.enable(); 
     } else {
       grid.disableRecordButtons();
+			savingsGrid.addObjectButton.disable(); 
     }
+
+		var selectedListId; 
+
+		if (grid.getSelectionModel().hasSelection()) {
+			 
+			var row = grid.getSelectionModel().getSelection()[0];
+			selectedListId = row.get("id"); 
+			
+			var title = "";
+			if( row ){
+				title = "Weekly Collection: " + row.get("week_number");
+			}else{
+				title = "";
+			}
+			savingsGrid.setTitle( title );
+		}
+		
+		savingsGrid.getStore().getProxy().extraParams.parent_id =  selectedListId ;
+		savingsGrid.getStore().load();
+		
+		
   },
 
 	parentSelectionChange: function(selectionModel, selections) {
@@ -120,22 +157,14 @@ Ext.define('AM.controller.GroupLoanWeeklyCollections', {
     var grid = me.getList();
 		var parentList = me.getParentList();
 		var wrapper = me.getWrapper();
+		var savingsGrid = this.getSavingsList(); 
 		
 		
-		// console.log("parent selection change");
-		// console.log("The wrapper");
-		// console.log( wrapper ) ;
-
-    if (selections.length > 0) {
-			// grid.enableAddButton();
-      // grid.enableRecordButtons();
-    } else {
-			// grid.disableAddButton();
-      // grid.disableRecordButtons();
-    }
-		
+	 
 		 
 		if (parentList.getSelectionModel().hasSelection()) {
+			
+			savingsGrid.getStore().loadData([], false);
 			var row = parentList.getSelectionModel().getSelection()[0];
 			var id = row.get("id"); 
 			
@@ -148,6 +177,8 @@ Ext.define('AM.controller.GroupLoanWeeklyCollections', {
 			grid.setTitle( title );
 			
 			wrapper.selectedParentId = id ; 
+			
+			// empty out the savingsGrid
 		}
 		
 		grid.getStore().getProxy().extraParams.parent_id =  wrapper.selectedParentId ;

@@ -13,6 +13,8 @@ class GroupLoanMembership < ActiveRecord::Base
   
   # has_one :group_loan_default_payment 
   has_one :group_loan_premature_clearance_payment 
+
+  has_many :group_loan_weekly_collection_voluntary_savings_entries
   
     
   

@@ -2,8 +2,13 @@ Ext.define('AM.view.operation.GroupLoanWeeklyCollection', {
     extend: 'AM.view.Worksheet',
     alias: 'widget.grouploanweeklycollectionProcess',
 	 
+		// layout : {
+		// 	type : 'hbox',
+		// 	align : 'stretch'
+		// },
+		
 		layout : {
-			type : 'hbox',
+			type : 'vbox',
 			align : 'stretch'
 		},
 		header: false, 
@@ -11,22 +16,50 @@ Ext.define('AM.view.operation.GroupLoanWeeklyCollection', {
 		selectedParentId : null,
 		
 		items : [
-		// just the list
 			{
-				xtype : 'operationgrouploanList',
-				flex : 1
+				xtype : 'container',
+				flex: 3 ,
+				layout : {
+					type : 'hbox',
+					align : 'stretch'
+				},
+				items : [
+					{
+						xtype : 'operationgrouploanList',
+						flex : 1
+					},
+
+					{
+						xtype : 'grouploanweeklycollectionlist',
+						flex : 2
+					},
+				]
+				
 			},
-			
 			{
-				xtype : 'grouploanweeklycollectionlist',
+				// html : "This is fucking awesome",
+				xtype : 'grouploanweeklycollectionvoluntarysavingsentrylist',
 				flex : 2
-			}, 
-			
-			// maybe another
+				
+			}
+		
+		// just the list
+		 
+			// {
+			// 	xtype : 'operationgrouploanList',
+			// 	flex : 1
+			// },
+			// 
 			// {
 			// 	xtype : 'grouploanweeklycollectionlist',
 			// 	flex : 2
-			// },
+			// }, 
+			// {
+			// 			// xtype : 'grouploanweeklycollectionlist',
+			// 			html : "This is awesome",
+			// 			flex : 2
+			// 		},
+		 
 			
 		]
 });
