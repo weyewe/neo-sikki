@@ -139,6 +139,14 @@ class Api::GroupLoanWeeklyCollectionsController < Api::BaseApiController
     # end
   end
   
+  def active_group_loan_memberships
+    weekly_collection = GroupLoanWeeklyCollection.find(params[:group_loan_weekly_collection_id])
+    @objects = weekly_collection.active_group_loan_memberships.joins(:member).
+              order("id ASC") 
+    
+    
+  end
+  
   
   def search
     search_params = params[:query]

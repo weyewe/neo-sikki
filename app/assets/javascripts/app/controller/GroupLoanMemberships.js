@@ -129,8 +129,8 @@ Ext.define('AM.controller.GroupLoanMemberships', {
     var record = form.getRecord();
     var values = form.getValues();
 
-console.log("The values: " ) ;
-console.log( values );
+// console.log("The values: " ) ;
+// console.log( values );
 
 		
 		if( record ){

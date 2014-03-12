@@ -1,7 +1,7 @@
 Ext.define('AM.controller.GroupLoanWeeklyCollections', {
   extend: 'Ext.app.Controller',
 
-  stores: ['GroupLoanWeeklyCollections', 'GroupLoans'],
+  stores: ['GroupLoanWeeklyCollections', 'GroupLoans', 'GroupLoanWeeklyCollectionVoluntarySavingsEntries'],
   models: ['GroupLoanWeeklyCollection'],
 
   views: [
@@ -31,7 +31,9 @@ Ext.define('AM.controller.GroupLoanWeeklyCollections', {
 		{
 			ref : 'searchField',
 			selector: 'grouploanweeklycollectionlist textfield[name=searchField]'
-		}
+		},
+		
+
 	],
 
   init: function() {
@@ -78,6 +80,23 @@ Ext.define('AM.controller.GroupLoanWeeklyCollections', {
 			'confirmgrouploanweeklycollectionform button[action=confirm]' : {
 				click : this.executeConfirm
 			},
+			
+			
+			// related to the savings entry
+			'grouploanweeklycollectionvoluntarysavingsentrylist button[action=addObject]': {
+	      click: this.addSavingsObject
+	    },
+	
+			'grouploanweeklycollectionvoluntarysavingsentryform button[action=save]': {
+        click: this.updateSavingsObject
+      },
+
+	    'grouploanweeklycollectionvoluntarysavingsentrylist button[action=editObject]': {
+	      click: this.editSavingsObject
+	    },
+	    'grouploanweeklycollectionvoluntarysavingsentrylist button[action=deleteObject]': {
+	      click: this.deleteSavingsObject
+	    },
     });
   },
 
@@ -139,7 +158,7 @@ Ext.define('AM.controller.GroupLoanWeeklyCollections', {
 			
 			var title = "";
 			if( row ){
-				title = "Weekly Collection: " + row.get("week_number");
+				title = "Weekly Collection Voluntary Savings, Week: " + row.get("week_number");
 			}else{
 				title = "";
 			}
@@ -183,6 +202,8 @@ Ext.define('AM.controller.GroupLoanWeeklyCollections', {
 		
 		grid.getStore().getProxy().extraParams.parent_id =  wrapper.selectedParentId ;
 		grid.getStore().load(); 
+		
+		savingsGrid.setTitle("");
   },
 
 	collectObject: function(){
@@ -313,5 +334,141 @@ Ext.define('AM.controller.GroupLoanWeeklyCollections', {
 		    }
 		});
 	},
+	
+	
+	
+	/*
+	FOR THE SAVINGS
+	*/
+	
+	addSavingsObject: function() {
+	 
+		var parentObject  = this.getList().getSelectedObject();
+		 
+		if( parentObject) { 
+			var view = Ext.widget('grouploanweeklycollectionvoluntarysavingsentryform');
+			 
+			view.setExtraParamForJsonRemoteStore( parentObject.get("id")); 
+			view.setParentData( parentObject );
+			view.show();
+		}
+  },
+
+  editSavingsObject: function() {
+		var me = this; 
+		var parentObject  = this.getList().getSelectedObject();
+    var record = this.getSavingsList().getSelectedObject();
+
+		
+		 
+		if( parentObject) { 
+			var view = Ext.widget('grouploanweeklycollectionvoluntarysavingsentryform');
+			 
+			view.setExtraParamForJsonRemoteStore( parentObject.get("id")); 
+			view.setComboBoxData( record );
+
+			view.setParentData( parentObject );
+
+	    view.down('form').loadRecord(record);
+			view.show();
+		}
+		
+		 
+  },
+
+  updateSavingsObject: function(button) {
+		var me = this; 
+    var win = button.up('window');
+    var form = win.down('form');
+		var parentList = this.getParentList();
+		
+		var groupLoanWeeklyCollectionId = this.getList().getSelectedObject().get("id");
+		var wrapper = this.getWrapper();
+
+    var store = this.getGroupLoanWeeklyCollectionVoluntarySavingsEntriesStore();
+    var record = form.getRecord();
+    var values = form.getValues();
+
+// console.log("The values: " ) ;
+// console.log( values );
+
+		
+		if( record ){
+			record.set( values );
+			 
+			form.setLoading(true);
+			record.save({
+				success : function(record){
+					form.setLoading(false);
+					//  since the grid is backed by store, if store changes, it will be updated
+					
+					// store.getProxy().extraParams = {
+					//     livesearch: ''
+					// };
+	 
+					store.load({
+						params: {
+							parent_id : groupLoanWeeklyCollectionId
+						}
+					});
+					 
+					
+					win.close();
+				},
+				failure : function(record,op ){
+					form.setLoading(false);
+					var message  = op.request.scope.reader.jsonData["message"];
+					var errors = message['errors'];
+					form.getForm().markInvalid(errors);
+					this.reject();
+				}
+			});
+				
+			 
+		}else{
+			//  no record at all  => gonna create the new one 
+			var me  = this; 
+			var newObject = new AM.model.GroupLoanWeeklyCollectionVoluntarySavingsEntry( values ) ;
+			
+			// learnt from here
+			// http://www.sencha.com/forum/showthread.php?137580-ExtJS-4-Sync-and-success-failure-processing
+			// form.mask("Loading....."); 
+			form.setLoading(true);
+			newObject.save({
+				success: function(record){
+	
+					store.load({
+						params: {
+							parent_id : groupLoanWeeklyCollectionId
+						}
+					});
+					
+					form.setLoading(false);
+					win.close();
+					
+				},
+				failure: function( record, op){
+					form.setLoading(false);
+					var message  = op.request.scope.reader.jsonData["message"];
+					var errors = message['errors'];
+					form.getForm().markInvalid(errors);
+					this.reject();
+				}
+			});
+		} 
+  },
+
+  deleteSavingsObject: function() {
+    var record = this.getList().getSelectedObject();
+
+    if (record) {
+      var store = this.getGroupLoanWeeklyCollectionVoluntarySavingsEntriesStore();
+      store.remove(record);
+      store.sync();
+// to do refresh programmatically
+			this.getList().query('pagingtoolbar')[0].doRefresh();
+    }
+
+  },
 
 });

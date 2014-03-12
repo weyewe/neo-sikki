@@ -17,7 +17,7 @@ Ext.define('AM.view.operation.grouploanweeklycollection.voluntarysavingsentry.Li
 				text : "Jumlah Penerimaan",
 				sortable : false,
 				flex : 1,
-				tpl : '<b>{amount_receivable}</b>'   
+				tpl : '<b>{amount}</b>'   
 			},
 			
 			
