@@ -33,7 +33,6 @@ class Api::GroupLoanWeeklyCollectionVoluntarySavingsEntriesController < Api::Bas
       @total = 0 
     end
 
-    # render :json => { :group_loan_weekly_collection_voluntary_savings_entry_voluntary_savings_entries => @objects , :total => @total , :success => true }
   end
 
 
