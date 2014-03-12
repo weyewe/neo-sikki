@@ -121,28 +121,32 @@ class Api::GroupLoanWeeklyCollectionsController < Api::BaseApiController
                       :total => GroupLoanWeeklyCollection.count }
   end
 
-  def destroy
-    # @object = GroupLoanWeeklyCollection.find(params[:id])
-    # @object.delete_object 
-    # 
-    # if ( not @object.persisted?  or @object.is_deleted ) and @object.errors.size == 0 
-    #   render :json => { :success => true, :total => GroupLoanWeeklyCollection.count }  
-    # else
-    #   msg = {
-    #     :success => false, 
-    #     :message => {
-    #       :errors => extjs_error_format( @object.errors )  
-    #     }
-    #   }
-    #   
-    #   render :json => msg
-    # end
-  end
+  # def destroy
+  #   @object = GroupLoanWeeklyCollectionVoluntarySavingsEntry.find(params[:id])
+  #   @parent_object = @object.group_loan_weekly_collection
+  #   @object.delete_object 
+  #   
+  #   if ( not @object.persisted?  or @object.is_deleted ) and @object.errors.size == 0 
+  #     render :json => { :success => true, :total => parent_object.group_loan_weekly_collection_voluntary_savings_entries.count }  
+  #   else
+  #     msg = {
+  #       :success => false, 
+  #       :message => {
+  #         :errors => extjs_error_format( @object.errors )  
+  #       }
+  #     }
+  #     
+  #     render :json => msg
+  #   end
+  # end
   
   def active_group_loan_memberships
-    weekly_collection = GroupLoanWeeklyCollection.find(params[:group_loan_weekly_collection_id])
-    @objects = weekly_collection.active_group_loan_memberships.joins(:member).
-              order("id ASC") 
+    
+     
+      weekly_collection = GroupLoanWeeklyCollection.find(params[:group_loan_weekly_collection_id])
+      @objects = weekly_collection.active_group_loan_memberships.joins(:member).
+                order("id ASC")
+    
     
     
   end

@@ -83,6 +83,13 @@ Ext.define('AM.controller.GroupLoanWeeklyCollections', {
 			
 			
 			// related to the savings entry
+			
+			'grouploanweeklycollectionvoluntarysavingsentrylist': {
+        // itemdblclick: this.editObject,
+        selectionchange: this.savingsGridSelectionChange 
+      },
+
+
 			'grouploanweeklycollectionvoluntarysavingsentrylist button[action=addObject]': {
 	      click: this.addSavingsObject
 	    },
@@ -128,6 +135,24 @@ Ext.define('AM.controller.GroupLoanWeeklyCollections', {
 	},
 
   
+
+	savingsGridSelectionChange : function( selectionModel, selections){
+		var grid = this.getList();
+		var savingsGrid = this.getSavingsList();
+		
+		// if( savingsGrid ){
+		// 	console.log( savingsGrid);
+		// 	alert("The savings grid is here");
+		// } 
+  
+    if (selections.length > 0) {
+			savingsGrid.enableRecordButtons();
+    } else {
+			savingsGrid.disableRecordButtons();
+    }
+
+		 
+	},
 
   selectionChange: function(selectionModel, selections) {
 		// alert("Selection change on the group loan weekly colelction");
@@ -459,14 +484,21 @@ Ext.define('AM.controller.GroupLoanWeeklyCollections', {
   },
 
   deleteSavingsObject: function() {
-    var record = this.getList().getSelectedObject();
+    var record = this.getSavingsList().getSelectedObject();
+
+		
 
     if (record) {
-      var store = this.getGroupLoanWeeklyCollectionVoluntarySavingsEntriesStore();
+			var group_loan_weekly_collection_id = record.get('group_loan_weekly_collection_id');
+      var store = this.getSavingsList().getStore();
       store.remove(record);
       store.sync();
 // to do refresh programmatically
-			this.getList().query('pagingtoolbar')[0].doRefresh();
+
+			this.getSavingsList().getStore().getProxy().extraParams.parent_id =  group_loan_weekly_collection_id ;
+
+
+			this.getSavingsList().query('pagingtoolbar')[0].doRefresh();
     }
 
   },

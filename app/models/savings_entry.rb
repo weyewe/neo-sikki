@@ -321,8 +321,6 @@ class SavingsEntry < ActiveRecord::Base
       multiplier = -1 if self.direction == FUND_TRANSFER_DIRECTION[:outgoing]
       
      
-      
-      
       if self.savings_status == SAVINGS_STATUS[:savings_account]
         member.update_total_savings_account( multiplier  *self.amount )
       elsif  self.savings_status == SAVINGS_STATUS[:membership]
@@ -401,6 +399,26 @@ class SavingsEntry < ActiveRecord::Base
                         
     # puts "The amount: #{new_object.amount}"
     group_loan_membership.update_total_compulsory_savings( new_object.amount)
+  end
+  
+  def self.create_weekly_collection_voluntary_savings( savings_source )
+    # puts "Gonna create savings_entry"
+    group_loan_membership = savings_source.group_loan_membership
+    member = group_loan_membership.member 
+    
+    new_object = self.create :savings_source_id => savings_source.id,
+                        :savings_source_type => savings_source.class.to_s,
+                        :amount => savings_source.amount,
+                        :savings_status => SAVINGS_STATUS[:savings_account],
+                        :direction => FUND_TRANSFER_DIRECTION[:incoming],
+                        :financial_product_id => group_loan_membership.group_loan_id,
+                        :financial_product_type => group_loan_membership.group_loan.class.to_s,
+                        :member_id => member.id ,
+                        :is_confirmed => true, 
+                        :confirmed_at => savings_source.group_loan_weekly_collection.confirmed_at 
+                        
+    # puts "The amount: #{new_object.amount}"
+    member.update_total_savings_account( new_object.amount)
   end
 
  

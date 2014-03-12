@@ -10,6 +10,9 @@ class GroupLoanWeeklyCollectionVoluntarySavingsEntry < ActiveRecord::Base
   validate :valid_glm_group_loan_weekly_collection_id 
   validate :group_loan_weekly_collection_not_collected
   validate :group_loan_membership_is_still_active
+  validate :no_double_group_loan_membership
+  
+  
   
   def valid_amount
     return if not self.amount.present? 
@@ -61,9 +64,24 @@ class GroupLoanWeeklyCollectionVoluntarySavingsEntry < ActiveRecord::Base
     return if group_loan_weekly_collection_id.nil? 
     
     active_glm_id_list = group_loan_weekly_collection.active_group_loan_memberships.map {|x| x.id}
-    if active_glm_id_list.include?(self.group_loan_membership_id)
+    if not active_glm_id_list.include?(self.group_loan_membership_id)
       self.errors.add(:generic_errors, "Member sudah tidak aktif di group ini")
     end
+  end
+  
+  def no_double_group_loan_membership
+    return if group_loan_membership_id.nil?
+    return if group_loan_weekly_collection_id.nil? 
+    
+    voluntary_savings_glm_id_list = group_loan_weekly_collection.
+                                      group_loan_weekly_collection_voluntary_savings_entries.
+                                      map {|x| x.group_loan_membership_id}
+ 
+    if voluntary_savings_glm_id_list.include?( group_loan_membership_id )
+      self.errors.add(:generic_errors, "Sudah ada tabungan oleh member tersebut")
+      return self 
+    end
+    
   end
   
   def self.create_object(  params)
@@ -104,8 +122,13 @@ class GroupLoanWeeklyCollectionVoluntarySavingsEntry < ActiveRecord::Base
     self.destroy 
   end
   
-  def confirm
-    # create the savings_entries
+  def confirm 
+    if group_loan_weekly_collection.is_collected? and not group_loan_weekly_collection.is_confirmed? 
+      SavingsEntry.create_weekly_collection_voluntary_savings( self ) 
+    else
+      self.errors.add(:generic_errors, "Sudah dikonfirmasi")
+      return self
+    end
   end
   
   

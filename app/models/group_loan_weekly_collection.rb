@@ -117,14 +117,28 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
       return self 
     end
     
-    self.confirmed_at = params[:confirmed_at]
-    self.is_confirmed = true 
-    self.save 
+    begin
+      ActiveRecord::Base.transaction do
+        self.group_loan_weekly_collection_voluntary_savings_entries.each do |x|
+          x.confirm
+        end
+        self.confirmed_at = params[:confirmed_at]
+        self.is_confirmed = true 
+        self.save 
+
+        self.create_group_loan_weekly_payments 
+        # self.group_loan.update_default_payment_amount_receivable
+        self.confirm_premature_clearances
+        self.update_group_loan_bad_debt_allowance  # from uncollectible +  run_away_member
+        
+      end
+    rescue ActiveRecord::ActiveRecordError  
+    else
+    end
     
-    self.create_group_loan_weekly_payments 
-    # self.group_loan.update_default_payment_amount_receivable
-    self.confirm_premature_clearances
-    self.update_group_loan_bad_debt_allowance  # from uncollectible +  run_away_member
+    
+    
+    
   end
   
   

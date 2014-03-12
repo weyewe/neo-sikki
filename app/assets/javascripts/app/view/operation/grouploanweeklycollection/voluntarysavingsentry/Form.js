@@ -127,17 +127,23 @@ Ext.define('AM.view.operation.grouploanweeklycollection.voluntarysavingsentry.Fo
 
 	setComboBoxData : function( record){
 		// console.log("Inside the Form.. edit.. setComboBox data");
-		var role_id = record.get("role_id");
-		var comboBox = this.down('form').getForm().findField('role_id'); 
+		var group_loan_membership_id = record.get("group_loan_membership_id");
+		console.log("the glm:  " );
+		console.log(group_loan_membership_id  );
+		var group_loan_weekly_collection_id = record.get("group_loan_weekly_collection_id");
+		var comboBox = this.down('form').getForm().findField('group_loan_membership_id'); 
 		var me = this; 
 		var store = comboBox.store; 
 		store.load({
 			params: {
-				selected_id : role_id 
+				group_loan_weekly_collection_id : group_loan_weekly_collection_id 
 			},
 			callback : function(records, options, success){
 				me.setLoading(false);
-				comboBox.setValue( role_id );
+				comboBox.setValue( group_loan_membership_id );
+				console.log("done setting value");
+				console.log( comboBox );
+				console.log( comboBox.getValue() ) ;
 			}
 		});
 	},

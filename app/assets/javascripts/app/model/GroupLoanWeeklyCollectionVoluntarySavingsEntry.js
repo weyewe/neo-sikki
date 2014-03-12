@@ -3,7 +3,7 @@ Ext.define('AM.model.GroupLoanWeeklyCollectionVoluntarySavingsEntry', {
   	fields: [
     	{ name: 'id', type: 'int' },
     	{ name: 'group_loan_weekly_collection_id', type: 'int' },
-			{ name: 'group_loan_membership_id', type: 'string' } ,
+			{ name: 'group_loan_membership_id', type: 'int' } ,
 			
 			{ name: 'amount', type: 'string ' }  , 
 			{ name: 'member_name', type: 'string' }   ,
