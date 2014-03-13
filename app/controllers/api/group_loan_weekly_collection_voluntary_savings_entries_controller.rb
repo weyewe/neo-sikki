@@ -113,7 +113,7 @@ class Api::GroupLoanWeeklyCollectionVoluntarySavingsEntriesController < Api::Bas
     @parent_object = @object.group_loan_weekly_collection
     @object.delete_object 
     
-    if ( not @object.persisted?  or @object.is_deleted ) and @object.errors.size == 0 
+    if ( not @object.persisted?   ) and @object.errors.size == 0 
       render :json => { :success => true, :total => @parent_object.
                                                 group_loan_weekly_collection_voluntary_savings_entries.
                                                 count }  
