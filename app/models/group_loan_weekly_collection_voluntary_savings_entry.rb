@@ -70,6 +70,7 @@ class GroupLoanWeeklyCollectionVoluntarySavingsEntry < ActiveRecord::Base
   end
   
   def no_double_group_loan_membership
+    return if self.persisted? 
     return if group_loan_membership_id.nil?
     return if group_loan_weekly_collection_id.nil? 
     
