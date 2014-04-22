@@ -62,6 +62,7 @@ class AttachEmailNew
 
   def generate_csv
     begin
+      non_existant_id_number= [] 
       filename = "update_member_address.csv"
       
       CSV.open(filename, 'r') do |csv| 
@@ -83,7 +84,8 @@ class AttachEmailNew
           member = Member.find_by_id_number( x[0] )
           
           if member.nil? 
-            puts "member with id_number #{x[0]} is non existant"
+            # puts "member with id_number #{x[0]} is non existant"
+            non_existant_id_number << x[0]
           else
             # puts "Inside member update"
             member.id_card_number = x[2]
