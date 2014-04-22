@@ -70,7 +70,7 @@ class AttachEmailNew
         fail_member_id_array = [] 
         
         csv.each do |x|
-          puts "\n\n"
+          # puts "\n\n"
           # puts "#{x.inspect}"
           # puts "id : #{x[0]}"
           # puts "name : #{x[1]}"
@@ -101,6 +101,8 @@ class AttachEmailNew
         end
          
       end
+      
+      puts non_existant_id_number
     rescue Exception => e
       puts e
     end
