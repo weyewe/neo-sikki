@@ -24,13 +24,16 @@ class Member < ActiveRecord::Base
     new_object           = self.new
     new_object.name      = params[:name]
     new_object.address   = params[:address]
-    new_object.id_number = params[:id_number] 
+    new_object.id_number = params[:id_number]
     # next modification
     new_object.id_card_number = params[:id_card_number]  # KTP 
     new_object.birthday_date = params[:birthday_date]
     new_object.is_data_complete = params[:is_data_complete]
 
-    new_object.save
+    if new_object.save
+      new_object.id_number = new_object.id_number.strip
+      new_object.save 
+    end
     
     return new_object 
   end
@@ -50,6 +53,9 @@ class Member < ActiveRecord::Base
       self.errors.messages.each do |msg|
         puts "The message: #{msg}"
       end
+    else
+      self.id_number = self.id_number.strip
+      self.save
     end
   end
   

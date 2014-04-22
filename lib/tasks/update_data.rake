@@ -117,5 +117,12 @@ task :update_and_generate_member_address_data => :environment do
   generate= AttachEmailNew.new
   generate.generate_csv
 end
+
+task :clean_member_id_number => :environment do
+  Member.all.each do |x|
+    x.id_number = x.id_number.strip
+    x.save 
+  end
+end
  
 
