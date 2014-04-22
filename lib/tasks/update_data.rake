@@ -21,11 +21,15 @@ class AttachEmailNew
   
   def parse_date( date_string) 
     return nil if not date_string.present?
+    # puts "Inside the parse_date"
     # puts "'The date_string: ' :#{date_string}"
     # month/day/year
+    # puts "The date_string: #{date_string}"
     
     begin 
       date_array = date_string.split('/').map{|x| x.to_i}
+      
+      # puts "The date array: #{date_array}"
      
       
       # 11/21/1958  month/day/year 
@@ -37,9 +41,11 @@ class AttachEmailNew
                                  0,
                     Rational( UTC_OFFSET , 24) )
                   
-                  
+      # puts "The datetime: #{datetime}"            
       return datetime.utc
     rescue Exception => e
+      # puts "There is exception"
+      puts e 
       return nil 
     end
   end
@@ -56,7 +62,7 @@ class AttachEmailNew
 
   def generate_csv
     begin
-      filename = "update.csv"
+      filename = "update_member_address.csv"
       
       CSV.open(filename, 'r') do |csv| 
          
@@ -70,30 +76,23 @@ class AttachEmailNew
           # puts "ktp_number : #{x[2]}"
           # puts "birthday: #{x[3]}"
           # puts "address: #{x[4]}"
-          # puts "compulsory_savings: #{extract_amount( x[5] ) }"
-          # puts "voluntary_savings: #{extract_amount( x[6] )}"
-          # puts "training_savings: #{extract_amount( x[7] )}"
-          # puts "membership_savings: #{extract_amount( x[8] )}"
+          # puts "rt: #{extract_amount( x[5] ) }"
+          # puts "rw: #{extract_amount( x[6] )}"
+          # puts "village: #{extract_amount( x[7] )}" 
           
           member = Member.find_by_id_number( x[0] )
           
-          if member.nil?
-            member = Member.create_object(
-              :name           => x[1], 
-              :address        => x[4], 
-              :id_number      =>  x[0], 
-              :id_card_number => x[2] , # KTP 
-              :birthday_date  => parse_date( x[3] ) ,
-              :is_data_complete =>  false
-            )
-          
-            fail_member_id_array << x[0]  if member.errors.size != 0 
-            puts "member with id_number is non existant"
+          if member.nil? 
+            puts "member with id_number #{x[0]} is non existant"
           else
+            # puts "Inside member update"
             member.id_card_number = x[2]
             member.birthday_date = parse_date( x[3] ) 
             member.address = x[4]
             member.name = x[1]
+            member.rt = x[5]
+            member.rw  = x[6]
+            member.village = x[7]
             member.save 
           end  
           
@@ -110,7 +109,7 @@ end
 
 
 
-task :update_and_generate_member_data => :environment do
+task :update_and_generate_member_address_data => :environment do
   generate= AttachEmailNew.new
   generate.generate_csv
 end
