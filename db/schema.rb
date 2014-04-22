@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140311011711) do
+ActiveRecord::Schema.define(version: 20140422065420) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -178,6 +178,9 @@ ActiveRecord::Schema.define(version: 20140311011711) do
     t.boolean  "is_data_complete",                                      default: false
     t.decimal  "total_locked_savings_account", precision: 12, scale: 2, default: 0.0
     t.decimal  "total_membership_savings",     precision: 12, scale: 2, default: 0.0
+    t.integer  "rt"
+    t.integer  "rw"
+    t.string   "village"
   end
 
   create_table "roles", force: true do |t|
