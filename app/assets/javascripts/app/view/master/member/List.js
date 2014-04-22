@@ -44,8 +44,20 @@ Ext.define('AM.view.master.member.List' ,{
 							'<b>Masa Depan</b>: <br />{total_savings_account}'  
 			},
 			
+			{
+				xtype : 'templatecolumn',
+				text : "Address",
+				sortable : false,
+				flex : 1,
+				tpl : '<b>RT</b>: <br />{rt}' + '<br /><br />' + 
+							'<b>RW</b>: <br />{rw}' + '<br /><br />' + 
+							'<b>Kelurahan</b>: <br />{village}'  
+			},
+			
 			
 			{	header: 'Complete?', dataIndex: 'is_data_complete', flex: 1 }  , 
+			
+			
 			
 			
 		];

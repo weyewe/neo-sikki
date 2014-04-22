@@ -16,6 +16,10 @@ Ext.define('AM.model.Member', {
 			{ name: 'id_card_number', type: 'string' }     ,
 			{ name: 'birthday_date', type: 'string' }     ,
 			{ name: 'is_data_complete', type: 'boolean' }     ,
+			{ name: 'rt', type: 'int' }     ,
+			
+			{ name: 'rw', type: 'int' }     ,
+			{ name: 'village', type: 'string' }     ,
   	],
 
 	 

@@ -66,10 +66,31 @@ Ext.define('AM.view.master.member.Form', {
 				},
 				
 				{
+					xtype: 'numberfield',
+					name : 'rt',
+					fieldLabel: 'RT'
+				},
+				
+				{
+					xtype: 'numberfield',
+					name : 'rw',
+					fieldLabel: 'RW'
+				},
+				
+				{
+					xtype: 'textfield',
+					name : 'village',
+					fieldLabel: 'Kelurahan'
+				},
+				
+				
+				{
 					xtype: 'textfield',
 					name : 'id_card_number',
 					fieldLabel: 'KTP'
 				},
+				
+				
 				
 				{
 					xtype: 'datefield',

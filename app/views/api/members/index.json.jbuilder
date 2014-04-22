@@ -24,6 +24,10 @@ json.members @objects do |object|
 	json.id_card_number object.id_card_number
 	json.birthday_date 	format_date_friendly( object.birthday_date )
 	json.is_data_complete object.is_data_complete
+	
+	json.rt object.rt
+	json.rw object.rw
+	json.village object.village
 end
 
 

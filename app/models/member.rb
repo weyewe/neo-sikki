@@ -29,6 +29,9 @@ class Member < ActiveRecord::Base
     new_object.id_card_number = params[:id_card_number]  # KTP 
     new_object.birthday_date = params[:birthday_date]
     new_object.is_data_complete = params[:is_data_complete]
+    new_object.rt      = params[:rt     ]
+    new_object.rw      = params[:rw     ]
+    new_object.village = params[:village] 
 
     if new_object.save
       new_object.id_number = new_object.id_number.strip
@@ -46,6 +49,9 @@ class Member < ActiveRecord::Base
     self.id_card_number = params[:id_card_number]
     self.birthday_date = params[:birthday_date]
     self.is_data_complete = params[:is_data_complete]
+    self.rt      = params[:rt     ]
+    self.rw      = params[:rw     ]
+    self.village = params[:village]
 
     self.save 
     if self.errors.size != 0 
