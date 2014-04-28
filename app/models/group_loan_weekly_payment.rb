@@ -33,4 +33,6 @@ class GroupLoanWeeklyPayment < ActiveRecord::Base
     end
     
   end
+  
+   
 end

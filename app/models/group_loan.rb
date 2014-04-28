@@ -257,6 +257,29 @@ Phase: loan disbursement finalization
     # create GroupLoanWeeklyCollection  => it has many weird cases. new problem domain on that model.
   end
   
+  def undisburse_group_loan
+    # destroy all weekly collection
+    self.group_loan_weekly_collections.each do |x|
+      x.destroy 
+    end
+    
+    # cancel loan disbursement execution 
+    GroupLoanDisbursement.where(:group_loan_id => self.id ).each do |x|
+      x.destroy 
+    end 
+    
+    self.is_loan_disbursed = false
+    self.disbursed_at = nil
+    self.save 
+  end
+  
+  def cancel_start
+    self.started_at =  nil 
+    self.is_started = false 
+    self.number_of_collections = 0 
+    self.save
+  end
+  
   
 =begin
   WeeklyCollection 
@@ -422,6 +445,8 @@ Phase: loan disbursement finalization
     self.bad_debt_allowance += amount 
     self.save 
   end
+  
+  
   
   
   
@@ -643,6 +668,7 @@ Phase: loan disbursement finalization
 =end 
 
   def non_disbursed_fund
+    return BigDecimal("0") if not self.is_loan_disbursed?
     start_fund - disbursed_fund 
   end
   
@@ -678,7 +704,7 @@ Phase: loan disbursement finalization
   
   def disbursed_fund
     amount = BigDecimal('0')
-    # return amount if not self.is_loan_disbursed? 
+    return amount if not self.is_loan_disbursed? 
     
     disbursed_group_loan_memberships.joins(:group_loan_product).each do |glm|
       amount += glm.group_loan_product.weekly_payment_amount * glm.group_loan_product.total_weeks

@@ -135,21 +135,146 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
     rescue ActiveRecord::ActiveRecordError  
     else
     end
-    
-    
-    
-    
   end
   
   
   def unconfirm
+    return if not self.is_confirmed? 
+    begin
+      ActiveRecord::Base.transaction do
+        
+        # undo bad_debt_allowance to 0
+        # By doing this, we will delete the deceased, run_away, and premature clearance 
+        group_loan.update_bad_debt_allowance(      
+                          -1 * (
+                            self.extract_uncollectible_weekly_payment_default_amount + 
+                            self.extract_run_away_end_of_cycle_resolution_default_amount
+                          )
+        )
+        group_loan.save 
     
-    # reverse the confirm 
-    # if it is unconfirmable (the next group loan weekly collection is not confirmed?)
-    # and there is no corner cases created for the next group 
+    
+        # unconfirm premature clearances
+        self.group_loan_premature_clearance_payments.each do |x|
+          x.unconfirm 
+        end
+    
+    
+        # delete group loan weekly_payment 
+        GroupLoanWeeklyPayment.where(:group_loan_weekly_collection_id => self.id).each do |x|
+          glm = x.group_loan_membership 
+          # delete transaction_activity
+          TransactionActivity.where(
+            :transaction_source_id => x.id, 
+            :transaction_source_type => x.class.to_s
+          ).each {|x| x.destroy }
+                                    
+                                    
+          # SavingsEntry.create_weekly_payment_compulsory_savings( self )
+          total_amount = BigDecimal("0")
+          SavingsEntry.where(
+            :savings_source_id => x.id,
+            :savings_source_type => x.class.to_s,
+            :savings_status => SAVINGS_STATUS[:group_loan_compulsory_savings],
+            :direction => FUND_TRANSFER_DIRECTION[:incoming],
+            :financial_product_id => x.group_loan_id ,
+            :financial_product_type => x.group_loan.class.to_s
+          ).each do |savings_entry|
+            total_amount += savings_entry.amount 
+            savings_entry.destroy
+          end
+          
+          glm.update_total_compulsory_savings( -1*total_amount)
+          
+          x.destroy
+        end
+     
+        # unconfirm all group_loan_weekly_collection_voluntary_savings
+        # delete the voluntary savings_entry
+        list_of_group_loan_weekly_voluntary_savings_entry = GroupLoanWeeklyCollectionVoluntarySavingsEntry.where(:group_loan_weekly_collection_id => self.id) 
+    
+        list_of_group_loan_weekly_voluntary_savings_entry.each do |weekly_voluntary_savings|
+          member = weekly_voluntary_savings.group_loan_membership.member 
+      
+          weekly_collection_voluntary_savings_array = SavingsEntry.where(
+            :savings_source_id => list_of_group_loan_voluntary_savings_entry_id,
+            :savings_source_type => weekly_voluntary_savings.class.to_s,
+            :member_id => member.id
+          )
+      
+          total_amount = BigDecimal("0")
+      
+          weekly_collection_voluntary_savings_array.each do |x|
+            total_amount += x.amount 
+            x.destroy 
+          end
+      
+          member.update_total_savings_account( -1* total_amount)
+          weekly_voluntary_savings.destroy 
+        end
+    
+        # unconfirm the big thing 
+        self.confirmed_at = nil
+        self.is_confirmed = false 
+        self.save
+    
+      end
+    rescue ActiveRecord::ActiveRecordError  
+    else
+    end
   end
   
   
+  
+  def uncollect
+    return if not self.is_collected? 
+    self.collected_at = nil
+    self.is_collected = false  
+    self.save
+  end
+  
+  def uncreate_things
+    group_loan = self.group_loan 
+    
+    
+    # deceased 
+    
+    group_loan.group_loan_memberships.where(
+      :deactivation_case =>  GROUP_LOAN_DEACTIVATION_CASE[:deceased] ,
+      :is_active => false, 
+      :deactivation_week_number => self.week_number 
+    ).each do |deceased_glm|
+      
+      member = deceased_glm.member  
+      member.undo_mark_as_deceased(self)
+    end
+    
+      
+    # run_away
+    group_loan.group_loan_memberships.where(
+      :deactivation_case =>  GROUP_LOAN_DEACTIVATION_CASE[:run_away] ,
+      :is_active => false, 
+      :deactivation_week_number => self.week_number 
+    ).each do |run_away_glm|
+      
+      member = run_away_glm.member  
+      member.undo_mark_as_run_away(self)
+    end
+    
+    
+    # uncollectibles
+    self.group_loan_weekly_uncollectibles.each do |x|
+      x.unclear
+      x.uncollect
+      x.destroy 
+    end
+    
+    # prematures 
+    self.group_loan_premature_clearance_payments.each do |x|
+      x.unconfirm
+      x.destroy 
+    end
+  end
   
   
   def confirm_premature_clearances

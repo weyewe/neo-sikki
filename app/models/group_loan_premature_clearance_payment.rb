@@ -254,5 +254,67 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
     
   end
   
+  def unconfirm
+    self.group_loan.update_premature_clearance_deposit( -1*premature_clearance_deposit_amount ) 
+    
+    glm = self.group_loan_membership
+    glm.is_active = true 
+    glm.deactivation_case =  nil 
+    glm.deactivation_week_number =  nil 
+    if glm.save  
+      
+      # SavingsEntry.create_group_loan_compulsory_savings_withdrawal( self , self.group_loan_membership.total_compulsory_savings )  
+      
+      compulsory_savings_withdrawal_array = SavingsEntry.where(
+        :savings_source_id => self.id,
+        :savings_source_type => self.class.to_s, 
+        :savings_status => SAVINGS_STATUS[:group_loan_compulsory_savings],
+        :direction => FUND_TRANSFER_DIRECTION[:outgoing],
+        :financial_product_id => self.group_loan_id ,
+        :financial_product_type => self.group_loan.class.to_s,
+        :member_id => glm.member.id,
+        :is_confirmed => true 
+      )
+      total_amount = BigDecimal("0")
+      compulsory_savings_withdrawal_array.each do |x|
+        total_amount += x.amount 
+        x.destroy 
+      end
+      
+      glm.update_total_compulsory_savings( total_amount )
+      
+      
+      
+      # if remaining_compulsory_savings > BigDecimal('0')
+      #   SavingsEntry.create_savings_account_group_loan_premature_clearance_addition( self , self.remaining_compulsory_savings )  
+      # end 
+      
+      remaining_compulsory_savings_array = SavingsEntry.where(
+        :savings_source_id => self.id,
+        :savings_source_type => self.class.to_s,
+        :savings_status => SAVINGS_STATUS[:savings_account],
+        :direction => FUND_TRANSFER_DIRECTION[:incoming],
+        :financial_product_id =>  self.group_loan.id  ,
+        :financial_product_type => self.group_loan.class.to_s ,
+        :member_id => glm.member.id,
+        :is_confirmed => true 
+      )
+      
+      total_remaining_amount = BigDecimal("0")
+      remaining_compulsory_savings_array.each do |x|
+        total_amount += x.amount 
+        x.destroy
+      end
+      
+      member = glm.member 
+      member.update_total_savings_account( -1*total_amount)
+    end
+    
+    
+    self.is_confirmed = false 
+    self.save 
+    
+  end
+  
   
 end

@@ -223,6 +223,16 @@ class GroupLoanWeeklyUncollectible < ActiveRecord::Base
     end
   end
   
+  def uncollect
+    self.is_collected = true 
+    self.collected_at = params[:collected_at]
+    self.save
+  end
+  
+  def unclear
+    self.group_loan.update_bad_debt_allowance(   self.principal)
+  end
+  
   def clear_end_of_cycle
     self.is_cleared = true 
     self.cleared_at = self.group_loan.closed_at 
