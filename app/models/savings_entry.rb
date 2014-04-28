@@ -321,10 +321,15 @@ class SavingsEntry < ActiveRecord::Base
       multiplier = -1 if self.direction == FUND_TRANSFER_DIRECTION[:outgoing]
       
      
+     # voluntary savings account 
       if self.savings_status == SAVINGS_STATUS[:savings_account]
         member.update_total_savings_account( multiplier  *self.amount )
+        
+    # one off savings so that the member is elligible for borrowing $$ from KKI
       elsif  self.savings_status == SAVINGS_STATUS[:membership]
         member.update_total_membership_savings_account( multiplier  *self.amount )
+        
+    # kept $$ to sustain group loan membership
       elsif self.savings_status == SAVINGS_STATUS[:locked]
         member.update_total_locked_savings_account( multiplier  *self.amount )
       end

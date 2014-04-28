@@ -36,3 +36,15 @@ task :undo_group_loan => :environment do
   
   
 end
+
+task :create_member_status_report => :environment do
+  filename = "member_status.csv"
+
+  CSV.open(filename, 'w') do |csv|
+    
+    Member.all.each do |member|
+      csv << [member.id_number, member.name, member.total_membership_savings, member.total_locked_savings_account, member.total_savings_account]
+    end
+  end
+  
+end
