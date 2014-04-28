@@ -16,6 +16,9 @@ class Member < ActiveRecord::Base
   validates_presence_of :name # , :id_number 
   
    
+   
+   
+   
   def self.active_objects
     self.where(:is_deceased => false).order("id DESC")
   end

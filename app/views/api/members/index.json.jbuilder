@@ -28,6 +28,13 @@ json.members @objects do |object|
 	json.rt object.rt
 	json.rw object.rw
 	json.village object.village
+	
+	if not object.group_loan_memberships.where(:is_active =>true ).first.nil?
+		json.active_group_loan_name  object.group_loan_memberships.where(:is_active => true).first.group_loan.id_number_name 
+	else
+		json.active_group_loan_name  "NA" 
+	end
+	
 end
 
 

@@ -12,14 +12,13 @@ class Api::MembersController < Api::BaseApiController
       livesearch = "%#{params[:livesearch]}%"
       
       if params[:is_deceased].present? or params[:is_run_away].present?
-        @objects = Member.where{
+        @objects = Member.joins(:group_loan_memberships => [:group_loan]).where{
           (is_deceased.eq is_deceased_value) & 
           (is_run_away.eq is_run_away_value ) & 
           (
             (name =~  livesearch ) | 
             (id_number =~ livesearch)
-          )
-
+          ) 
         }.page(params[:page]).per(params[:limit]).order("id DESC")
 
         @total = Member.where{
@@ -31,7 +30,7 @@ class Api::MembersController < Api::BaseApiController
           )
         }.count
       else
-        @objects = Member.where{
+        @objects = Member.joins(:group_loan_memberships => [:group_loan]).where{
           # (is_deceased.eq is_deceased_value) & 
           # (is_run_away.eq is_run_away_value ) & 
           (
@@ -55,13 +54,13 @@ class Api::MembersController < Api::BaseApiController
       # calendar
       
     elsif params[:is_deceased].present? 
-      @objects = Member.where(:is_deceased => true ).page(params[:page]).per(params[:limit]).order("deceased_at DESC")
+      @objects = Member.joins(:group_loan_memberships => [:group_loan]).where(:is_deceased => true ).page(params[:page]).per(params[:limit]).order("deceased_at DESC")
       @total = Member.where(:is_deceased => true ).count
     elsif params[:is_run_away].present? 
-      @objects = Member.where(:is_run_away => true ).page(params[:page]).per(params[:limit]).order("run_away_at DESC")
+      @objects = Member.joins(:group_loan_memberships => [:group_loan]).where(:is_run_away => true ).page(params[:page]).per(params[:limit]).order("run_away_at DESC")
       @total = Member.where(:is_run_away => true ).count
     else
-      @objects = Member.page(params[:page]).per(params[:limit]).order("id DESC")
+      @objects = Member.joins(:group_loan_memberships => [:group_loan]).page(params[:page]).per(params[:limit]).order("id DESC")
       @total = Member.count 
     end
     

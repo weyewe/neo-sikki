@@ -48,3 +48,15 @@ task :create_member_status_report => :environment do
   end
   
 end
+
+task :create_glm_status_report => :environment do
+  filename = "glm_status.csv"
+
+  CSV.open(filename, 'w') do |csv|
+    
+    GroupLoanMembership.joins(:group_loan, :member).all.each do |glm|
+      csv << [glm.id, glm.member.name, glm.group_loan.name, glm.total_compulsory_savings.to_s]
+    end
+  end
+  
+end

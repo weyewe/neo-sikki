@@ -20,6 +20,7 @@ Ext.define('AM.model.Member', {
 			
 			{ name: 'rw', type: 'int' }     ,
 			{ name: 'village', type: 'string' }     ,
+			{ name: 'active_group_loan_name', type: 'string' }     ,
   	],
 
 	 

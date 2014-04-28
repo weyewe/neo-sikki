@@ -57,7 +57,7 @@ Ext.define('AM.view.master.member.List' ,{
 			
 			{	header: 'Complete?', dataIndex: 'is_data_complete', flex: 1 }  , 
 			
-			
+			{	header: 'Active Group Loan', dataIndex: 'active_group_loan_name', flex: 1 }  , 
 			
 			
 		];

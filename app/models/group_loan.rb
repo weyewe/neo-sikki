@@ -25,6 +25,9 @@ class GroupLoan < ActiveRecord::Base
                           
   validates_uniqueness_of :name 
   
+  def id_number_name
+    "#{self.name}"
+  end
   
   def self.create_object(  params)
     new_object = self.new
@@ -650,6 +653,8 @@ Phase: loan disbursement finalization
 =begin
   Start Group Loan
 =end
+  
+
   def total_members_count
     self.group_loan_memberships.count 
   end
