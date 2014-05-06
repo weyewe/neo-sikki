@@ -60,3 +60,32 @@ task :create_glm_status_report => :environment do
   end
   
 end
+
+task :member_creation_report => :environment do
+  filename = "member_creation.csv"
+
+  CSV.open(filename, 'w') do |csv|
+    
+    Member.order("id_number ASC").all.each do |member|
+      csv << [member.id_number, member.name, member.created_at]
+    end
+  end
+  
+end
+
+task :non_available_member_id_number => :environment do
+  filename = "non_available_member_id_number.csv"
+
+  CSV.open(filename, 'w') do |csv|
+    
+    (1..5000).each do |x|
+      member = Member.find_by_id_number( x.to_s )
+      
+      if member.nil?
+        csv << [ x ]  
+      end
+    end
+ 
+  end
+  
+end

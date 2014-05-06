@@ -57,6 +57,13 @@ class User < ActiveRecord::Base
     
   end
   
+  def recover_object
+    self.password = 'user1234'
+    self.password_confirmation = 'user1234'
+    self.is_deleted = false 
+    self.save 
+  end
+  
   def User.create_object(params)
     # only used in seeds.rb => we need to assign pre-determined password
     

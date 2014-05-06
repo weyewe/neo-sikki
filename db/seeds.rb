@@ -56,7 +56,7 @@ data_entry_role = Role.create!(
   admin = User.create_main_user(  :name => "Admin", :email => "admin@gmail.com" ,:password => "willy1234", :password_confirmation => "willy1234") 
   admin.set_as_main_user
   
-  admin = User.create_main_user(  :name => "Admin", :email => "admin2@gmail.com" ,:password => "willy1234", :password_confirmation => "willy1234") 
+  admin = User.create_main_user(  :name => "Leon", :email => "leonardo.kamilius@gmail.com" ,:password => "leon1234", :password_confirmation => "leon1234") 
   admin.set_as_main_user
   
   admin = User.create_main_user(  :name => "Admin", :email => "admin3@gmail.com" ,:password => "willy1234", :password_confirmation => "willy1234") 
@@ -404,4 +404,17 @@ data_entry_role = Role.create!(
     
  
 # end
+
+=begin
+array = [
+"data_entry1@gmail.com", 
+"data_entry2@gmail.com"
+]
+
+array.each do |x|
+  user = User.find_by_email x 
+  
+  user.recover_object 
+end
+=end
 
