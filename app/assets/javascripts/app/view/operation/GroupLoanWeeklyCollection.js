@@ -43,23 +43,7 @@ Ext.define('AM.view.operation.GroupLoanWeeklyCollection', {
 				
 			}
 		
-		// just the list
-		 
-			// {
-			// 	xtype : 'operationgrouploanList',
-			// 	flex : 1
-			// },
-			// 
-			// {
-			// 	xtype : 'grouploanweeklycollectionlist',
-			// 	flex : 2
-			// }, 
-			// {
-			// 			// xtype : 'grouploanweeklycollectionlist',
-			// 			html : "This is awesome",
-			// 			flex : 2
-			// 		},
-		 
+	 
 			
 		]
 });

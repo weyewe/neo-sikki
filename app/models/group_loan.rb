@@ -662,7 +662,8 @@ Phase: loan disbursement finalization
   def start_fund
     amount = BigDecimal("0")
     self.group_loan_memberships.joins(:group_loan_product).each do |glm|
-      amount += glm.group_loan_product.weekly_payment_amount * glm.group_loan_product.total_weeks
+      # amount += glm.group_loan_product.weekly_payment_amount * glm.group_loan_product.total_weeks
+      amount += glm.group_loan_product.actual_amount_to_be_disbursed
     end
     
     return amount 

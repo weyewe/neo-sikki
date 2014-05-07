@@ -406,6 +406,11 @@ data_entry_role = Role.create!(
 # end
 
 =begin
+
+admin = User.create_main_user(  :name => "Willy", :email => "willy@gmail.com" ,:password => "willy1234", :password_confirmation => "willy1234") 
+admin.set_as_main_user
+
+
 array = [
 "data_entry1@gmail.com", 
 "data_entry2@gmail.com"
@@ -416,5 +421,58 @@ array.each do |x|
   
   user.recover_object 
 end
+=end
+
+=begin
+  Data entry role 
+  
+  
+  data_entry_role = {
+    :passwords => {
+      :update => true 
+    },
+    :calendars => {
+      :search => true,
+      :index => true ,
+      # there are 2: update is hack for extensible.. 
+      # update details  => authorization to update discount, calendar name, etc
+      :update => true,
+      :update_details => false 
+    },
+    :customers => {
+      :new => true,
+      :create => true, 
+      :edit => true, 
+      :update => true ,
+      :destroy => true  ,
+      :index => true ,
+      :search => true 
+    },
+    :bookings => {
+      :new => true,
+      :create => true, 
+      :edit => true, 
+      :update => true ,
+      :destroy => true ,
+      :confirm => true,
+      :pay => true, 
+      :index => true ,
+      :search => true,
+      :update_start_datetime => true, 
+      :update_end_datetime => true 
+    } ,
+    :events => {
+      :index => true 
+    }
+  }
+
+  data_entry_role = Role.create!(
+    :name        => ROLE_NAME[:data_entry],
+    :title       => 'Data Entry',
+    :description => 'Role for data entry',
+    :the_role    => data_entry_role.to_json
+  )
+
+
 =end
 
