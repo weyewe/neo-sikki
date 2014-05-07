@@ -112,7 +112,7 @@ class GroupLoanProduct < ActiveRecord::Base
   end
   
   def actual_amount_to_be_disbursed
-    principal*total_weeks - admin_fee - initial_savings 
+    principal*total_weeks 
   end
   
 end

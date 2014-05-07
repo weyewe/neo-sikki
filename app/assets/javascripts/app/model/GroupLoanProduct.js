@@ -9,6 +9,9 @@ Ext.define('AM.model.GroupLoanProduct', {
 			{ name: 'compulsory_savings', type: 'string' }  ,
 			{ name: 'admin_fee', type: 'string' }     ,
 			{ name : "weekly_payment_amount", type: 'string'}
+			{ name: 'initial_savings', type: 'string' }  ,
+			
+			
   	],
 
 	  
