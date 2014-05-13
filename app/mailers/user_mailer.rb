@@ -4,16 +4,16 @@ class UserMailer < ActionMailer::Base
   default from: "from@example.com"
 
   def welcome 
-    some_string = 'awesome banzai'
+    content = 'awesome banzai'
     attachments['text.txt'] = {:mime_type => 'text/plain',
       :content => some_string }
-      mail(:to => "w.yunnal@gmail.com", :subject => "New account information")
+    
+    
+    mail(:to => "w.yunnal@gmail.com", :subject => "banzai New account information")
   end
 
 
-
   def sales_for_yesterday 
-    
     require 'FasterCSV'
     @from = 'someone@example.com' 
     @recipients = 'w.yunnal@gmail.com' 
