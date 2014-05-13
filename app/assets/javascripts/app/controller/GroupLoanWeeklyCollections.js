@@ -204,6 +204,7 @@ Ext.define('AM.controller.GroupLoanWeeklyCollections', {
 		var savingsGrid = this.getSavingsList(); 
 		
 		
+		
 	 
 		 
 		if (parentList.getSelectionModel().hasSelection()) {
