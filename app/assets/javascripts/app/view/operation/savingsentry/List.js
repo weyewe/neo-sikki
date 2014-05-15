@@ -20,7 +20,8 @@ Ext.define('AM.view.operation.savingsentry.List' ,{
 				text : "Jumlah",
 				sortable: false, 
 				flex : 2,
-				tpl : '<b>{amount}</b>' + '<br />'  + '<br />'  + 
+				tpl : '<b>{savings_status_text}</b>' + '<br />'  + '<br />'  +
+							'<b>{amount}</b>' + '<br />'  + '<br />'  + 
 							'Kondisi: <b>{direction_text}</b>' 
 			},
 			{
@@ -39,8 +40,20 @@ Ext.define('AM.view.operation.savingsentry.List' ,{
 		// };
 
 		this.addObjectButton = new Ext.Button({
-			text: 'Add',
+			text: 'Add Voluntary',
 			action: 'addObject',
+			disabled: true
+		});
+		
+		this.addLockedObjectButton = new Ext.Button({
+			text: 'Add Locked',
+			action: 'addLockedObject',
+			disabled: true
+		});
+		
+		this.addMembershipObjectButton = new Ext.Button({
+			text: 'Add Membership',
+			action: 'addMembershipObject',
 			disabled: true
 		});
 
@@ -72,7 +85,11 @@ Ext.define('AM.view.operation.savingsentry.List' ,{
 
 
 
-		this.tbar = [this.addObjectButton, this.editObjectButton, this.deleteObjectButton ,	
+		this.tbar = [this.addObjectButton, 
+									this.addLockedObjectButton,
+									this.addMembershipObjectButton,
+									'->',
+									this.editObjectButton, this.deleteObjectButton ,	
 									this.confirmObjectButton ];
 		this.bbar = Ext.create("Ext.PagingToolbar", {
 			store	: this.store, 
@@ -92,10 +109,14 @@ Ext.define('AM.view.operation.savingsentry.List' ,{
 	
 	enableAddButton: function(){
 		this.addObjectButton.enable();
+		this.addLockedObjectButton.enable();
+		this.addMembershipObjectButton.enable();
 	},
 	
 	disableAddButton : function(){
 		this.addObjectButton.disable();
+		this.addLockedObjectButton.disable();
+		this.addMembershipObjectButton.disable();
 	},
 
 	enableRecordButtons: function() {

@@ -15,7 +15,9 @@ Ext.define('AM.model.SavingsEntry', {
 			{ name: 'amount', type: 'string'},
 			
 			{ name: 'is_confirmed', type: 'boolean'},
-			{ name: 'confirmed_at', type: 'string'}
+			{ name: 'confirmed_at', type: 'string'},
+			{ name: 'savings_status', type: 'int'},
+			{ name: 'savings_status_text', type: 'string'}
   	],
 
   	idProperty: 'id' ,

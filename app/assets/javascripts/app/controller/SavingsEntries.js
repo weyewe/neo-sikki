@@ -55,6 +55,15 @@ Ext.define('AM.controller.SavingsEntries', {
       'savingsentrylist button[action=addObject]': {
         click: this.addObject
       },
+
+			'savingsentrylist button[action=addLockedObject]': {
+        click: this.addLockedObject
+      },
+
+			'savingsentrylist button[action=addMembershipObject]': {
+        click: this.addMembershipObject
+      },
+
       'savingsentrylist button[action=editObject]': {
         click: this.editObject
       },
@@ -201,16 +210,49 @@ Ext.define('AM.controller.SavingsEntries', {
 		me.getStore().load(); 
 	},
  
+	baseAddObject: function( parentObject, savingsStatus ) {
+		var view = Ext.widget('savingsentryform');
+		view.show();
+		view.setParentData(parentObject);
+		view.setSavingsStatus( savingsStatus );  
+		view.setConditionalTitle( savingsStatus );  
+	},
+	
+	
+	// addObject: function() {
+	//     
+	// 	var parentObject  = this.getParentList().getSelectedObject();
+	// 	if( parentObject) {
+	// 		var view = Ext.widget('savingsentryform');
+	// 		view.show();
+	// 		view.setParentData(parentObject);
+	// 	}
+	//   },
 
 	addObject: function() {
     
 		var parentObject  = this.getParentList().getSelectedObject();
 		if( parentObject) {
-			var view = Ext.widget('savingsentryform');
-			view.show();
-			view.setParentData(parentObject);
+			this.baseAddObject( parentObject, 0);  
 		}
   },
+
+	addMembershipObject: function() {
+    
+		var parentObject  = this.getParentList().getSelectedObject();
+		if( parentObject) {
+			this.baseAddObject( parentObject, 1);
+		}
+  },
+
+	addLockedObject: function() {
+    
+		var parentObject  = this.getParentList().getSelectedObject();
+		if( parentObject) {
+			this.baseAddObject( parentObject, 2);  
+		}
+  },
+	
 
 	editObject: function() {
 		var me = this; 
@@ -222,6 +264,7 @@ Ext.define('AM.controller.SavingsEntries', {
 			view.show();
 			view.down('form').loadRecord(record);
 			view.setParentData(parentObject);
+			view.setConditionalTitle( record.get("savings_status") ); 
 		}
 		
 		

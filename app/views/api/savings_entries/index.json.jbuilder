@@ -20,5 +20,14 @@ json.savings_entries @objects do |object|
 	json.is_confirmed object.is_confirmed
 	json.confirmed_at format_date_friendly( object.confirmed_at )
 	 
+	json.savings_status object.savings_status 
+	
+	if object.savings_status == SAVINGS_STATUS[:savings_account]
+		json.savings_status_text				"Voluntary" 
+	elsif object.savings_status == SAVINGS_STATUS[:membership]
+		json.savings_status_text				"Membership" 
+	elsif object.savings_status == SAVINGS_STATUS[:locked]
+		json.savings_status_text				"Locked" 
+	end
 	
 end

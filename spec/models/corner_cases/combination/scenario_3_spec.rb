@@ -186,6 +186,7 @@ describe GroupLoan do
         
         
         it 'should confirm the fourth week' do
+          @first_gl_pc.errors.messages.each {|x| puts x }
           @fourth_group_loan_weekly_collection.is_confirmed?.should be_true 
         end
         
@@ -193,19 +194,21 @@ describe GroupLoan do
           @first_gl_pc.should be_valid 
         end
         
-        it 'should produce premature_clearance_payment including the bail_out for run_away member' do
-          compulsory_savings = @premature_clearance_glm.group_loan_product.compulsory_savings 
-          paid_weeks =   4
-          remaining_weeks = @group_loan.loan_duration - ( paid_weeks + 1 ) 
-          
-          bail_out_amount = 
-          @first_gl_pc.amount.should == GroupLoan.rounding_up( 
-                  total_remaining_principal - 
-                  compulsory_savings*(paid_weeks + 1) + 
-                  bail_out_amount,
-                  DEFAULT_PAYMENT_ROUND_UP_VALUE )
-        end
+        # it 'should produce premature_clearance_payment including the bail_out for run_away member' do
+        #   compulsory_savings = @premature_clearance_glm.group_loan_product.compulsory_savings 
+        #   paid_weeks =   4
+        #   remaining_weeks = @group_loan.loan_duration - ( paid_weeks + 1 ) 
+        #   
+        #   bail_out_amount = 
+        #   @first_gl_pc.amount.should == GroupLoan.rounding_up( 
+        #           total_remaining_principal - 
+        #           compulsory_savings*(paid_weeks + 1) + 
+        #           bail_out_amount,
+        #           DEFAULT_PAYMENT_ROUND_UP_VALUE )
+        # end
         
+        
+        # /spec/models/corner_cases/uncollectible/end_of_cycle_resolution_spec.rb
        
       end
     end

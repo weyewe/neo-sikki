@@ -23,11 +23,17 @@ class Api::SavingsEntriesController < Api::BaseApiController
       @objects = SavingsEntry.joins(:member).
                   where(
                     :member_id => params[:parent_id],
-                    :savings_status => SAVINGS_STATUS[:savings_account]).
+                    :savings_status => [
+                              SAVINGS_STATUS[:savings_account],
+                              SAVINGS_STATUS[:membership],
+                              SAVINGS_STATUS[:locked] ]).
                   page(params[:page]).per(params[:limit]).order("id DESC")
       @total = SavingsEntry.where(            
                   :member_id => params[:parent_id],
-                  :savings_status => SAVINGS_STATUS[:savings_account]).count 
+                  :savings_status => [
+                            SAVINGS_STATUS[:savings_account],
+                            SAVINGS_STATUS[:membership],
+                            SAVINGS_STATUS[:locked] ]).count 
     
     end
     

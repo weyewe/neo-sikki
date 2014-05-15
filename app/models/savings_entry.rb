@@ -97,14 +97,29 @@ class SavingsEntry < ActiveRecord::Base
   # Independent savings, 
 =end
   def self.create_object( params ) 
+    new_object = self.new 
+    
+    if params[:savings_status].nil?
+      new_object.errors.add(:generic_errors, "Harus ada savings status")
+      return new_object 
+    end
+    
+    if not [
+              SAVINGS_STATUS[:savings_account],
+              SAVINGS_STATUS[:membership],
+              SAVINGS_STATUS[:locked] ].include?( params[:savings_status].to_i ) 
+      new_object.errors.add(:generic_errors , "Savings Status must be present")
+      return new_object
+    end
+    
     
     # puts "Inside self.create_object\n"
-    new_object = self.new 
+    
     
     new_object.savings_source_id      = nil  
     new_object.savings_source_type    = nil 
     new_object.amount                 = BigDecimal(params[:amount] || '0')
-    new_object.savings_status         = SAVINGS_STATUS[:savings_account]
+    new_object.savings_status         = params[:savings_status]
     new_object.direction              = params[:direction]
     new_object.financial_product_id   = nil 
     new_object.financial_product_type = nil
@@ -116,15 +131,30 @@ class SavingsEntry < ActiveRecord::Base
   
   def  update_object( params ) 
     
+    if params[:savings_status].nil?
+      self.errors.add(:generic_errors, "Harus ada savings status")
+      return self 
+    end
+    
+    if not [
+              SAVINGS_STATUS[:savings_account],
+              SAVINGS_STATUS[:membership],
+              SAVINGS_STATUS[:locked] ].include?( params[:savings_status].to_i ) 
+      self.errors.add(:generic_errors , "Savings Status must be present")
+      return self
+    end
+    
     if self.is_confirmed?
       self.errors.add(:generic_errors, 'Sudah dikonfirmasi. Silakan unconfirm')
       return self 
     end
     
+    
+    
     self.savings_source_id      = nil  
     self.savings_source_type    = nil 
     self.amount                 = BigDecimal(params[:amount] || '0')
-    self.savings_status         = SAVINGS_STATUS[:savings_account]
+    self.savings_status         = params[:savings_status]
     self.direction              = params[:direction]
     self.financial_product_id   = nil 
     self.financial_product_type = nil

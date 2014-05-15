@@ -2,7 +2,7 @@ Ext.define('AM.view.operation.savingsentry.Form', {
   extend: 'Ext.window.Window',
   alias : 'widget.savingsentryform',
 
-  title : 'Add / Edit Savings Entry',
+  // title : 'Add / Edit Savings Entry',
   layout: 'fit',
 	width	: 500,
   autoShow: true,  // does it need to be called?
@@ -48,6 +48,11 @@ Ext.define('AM.view.operation.savingsentry.Form', {
 	        xtype: 'hidden',
 	        name : 'member_id',
 	        fieldLabel: 'GroupLoan ID'
+	      },
+				{
+	        xtype: 'hidden',
+	        name : 'savings_status',
+	        fieldLabel: 'Savings Status'
 	      },
 				{
 					xtype: 'displayfield',
@@ -115,5 +120,20 @@ Ext.define('AM.view.operation.savingsentry.Form', {
 		this.down('form').getForm().findField('member_id_number').setValue(record.get('id_number')); 
 		this.down('form').getForm().findField('member_id').setValue(record.get('id')); 
 	},
+	
+	setSavingsStatus: function( savingsStatus ){
+		this.down('form').getForm().findField('savings_status').setValue( savingsStatus ); 
+	},
+	
+	setConditionalTitle: function(savingsStatus){
+		// console.log("SetConditionalTitle is called");
+		if( savingsStatus == 0 ){
+			this.setTitle( "Voluntary Savings");
+		}else if( savingsStatus == 1 ){
+			this.setTitle("Membership Savings");
+		}else if( savingsStatus == 2 ) {
+			this.setTitle("Locked Savings");
+		}
+	}
 });
 

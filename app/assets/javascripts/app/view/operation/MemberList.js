@@ -5,16 +5,28 @@ Ext.define('AM.view.operation.MemberList' ,{
   	store: 'Members', 
    
 	showTotalSavingsAmount: false, 
+	showTotalLockedSavingsAmount: false,
+	showTotalMembershipSavingsAmount: false,
 
 	initComponent: function() {
 		
 		var templateBuilder = '<b>{name}</b>' + '<br />' + 
 					'ID : <b>{id_number}</b>' + '<br />'  + 
-					'Alamat: <b>{address}</b>'; 
+					'Alamat: <b>{address}</b>' ; 
 					
 		if( this.showTotalSavingsAmount === true ){
 			templateBuilder += '<br />'  + 
-												'Total Savings: <b>{total_savings_account}</b>';
+												'Total Savings: <b>{total_savings_account}</b>' ;
+		}
+		
+		if( this.showTotalLockedSavingsAmount === true ){
+			templateBuilder += '<br />'  + 
+												'Locked Savings: <b>{total_locked_savings_account}</b>' ;
+		}
+		
+		if( this.showTotalMembershipSavingsAmount === true ){
+			templateBuilder += '<br />'  + 
+												'Membership Savings: <b>{total_membership_savings}</b>' ;
 		}
 					
 		this.columns = [
