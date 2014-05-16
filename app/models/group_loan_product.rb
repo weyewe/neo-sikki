@@ -97,7 +97,13 @@ class GroupLoanProduct < ActiveRecord::Base
   
   def delete_object
     allow_update_if_no_subcriptions # validation 
-    return if self.errors.size != 0 
+    # return if self.errors.size != 0 
+    
+    
+    if self.group_loan_memberships.count != 0 
+      self.errors.add(:generic_errors, "Masih ada anggota pinjaman group yang menggunakan group loan product ini")
+      return self
+    end
     
     self.destroy 
   end

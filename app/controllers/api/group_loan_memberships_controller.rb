@@ -21,9 +21,11 @@ class Api::GroupLoanMembershipsController < Api::BaseApiController
       
     elsif params[:parent_id].present?
       # @group_loan = GroupLoan.find_by_id params[:parent_id]
-      @objects = GroupLoanMembership.joins(:group_loan_product, :member, :group_loan).
+      @objects = GroupLoanMembership. #joins(:group_loan_product, :member, :group_loan).
                   where(:group_loan_id => params[:parent_id]).
                   page(params[:page]).per(params[:limit]).order("id DESC")
+                  
+        puts "Total objects => #{@objects.count}"
       @total = GroupLoanMembership.where(:group_loan_id => params[:parent_id]).count 
     else
       @objects = []
