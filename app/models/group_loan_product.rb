@@ -116,3 +116,30 @@ class GroupLoanProduct < ActiveRecord::Base
   end
   
 end
+
+=begin
+glp_id_list = []
+GroupLoanProduct.all.each do |glp|
+  first_amount = BigDecimal("1200000")
+  second_amount = BigDecimal("2200000")
+  if glp.disbursed_principal == first_amount or glp.disbursed_principal == second_amount
+    glp_id_list << glp.id 
+  end
+end
+
+affected_glm_list = [] 
+GroupLoanMembership.where(:group_loan_product_id => glp_id_list).each do |glm|
+  affected_glm_list << glm.id 
+end
+
+result = [] 
+GroupLoanMembership.joins(:group_loan, :member).where(:id => affected_glm_list ).each do |glm|
+  array = []
+  array << glm.group_loan.name 
+  array << glm.member.name 
+  array << glm.member.id_number 
+  result << array 
+end
+
+
+=end
