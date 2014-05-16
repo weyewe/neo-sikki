@@ -19,6 +19,8 @@ class Api::GroupLoansController < Api::BaseApiController
       
       # calendar
       
+      puts "TOtal @objects: #{@objects.count}"
+      
     else
       @objects = GroupLoan.includes(:group_loan_memberships).page(params[:page]).per(params[:limit]).order("id DESC")
       @total = GroupLoan.count 

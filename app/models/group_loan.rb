@@ -289,6 +289,7 @@ Phase: loan disbursement finalization
 =end
 
   def loan_duration
+    return 0 if not self.is_started?
     duration_array = []
     self.active_group_loan_memberships.each do |glm|
       duration_array << glm.group_loan_product.total_weeks
@@ -581,6 +582,10 @@ Phase: loan disbursement finalization
   end
   
   def expected_revenue_from_run_away_member_end_of_cycle_resolution
+    if loan_duration.nil?
+      return BigDecimal("0")
+    end
+    
     total_week = self.loan_duration
     amount = BigDecimal('0')
     
