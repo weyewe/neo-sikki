@@ -72,8 +72,7 @@ Ext.define('AM.view.operation.savingsentry.List' ,{
 		this.confirmObjectButton = new Ext.Button({
 			text: 'Confirm',
 			action: 'confirmObject',
-			disabled: true,
-			hidden : true 
+			disabled: true 
 		});
 		
 		this.unconfirmObjectButton = new Ext.Button({
@@ -133,13 +132,13 @@ Ext.define('AM.view.operation.savingsentry.List' ,{
 		this.editObjectButton.enable();
 		this.deleteObjectButton.enable();
 		this.confirmObjectButton.enable();
-		this.unconfirmObjectButton.enable();
+		// this.unconfirmObjectButton.enable();
 	},
 
 	disableRecordButtons: function() {
 		this.editObjectButton.disable();
 		this.deleteObjectButton.disable();
 		this.confirmObjectButton.disable();
-		this.unconfirmObjectButton.disable();
+		// this.unconfirmObjectButton.disable();
 	}
 });

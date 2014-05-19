@@ -227,7 +227,13 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
   
   
   def uncollect
+    if self.is_confirmed?
+      self.errors.add(:generic_errors, "Sudah di konfirmasi. Harap Unconfirm")
+      return self 
+    end
+    
     return if not self.is_collected? 
+       
     self.collected_at = nil
     self.is_collected = false  
     self.save
