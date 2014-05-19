@@ -366,7 +366,16 @@ Ext.define('AM.controller.SavingsEntries', {
     var grid = this.getList();
   
     if (selections.length > 0) {
+			var record = this.getList().getSelectedObject();
       grid.enableRecordButtons();
+			if(record.get("is_confirmed") == true ){
+				grid.confirmObjectButton.hide();
+				grid.unconfirmObjectButton.show();
+			}else{
+				grid.confirmObjectButton.show();
+				grid.unconfirmObjectButton.hide();
+			}
+			
     } else {
       grid.disableRecordButtons();
     }

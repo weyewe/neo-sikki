@@ -72,7 +72,15 @@ Ext.define('AM.view.operation.savingsentry.List' ,{
 		this.confirmObjectButton = new Ext.Button({
 			text: 'Confirm',
 			action: 'confirmObject',
-			disabled: true
+			disabled: true,
+			hidden : true 
+		});
+		
+		this.unconfirmObjectButton = new Ext.Button({
+			text: 'Unconfirm',
+			action: 'unconfirmObject',
+			disabled: true,
+			hidden : true 
 		});
 		
 		this.searchField = new Ext.form.field.Text({
@@ -90,7 +98,9 @@ Ext.define('AM.view.operation.savingsentry.List' ,{
 									this.addMembershipObjectButton,
 									'->',
 									this.editObjectButton, this.deleteObjectButton ,	
-									this.confirmObjectButton ];
+									'-',
+									this.confirmObjectButton,
+									this.unconfirmObjectButton ];
 		this.bbar = Ext.create("Ext.PagingToolbar", {
 			store	: this.store, 
 			displayInfo: true,
@@ -123,11 +133,13 @@ Ext.define('AM.view.operation.savingsentry.List' ,{
 		this.editObjectButton.enable();
 		this.deleteObjectButton.enable();
 		this.confirmObjectButton.enable();
+		this.unconfirmObjectButton.enable();
 	},
 
 	disableRecordButtons: function() {
 		this.editObjectButton.disable();
 		this.deleteObjectButton.disable();
 		this.confirmObjectButton.disable();
+		this.unconfirmObjectButton.disable();
 	}
 });
