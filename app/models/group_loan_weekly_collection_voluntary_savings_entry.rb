@@ -12,6 +12,18 @@ class GroupLoanWeeklyCollectionVoluntarySavingsEntry < ActiveRecord::Base
   validate :group_loan_membership_is_still_active
   validate :no_double_group_loan_membership
   
+  validate :valid_group_loan_membership_id
+  
+  def valid_group_loan_membership_id
+    return if group_loan_membership_id.nil? 
+    assigned_glm =  GroupLoanMembership.find_by_id group_loan_membership_id
+    
+    if assigned_glm.nil?
+      self.errors.add(:group_loan_membership_id , "Harus ada dan valid")
+      return self
+    end
+  end
+  
   
   
   def valid_amount

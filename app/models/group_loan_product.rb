@@ -144,6 +144,16 @@ GroupLoanMembership.joins(:group_loan, :member).where(:id => affected_glm_list )
   array << glm.group_loan.name 
   array << glm.member.name 
   array << glm.member.id_number 
+  
+  if not glm.group_loan.disbursed_at.nil? 
+    array << glm.group_loan.disbursed_at.in_time_zone("Jakarta").to_s
+  else
+    array <<  "NA"
+  end
+  
+  array << glm.group_loan_product.interest.to_i
+  
+  
   result << array 
 end
 

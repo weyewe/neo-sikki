@@ -22,7 +22,28 @@ class GroupLoanMembership < ActiveRecord::Base
   
   validate :no_active_membership_of_another_group_loan
   validate :no_deceased_or_run_away_member
-  # validate :ensure_group_loan_is_not_started
+  validate :valid_member_id
+  validate :valid_group_loan_product_id
+  
+  def valid_member_id
+    return if member_id.nil? 
+    assigned_member =  Member.find_by_id member_id
+    
+    if assigned_member.nil?
+      self.errors.add(:member_id , "Harus ada dan valid")
+      return self
+    end
+  end
+  
+  def valid_group_loan_product_id
+    return if group_loan_product_id.nil? 
+    assigned_glp =  GroupLoanProduct.find_by_id group_loan_product_id
+    
+    if assigned_glp.nil?
+      self.errors.add(:group_loan_product_id , "Harus ada dan valid")
+      return self
+    end
+  end
   
   def no_active_membership_of_another_group_loan
     return if self.persisted? or not self.member_id.present? 
