@@ -144,6 +144,31 @@ class GroupLoanWeeklyCollectionVoluntarySavingsEntry < ActiveRecord::Base
     end
   end
   
+  def unconfirm
+    
+    member = self.group_loan_membership.member 
+
+    weekly_collection_voluntary_savings_array = SavingsEntry.where(
+      :savings_source_id => self.id ,
+      :savings_source_type => self.class.to_s,
+      :member_id => member.id
+    )
+
+    total_amount = BigDecimal("0")
+
+    weekly_collection_voluntary_savings_array.each do |x|
+      total_amount += x.amount 
+      x.destroy 
+    end
+
+    member.update_total_savings_account( -1* total_amount)
+    self.destroy
+    
+    
+  end
+  
+   
+  
   
   
 end

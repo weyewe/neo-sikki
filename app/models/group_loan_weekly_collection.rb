@@ -89,6 +89,8 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
   
   
   
+  
+  
   def update_group_loan_bad_debt_allowance
     group_loan.update_bad_debt_allowance(                 
                       self.extract_uncollectible_weekly_payment_default_amount + 
@@ -127,7 +129,7 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
         self.save 
 
         self.create_group_loan_weekly_payments 
-        # self.group_loan.update_default_payment_amount_receivable
+        
         self.confirm_premature_clearances
         self.update_group_loan_bad_debt_allowance  # from uncollectible +  run_away_member
         
@@ -138,90 +140,136 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
   end
   
   
+  def next_weekly_collection
+    current_week_number=  self.week_number
+    return group_loan.group_loan_weekly_collections.where(:week_number => current_week_number + 1 ).first
+  end
+  
+  def can_be_unconfirmed? 
+    
+    if not self.is_confirmed? 
+      self.errors.add(:generic_errors, "Belum di konfirmasi")
+      return false 
+    end
+    
+    
+    next_week_collection = self.next_weekly_collection
+    next_week_week_number = next_week_collection.week_number
+    
+    if not next_week_collection.nil?
+      if  next_week_collection.is_collected?
+        return false
+      else
+         
+        
+        # in the next week: 
+        # 1. check whether it has deceased 
+        
+        if group_loan.group_loan_memberships.where(
+                    :is_active => false, 
+                    :deactivation_case => GROUP_LOAN_DEACTIVATION_CASE[:deceased],
+                    :deactivation_week_number => next_week_week_number   ).count != 0 
+                    
+          self.errors.add(:generic_errors, "Sudah ada member yang meninggal di minggu #{next_week_week_number}")
+          return false
+        end
+    
+        # 2. check whether it has run_away
+        if next_week_collection.group_loan_run_away_receivables.count != 0
+          self.errors.add(:generic_errors, "Sudah ada member yang kabur di minggu #{next_week_week_number}")
+          return false
+        end
+          
+        # 3. check whether it has group_loan_weekly_uncollectibles
+        if next_week_collection.group_loan_weekly_uncollectibles.count != 0
+          self.errors.add(:generic_errors, "Sudah ada member yang di declare tidak membayar di minggu #{next_week_week_number}")
+          return false
+        end
+        
+        # 4. check whether it has premature_clearance
+        if next_week_collection.group_loan_premature_clearance_payments.count != 0 
+          self.errors.add(:generic_errors, "Sudah ada member yang premature clearance di minggu #{next_week_week_number}")
+          return false
+        end
+        
+        # 5. check whether it has weekly_collection_voluntary_savings
+        if next_week_collection.group_loan_weekly_collection_voluntary_savings_entries.count != 0 
+          self.errors.add(:generic_errors, "Sudah ada member yang  membayar tabungan sukarela di minggu #{next_week_week_number}")
+          return false
+        end
+        
+        
+      end
+    end
+    
+    # now, the case where the current week to be unconfirmed is the last week. hence, there is no next week
+    if group_loan.is_closed? 
+      self.errors.add(:generic_errors, "Group loan sudah ditutup")
+      return false 
+    end
+    
+    return false 
+  end
+  
+  
+  def uncreate_group_loan_weekly_payments
+    GroupLoanWeeklyPayment.where(
+      :group_loan_id => self.group_loan_id,
+      :group_loan_weekly_collection_id => self.id ,
+    ).each do |glwp|
+      glwp.delete_object
+    end
+  end
+  
+  def unconfirm_weekly_collection_voluntary_savings 
+    self.group_loan_weekly_collection_voluntary_savings_entries.each do |x|
+      x.unconfirm
+    end
+  end
+  
+  def unconfirm_premature_clearances
+    self.group_loan_premature_clearance_payments.each do |x|
+      x.unconfirm 
+    end
+  end
+  
   def unconfirm
-    return if not self.is_confirmed? 
+    if self.can_be_unconfirmed?
+      return self 
+    end
+    
     begin
       ActiveRecord::Base.transaction do
         
-        # undo bad_debt_allowance to 0
-        # By doing this, we will delete the deceased, run_away, and premature clearance 
+        #0. unconfirm summary on bad debt allowance in group loan 
         group_loan.update_bad_debt_allowance(      
                           -1 * (
                             self.extract_uncollectible_weekly_payment_default_amount + 
                             self.extract_run_away_end_of_cycle_resolution_default_amount
                           )
         )
-        group_loan.save 
-    
-    
-        # unconfirm premature clearances
-        self.group_loan_premature_clearance_payments.each do |x|
-          x.unconfirm 
-        end
-    
-    
-        # delete group loan weekly_payment 
-        GroupLoanWeeklyPayment.where(:group_loan_weekly_collection_id => self.id).each do |x|
-          glm = x.group_loan_membership 
-          # delete transaction_activity
-          TransactionActivity.where(
-            :transaction_source_id => x.id, 
-            :transaction_source_type => x.class.to_s
-          ).each {|x| x.destroy }
-                                    
-                                    
-          # SavingsEntry.create_weekly_payment_compulsory_savings( self )
-          total_amount = BigDecimal("0")
-          SavingsEntry.where(
-            :savings_source_id => x.id,
-            :savings_source_type => x.class.to_s,
-            :savings_status => SAVINGS_STATUS[:group_loan_compulsory_savings],
-            :direction => FUND_TRANSFER_DIRECTION[:incoming],
-            :financial_product_id => x.group_loan_id ,
-            :financial_product_type => x.group_loan.class.to_s
-          ).each do |savings_entry|
-            total_amount += savings_entry.amount 
-            savings_entry.destroy
-          end
-          
-          glm.update_total_compulsory_savings( -1*total_amount)
-          
-          x.destroy
-        end
-     
-        # unconfirm all group_loan_weekly_collection_voluntary_savings
-        # delete the voluntary savings_entry
-        list_of_group_loan_weekly_voluntary_savings_entry = GroupLoanWeeklyCollectionVoluntarySavingsEntry.where(:group_loan_weekly_collection_id => self.id) 
-    
-        list_of_group_loan_weekly_voluntary_savings_entry.each do |weekly_voluntary_savings|
-          member = weekly_voluntary_savings.group_loan_membership.member 
-      
-          weekly_collection_voluntary_savings_array = SavingsEntry.where(
-            :savings_source_id => list_of_group_loan_voluntary_savings_entry_id,
-            :savings_source_type => weekly_voluntary_savings.class.to_s,
-            :member_id => member.id
-          )
-      
-          total_amount = BigDecimal("0")
-      
-          weekly_collection_voluntary_savings_array.each do |x|
-            total_amount += x.amount 
-            x.destroy 
-          end
-      
-          member.update_total_savings_account( -1* total_amount)
-          weekly_voluntary_savings.destroy 
-        end
-    
-        # unconfirm the big thing 
+        group_loan.save
+        
+        
+        #1.  unconfirm all voluntary savings 
+        self.unconfirm_weekly_collection_voluntary_savings 
+        
         self.confirmed_at = nil
-        self.is_confirmed = false 
-        self.save
-    
+        self.is_confirmed = false  
+        self.save 
+        
+        #2.  unconfirm all compulsory savings 
+        self.uncreate_group_loan_weekly_payments   # ok  
+        
+        #3. unconfirm premature clearance
+        self.unconfirm_premature_clearances
+        
+       
+        
       end
     rescue ActiveRecord::ActiveRecordError  
     else
-    end
+    end 
   end
   
   
@@ -232,7 +280,10 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
       return self 
     end
     
-    return if not self.is_collected? 
+    if not self.is_collected? 
+      self.errors.add(:generic_errors, "Belum ada Collection")
+      return self 
+    end
        
     self.collected_at = nil
     self.is_collected = false  
@@ -358,51 +409,6 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
     return amount 
   end
   
-  # def extract_run_away_weekly_resolution_amount
-  #   # new methodology
-  #   # build the timeline of corner_cases (x-axis is the week_number) from week1 to the current week 
-  #   # ordered by case as well.. deceased => 1, run_away_weekly_resolution => 2, premature_clearance => 3 
-  #   # if there is run_away_weekly_resolution, put it into the bail out array 
-  #   # if there premature_clearance => adjust each run away weekly resolution 
-  #   
-  #   # 1. get all premature clearance lte than this week
-  #   # 2. get all run_away_weekly_resolution lte than this week. 
-  #   
-  #   # for each run_away_weekly_resolution
-  #   # traverse over all premature_clearance (order by week_number )
-  #   # if premature clearance is gte than the run_away_weekly_resolution
-  #   # extract the multipler (1/number_of_active_glm_at_that_week)
-  #   
-  #   # get the run_away member lte than this week 
-  #   # for each run_away member => get all premature clearance up to this week
-  #   
-  #   # calculate the multiplier 
-  #   # for each premature clearance
-  #   # 1. on the week of premature clearance is starting, get the number of active members
-  #   # 2. return the 1/number_of_active members
-  #   
-  #   
-  #   
-  #   # return BigDecimal('0')
-  #   amount = BigDecimal('0')
-  #   current_week_number = self.week_number
-  #   
-  #   group_loan.group_loan_memberships.joins(:group_loan_run_away_receivable).where{
-  #     ( deactivation_case.eq GROUP_LOAN_DEACTIVATION_CASE[:run_away] ) & 
-  #     ( deactivation_week_number.lte current_week_number ) & 
-  #     (
-  #       group_loan_run_away_receivable.payment_case.eq GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:weekly] 
-  #     )
-  #   }.each do |glm|
-  #     amount += glm.group_loan_product.weekly_payment_amount
-  #   end
-  #   
-  #   # adjust the weekly_amount, deduct the premature_clearance 
-  #   
-  #   
-  #   
-  #   return amount 
-  # end
   
   def premature_clearance_group_loan_memberships
     current_week_number = self.week_number

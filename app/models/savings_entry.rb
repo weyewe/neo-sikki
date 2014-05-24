@@ -455,10 +455,7 @@ class SavingsEntry < ActiveRecord::Base
     # puts "The amount: #{new_object.amount}"
     member.update_total_savings_account( new_object.amount)
   end
-
- 
-  
-  
+   
    
  
   
