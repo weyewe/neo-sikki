@@ -97,11 +97,26 @@ Ext.define('AM.view.operation.grouploan.List' ,{
 			disabled: true
 		});
 		
+		this.unstartObjectButton = new Ext.Button({
+			text: 'Cancel Start',
+			action: 'unstartObject',
+			disabled: true,
+			hidden : true 
+		});
+		
 		this.disburseObjectButton = new Ext.Button({
 			text: 'Disburse',
 			action: 'disburseObject',
 			disabled: true
 		});
+		
+		this.undisburseObjectButton = new Ext.Button({
+			text: 'Cancel Disburse',
+			action: 'undisburseObject',
+			disabled: true,
+			hidden : true 
+		});
+		
 		this.closeObjectButton = new Ext.Button({
 			text: 'Close',
 			action: 'closeObject',
@@ -125,8 +140,8 @@ Ext.define('AM.view.operation.grouploan.List' ,{
 
 		this.tbar = [this.addObjectButton, this.editObjectButton, this.deleteObjectButton,
 		  			'-',
-						this.startObjectButton,
-						this.disburseObjectButton,
+						this.startObjectButton, this.unstartObjectButton,
+						this.disburseObjectButton,this.undisburseObjectButton,
 						this.closeObjectButton,
 						this.withdrawObjectButton, 
 						'-',
@@ -152,9 +167,29 @@ Ext.define('AM.view.operation.grouploan.List' ,{
 		this.editObjectButton.enable();
 		this.deleteObjectButton.enable();
 		this.startObjectButton.enable();
+		this.unstartObjectButton.enable();
 		this.disburseObjectButton.enable();
+		this.undisburseObjectButton.enable();
 		this.closeObjectButton.enable();
 		this.withdrawObjectButton.enable();
+		
+		selectedObject = this.getSelectedObject();
+		if( selectedObject && selectedObject.get("is_started") == true ){
+			this.startObjectButton.hide();
+			this.unstartObjectButton.show();
+		}else{
+			this.startObjectButton.show();
+			this.unstartObjectButton.hide();
+		}
+		
+		if( selectedObject && selectedObject.get("is_loan_disbursed") == true ){
+			this.disburseObjectButton.hide();
+			this.undisburseObjectButton.show();
+		}else{
+			this.disburseObjectButton.show();
+			this.undisburseObjectButton.hide();
+		}
+		
 	},
 
 	disableRecordButtons: function() {

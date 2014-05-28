@@ -61,8 +61,12 @@ class Api::GroupLoansController < Api::BaseApiController
 
     if params[:start].present?  
       @object.start(:started_at => params[:group_loan][:started_at] )
+    elsif params[:unstart].present?    
+      @object.cancel_start
     elsif params[:disburse].present?
       @object.disburse_loan( :disbursed_at => params[:group_loan][:disbursed_at] )
+    elsif params[:undisburse].present?    
+      @object.undisburse
     elsif params[:close].present?
       @object.close( :closed_at => params[:group_loan][:closed_at] )
     elsif params[:withdraw].present?

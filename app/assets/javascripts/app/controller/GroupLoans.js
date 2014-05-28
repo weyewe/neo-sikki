@@ -48,16 +48,32 @@ Ext.define('AM.controller.GroupLoans', {
         click: this.startObject
 			}	,
 			
+			'grouploanlist button[action=unstartObject]': {
+        click: this.unstartObject
+			}	,
+			
 			'startgrouploanform button[action=start]' : {
 				click : this.executeStart
+			},
+			
+			'unstartgrouploanform button[action=unstart]' : {
+				click : this.executeUnstart
 			},
 			
 			'grouploanlist button[action=disburseObject]': {
         click: this.disburseObject
 			}	,
 			
+			'grouploanlist button[action=undisburseObject]': {
+        click: this.undisburseObject
+			}	,
+			
 			'disbursegrouploanform button[action=disburse]' : {
 				click : this.executeDisburse
+			},
+			
+			'undisbursegrouploanform button[action=undisburse]' : {
+				click : this.executeUndisburse
 			},
 			
 			'grouploanlist button[action=closeObject]': {
@@ -207,6 +223,15 @@ Ext.define('AM.controller.GroupLoans', {
 		// this.reloadRecordView( record, view ) ; 
 	},
 	
+	unstartObject: function(){
+		// console.log("the startObject callback function");
+		var view = Ext.widget('unstartgrouploanform');
+		var record = this.getList().getSelectedObject();
+		view.setParentData( record );
+    view.show();
+		// this.reloadRecordView( record, view ) ; 
+	},
+	
 	executeStart: function(button){
 		var me = this; 
 		var win = button.up('window');
@@ -235,6 +260,52 @@ Ext.define('AM.controller.GroupLoans', {
 					
 					me.reloadRecord( record ) ; 
 					
+					list.enableRecordButtons(); 
+					
+					
+					win.close();
+				},
+				failure : function(record,op ){
+					// console.log("Fail update");
+					form.setLoading(false);
+					var message  = op.request.scope.reader.jsonData["message"];
+					var errors = message['errors'];
+					form.getForm().markInvalid(errors);
+					record.reject(); 
+					// this.reject(); 
+				}
+			});
+		}
+	},
+	
+	executeUnstart: function(button){
+		var me = this; 
+		var win = button.up('window');
+    var form = win.down('form');
+		var list = this.getList();
+
+    var store = this.getGroupLoansStore();
+		var record = this.getList().getSelectedObject();
+    var values = form.getValues();
+ 
+		if(record){
+			var rec_id = record.get("id");
+			record.set( 'started_at' , values['started_at'] );
+			 
+			// form.query('checkbox').forEach(function(checkbox){
+			// 	record.set( checkbox['name']  ,checkbox['checked'] ) ;
+			// });
+			// 
+			form.setLoading(true);
+			record.save({
+				params : {
+					unstart: true 
+				},
+				success : function(record){
+					form.setLoading(false);
+					
+					me.reloadRecord( record ) ; 
+					list.enableRecordButtons(); 
 					
 					win.close();
 				},
@@ -253,6 +324,15 @@ Ext.define('AM.controller.GroupLoans', {
 	
 	disburseObject: function(){
 		var view = Ext.widget('disbursegrouploanform');
+		var record = this.getList().getSelectedObject();
+		view.setParentData( record );
+    view.show();
+
+		// this.reloadRecordView( record, view ) ; 
+	},
+	
+	undisburseObject: function(){
+		var view = Ext.widget('undisbursegrouploanform');
 		var record = this.getList().getSelectedObject();
 		view.setParentData( record );
     view.show();
@@ -286,6 +366,7 @@ Ext.define('AM.controller.GroupLoans', {
 				success : function(record){
 					form.setLoading(false);
 					me.reloadRecord( record ) ; 
+					list.enableRecordButtons(); 
 					win.close();
 				},
 				failure : function(record,op ){
@@ -300,6 +381,49 @@ Ext.define('AM.controller.GroupLoans', {
 			});
 		}
 	},
+	
+	executeUndisburse: function(button){
+		var me = this; 
+		var win = button.up('window');
+    var form = win.down('form');
+		var list = this.getList();
+
+    var store = this.getGroupLoansStore();
+		var record = this.getList().getSelectedObject();
+    var values = form.getValues();
+ 
+		if(record){
+			var rec_id = record.get("id");
+			record.set( 'disbursed_at' , values['disbursed_at'] );
+			 
+			// form.query('checkbox').forEach(function(checkbox){
+			// 	record.set( checkbox['name']  ,checkbox['checked'] ) ;
+			// });
+			// 
+			form.setLoading(true);
+			record.save({
+				params : {
+					undisburse: true 
+				},
+				success : function(record){
+					form.setLoading(false);
+					me.reloadRecord( record ) ; 
+					list.enableRecordButtons();
+					win.close();
+				},
+				failure : function(record,op ){
+					// console.log("Fail update");
+					form.setLoading(false);
+					var message  = op.request.scope.reader.jsonData["message"];
+					var errors = message['errors'];
+					form.getForm().markInvalid(errors);
+					record.reject(); 
+					// this.reject(); 
+				}
+			});
+		}
+	},
+	
 	
 	closeObject: function(){
 		// console.log("mark as Deceased is clicked");
