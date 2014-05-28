@@ -191,6 +191,58 @@ describe GroupLoanWeeklyCollection do
     it 'should create grouploanweeklypayment' do
       @first_glwc.group_loan_weekly_payments.count.should == @group_loan.group_loan_memberships.count 
     end
+    
+    context "creating premature clearance in the second weekly collection" do
+      before(:each) do
+        @second_glwc = @group_loan.group_loan_weekly_collections.order("week_number ASC")[1]
+        @premature_clearance_glm = @group_loan.group_loan_memberships.first 
+        
+        @second_gl_pc = GroupLoanPrematureClearancePayment.create_object({
+          :group_loan_id => @group_loan.id,
+          :group_loan_membership_id => @premature_clearance_glm.id ,
+          :group_loan_weekly_collection_id => @second_glwc.id   
+        })
+      end
+      
+      it 'should create gl_pc' do
+        @second_gl_pc.should be_valid 
+      end
+      
+      context "confirming the second glwc" do
+        before(:each) do
+          @second_glwc.collect( :collected_at => @collected_at + 7.days )
+          @second_glwc.reload
+          @second_glwc.confirm(:confirmed_at => @confirmed_at + 7.days )
+          @second_glwc.reload
+          
+          @second_gl_pc.reload 
+          @premature_clearance_glm.reload 
+        end
+        
+        it 'should create compulsory savings withdrawal' do
+          @second_gl_pc.is_confirmed.should be_true 
+        end
+        
+        it 'should deactivate the glm' do
+          @premature_clearance_glm.is_active.should be_false 
+        end
+        
+        it 'should create compulsory savings withdrawal for the premature clearance' do
+          @savings_entry_array = SavingsEntry.where( 
+                  :savings_source_id => @second_gl_pc.id,
+                              :savings_source_type => @second_gl_pc.class.to_s, 
+                              :savings_status => SAVINGS_STATUS[:group_loan_compulsory_savings],
+                              :direction => FUND_TRANSFER_DIRECTION[:outgoing],
+                              :financial_product_id => @second_gl_pc.group_loan_id ,
+                              :financial_product_type => @second_gl_pc.group_loan.class.to_s,
+                              :member_id => @premature_clearance_glm.member.id,
+                              :is_confirmed => true ) 
+                              
+          @savings_entry_array.count.should == 1 
+          @savings_entry_array.first.amount. should == @premature_clearance_glm.group_loan_product.compulsory_savings * 2 
+        end
+      end
+    end
   end
 
 end

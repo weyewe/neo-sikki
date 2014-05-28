@@ -158,6 +158,9 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
     
     if not next_week_collection.nil?
       if  next_week_collection.is_collected?
+        puts "next week collection is collected "
+        self.errors.add(:generic_errors, "Pengumpulan minggu berikutnya sudah di konfirmasi.")
+        puts "Total error in the shite: #{self.errors.size}"
         return false
       else
          
@@ -208,7 +211,7 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
       return false 
     end
     
-    return false 
+    return true 
   end
   
   
@@ -234,7 +237,9 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
   end
   
   def unconfirm
-    if self.can_be_unconfirmed?
+    # puts "3321 Unconfirm"
+    if not self.can_be_unconfirmed?
+      # puts "Total error in self: #{self.errors.size}"
       return self 
     end
     
@@ -242,6 +247,7 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
       ActiveRecord::Base.transaction do
         
         #0. unconfirm summary on bad debt allowance in group loan 
+        # puts "cancel the bad debt"
         group_loan.update_bad_debt_allowance(      
                           -1 * (
                             self.extract_uncollectible_weekly_payment_default_amount + 
@@ -252,18 +258,25 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
         
         
         #1.  unconfirm all voluntary savings 
+        # puts "cancel the weekly collection voluntary savings"
         self.unconfirm_weekly_collection_voluntary_savings 
         
+        # puts "gonna update is_confirmed to be false "
         self.confirmed_at = nil
         self.is_confirmed = false  
         self.save 
         
+        
+        
         #2.  unconfirm all compulsory savings 
+        # puts "creating group loan weekly payments"
         self.uncreate_group_loan_weekly_payments   # ok  
         
         #3. unconfirm premature clearance
+        # puts "unconfirm premature clearances"
         self.unconfirm_premature_clearances
         
+        # puts "all is good"
        
         
       end

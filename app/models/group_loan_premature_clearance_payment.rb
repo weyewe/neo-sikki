@@ -75,7 +75,7 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
     return if not all_fields_present? 
     current_weekly_collection = group_loan_weekly_collection
     next_weekly_collection = group_loan.group_loan_weekly_collections.
-                                where(:week_number => current_weekly_collection.week_number + 1 )
+                                where(:week_number => current_weekly_collection.week_number + 1 ).first
                                 
     if next_weekly_collection.nil?
       self.errors.add(:group_loan_weekly_collection_id , "Tidak ada pengumpulan minggu #{current_weekly_collection.week_number + 1 }")
