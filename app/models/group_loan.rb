@@ -335,6 +335,8 @@ Phase: loan disbursement finalization
       return false 
     end
     
+        
+  
     return true 
   end
   
@@ -342,6 +344,19 @@ Phase: loan disbursement finalization
     if not self.can_be_canceled?
       return self 
     end
+    
+    self.group_loan_memberships.where(
+          :is_active => false,
+          :deactivation_case => [
+              GROUP_LOAN_DEACTIVATION_CASE[:financial_education_absent],
+              GROUP_LOAN_DEACTIVATION_CASE[:loan_disbursement_absent]
+            ]
+    ).each do |glm|
+      glm.is_active = true 
+      glm.deactivation_case = nil
+      glm.save 
+    end
+    
     self.started_at =  nil 
     self.is_started = false 
     self.number_of_collections = 0 
@@ -744,7 +759,7 @@ Phase: loan disbursement finalization
 =end 
 
   def non_disbursed_fund
-    return BigDecimal("0") if not self.is_loan_disbursed?
+    # return BigDecimal("0") if not self.is_loan_disbursed?
     start_fund - disbursed_fund 
   end
   
@@ -778,12 +793,14 @@ Phase: loan disbursement finalization
     disbursed_group_loan_memberships.count 
   end
   
+  
+  # disbursed_fund vs non_disbursed_fund 
   def disbursed_fund
     amount = BigDecimal('0')
-    return amount if not self.is_loan_disbursed? 
+    # return amount if not self.is_loan_disbursed? 
     
     disbursed_group_loan_memberships.joins(:group_loan_product).each do |glm|
-      amount += glm.group_loan_product.weekly_payment_amount * glm.group_loan_product.total_weeks
+      amount += glm.group_loan_product.principal * glm.group_loan_product.total_weeks
     end
     return amount 
   end
