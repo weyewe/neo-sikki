@@ -158,9 +158,9 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
     
     if not next_week_collection.nil?
       if  next_week_collection.is_collected?
-        puts "next week collection is collected "
+        # puts "next week collection is collected "
         self.errors.add(:generic_errors, "Pengumpulan minggu berikutnya sudah di konfirmasi.")
-        puts "Total error in the shite: #{self.errors.size}"
+        # puts "Total error in the shite: #{self.errors.size}"
         return false
       else
          

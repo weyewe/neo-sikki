@@ -90,76 +90,76 @@ describe GroupLoanWeeklyCollection do
     @group_loan.is_loan_disbursed.should be_true 
   end
   
-  # context "setup the group loan to perform 2 weekly collections successfully per normal" do
-  #   before(:each) do
-  #     x_start = 0 
-  #     x_diff = 3 
-  #     @group_loan.group_loan_weekly_collections.each do |glwc|
-  #       glwc.collect(
-  #         :collected_at => @collected_at + (x_start * x_diff).days
-  #       )
-  #       glwc.reload
-  #       glwc.confirm( 
-  #         :confirmed_at => @confirmed_at + (x_start * x_diff ).days 
-  #       )
-  #       
-  #       
-  #       
-  #       x_start += 1
-  #       break if x_start == 2 
-  #       
-  #     end
-  #   end
-  #   
-  #   it 'should have total 2 group loan weekly collections confirmed' do
-  #     @group_loan.reload
-  #     @group_loan.group_loan_weekly_collections.where(:is_confirmed => true).count.should == 2 
-  #   end
-  #   
-  #   it 'should not allow unconfirm of weekly collection 1' do
-  #     @first_glwc = @group_loan.group_loan_weekly_collections.where(:is_confirmed => true).order("id ASC").first 
-  #     @first_glwc.unconfirm
-  #     
-  #     @first_glwc.errors.size.should_not == 0 
-  #     @first_glwc.reload
-  #     @first_glwc.is_confirmed.should be_true 
-  #   end
-  # end
+  context "setup the group loan to perform 2 weekly collections successfully per normal" do
+    before(:each) do
+      x_start = 0 
+      x_diff = 3 
+      @group_loan.group_loan_weekly_collections.each do |glwc|
+        glwc.collect(
+          :collected_at => @collected_at + (x_start * x_diff).days
+        )
+        glwc.reload
+        glwc.confirm( 
+          :confirmed_at => @confirmed_at + (x_start * x_diff ).days 
+        )
+        
+        
+        
+        x_start += 1
+        break if x_start == 2 
+        
+      end
+    end
+    
+    it 'should have total 2 group loan weekly collections confirmed' do
+      @group_loan.reload
+      @group_loan.group_loan_weekly_collections.where(:is_confirmed => true).count.should == 2 
+    end
+    
+    it 'should not allow unconfirm of weekly collection 1' do
+      @first_glwc = @group_loan.group_loan_weekly_collections.where(:is_confirmed => true).order("id ASC").first 
+      @first_glwc.unconfirm
+      
+      @first_glwc.errors.size.should_not == 0 
+      @first_glwc.reload
+      @first_glwc.is_confirmed.should be_true 
+    end
+  end
   
-  # 
-  # context "confirming 1 weekly collection with no voluntary savings => create group loan weekly payment" do
-  #   before(:each ) do
-  #     @first_glwc = @group_loan.group_loan_weekly_collections.first
-  #     
-  #     @first_glwc.collect( :collected_at => @collected_at )
-  #     @first_glwc.reload
-  #     @first_glwc.confirm(:confirmed_at => @confirmed_at )
-  #     @first_glwc.reload
-  #   end
-  #   
-  #   it 'should have confirmed the glwc' do
-  #     @first_glwc.is_confirmed.should be_true 
-  #   end
-  #   
-  #   it 'should have created group loan weekly paymetns' do
-  #     @first_glwc.group_loan_weekly_payments.count.should == @group_loan.group_loan_memberships.count
-  #     
-  #     @group_loan.group_loan_memberships.each do |glm|
-  #       glm.total_compulsory_savings.should == glm.group_loan_product.compulsory_savings
-  #     end
-  #   end
-  #   
-  #   context "unconfirm the weekly collection" do
-  #     before(:each) do
-  #       @first_glwc.unconfirm
-  #     end
-  #     
-  #     it 'should unconfirm the glwc' do
-  #       @first_glwc.is_confirmed.should be_false 
-  #     end
-  #   end
-  #   
-  # end
+  
+  context "confirming 1 weekly collection with no voluntary savings => create group loan weekly payment" do
+    before(:each ) do
+      @first_glwc = @group_loan.group_loan_weekly_collections.first
+      
+      @first_glwc.collect( :collected_at => @collected_at )
+      @first_glwc.reload
+      @first_glwc.confirm(:confirmed_at => @confirmed_at )
+      @first_glwc.reload
+    end
+    
+    it 'should have confirmed the glwc' do
+      @first_glwc.is_confirmed.should be_true 
+    end
+    
+    it 'should have created group loan weekly paymetns' do
+      @first_glwc.group_loan_weekly_payments.count.should == @group_loan.group_loan_memberships.count
+      
+      @group_loan.group_loan_memberships.each do |glm|
+        glm.total_compulsory_savings.should == glm.group_loan_product.compulsory_savings
+      end
+    end
+    
+    context "unconfirm the weekly collection" do
+      before(:each) do
+        @first_glwc.unconfirm
+      end
+      
+      it 'should unconfirm the glwc' do
+        @first_glwc.is_confirmed.should be_false 
+      end
+    end
+    
+  end
   
   context "has 2 weekly collection. The 2nd is not confirmed, however, it has 'baggages'" do
     before(:each) do
@@ -290,113 +290,113 @@ describe GroupLoanWeeklyCollection do
   
   
   
-  # 
-  # context "confirming 1 weekly collection with voluntary savings" do
-  #   before(:each) do
-  #     @first_glwc = @group_loan.group_loan_weekly_collections.first
-  #     
-  #     @initial_savings_account_array = []
-  #     count = 1 
-  #     @group_loan.group_loan_memberships.order("created_at DESC").each do |glm|
-  #       voluntary_savings_amount = count *BigDecimal("1000")
-  #       GroupLoanWeeklyCollectionVoluntarySavingsEntry.create_object(
-  #         :amount                            =>  voluntary_savings_amount, 
-  #         :group_loan_membership_id          => glm.id , 
-  #         :group_loan_weekly_collection_id   => @first_glwc.id 
-  #         
-  #       )
-  #       
-  #       @initial_savings_account_array  << glm.member.total_savings_account
-  #       count += 1
-  #     end 
-  #     
-  #     @first_glwc.collect( :collected_at => @collected_at )
-  #     @first_glwc.reload
-  #     @first_glwc.confirm(:confirmed_at => @confirmed_at )
-  #     @first_glwc.reload
-  #   end
-  #   
-  #   it 'should increase the voluntary savings amount' do
-  #     @first_glwc = @group_loan.group_loan_weekly_collections.first
-  #    
-  #     @group_loan.reload 
-  #     index = 0 
-  #     count = 1 
-  #     
-  #     @group_loan.group_loan_memberships.order("created_at DESC").each do |glm|
-  #       voluntary_savings_amount = count *BigDecimal("1000")
-  #       initial_final_savings_amount = @initial_savings_account_array[index]
-  #       final_savings_amount = glm.member.total_savings_account
-  #       
-  #       diff = final_savings_amount - initial_final_savings_amount
-  #       diff.should == voluntary_savings_amount
-  #       
-  #       index += 1 
-  #       count += 1
-  #     end
-  #   end
-  #   
-  #   it 'should create grouploanweeklypayment' do
-  #     @first_glwc.group_loan_weekly_payments.count.should == @group_loan.group_loan_memberships.count 
-  #   end
-  #   
-  #   
-  #   
-  #   # 
-  #   # context "creating premature clearance in the second weekly collection" do
-  #   #   before(:each) do
-  #   #     @second_glwc = @group_loan.group_loan_weekly_collections.order("week_number ASC")[1]
-  #   #     @premature_clearance_glm = @group_loan.group_loan_memberships.first 
-  #   #     
-  #   #     @second_gl_pc = GroupLoanPrematureClearancePayment.create_object({
-  #   #       :group_loan_id => @group_loan.id,
-  #   #       :group_loan_membership_id => @premature_clearance_glm.id ,
-  #   #       :group_loan_weekly_collection_id => @second_glwc.id   
-  #   #     })
-  #   #   end
-  #   #   
-  #   #   it 'should create gl_pc' do
-  #   #     @second_gl_pc.should be_valid 
-  #   #   end
-  #   #   
-  #   #   context "confirming the second glwc" do
-  #   #     before(:each) do
-  #   #       @second_glwc.collect( :collected_at => @collected_at + 7.days )
-  #   #       @second_glwc.reload
-  #   #       @second_glwc.confirm(:confirmed_at => @confirmed_at + 7.days )
-  #   #       @second_glwc.reload
-  #   #       
-  #   #       @second_gl_pc.reload 
-  #   #       @premature_clearance_glm.reload 
-  #   #     end
-  #   #     
-  #   #     it 'should create compulsory savings withdrawal' do
-  #   #       @second_gl_pc.is_confirmed.should be_true 
-  #   #     end
-  #   #     
-  #   #     it 'should deactivate the glm' do
-  #   #       @premature_clearance_glm.is_active.should be_false 
-  #   #     end
-  #   #     
-  #   #     it 'should create compulsory savings withdrawal for the premature clearance' do
-  #   #       @savings_entry_array = SavingsEntry.where( 
-  #   #               :savings_source_id => @second_gl_pc.id,
-  #   #                           :savings_source_type => @second_gl_pc.class.to_s, 
-  #   #                           :savings_status => SAVINGS_STATUS[:group_loan_compulsory_savings],
-  #   #                           :direction => FUND_TRANSFER_DIRECTION[:outgoing],
-  #   #                           :financial_product_id => @second_gl_pc.group_loan_id ,
-  #   #                           :financial_product_type => @second_gl_pc.group_loan.class.to_s,
-  #   #                           :member_id => @premature_clearance_glm.member.id,
-  #   #                           :is_confirmed => true ) 
-  #   #                           
-  #   #       @savings_entry_array.count.should == 1 
-  #   #       @savings_entry_array.first.amount. should == @premature_clearance_glm.group_loan_product.compulsory_savings * 2 
-  #   #     end
-  #   #   end
-  #   # end
-  #   #   
-  # 
-  # end
+  
+  context "confirming 1 weekly collection with voluntary savings" do
+    before(:each) do
+      @first_glwc = @group_loan.group_loan_weekly_collections.first
+      
+      @initial_savings_account_array = []
+      count = 1 
+      @group_loan.group_loan_memberships.order("created_at DESC").each do |glm|
+        voluntary_savings_amount = count *BigDecimal("1000")
+        GroupLoanWeeklyCollectionVoluntarySavingsEntry.create_object(
+          :amount                            =>  voluntary_savings_amount, 
+          :group_loan_membership_id          => glm.id , 
+          :group_loan_weekly_collection_id   => @first_glwc.id 
+          
+        )
+        
+        @initial_savings_account_array  << glm.member.total_savings_account
+        count += 1
+      end 
+      
+      @first_glwc.collect( :collected_at => @collected_at )
+      @first_glwc.reload
+      @first_glwc.confirm(:confirmed_at => @confirmed_at )
+      @first_glwc.reload
+    end
+    
+    it 'should increase the voluntary savings amount' do
+      @first_glwc = @group_loan.group_loan_weekly_collections.first
+     
+      @group_loan.reload 
+      index = 0 
+      count = 1 
+      
+      @group_loan.group_loan_memberships.order("created_at DESC").each do |glm|
+        voluntary_savings_amount = count *BigDecimal("1000")
+        initial_final_savings_amount = @initial_savings_account_array[index]
+        final_savings_amount = glm.member.total_savings_account
+        
+        diff = final_savings_amount - initial_final_savings_amount
+        diff.should == voluntary_savings_amount
+        
+        index += 1 
+        count += 1
+      end
+    end
+    
+    it 'should create grouploanweeklypayment' do
+      @first_glwc.group_loan_weekly_payments.count.should == @group_loan.group_loan_memberships.count 
+    end
+    
+    
+    
+    
+    context "creating premature clearance in the second weekly collection" do
+      before(:each) do
+        @second_glwc = @group_loan.group_loan_weekly_collections.order("week_number ASC")[1]
+        @premature_clearance_glm = @group_loan.group_loan_memberships.first 
+        
+        @second_gl_pc = GroupLoanPrematureClearancePayment.create_object({
+          :group_loan_id => @group_loan.id,
+          :group_loan_membership_id => @premature_clearance_glm.id ,
+          :group_loan_weekly_collection_id => @second_glwc.id   
+        })
+      end
+      
+      it 'should create gl_pc' do
+        @second_gl_pc.should be_valid 
+      end
+      
+      context "confirming the second glwc" do
+        before(:each) do
+          @second_glwc.collect( :collected_at => @collected_at + 7.days )
+          @second_glwc.reload
+          @second_glwc.confirm(:confirmed_at => @confirmed_at + 7.days )
+          @second_glwc.reload
+          
+          @second_gl_pc.reload 
+          @premature_clearance_glm.reload 
+        end
+        
+        it 'should create compulsory savings withdrawal' do
+          @second_gl_pc.is_confirmed.should be_true 
+        end
+        
+        it 'should deactivate the glm' do
+          @premature_clearance_glm.is_active.should be_false 
+        end
+        
+        it 'should create compulsory savings withdrawal for the premature clearance' do
+          @savings_entry_array = SavingsEntry.where( 
+                  :savings_source_id => @second_gl_pc.id,
+                              :savings_source_type => @second_gl_pc.class.to_s, 
+                              :savings_status => SAVINGS_STATUS[:group_loan_compulsory_savings],
+                              :direction => FUND_TRANSFER_DIRECTION[:outgoing],
+                              :financial_product_id => @second_gl_pc.group_loan_id ,
+                              :financial_product_type => @second_gl_pc.group_loan.class.to_s,
+                              :member_id => @premature_clearance_glm.member.id,
+                              :is_confirmed => true ) 
+                              
+          @savings_entry_array.count.should == 1 
+          @savings_entry_array.first.amount. should == @premature_clearance_glm.group_loan_product.compulsory_savings * 2 
+        end
+      end
+    end
+      
+  
+  end
 
 end
 

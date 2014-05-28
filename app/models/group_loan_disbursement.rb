@@ -64,4 +64,24 @@ class GroupLoanDisbursement < ActiveRecord::Base
     
   end
   
+  def delete_object
+    # destroy initial compulsory savings
+    glm = self.group_loan_membership 
+    
+    self.savings_entries.each do |x|
+      glm.update_total_compulsory_savings( -1 * savings_entry.amount)
+      x.destroy
+      glm.reload 
+    end
+               
+    # destroy transaction activities
+    self.transaction_activities.each do |x|
+      x.destroy 
+    end
+    
+    
+    self.destroy 
+    
+  end
+  
 end

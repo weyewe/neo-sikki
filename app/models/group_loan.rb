@@ -260,7 +260,60 @@ Phase: loan disbursement finalization
     # create GroupLoanWeeklyCollection  => it has many weird cases. new problem domain on that model.
   end
   
-  def undisburse_group_loan
+  def can_be_undisbursed?
+    if not self.is_loan_disbursed? 
+      self.errors.add(:generic_errors, "Belum di disburse")
+      return false 
+    end
+    
+    
+    # puts "inside the can_be_undisbursed?"
+    
+    first_glwc = self.group_loan_weekly_collections.where(:week_number => 1 ).first 
+   
+    if first_glwc.is_collected?
+      # puts "first glwc is collected"
+      self.errors.add(:generic_errors, "Sudah ada pengumpulan yang terkumpul")
+      return false 
+    end
+    
+    if group_loan_memberships.where(
+                :is_active => false, 
+                :deactivation_case => GROUP_LOAN_DEACTIVATION_CASE[:deceased],
+                :deactivation_week_number => 1   ).count != 0 
+                
+      self.errors.add(:generic_errors, "Sudah ada member yang meninggal di pengumpulan ini")
+      return false
+    end
+    
+    if first_glwc.group_loan_run_away_receivables.count != 0
+      self.errors.add(:generic_errors, "Sudah ada member yang kabur di pengumpulan ini")
+      return false
+    end
+    
+    if first_glwc.group_loan_weekly_uncollectibles.count != 0
+      self.errors.add(:generic_errors, "Sudah ada member yang di declare tidak membayar di pengumpulan ini")
+      return false
+    end
+    
+    if first_glwc.group_loan_premature_clearance_payments.count != 0 
+      self.errors.add(:generic_errors, "Sudah ada member yang premature clearance di pengumpulan ini")
+      return false
+    end
+    
+    if first_glwc.group_loan_weekly_collection_voluntary_savings_entries.count != 0 
+      self.errors.add(:generic_errors, "Sudah ada member yang  membayar tabungan sukarela di pengumpulan ini")
+      return false
+    end
+   
+    return true
+  end
+  
+  def undisburse 
+    if not self.can_be_undisbursed?
+      return self
+    end
+    
     # destroy all weekly collection
     self.group_loan_weekly_collections.each do |x|
       x.destroy 
@@ -268,7 +321,7 @@ Phase: loan disbursement finalization
     
     # cancel loan disbursement execution 
     GroupLoanDisbursement.where(:group_loan_id => self.id ).each do |x|
-      x.destroy 
+      x.delete_object 
     end 
     
     self.is_loan_disbursed = false
@@ -276,7 +329,19 @@ Phase: loan disbursement finalization
     self.save 
   end
   
+  def can_be_canceled?
+    if self.is_loan_disbursed?
+      self.errors.add(:generic_errors, "Sudah ada disbursement")
+      return false 
+    end
+    
+    return true 
+  end
+  
   def cancel_start
+    if not self.can_be_canceled?
+      return self 
+    end
     self.started_at =  nil 
     self.is_started = false 
     self.number_of_collections = 0 
