@@ -54,16 +54,32 @@ Ext.define('AM.view.operation.grouploanweeklycollection.List' ,{
 			action: 'collectObject',
 			disabled: true
 		});
+		this.uncollectObjectButton = new Ext.Button({
+			text: 'Uncollect',
+			action: 'uncollectObject',
+			disabled: true,
+			hidden :true 
+		});
+		
 
 		this.confirmObjectButton = new Ext.Button({
 			text: 'Confirm',
 			action: 'confirmObject',
 			disabled: true
 		});
+		
+		this.unconfirmObjectButton = new Ext.Button({
+			text: 'Unconfirm',
+			action: 'unconfirmObject',
+			disabled: true,
+			hidden : true 
+		});
  
 
 
-		this.tbar = [ this.collectObjectButton, this.confirmObjectButton  ];
+		this.tbar = [ this.collectObjectButton, this.uncollectObjectButton, '-',
+								this.confirmObjectButton , 	this.unconfirmObjectButton  ];
+								
 		this.bbar = Ext.create("Ext.PagingToolbar", {
 			store	: this.store, 
 			displayInfo: true,
@@ -85,10 +101,32 @@ Ext.define('AM.view.operation.grouploanweeklycollection.List' ,{
 	enableRecordButtons: function() {
 		this.collectObjectButton.enable();
 		this.confirmObjectButton.enable();
+		this.unconfirmObjectButton.enable();
+		this.uncollectObjectButton.enable();
+		
+		selectedObject = this.getSelectedObject();
+		if( selectedObject && selectedObject.get("is_collected") == true ){
+			this.collectObjectButton.hide();
+			this.uncollectObjectButton.show();
+		}else{
+			this.collectObjectButton.show();
+			this.uncollectObjectButton.hide();
+		}
+		
+		if( selectedObject && selectedObject.get("is_confirmed") == true ){
+			this.confirmObjectButton.hide();
+			this.unconfirmObjectButton.show();
+		}else{
+			this.confirmObjectButton.show();
+			this.unconfirmObjectButton.hide();
+		}
+		
 	},
 
 	disableRecordButtons: function() {
 		this.collectObjectButton.disable();
 		this.confirmObjectButton.disable();
+		this.unconfirmObjectButton.disable();
+		this.uncollectObjectButton.disable();
 	}
 });

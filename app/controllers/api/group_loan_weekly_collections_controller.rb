@@ -60,8 +60,12 @@ class Api::GroupLoanWeeklyCollectionsController < Api::BaseApiController
 
     if params[:collect].present?  
       @object.collect(:collected_at => params[:group_loan_weekly_collection][:collected_at] )
+    elsif params[:uncollect].present?
+      @object.uncollect 
     elsif params[:confirm].present?
       @object.confirm( :confirmed_at => params[:group_loan_weekly_collection][:confirmed_at] )
+    elsif params[:unconfirm].present?
+      @object.unconfirm 
     else
       @object.update_object(params[:group_loan_weekly_collection])
     end

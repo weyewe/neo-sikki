@@ -73,12 +73,28 @@ Ext.define('AM.controller.GroupLoanWeeklyCollections', {
 				click : this.executeCollect
 			},
 			
+			'grouploanweeklycollectionlist button[action=uncollectObject]': {
+        click: this.uncollectObject
+			}	,
+			
+			'uncollectgrouploanweeklycollectionform button[action=uncollect]' : {
+				click : this.executeUncollect
+			},
+			
 			'grouploanweeklycollectionlist button[action=confirmObject]': {
         click: this.confirmObject
 			}	,
 			
 			'confirmgrouploanweeklycollectionform button[action=confirm]' : {
 				click : this.executeConfirm
+			},
+			
+			'grouploanweeklycollectionlist button[action=unconfirmObject]': {
+        click: this.unconfirmObject
+			}	,
+			
+			'unconfirmgrouploanweeklycollectionform button[action=unconfirm]' : {
+				click : this.executeUnconfirm
 			},
 			
 			
@@ -240,6 +256,15 @@ Ext.define('AM.controller.GroupLoanWeeklyCollections', {
 		// this.reloadRecordView( record, view ) ; 
 	},
 	
+	uncollectObject: function(){
+		// console.log("Inside uncollectObject");
+		var view = Ext.widget('uncollectgrouploanweeklycollectionform');
+		var record = this.getList().getSelectedObject();
+		view.setParentData( record );
+    view.show();
+		// this.reloadRecordView( record, view ) ; 
+	},
+	
 	executeCollect: function(button){
 		var me = this; 
 		var win = button.up('window');
@@ -266,8 +291,57 @@ Ext.define('AM.controller.GroupLoanWeeklyCollections', {
 				success : function(record){
 					form.setLoading(false);
 					
-					me.reloadRecord( record ) ; 
 					
+					me.reloadRecord( record ) ; 
+					list.enableRecordButtons();
+					// store.load();
+					
+					win.close();
+				},
+				failure : function(record,op ){
+					// console.log("Fail update");
+					form.setLoading(false);
+					var message  = op.request.scope.reader.jsonData["message"];
+					var errors = message['errors'];
+					form.getForm().markInvalid(errors);
+					record.reject(); 
+					// this.reject(); 
+				}
+			});
+		}
+	},
+	
+	executeUncollect: function(button){
+		// console.log("Inside execute Uncollect");
+		var me = this; 
+		var win = button.up('window');
+    var form = win.down('form');
+		var list = this.getList();
+
+    var store = this.getGroupLoanWeeklyCollectionsStore();
+		var record = this.getList().getSelectedObject();
+    var values = form.getValues();
+ 
+		if(record){
+			var rec_id = record.get("id");
+			record.set( 'collected_at' , values['collected_at'] );
+			 
+			// form.query('checkbox').forEach(function(checkbox){
+			// 	record.set( checkbox['name']  ,checkbox['checked'] ) ;
+			// });
+			// 
+			form.setLoading(true);
+			record.save({
+				params : {
+					uncollect: true 
+				},
+				success : function(record){
+					form.setLoading(false);
+					
+					
+					me.reloadRecord( record ) ; 
+					list.enableRecordButtons();
+					// store.load();
 					
 					win.close();
 				},
@@ -286,6 +360,14 @@ Ext.define('AM.controller.GroupLoanWeeklyCollections', {
 	
 	confirmObject: function(){
 		var view = Ext.widget('confirmgrouploanweeklycollectionform');
+		var record = this.getList().getSelectedObject();
+		view.setParentData( record );
+    view.show();
+		// this.reloadRecordView( record, view ) ; 
+	},
+	
+	unconfirmObject: function(){
+		var view = Ext.widget('unconfirmgrouploanweeklycollectionform');
 		var record = this.getList().getSelectedObject();
 		view.setParentData( record );
     view.show();
@@ -314,6 +396,50 @@ Ext.define('AM.controller.GroupLoanWeeklyCollections', {
 			record.save({
 				params : {
 					confirm: true 
+				},
+				success : function(record){
+					form.setLoading(false);
+					
+					me.reloadRecord( record ) ; 
+					store.load();
+					
+					win.close();
+				},
+				failure : function(record,op ){
+					// console.log("Fail update");
+					form.setLoading(false);
+					var message  = op.request.scope.reader.jsonData["message"];
+					var errors = message['errors'];
+					form.getForm().markInvalid(errors);
+					record.reject(); 
+					// this.reject(); 
+				}
+			});
+		}
+	},
+	
+	executeUnconfirm: function(button){
+		var me = this; 
+		var win = button.up('window');
+    var form = win.down('form');
+		var list = this.getList();
+
+    var store = this.getGroupLoanWeeklyCollectionsStore();
+		var record = this.getList().getSelectedObject();
+    var values = form.getValues();
+ 
+		if(record){
+			var rec_id = record.get("id");
+			record.set( 'confirmed_at' , values['confirmed_at'] );
+			 
+			// form.query('checkbox').forEach(function(checkbox){
+			// 	record.set( checkbox['name']  ,checkbox['checked'] ) ;
+			// });
+			// 
+			form.setLoading(true);
+			record.save({
+				params : {
+					unconfirm: true 
 				},
 				success : function(record){
 					form.setLoading(false);

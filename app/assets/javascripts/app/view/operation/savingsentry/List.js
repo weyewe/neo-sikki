@@ -132,13 +132,22 @@ Ext.define('AM.view.operation.savingsentry.List' ,{
 		this.editObjectButton.enable();
 		this.deleteObjectButton.enable();
 		this.confirmObjectButton.enable();
-		// this.unconfirmObjectButton.enable();
+		this.unconfirmObjectButton.enable();
+		
+		selectedObject = this.getSelectedObject();
+		if( selectedObject && selectedObject.get("is_confirmed") == true ){
+			this.confirmObjectButton.hide();
+			this.unconfirmObjectButton.show();
+		}else{
+			this.confirmObjectButton.show();
+			this.unconfirmObjectButton.hide();
+		}
 	},
 
 	disableRecordButtons: function() {
 		this.editObjectButton.disable();
 		this.deleteObjectButton.disable();
 		this.confirmObjectButton.disable();
-		// this.unconfirmObjectButton.disable();
+		this.unconfirmObjectButton.disable();
 	}
 });
