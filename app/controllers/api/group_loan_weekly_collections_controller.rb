@@ -59,12 +59,38 @@ class Api::GroupLoanWeeklyCollectionsController < Api::BaseApiController
     params[:group_loan_weekly_collection][:confirmed_at] =  parse_date( params[:group_loan_weekly_collection][:confirmed_at] ) 
 
     if params[:collect].present?  
+      if not current_user.has_role?( :group_loan_weekly_collections, :collect)
+        render :json => {:success => false, :access_denied => "Tidak punya authorisasi"}
+        return
+      end
+      
+      
       @object.collect(:collected_at => params[:group_loan_weekly_collection][:collected_at] )
     elsif params[:uncollect].present?
+      
+      if not current_user.has_role?( :group_loan_weekly_collections, :uncollect)
+        render :json => {:success => false, :access_denied => "Tidak punya authorisasi"}
+        return
+      end
+      
+      
       @object.uncollect 
     elsif params[:confirm].present?
+      
+      if not current_user.has_role?( :group_loan_weekly_collections, :confirm)
+        render :json => {:success => false, :access_denied => "Tidak punya authorisasi"}
+        return
+      end
+      
+      
       @object.confirm( :confirmed_at => params[:group_loan_weekly_collection][:confirmed_at] )
     elsif params[:unconfirm].present?
+      
+      if not current_user.has_role?( :group_loan_weekly_collections, :unconfirm)
+        render :json => {:success => false, :access_denied => "Tidak punya authorisasi"}
+        return
+      end
+      
       @object.unconfirm 
     else
       @object.update_object(params[:group_loan_weekly_collection])

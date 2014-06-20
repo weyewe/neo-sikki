@@ -59,8 +59,20 @@ class Api::GroupLoanWeeklyUncollectiblesController < Api::BaseApiController
     params[:group_loan_weekly_uncollectible][:cleared_at] =  parse_date( params[:group_loan_weekly_uncollectible][:cleared_at] ) 
 
     if params[:collect].present?  
+      
+      if not current_user.has_role?( :group_loan_weekly_uncollectibles, :collect)
+        render :json => {:success => false, :access_denied => "Tidak punya authorisasi"}
+        return
+      end
+      
       @object.collect(:collected_at => params[:group_loan_weekly_uncollectible][:collected_at] )
     elsif params[:clear].present?
+      
+      if not current_user.has_role?( :group_loan_weekly_uncollectibles, :clear)
+        render :json => {:success => false, :access_denied => "Tidak punya authorisasi"}
+        return
+      end
+      
       @object.clear( :cleared_at => params[:group_loan_weekly_uncollectible][:cleared_at] )
     else
       @object.update_object(params[:group_loan_weekly_uncollectible])

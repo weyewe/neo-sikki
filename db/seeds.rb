@@ -15,22 +15,140 @@ role = {
   :passwords => {
     :update => true 
   },
-  :works => {
+  :members => {
+    :index => true,
+    :search => true 
+  },
+  :group_loan_products => {
+    :index => true ,
+    :search => true 
+  },
+  :group_loans => {
     :index => true, 
     :create => true,
     :update => true,
     :destroy => true,
-    :work_reports => true ,
-    :project_reports => true ,
-    :category_reports => true 
   },
-  :projects => {
-    :search => true 
+  :group_loan_memberships => {
+    :search => true ,
+    :index => true, 
+    :create => true,
+    :update => true,
+    :destroy => true,
+    :deactivate => true 
   },
-  :categories => {
-    :search => true 
+  :group_loan_weekly_collections => {
+    :search => true ,
+    :index => true, 
+    :create => true,
+    :update => true,
+    :destroy => true,
+    :collect => true,
+    :uncollect => true 
+  },
+  
+  :group_loan_weekly_uncollectibles => {
+    :search => true ,
+    :index => true, 
+    :create => true,
+    :update => true,
+    :destroy => true,
+    :clear => true,
+    :collect => true,
+  },
+  :group_loan_premature_clearance_payments => {
+    :search => true ,
+    :index => true, 
+    :create => true,
+    :update => true,
+    :destroy => true 
+  },
+  
+  :savings_entries => {
+    :search => true ,
+    :index => true, 
+    :create => true,
+    :update => true,
+    :destroy => true 
   }
 }
+=begin
+
+old_role = Role.find_by_name("dataentry")
+new_role_hash = {
+  :passwords => {
+    :update => true 
+  },
+  :members => {
+    :index => true,
+    :search => true 
+  },
+  :group_loan_products => {
+    :index => true ,
+    :search => true 
+  },
+  :group_loans => {
+    :index => true, 
+    :create => true,
+    :update => true,
+    :destroy => true,
+  },
+  :group_loan_memberships => {
+    :search => true ,
+    :index => true, 
+    :create => true,
+    :update => true,
+    :destroy => true,
+    :deactivate => true 
+  },
+  :group_loan_weekly_collections => {
+    :search => true ,
+    :index => true, 
+    :active_group_loan_memberships => true, 
+    :create => true,
+    :update => true,
+    :destroy => true,
+    :collect => true ,
+    :uncollect => true, 
+    :show => true ,
+    
+  },
+  
+  :group_loan_weekly_uncollectibles => {
+    :search => true ,
+    :index => true, 
+    :create => true,
+    :update => true,
+    :destroy => true,
+    :collect => true, 
+    :uncollect => true 
+  },
+  :group_loan_premature_clearance_payments => {
+    :search => true ,
+    :index => true, 
+    :create => true,
+    :update => true,
+    :destroy => true 
+  },
+  
+  :savings_entries => {
+    :search => true ,
+    :index => true, 
+    :create => true,
+    :update => true,
+    :destroy => true,
+    :show => true 
+  },
+  :group_loan_weekly_collection_voluntary_savings_entries => {
+    :search => true ,
+    :index => true, 
+    :create => true,
+    :update => true,
+    :destroy => true
+  }
+}
+old_role.update_role(new_role_hash)
+=end
 
 data_entry_role = Role.create!(
   :name        => ROLE_NAME[:data_entry],

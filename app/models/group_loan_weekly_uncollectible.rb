@@ -97,6 +97,7 @@ class GroupLoanWeeklyUncollectible < ActiveRecord::Base
     return if self.persisted? 
     
     if group_loan.first_uncollected_weekly_collection.id != self.group_loan_weekly_collection_id 
+      
       msg = "Pengumpulan minggu #{group_loan_weekly_collection.week_number} tidak valid"
       self.errors.add(:group_loan_weekly_collection_id , msg  )
       return self 
@@ -145,12 +146,20 @@ class GroupLoanWeeklyUncollectible < ActiveRecord::Base
       self.errors.add(:generic_errors, "Pengumpulan mingguan terkumpul atau terkonfirmasi ")
       return self 
     end
-    
-    
+     
+     
     self.group_loan_id                     = params[:group_loan_id]
     self.group_loan_membership_id          = params[:group_loan_membership_id]  
     self.group_loan_weekly_collection_id   = params[:group_loan_weekly_collection_id]
+    
     self.clearance_case = params[:clearance_case]
+    
+    if group_loan.first_uncollected_weekly_collection.id != self.group_loan_weekly_collection_id 
+      
+      msg = "Pengumpulan minggu #{group_loan_weekly_collection.week_number} tidak valid"
+      self.errors.add(:group_loan_weekly_collection_id , msg  )
+      return self 
+    end
     
     
     self.update_amount if self.save  
@@ -188,6 +197,11 @@ class GroupLoanWeeklyUncollectible < ActiveRecord::Base
       return self
     end
     
+    if not self.group_loan_weekly_collection.is_confirmed? 
+      self.errors.add(:generic_errors, "Weekly collection belum di konfirmasi")
+      return self
+    end
+    
     self.is_collected = true 
     self.collected_at = params[:collected_at]
     self.save 
@@ -205,7 +219,7 @@ class GroupLoanWeeklyUncollectible < ActiveRecord::Base
     end
     
     if self.is_cleared? 
-      self.errors.add(:generic_errors, "Sudah di selesaikan")
+      self.errors.add(:generic_errors, "Sudah di lunaskan")
       return self 
     end
     
@@ -224,12 +238,27 @@ class GroupLoanWeeklyUncollectible < ActiveRecord::Base
   end
   
   def uncollect
-    self.is_collected = true 
-    self.collected_at = params[:collected_at]
+    if self.is_collected == false
+      self.errors.add(:generic_errors, "Belum ada collection")
+      return self 
+    end
+    
+    
+    self.is_collected = false 
+    self.collected_at = nil
     self.save
   end
   
   def unclear
+    if self.is_cleared == false
+      self.errors.add(:generic_errors, "Belum ada clearance")
+      return self 
+    end
+    
+    self.is_cleared = false 
+    self.cleared_at = nil
+    
+    
     self.group_loan.update_bad_debt_allowance(   self.principal)
   end
   

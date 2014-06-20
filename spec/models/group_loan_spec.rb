@@ -234,7 +234,9 @@ describe GroupLoan do
             end
             
             it 'should have confirmed all group_loan weekly collections' do
-              @group_loan.group_loan_weekly_collections.where(:is_collected => true, :is_confirmed => true).count.should == @group_loan.number_of_collections 
+              @group_loan.group_loan_weekly_collections.
+                      where(:is_collected => true, :is_confirmed => true).
+                      count.should == @group_loan.number_of_collections 
             end
             
             it 'should give nil to the next uncollected group_loan_weekly_collection' do

@@ -79,6 +79,14 @@ Ext.define('AM.controller.SavingsEntries', {
 				click : this.executeConfirm
 			},
 			
+			'savingsentrylist button[action=unconfirmObject]': {
+        click: this.unconfirmObject
+			}	,
+			
+			'unconfirmsavingsentryform button[action=unconfirm]' : {
+				click : this.executeUnconfirm
+			},
+			
 			'savingsentryProcess operationmemberList textfield[name=searchField]': {
         change: this.liveSearch
       }
@@ -506,5 +514,62 @@ Ext.define('AM.controller.SavingsEntries', {
 		grid.getStore().getProxy().extraParams.is_savings_account =  true ;
 		grid.getStore().load(); 
   },
+
+	unconfirmObject: function(){
+		// console.log("Inside uncollectObject");
+		var view = Ext.widget('unconfirmsavingsentryform');
+		var record = this.getList().getSelectedObject();
+		view.setParentData( record );
+    view.show();
+		// this.reloadRecordView( record, view ) ; 
+	},
+	
+	executeUnconfirm: function(button){
+		// console.log("Inside execute Uncollect");
+		var me = this; 
+		var win = button.up('window');
+    var form = win.down('form');
+		var list = this.getList();
+
+    var store = this.getSavingsEntriesStore();
+		var record = this.getList().getSelectedObject();
+    var values = form.getValues();
+ 
+		if(record){
+			var rec_id = record.get("id");
+			record.set( 'confirmed_at' , values['confirmed_at'] );
+			 
+			// form.query('checkbox').forEach(function(checkbox){
+			// 	record.set( checkbox['name']  ,checkbox['checked'] ) ;
+			// });
+			// 
+			form.setLoading(true);
+			record.save({
+				params : {
+					unconfirm: true 
+				},
+				success : function(record){
+					form.setLoading(false);
+					
+					
+					 
+					
+					list.fireEvent('confirmed', record);
+					
+					win.close();
+				},
+				failure : function(record,op ){
+					// console.log("Fail update");
+					form.setLoading(false);
+					var message  = op.request.scope.reader.jsonData["message"];
+					var errors = message['errors'];
+					form.getForm().markInvalid(errors);
+					record.reject(); 
+					// this.reject(); 
+				}
+			});
+		}
+	},
+	
 
 });

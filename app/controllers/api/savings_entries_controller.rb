@@ -65,7 +65,24 @@ class Api::SavingsEntriesController < Api::BaseApiController
     params[:savings_entry][:confirmed_at] =  parse_date( params[:savings_entry][:confirmed_at] )
     
     if params[:confirm].present?  
+      
+      if not current_user.has_role?( :savings_entries, :confirm)
+        render :json => {:success => false, :access_denied => "Tidak punya authorisasi"}
+        return
+      end
+      
+      
       @object.confirm(:confirmed_at => params[:savings_entry][:confirmed_at] )
+    elsif params[:unconfirm].present?
+      
+      if not current_user.has_role?( :savings_entries, :unconfirm)
+        render :json => {:success => false, :access_denied => "Tidak punya authorisasi"}
+        return
+      end
+      
+      
+      @object.unconfirm 
+      
     else
       @object.update_object( params[:savings_entry] )
     end

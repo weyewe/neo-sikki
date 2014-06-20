@@ -60,16 +60,49 @@ class Api::GroupLoansController < Api::BaseApiController
     params[:group_loan][:compulsory_savings_withdrawn_at] =  parse_date( params[:group_loan][:compulsory_savings_withdrawn_at] )
 
     if params[:start].present?  
+      if not current_user.has_role?( :group_loans, :start)
+        render :json => {:success => false, :access_denied => "Tidak punya authorisasi"}
+        return
+      end
+      
+      
       @object.start(:started_at => params[:group_loan][:started_at] )
     elsif params[:unstart].present?    
+      
+      if not current_user.has_role?( :group_loans, :unstart)
+        render :json => {:success => false, :access_denied => "Tidak punya authorisasi"}
+        return
+      end
+      
       @object.cancel_start
     elsif params[:disburse].present?
+      if not current_user.has_role?( :group_loans, :disburse)
+        render :json => {:success => false, :access_denied => "Tidak punya authorisasi"}
+        return
+      end
+      
       @object.disburse_loan( :disbursed_at => params[:group_loan][:disbursed_at] )
-    elsif params[:undisburse].present?    
+    elsif params[:undisburse].present?  
+      if not current_user.has_role?( :group_loans, :undisburse)
+        render :json => {:success => false, :access_denied => "Tidak punya authorisasi"}
+        return
+      end
+      
+        
       @object.undisburse
     elsif params[:close].present?
+      if not current_user.has_role?( :group_loans, :close)
+        render :json => {:success => false, :access_denied => "Tidak punya authorisasi"}
+        return
+      end
+      
       @object.close( :closed_at => params[:group_loan][:closed_at] )
     elsif params[:withdraw].present?
+      if not current_user.has_role?( :group_loans, :withdraw)
+        render :json => {:success => false, :access_denied => "Tidak punya authorisasi"}
+        return
+      end
+      
       @object.withdraw_compulsory_savings( :compulsory_savings_withdrawn_at => params[:group_loan][:compulsory_savings_withdrawn_at] )
     else
       # puts "==========> Inside the update object\n"*100

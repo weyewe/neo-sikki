@@ -56,7 +56,11 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
   
   def group_loan_weekly_collection_must_be_uncollected
     return if not all_fields_present?
-    return if self.group_loan_weekly_collection.is_confirmed?   
+    
+    if self.group_loan_weekly_collection.is_collected?   
+      self.errors.add(:generic_errors, "The group loan weekly collection is collected ")
+    end
+    
     
     first_uncollected = group_loan.first_uncollected_weekly_collection
     
@@ -192,8 +196,19 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
   
   def run_away_end_of_cycle_resolved_bail_out_contribution
     # group_loan_weekly_collection  
+    
     current_week_number = group_loan_weekly_collection.week_number
-    remaining_weeks = group_loan.loan_duration -  current_week_number
+    puts "2211 currentweeknumber: #{current_week_number}"
+    puts "group_loan: #{self.group_loan}"
+    
+    puts "group_loan.id: #{self.group_loan.id}"
+    puts "class of loan duration: #{group_loan.loan_duration.class}"
+    awesome_loan_duration = group_loan.loan_duration
+    puts "extracted_loan_duration: #{awesome_loan_duration}"
+    puts "group_loan.loan_duration: #{self.group_loan.loan_duration}"
+    
+    remaining_weeks = awesome_loan_duration -  current_week_number
+    puts "remaining_weeks: #{remaining_weeks}"
      
     amount = BigDecimal('0')
     
