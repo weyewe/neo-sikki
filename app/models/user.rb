@@ -49,6 +49,11 @@ class User < ActiveRecord::Base
   
   def delete_object 
     
+    if self.is_main_user
+      self.errors.add(:generic_errors, "Tidak dapat delete user utama")
+      return self 
+    end
+    
     random_password                    = UUIDTools::UUID.timestamp_create.to_s[0..7]
     self.password = random_password
     self.password_confirmation = random_password 
@@ -69,7 +74,7 @@ class User < ActiveRecord::Base
     
     
     new_object                        = User.new 
-    password                         = UUIDTools::UUID.timestamp_create.to_s[0..7]
+    password                         = "willy1234" #UUIDTools::UUID.timestamp_create.to_s[0..7]
     new_object.name                  = params[:name]
     new_object.email                 = params[:email] 
     new_object.role_id               =   params[:role_id]
