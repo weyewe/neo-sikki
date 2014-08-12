@@ -2,13 +2,3 @@ pending:
 
 rspec ./spec/models/corner_cases/combination/scenario_3_spec.rb:188 # GroupLoan perform run_away confirm second_week confirm up to week 5 should confirm the fourth week
 
-
-rspec ./spec/models/corner_cases/combination/scenario_3_spec.rb:193 # GroupLoan perform run_away confirm second_week confirm up to week 5 should create valid gl_pc
-
-
-
-
-
-
-rspec ./spec/models/corner_cases/combination/scenario_2_spec.rb:209 # GroupLoan perform premature clearance weekly_collection.confirm should confirm the clearance
-rspec ./spec/models/corner_cases/combination/scenario_2_spec.rb:327 # GroupLoan perform premature clearance weekly_collection.confirm closing week 3, going to week 4 closing the group loan should confirm the premature clearance
