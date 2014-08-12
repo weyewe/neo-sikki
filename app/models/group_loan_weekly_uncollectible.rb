@@ -27,7 +27,7 @@ class GroupLoanWeeklyUncollectible < ActiveRecord::Base
       
     
     member = self.group_loan_membership.member
-    if not  self.group_loan_membership.is_active? 
+    if  not self.group_loan.is_closed? and not  self.group_loan_membership.is_active? 
       self.errors.add(:generic_errors, "Member #{member.name} tidak aktif")
       return self 
     end
@@ -265,7 +265,10 @@ class GroupLoanWeeklyUncollectible < ActiveRecord::Base
   def clear_end_of_cycle
     self.is_cleared = true 
     self.cleared_at = self.group_loan.closed_at 
-    self.save
+    if self.save
+    else
+      self.errors.messages.each {|x| puts "error message in uncollectible clearance: #{x}"}
+    end
   end
   
 end

@@ -298,13 +298,13 @@ describe GroupLoanWeeklyUncollectible do
         final_uncollectible_weekly_payment_amount = @second_group_loan_weekly_collection.extract_uncollectible_weekly_payment_amount
         final_uncollectible_weekly_payment_amount.should == @uncollectible_glm.group_loan_product.weekly_payment_amount
       end
-
+      
       it 'should NOT be deletable' do
         @first_gl_wu.delete_object
         @first_gl_wu.errors.size.should_not == 0 
         @first_gl_wu.persisted?.should be_true  
       end
-
+      
       it 'should not allow creation of uncollectible' do
         @second_uncollectible_glm = @group_loan.active_group_loan_memberships.last 
          

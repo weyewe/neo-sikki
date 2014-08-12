@@ -154,9 +154,10 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
     
     
     next_week_collection = self.next_weekly_collection
-    next_week_week_number = next_week_collection.week_number
+    
     
     if not next_week_collection.nil?
+      next_week_week_number = next_week_collection.week_number
       if  next_week_collection.is_collected?
         # puts "next week collection is collected "
         self.errors.add(:generic_errors, "Pengumpulan minggu berikutnya sudah di konfirmasi.")

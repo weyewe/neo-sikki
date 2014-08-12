@@ -56,8 +56,9 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
   
   def group_loan_weekly_collection_must_be_uncollected
     return if not all_fields_present?
+    return if self.is_confirmed? 
     
-    if self.group_loan_weekly_collection.is_collected?   
+    if  self.group_loan_weekly_collection.is_collected?   
       self.errors.add(:generic_errors, "The group loan weekly collection is collected ")
     end
     
@@ -77,6 +78,8 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
   
   def next_weekly_collection_must_be_available
     return if not all_fields_present? 
+    return if self.is_confirmed? 
+    
     current_weekly_collection = group_loan_weekly_collection
     next_weekly_collection = group_loan.group_loan_weekly_collections.
                                 where(:week_number => current_weekly_collection.week_number + 1 ).first
@@ -198,17 +201,17 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
     # group_loan_weekly_collection  
     
     current_week_number = group_loan_weekly_collection.week_number
-    puts "2211 currentweeknumber: #{current_week_number}"
-    puts "group_loan: #{self.group_loan}"
+    # puts "2211 currentweeknumber: #{current_week_number}"
+    # puts "group_loan: #{self.group_loan}"
     
-    puts "group_loan.id: #{self.group_loan.id}"
-    puts "class of loan duration: #{group_loan.loan_duration.class}"
+    # puts "group_loan.id: #{self.group_loan.id}"
+    # puts "class of loan duration: #{group_loan.loan_duration.class}"
     awesome_loan_duration = group_loan.loan_duration
-    puts "extracted_loan_duration: #{awesome_loan_duration}"
-    puts "group_loan.loan_duration: #{self.group_loan.loan_duration}"
+    # puts "extracted_loan_duration: #{awesome_loan_duration}"
+    # puts "group_loan.loan_duration: #{self.group_loan.loan_duration}"
     
     remaining_weeks = awesome_loan_duration -  current_week_number
-    puts "remaining_weeks: #{remaining_weeks}"
+    # puts "remaining_weeks: #{remaining_weeks}"
      
     amount = BigDecimal('0')
     
@@ -249,7 +252,15 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
     
     
     self.is_confirmed = true 
-    self.save 
+    
+    if not self.save 
+      puts "inside the group loan premature clearance payment"
+      puts "The errors:"
+      self.errors.messages.each {|x| puts "error: #{x}"}
+    end
+    
+    
+    
     
     glm = self.group_loan_membership
     glm.is_active = false 

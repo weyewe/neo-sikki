@@ -653,9 +653,16 @@ Phase: loan disbursement finalization
     # self.update_bad_debt_expense 
     
     self.is_closed = true 
+    
     if self.save
+      puts "going to clear uncollectibles from group_loan"
       self.clear_end_of_cycle_uncollectibles
+    else
+      puts "fail to save group loan"
+      self.errors.messages.each {|x| puts "err close: #{x}"}
     end
+    
+    
     
     # create journal posting to recover bad_debt_allowance
     # create journal posting to assume bad_debt_expense 

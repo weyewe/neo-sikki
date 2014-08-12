@@ -147,6 +147,7 @@ describe GroupLoanWeeklyCollection do
     before(:each) do
       @first_glwc = @group_loan.group_loan_weekly_collections.first
       
+      
       @initial_savings_account_array = []
       count = 1 
       @group_loan.group_loan_memberships.order("created_at DESC").each do |glm|
@@ -195,6 +196,7 @@ describe GroupLoanWeeklyCollection do
     context "creating premature clearance in the second weekly collection" do
       before(:each) do
         @second_glwc = @group_loan.group_loan_weekly_collections.order("week_number ASC")[1]
+        @third_glwc = @group_loan.group_loan_weekly_collections.order("week_number ASC")[2]
         @premature_clearance_glm = @group_loan.group_loan_memberships.first 
         
         @second_gl_pc = GroupLoanPrematureClearancePayment.create_object({
@@ -204,8 +206,11 @@ describe GroupLoanWeeklyCollection do
         })
       end
       
+      
       it 'should create gl_pc' do
+        @second_gl_pc.errors.size.should == 0 
         @second_gl_pc.should be_valid 
+        
       end
       
       context "confirming the second glwc" do
@@ -219,13 +224,21 @@ describe GroupLoanWeeklyCollection do
           @premature_clearance_glm.reload 
         end
         
-        it 'should create compulsory savings withdrawal' do
+        it 'should confirm premature clearance' do
+          @second_glwc.is_confirmed.should be_true
+          
+          @second_gl_pc.errors.messages.each {|x| puts "premature learance error: #{x}"}
           @second_gl_pc.is_confirmed.should be_true 
         end
         
+        
+        
         it 'should deactivate the glm' do
           @premature_clearance_glm.is_active.should be_false 
+          @premature_clearance_glm.deactivation_case.should ==  GROUP_LOAN_DEACTIVATION_CASE[:premature_clearance]
         end
+        
+        
         
         it 'should create compulsory savings withdrawal for the premature clearance' do
           @savings_entry_array = SavingsEntry.where( 
@@ -241,6 +254,8 @@ describe GroupLoanWeeklyCollection do
           @savings_entry_array.count.should == 1 
           @savings_entry_array.first.amount. should == @premature_clearance_glm.group_loan_product.compulsory_savings * 2 
         end
+              
+              
       end
     end
   end
