@@ -22,11 +22,11 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
   
   validates_uniqueness_of :group_loan_membership_id 
   
-  validate :group_loan_weekly_collection_must_be_uncollected
-  validate :next_weekly_collection_must_be_available # reason: the deactivation will start from next week
+  # validate :group_loan_weekly_collection_must_be_uncollected
+  # validate :next_weekly_collection_must_be_available # reason: the deactivation will start from next week
   validate :no_uncleared_weekly_uncollectible
   validate :group_loan_must_not_be_closed
-  validate :member_must_be_active
+  # validate :member_must_be_active
   
   def group_loan_must_not_be_closed
     return if  not all_fields_present?
@@ -56,11 +56,16 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
   
   def group_loan_weekly_collection_must_be_uncollected
     return if not all_fields_present?
-    return if self.is_confirmed? 
+    # return if self.is_confirmed? 
+    # how can we differentiate the unconfirm and confirm phase? 
     
-    if  self.group_loan_weekly_collection.is_collected?   
+    # in the case of create and update 
+    if    self.group_loan_weekly_collection.is_collected?   
       self.errors.add(:generic_errors, "The group loan weekly collection is collected ")
+      return self 
     end
+    
+    
     
     
     first_uncollected = group_loan.first_uncollected_weekly_collection
@@ -105,6 +110,11 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
     new_object.group_loan_membership_id         = params[:group_loan_membership_id]
     new_object.group_loan_weekly_collection_id  = params[:group_loan_weekly_collection_id]
     
+    new_object.group_loan_weekly_collection_must_be_uncollected
+    new_object.member_must_be_active
+    new_object.next_weekly_collection_must_be_available
+    return new_object if new_object.errors.size != 0  
+    
     new_object.update_amount if new_object.save 
     
     return new_object
@@ -120,7 +130,11 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
     self.group_loan_membership_id         = params[:group_loan_membership_id]
     self.group_loan_weekly_collection_id  = params[:group_loan_weekly_collection_id]
     
+    self.group_loan_weekly_collection_must_be_uncollected
+    self.member_must_be_active
+    self.next_weekly_collection_must_be_available
     
+    return self if self.errors.size != 0
     self.update_amount if self.save 
     
     return self 
@@ -281,6 +295,10 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
   end
   
   def unconfirm
+    if not self.is_confirmed?
+      self.errors.add(:generic_errors, "Belum konfirmasi premature clearance")
+      return self 
+    end
     self.group_loan.update_premature_clearance_deposit( -1*premature_clearance_deposit_amount ) 
     
     glm = self.group_loan_membership
@@ -334,11 +352,17 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
       
       member = glm.member 
       member.update_total_savings_account( -1*total_amount)
+    else
+      puts "44321 fail to update glm"
     end
     
     
     self.is_confirmed = false 
-    self.save 
+    if self.save 
+    else
+      puts "44511 fail to save group loan premature clearance payment"
+      self.errors.messages.each {|x| puts "Err_msg: #{x}"}
+    end
     
   end
   
