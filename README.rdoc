@@ -2,3 +2,8 @@ pending:
 
 rspec ./spec/models/corner_cases/combination/scenario_3_spec.rb:188 # GroupLoan perform run_away confirm second_week confirm up to week 5 should confirm the fourth week
 
+bambu 54 
+4649 kaedah
+
+PorTimur 331
+3932 atik

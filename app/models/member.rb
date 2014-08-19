@@ -162,13 +162,26 @@ class Member < ActiveRecord::Base
     end
   end
   
-  def undo_mark_as_deceased(weekly_collection)
+  def undo_mark_as_deceased 
     # deceased_week_number? 
     self.group_loan_memberships.where(
       :is_active => false, 
-      :deactivation_case => GROUP_LOAN_DEACTIVATION_CASE[:deceased] ,
-      :deactivation_week_number => weekly_collection.week_number  
+      :deactivation_case => GROUP_LOAN_DEACTIVATION_CASE[:deceased] 
     ).each do |glm|
+      
+      
+      if glm.deactivation_case == GROUP_LOAN_DEACTIVATION_CASE[:deceased]   
+        deactivation_week = glm.deactivation_week_number 
+        deactivation_weekly_collection = glm.group_loan.group_loan_weekly_collections.where(:week_number =>deactivation_week ).first 
+
+        if deactivation_weekly_collection.is_collected == true 
+          self.errors.add(:generic_errors, "Sudah ada pengumpulan pada group loan #{glm.group_loan.name} di minggu #{deactivation_week}")
+          return self 
+        end
+      end
+      
+        
+        
       
       deceased_clearance = DeceasedClearance.where(
         :financial_product_id  => glm.group_loan.id,
@@ -184,9 +197,9 @@ class Member < ActiveRecord::Base
           :savings_source_type => deceased_clearance.class.to_s, 
           :savings_status => SAVINGS_STATUS[:group_loan_compulsory_savings],
           :direction => FUND_TRANSFER_DIRECTION[:outgoing],
-          :financial_product_id => savings_source.group_loan_id ,
-          :financial_product_type => savings_source.group_loan.class.to_s,
-          :member_id => member.id, 
+          :financial_product_id => glm.group_loan_id ,
+          :financial_product_type => glm.group_loan.class.to_s,
+          :member_id => self.id, 
         ).each do |x|
           total_amount += x.amount 
           x.destroy 
@@ -203,12 +216,12 @@ class Member < ActiveRecord::Base
           :direction => FUND_TRANSFER_DIRECTION[:incoming],
           :financial_product_id =>  deceased_clearance.group_loan.id  ,
           :financial_product_type => deceased_clearance.group_loan.class.to_s ,
-          :member_id => member.id
+          :member_id => self.id
         ).each do |x|
           total_amount += x.amount 
           x.destroy 
         end
-        member.update_total_savings_account( -1*total_amount)
+        self.update_total_savings_account( -1*total_amount)
       end 
       
       

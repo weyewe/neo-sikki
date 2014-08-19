@@ -294,6 +294,9 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
     
   end
   
+  
+  # GroupLoanPrematureClearancePayment.where(:group_loan_id => 19).each {|x| x.is_confirmed = false; x.save}
+  
   def unconfirm
     if not self.is_confirmed?
       self.errors.add(:generic_errors, "Belum konfirmasi premature clearance")
