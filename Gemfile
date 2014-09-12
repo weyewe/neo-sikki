@@ -41,14 +41,13 @@ end
 gem 'devise'
 gem "kaminari"  
 gem 'uuidtools'
-# gem 'fastercsv', '~> 1.5.5'
+gem 'fastercsv', '~> 1.5.5'
 
 gem 'bootstrap-sass', '~> 2.3.1.0'
 gem 'the_role', '~> 2.0.0'
 gem 'protected_attributes'
 gem 'squeel', :git => "git://github.com/ernie/squeel.git"
  
-
 group :production do
   gem 'rails_12factor'
 end

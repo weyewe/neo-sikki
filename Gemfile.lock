@@ -60,6 +60,7 @@ GEM
     erubis (2.7.0)
     eventmachine (1.0.3)
     execjs (2.0.1)
+    fastercsv (1.5.5)
     haml (4.0.3)
       tilt
     hike (1.2.3)
@@ -177,6 +178,7 @@ DEPENDENCIES
   bootstrap-sass (~> 2.3.1.0)
   coffee-rails (~> 4.0.0)
   devise
+  fastercsv (~> 1.5.5)
   jbuilder (~> 1.2)
   jquery-rails
   kaminari
