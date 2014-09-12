@@ -26,7 +26,7 @@ class UserMailer < ActionMailer::Base
   
     attachment :content_type => "text/csv", :filename => "sales_#{@yesterday.to_date}.csv" do |a| 
       a.body = FasterCSV.generate do |csv| 
-        csv < < (fields = ["artist", "product", "variant", "unit price", "qty sold", "total"]).map {|f| f.titleize } 
+        csv << (fields = ["artist", "product", "variant", "unit price", "qty sold", "total"]).map {|f| f.titleize } 
         # Report.sales_for_date(@yesterday).each do |row| 
         #   csv << fields.map {|f| row[f] } 
         # end 
