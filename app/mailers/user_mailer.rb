@@ -17,7 +17,7 @@ class UserMailer < ActionMailer::Base
   def sales_for_yesterday 
     
     base_filename = "awesome.csv"
-    filename = "#{Rails.root}/public/#{base_filenames}"
+    filename = "#{Rails.root}/public/#{base_filename}"
     
     begin
       CSV.open(filename, 'w') do |csv|
