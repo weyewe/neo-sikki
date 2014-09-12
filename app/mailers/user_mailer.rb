@@ -22,7 +22,7 @@ class UserMailer < ActionMailer::Base
     @body = { :yesterday => @yesterday } 
     @subject = "Sales Report"
     
-    mail(:to => "w.yunnal@gmail.com", :subject => "banzai New account information")
+    mail(:to => "admin@11ina.com", :subject => "banzai New account information")
   
     # attachment :content_type => "text/csv", :filename => "sales_#{@yesterday.to_date}.csv" do |a| 
     #   a.body = FasterCSV.generate do |csv| 
