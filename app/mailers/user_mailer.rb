@@ -1,7 +1,7 @@
 # UserMailer.notify_new_user_registration( new_object , password    ).deliver
 
 class UserMailer < ActionMailer::Base
-  require 'faster_csv'
+  require 'fastercsv'
   
   default from: "from@example.com"
 
