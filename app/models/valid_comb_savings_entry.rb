@@ -69,13 +69,16 @@ class ValidCombSavingsEntry < ActiveRecord::Base
       Member.find_each do |member|
         puts "\n\n===================> member #{member.id_number}"
         
-        if beginning_of_month > now
-          beginning_of_month = first_savings_entry.confirmed_at.beginning_of_month
-          next 
+        beginning_of_month = first_savings_entry.confirmed_at.beginning_of_month
+        
+       
+        
+        while beginning_of_month <= now do
+          ValidCombSavingsEntry.calculate_valid_comb_at_the_end_of_the_month( beginning_of_month , member,  selected_savings_status)
+          beginning_of_month = beginning_of_month + 1.month
         end
         
-        ValidCombSavingsEntry.calculate_valid_comb_at_the_end_of_the_month( beginning_of_month , member,  selected_savings_status)
-        beginning_of_month = beginning_of_month + 1.month 
+        
       end
     end
   end
