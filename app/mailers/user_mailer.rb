@@ -55,7 +55,7 @@ class UserMailer < ActionMailer::Base
         current_month = beginning_of_month
         
         while current_month < now
-          header_array << "#{beginning_of_month.month}/#{beginning_of_month.year}"
+          header_array << "#{current_month.month}/#{current_month.year}"
           current_month =  current_month + 1.month 
         end
         
