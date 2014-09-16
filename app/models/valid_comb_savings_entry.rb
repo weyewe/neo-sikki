@@ -38,7 +38,8 @@ class ValidCombSavingsEntry < ActiveRecord::Base
       ( savings_status.eq selected_savings_status ) &
       ( confirmed_at.gte start_datetime) & 
       ( confirmed_at.lt end_datetime) & 
-      ( is_confirmed.eq true )
+      ( is_confirmed.eq true ) & 
+      ( member_id.eq member.id )
     }
     
     positive_mutation = savings_entries.where(:direction => FUND_TRANSFER_DIRECTION[:incoming]).sum("amount")
@@ -67,7 +68,10 @@ class ValidCombSavingsEntry < ActiveRecord::Base
     if first_savings_entry.nil?
       
     else
+      count = 0 
       Member.find_each do |member|
+        break if count == 2
+        count += 1 
         puts "\n\n===================> member #{member.id_number}"
         
         beginning_of_month = first_savings_entry.confirmed_at.beginning_of_month
@@ -75,6 +79,8 @@ class ValidCombSavingsEntry < ActiveRecord::Base
        
         
         while beginning_of_month <= now do
+          # will calculate the starting balance of next month 
+          # or ending balance of this month  
           ValidCombSavingsEntry.calculate_valid_comb_at_the_end_of_the_month( beginning_of_month , member,  selected_savings_status)
           beginning_of_month = beginning_of_month + 1.month
         end

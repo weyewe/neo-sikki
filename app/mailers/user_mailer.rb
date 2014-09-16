@@ -67,7 +67,7 @@ class UserMailer < ActionMailer::Base
         # content 
         
 
-        
+        # UserMailer.savings_report(8,2014,5,0).deliver
         
         # current month
         # csv << ['MemberID','Name', 'Voluntary Savings Jan', 'Voluntary Savings Feb', 'Voluntary Savings March', 'Voluntary Savings April', 'Voluntary Savings May', 'Voluntary Savings Jun','Voluntary Savings July', 'Voluntary Savings August' ]
