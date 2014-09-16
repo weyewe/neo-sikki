@@ -1,4 +1,5 @@
 class Member < ActiveRecord::Base
+  has_many :valid_comb_savings_entries 
   # attr_accessible :title, :body
   belongs_to :office 
   

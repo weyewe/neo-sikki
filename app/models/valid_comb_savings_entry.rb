@@ -1,4 +1,5 @@
 class ValidCombSavingsEntry < ActiveRecord::Base
+  belongs_to :member
   
   def self.create_object(params) 
     new_object = self.new
