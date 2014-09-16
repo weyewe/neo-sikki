@@ -60,6 +60,7 @@ class UserMailer < ActionMailer::Base
         end
         
         header_array << "#{now.month}/#{now.year}"
+        csv << header_array
         
         
         
