@@ -71,11 +71,11 @@ class UserMailer < ActionMailer::Base
         
         # current month
         # csv << ['MemberID','Name', 'Voluntary Savings Jan', 'Voluntary Savings Feb', 'Voluntary Savings March', 'Voluntary Savings April', 'Voluntary Savings May', 'Voluntary Savings Jun','Voluntary Savings July', 'Voluntary Savings August' ]
-        count = 0 
+        # count = 0 
                 
                  Member.includes(:valid_comb_savings_entries).find_each do |member|
-                   count = count + 1
-                   break if count == 10
+                   # count = count + 1
+                   #                   break if count == 10
                    current_month = first_savings_entry.confirmed_at.beginning_of_month 
                    
                    
