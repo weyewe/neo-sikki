@@ -68,10 +68,8 @@ class ValidCombSavingsEntry < ActiveRecord::Base
     if first_savings_entry.nil?
       
     else
-      count = 0 
       Member.find_each do |member|
-        break if count == 2
-        count += 1 
+        
         puts "\n\n===================> member #{member.id_number}"
         
         beginning_of_month = first_savings_entry.confirmed_at.beginning_of_month
