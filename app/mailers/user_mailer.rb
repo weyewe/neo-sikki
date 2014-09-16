@@ -71,40 +71,43 @@ class UserMailer < ActionMailer::Base
         # current month
         # csv << ['MemberID','Name', 'Voluntary Savings Jan', 'Voluntary Savings Feb', 'Voluntary Savings March', 'Voluntary Savings April', 'Voluntary Savings May', 'Voluntary Savings Jun','Voluntary Savings July', 'Voluntary Savings August' ]
         count = 0 
-        Member.joins(:valid_comb_savings_entries).find_each do |member|
-          count = count + 1
-          break if count == 10 
-          current_month = first_savings_entry.confirmed_at.beginning_of_month 
-          
-          
-          
-          member_data = []
-          
-          member_data << member.id_number
-          member_data << member.name 
-          
-          
-          while current_month <= now do 
-            current_month_valid_comb = member.valid_comb_savings_entries.where(
-              :month => current_month.month,
-              :year => current_month.year,
-              :member_id => member.id 
-            ).first
-
-            if current_month_valid_comb.nil?
-              member_data << BigDecimal("0")
-            else
-              member_data << current_month_valid_comb.amount 
-            end
-
-            current_month = current_month + 1.month
-          end
-          
-          member_data << member.total_savings_account
-          csv  << member_data
-          
-          
-        end
+                # 
+                # Member.joins(:valid_comb_savings_entries).find_each do |member|
+                #   count = count + 1
+                #   break if count == 10
+                #   current_month = first_savings_entry.confirmed_at.beginning_of_month 
+                #   
+                #   
+                #   
+                #   member_data = []
+                #   
+                #   member_data << member.id_number
+                #   member_data << member.name 
+                #   
+                #   
+                #   while current_month <= now do 
+                #     current_month_valid_comb = member.valid_comb_savings_entries.where(
+                #       :month => current_month.month,
+                #       :year => current_month.year,
+                #       :member_id => member.id 
+                #     ).first
+                # 
+                #     if current_month_valid_comb.nil?
+                #       member_data << BigDecimal("0")
+                #     else
+                #       member_data << current_month_valid_comb.amount 
+                #     end
+                # 
+                #     current_month = current_month + 1.month
+                #   end
+                #   
+                #   member_data << member.total_savings_account
+                #   csv  << member_data
+                #   
+                #   
+                # end
+                #       
+      
       end
     rescue Exception => e
       puts e
