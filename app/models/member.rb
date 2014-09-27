@@ -19,7 +19,10 @@ class Member < ActiveRecord::Base
    
    
   def self.update_all_savings
-    Member.find_each { |member|  member.update_savings_info } 
+    Member.find_each do |member|  
+      puts "member: #{member.id_number }"
+      member.update_savings_info 
+    end
   end
    
   def update_savings_info
