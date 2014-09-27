@@ -18,6 +18,41 @@ class Member < ActiveRecord::Base
   
    
    
+  def self.update_all_savings
+    Member.find_each { |member|  member.update_savings_info } 
+  end
+   
+  def update_savings_info
+    result_array = []
+    [
+      SAVINGS_STATUS[:savings_account],
+      SAVINGS_STATUS[:membership],
+      SAVINGS_STATUS[:locked] ].each do |current_savings_status|
+      
+      incoming_savings_amount = SavingsEntry.where(
+              :savings_status => current_savings_status,
+              :direction => FUND_TRANSFER_DIRECTION[:incoming],
+              :member_id => self.id , 
+              :is_confirmed => true 
+      ).sum("amount")
+      
+      outgoing_savings_amount = SavingsEntry.where(
+              :savings_status => current_savings_status,
+              :direction => FUND_TRANSFER_DIRECTION[:outgoing],
+              :member_id => self.id , 
+              :is_confirmed => true 
+      ).sum("amount")
+      
+      net = incoming_savings_amount - outgoing_savings_amount
+      result_array << net
+    end
+    
+    self.total_savings_account = result_array[0]
+    self.total_membership_savings = result_array[1]
+    self.total_locked_savings_account = result_array[2]
+    self.save
+  end
+   
    
    
   def self.active_objects

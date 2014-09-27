@@ -26,7 +26,7 @@ class ValidCombSavingsEntry < ActiveRecord::Base
     latest_amount = BigDecimal("0")
     
     if starting_valid_comb.nil?
-      starting_amount = 0 
+      starting_amount = BigDecimal("0") 
     else
       starting_amount = starting_valid_comb.amount 
     end
