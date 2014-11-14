@@ -130,7 +130,6 @@ class UserMailer < ActionMailer::Base
         
         # header
         header_array = ["MemberId", "Name", "Savings Amount", "Savings Status", "ConfirmationDate"]
-        current_month = beginning_of_month
        
         csv << header_array
         
