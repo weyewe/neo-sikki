@@ -120,7 +120,7 @@ class UserMailer < ActionMailer::Base
   end
   
   def savings_entry_adjustments_report
-    base_filename = "adjustments_report_#{month}_#{year}.csv"
+    base_filename = "adjustments_report_#{DateTime.now.to_s}}.csv"
     filename = "#{Rails.root}/public/#{base_filename}"
     
      
