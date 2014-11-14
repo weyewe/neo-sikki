@@ -134,7 +134,7 @@ class UserMailer < ActionMailer::Base
         csv << header_array
         
 
-        SavingsEntry.includes(:member).where(:is_adjustment => true, :is_confirmed =>true ).order("confirmed_at ASC").find_each do |savings_entry|
+        SavingsEntry.joins(:member).where(:is_adjustment => true, :is_confirmed =>true ).order("confirmed_at ASC").find_each do |savings_entry|
           puts "x"
           
           savings_data = []
