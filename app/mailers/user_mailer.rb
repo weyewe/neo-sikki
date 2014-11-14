@@ -120,7 +120,7 @@ class UserMailer < ActionMailer::Base
   end
   
   def savings_entry_adjustments_report
-    base_filename = "adjustments_report_#{DateTime.now.to_s}}.csv"
+    base_filename = "adjustments_report_#{DateTime.now.to_s}.csv"
     filename = "#{Rails.root}/public/#{base_filename}"
     
      
@@ -136,7 +136,7 @@ class UserMailer < ActionMailer::Base
         
 
         SavingsEntry.includes(:member).where(:is_adjustment => true, :is_confirmed =>true ).order("confirmed_at ASC").find_each do |savings_entry|
-          
+          puts "x"
           
           savings_data = []
           savings_data << savings_entry.member.id_number
