@@ -119,6 +119,61 @@ class UserMailer < ActionMailer::Base
     mail(:to => "admin@11ina.com", :subject => "Registered")
   end
   
+  def savings_entry_adjustments_report
+    base_filename = "adjustments_report_#{month}_#{year}.csv"
+    filename = "#{Rails.root}/public/#{base_filename}"
+    
+     
+    
+    begin
+      CSV.open(filename, 'w') do |csv|
+        
+        # header
+        header_array = ["MemberId", "Name", "Savings Amount", "Savings Status", "ConfirmationDate"]
+        current_month = beginning_of_month
+       
+        csv << header_array
+        
+
+        SavingsEntry.includes(:member).where(:is_adjustment => true, :is_confirmed =>true ).order("confirmed_at ASC").find_each do |savings_entry|
+          
+          
+          savings_data = []
+          savings_data << savings_entry.member.id_number
+          savings_data << savings_entry.member.name 
+          savings_data << savings_entry.amount
+          
+           
+          
+          savings_status_text = "" 
+          if savings_entry.savings_status == SAVINGS_STATUS[:savings_account]
+            savings_status_text = "Sukarela"
+          elsif savings_entry.savings_status == SAVINGS_STATUS[:membership]
+            savings_status_text = "Keanggotaan"
+          elsif savings_entry.savings_status == SAVINGS_STATUS[:locked]
+            savings_status_text = "Locked"
+          end
+          
+          savings_data << savings_status_text
+          savings_data << savings_entry.confirmed_at.to_s
+          
+           
+          csv  << savings_data
+
+
+        end
+
+      
+      end
+    rescue Exception => e
+      puts e
+    end
+    
+    
+    attachments[ "#{base_filename}"] = File.read(filename )
+    mail(:to => "admin@11ina.com", :subject => "Adjustment")
+  end
+  
     
     
 end
