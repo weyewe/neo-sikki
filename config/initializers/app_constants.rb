@@ -185,3 +185,9 @@ SAVINGS_PRODUCT_CODE = {
   # total_savings_account
   
 }
+
+CASH_BANK_STATUS = {
+  :bank => 1,
+  :cashier => 2,
+  :other_cash => 3 
+}

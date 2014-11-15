@@ -60,6 +60,9 @@ class ValidCombSavingsEntry < ActiveRecord::Base
     )
   end
   
+  
+  # we want to generate valid comb every friday. 
+  
   def self.generate_valid_comb( selected_savings_status )
     first_savings_entry =  SavingsEntry.where(:is_confirmed => true, :savings_status => selected_savings_status ).order("confirmed_at ASC").first 
     beginning_of_month =  first_savings_entry.confirmed_at.beginning_of_month
