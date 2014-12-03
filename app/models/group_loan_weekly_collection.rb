@@ -1,5 +1,5 @@
 class GroupLoanWeeklyCollection < ActiveRecord::Base
-  attr_accessible :group_loan_id, :week_number 
+  attr_accessible :group_loan_id, :week_number , :tentative_collection_date 
   belongs_to :group_loan 
   validates_presence_of :group_loan_id, :week_number 
   

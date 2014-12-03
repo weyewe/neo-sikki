@@ -219,8 +219,10 @@ Phase: loan disbursement finalization
   end
   
   def schedule_group_loan_weekly_collection
+    disbursed_date = self.disbursed_at
     (1..self.number_of_collections).each do |week_number|
-      GroupLoanWeeklyCollection.create :group_loan_id => self.id, :week_number => week_number
+      GroupLoanWeeklyCollection.create :group_loan_id => self.id, :week_number => week_number,
+      :tentative_collection_date => disbursed_date + week_number.weeks 
     end
   end
   
@@ -882,3 +884,13 @@ Phase: loan disbursement finalization
  
  
 end
+
+=begin
+GroupLoan.where(:is_loan_disbursed => true ).each do |group_loan|
+  disbursed_date = group_loan.disbursed_at 
+  group_loan.group_loan_weekly_collections.each do |glwc|
+    glwc.tentative_collection_date = disbursed_date  + glwc.week_number.weeks
+    glwc.save 
+  end
+end
+=end
