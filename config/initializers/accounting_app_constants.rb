@@ -14,6 +14,57 @@ ACCOUNT_GROUP = {
 }
 
 
+ 
+# level 0
+ACCOUNT_CODE = {
+  :asset => "1-000",
+    :current_asset => "1-100",
+      :cash_and_others => "1-110",
+        :main_cash_leaf => "1-111",
+    :account_receivable => "1-140",
+      :pinjaman_sejahtera_ar_leaf => "1-141",
+    :bad_debt_allocation => "1-150",
+      :pinjaman_sejahtera_bda_leaf => "1-151",
+      
+      
+  :liability => "2-000",
+    :current_liability => "2-100",
+      :savings => "2-110",
+        :compulsory_savings_leaf => "2-111",
+        :voluntary_savings_leaf => "2-112",
+        :locked_savings_leaf => "2-113",
+      :other_current_liability => "2-190",
+        :utang_santunan_leaf => "2-191",
+        :uang_titipan_leaf => "2-192",
+        
+  :equity => "3-000",
+  
+  
+  :operating_revenue => "4-000",
+    :loan_revenue => "4-100",
+      :loan_administration_revenue => "4-110",
+        :pinjaman_sejahtera_administration_revenue_leaf => "4-111",
+      :interest_revenue => "4-120",
+        :pinjaman_sejahtera_interest_revenue_leaf => "4-121",
+        
+  :financial_expense => "5-000",
+  
+  :operating_expense => "6-000" ,
+    :account_receivable_allowance_expense => "6-200",
+      :account_receivable_allowance_expense => "6-210",
+        :pinjaman_sejahtera_arae_leaf => "6-211",
+        
+  :other_revenue => "7-000",
+    :other_revenue_1 => "7-100",
+      :other_revenue_2 => "7-110",
+        :other_revenue_leaf => "7-118",
+        
+  :other_expense => "8-000",
+  
+  :coop_expense => "9-000",
+}
+
+
 # public class AccountCode
 # {
 #     public static string Asset = "1";
@@ -70,10 +121,7 @@ Debit side
   1-100 Aktiva lancar 
     1-110 Kas dan setara kas
       1-111 Kas besar
-      1-112 Kas Kecil
-      1-114 BRI 
-    1-120 Dana yang dibatasi penggunaannya
-    1-130 Investasi jangka pendek
+      1-114 BRI    # menerima premi asuransi 
     1-140 Piutang 
       1-141 Piutang Pinjaman Sejahtera
     1-150 Penyisihan Piutang Tak Tertagih
@@ -139,4 +187,47 @@ Credit side
 11. 7-118 OK 
 12. 6-211 OK 
 
+
+
+TRANSACTION LIST
+
+1. Loan Disbursement
+2. Weekly Payment
+3. Savings Distribution  (compulsory savings part)
+4. Voluntary Savings Withdrawal
+5. Locked Savings Withdrawal
+6. Voluntary Savings Addition
+7. Locked Savings Addition
+8. Member Run Away
+  8.a. Jurnal pada saat  run away disetujui kantor pusat
+  8.b. Jurnal penerimaan pembayaran cicilan pinjaman
+  8.c. Jurnal di akhir periode: 
+    8.c.1 Jurnal jika tabungan wajib cukup untuk principal + bunga
+    8.c.1 Jurnal jika tabungan wajib hanya cukup untuk principal
+    8.c.3 Jurnal jika tabungan wajib tidak cukup untuk principal
+9.Deceased Member
+    9.a. Jurnal di pembayaran cicilan mingguan 
+    9.b. Jurnal ketika premi diterima 
+10. Premature Clearance: jika tidak ada member run away sebelumnya
+  10.a. jurnal pada saat permintaan pelunasan premature clearance
+        Penerimaan pembayaran per normal di minggu tersebut 
+        Permintaan pelunasan di minggu N, untuk minggu N+1 sampai akhir 
+  10.b. jurnal pada saat penerimaan pembayaran pelunasan premature clearance
+        Pembayaran sisa dari minggu N+1 sampai minggu terakhir   [principal + interest + compulsory savings]
+  10.c. jurnal di minggu berikutnya , tanpa orang tersebut 
+        
+11. Premature Clearance: jika ada member run away sebelumnya (ada outstanding default), paid @the end of term
+  11.a. Setoran dilakukan per normal, tidak termasuk tanggung renteng karena dilakukan terakhir 
+  11.b. Melunasi sisa pokok pinjaman + bagiannya untuk principal + bunga dari nasabah yg kabur [ tidak perlu membayar interest + compulsory savings]
+
+12. Premature Clearance: member run away paid weekly
+13. 
+
+
+How to create posting?
+
+GeneralLedger.create_posting(
+  Account.find_by_code( ACCOUNT_CODE[:main_cash], source_document, GL_STATUS[:credit], amount )
+  Account.find_by_code( ACCOUNT_CODE[:main_cash], source_document, GL_STATUS[:debit], amount )
+)
 =end

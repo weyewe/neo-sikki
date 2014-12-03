@@ -1,0 +1,15 @@
+
+easy transaction:
+1. Loan disbursement
+2. Manual savings => Voluntary, locked
+3. Loan weekly payment 
+4. Corner cases: Run Away, Death, Uncollectible, Premature Clearance 
+5. Rounding Up
+6. Compulsory Savings inequality 
+
+
+Corner Cases. Are they sure with the policy? 
+
+
+
+rails destroy model Account; rails destroy model CashMutation; rails destroy model CashBankMutation; rails destroy model CashBankAdjustment; rails destroy model CashBank
