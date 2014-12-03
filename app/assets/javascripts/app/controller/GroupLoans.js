@@ -91,6 +91,12 @@ Ext.define('AM.controller.GroupLoans', {
 			'withdrawgrouploanform button[action=confirmWithdraw]' : {
 				click : this.executeWithdraw
 			},
+			
+			'grouploanlist button[action=downloadPending]': {
+        click: this.downloadPending
+			}	,
+			
+			
 		
     });
   },
@@ -558,6 +564,19 @@ Ext.define('AM.controller.GroupLoans', {
 		        //do something whether the load succeeded or failed
 		    }
 		});
+	},
+	
+	downloadPending: function(){
+	 
+		
+		// var anotherwindow = window.open(
+		// 	'reports/billofsale.php?id='+id,'PDF','width='+ps_width+',height='+ps_height+',resizable');
+		console.log("Gonna download pending");
+			window.open(
+				'group_loans/pending_fulfillment', 'CSV');
+				
+				
+		// window.open( '/bookings/payment_receipt/'+ record.get('id')  );
 	},
 
 });

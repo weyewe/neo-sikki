@@ -135,6 +135,13 @@ Ext.define('AM.view.operation.grouploan.List' ,{
 			emptyText : "Search",
 			checkChangeBuffer: 300
 		});
+		
+		this.downloadPendingButton = new Ext.Button({
+			text: 'Download Pending',
+			action: 'downloadPending',
+			disabled: false
+		});
+		
 
 
 
@@ -145,7 +152,9 @@ Ext.define('AM.view.operation.grouploan.List' ,{
 						this.closeObjectButton,
 						this.withdrawObjectButton, 
 						'-',
-						this.searchField];
+						this.searchField,
+						'-',
+						this.downloadPendingButton ];
 						
 		this.bbar = Ext.create("Ext.PagingToolbar", {
 			store	: this.store, 
@@ -172,6 +181,7 @@ Ext.define('AM.view.operation.grouploan.List' ,{
 		this.undisburseObjectButton.enable();
 		this.closeObjectButton.enable();
 		this.withdrawObjectButton.enable();
+		// this.downloadPendingButton.enable();
 		
 		selectedObject = this.getSelectedObject();
 		if( selectedObject && selectedObject.get("is_started") == true ){
@@ -199,5 +209,6 @@ Ext.define('AM.view.operation.grouploan.List' ,{
 		this.disburseObjectButton.disable();
 		this.closeObjectButton.disable();
 		this.withdrawObjectButton.disable();
+		// this.downloadPendingButton.disable();
 	}
 });

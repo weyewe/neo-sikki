@@ -1,6 +1,8 @@
 NeoSikki::Application.routes.draw do
   devise_for :users 
-  root :to => 'home#extjs' , :method => :get 
+  root :to => 'home#extjs' , :method => :get
+  
+  get 'group_loans/pending_fulfillment' => 'group_loans#download_pending', :as => :download_pending  
   
   namespace :api do 
     devise_for :users

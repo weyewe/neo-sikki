@@ -1,3 +1,5 @@
+require 'csv'
+
 class GroupLoan < ActiveRecord::Base
   # attr_accessible :title, :body
   belongs_to :office 
@@ -815,6 +817,48 @@ Phase: loan disbursement finalization
   def update_premature_clearance_deposit(amount)
     self.premature_clearance_deposit += amount
     self.save 
+  end
+  
+
+  
+  def self.to_csv
+    column_names = [
+        "Group No",
+        "Nama Kelompok",
+        "Jumlah Anggota Aktif",
+        "Jumlah Minggu Setoran",
+        "Jumlah Minggu Terbayar",
+        "Last Payment Date",
+        "Jumlah Setoran Berikutnya"
+      ]
+    
+    
+    CSV.generate do |csv|
+      csv << column_names
+      all.each do |group_loan|
+        
+        last_collected = group_loan.group_loan_weekly_collections.where(:is_collected => true, :is_confirmed => true ).order("id ASC").last
+        
+        collected_at = nil
+        collected_at = last_collected.collected_at if not last_collected.nil?
+        
+        next_collection_amount = BigDecimal("0")
+        next_collection = group_loan.group_loan_weekly_collections.where(:is_collected => false, :is_confirmed => false ).order("id ASC").first
+        
+        next_collection_amount = next_collection.amount_receivable if not next_collection.nil? 
+        
+        result = [
+            group_loan.group_number,
+            group_loan.name, 
+            group_loan.active_group_loan_memberships.count , 
+            group_loan.number_of_collections,
+            group_loan.group_loan_weekly_collections.where(:is_collected => true, :is_confirmed => true ).count ,
+            collected_at,
+            next_collection_amount
+          ]
+        csv <<  result 
+      end
+    end
   end
   
 =begin
