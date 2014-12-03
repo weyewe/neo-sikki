@@ -20,12 +20,19 @@ end
 
 
 =begin
-Get all group loan weekly payments
-  that should make payment this week, but hasn't made any. 
-  
-  GroupLoanWeeklyCollection.where(:is_collected => false)
-  
-  not collected yet. 
-  supposed to be paid within this week 
+  Today is the week x
+    Get all weekly_collections with tentative_collection_date at week x, but uncollected
+    
+    Extract the group info.
+    
+    today = DateTime.now
+    end_of_week = today.end_of_week
+    list_of_group_loan_id = GroupLoanWeeklyCollection.where{
+      ( is_collected.eq false) & 
+      ( tentative_collection_date.lte end_of_week)
+    } .map{|x| x.group_loan_id}
+    
+    list_of_group_loan_id.uniq!
+    GroupLoan.includes(:group_loan_memberships, :group_loan_weekly_collections).where( :id => list_of_group_loan_id).count
   
 =end

@@ -173,6 +173,76 @@ class UserMailer < ActionMailer::Base
     mail(:to => "admin@11ina.com", :subject => "Adjustment")
   end
   
+  def pending_group_loan
+    base_filename = "pending_group_loan_#{DateTime.now.to_s}.csv"
+    filename = "#{Rails.root}/public/#{base_filename}"
+    
+    puts "pending group loan"
+     
+    
+    begin
+      CSV.open(filename, 'w') do |csv|
+        
+        # header
+        
+        header_array = [
+            "Group No",
+            "Nama Kelompok",
+            "Jumlah Anggota Aktif",
+            "Jumlah Minggu Setoran",
+            "Jumlah Minggu Terbayar",
+            "Last Payment Date",
+            "Jumlah Setoran Berikutnya"
+          ]
+          
+        csv << header_array
+        puts "after header array"
+        
+        
+        today = DateTime.now
+        end_of_week = today.end_of_week
+        list_of_group_loan_id = GroupLoanWeeklyCollection.where{
+          ( is_collected.eq false) & 
+          ( tentative_collection_date.lte end_of_week)
+        } .map{|x| x.group_loan_id}
+
+        list_of_group_loan_id.uniq!
+        
+        puts "after extracting problematic group loan id"
+        GroupLoan.includes(:group_loan_memberships, :group_loan_weekly_collections).where( :id => list_of_group_loan_id).each do |group_loan|
+          last_collected = group_loan.group_loan_weekly_collections.where(:is_collected => true, :is_confirmed => true ).order("id ASC").last
+
+          collected_at = nil
+          collected_at = last_collected.collected_at if not last_collected.nil?
+
+          next_collection_amount = BigDecimal("0")
+          next_collection = group_loan.group_loan_weekly_collections.where(:is_collected => false, :is_confirmed => false ).order("id ASC").first
+
+          next_collection_amount = next_collection.amount_receivable if not next_collection.nil? 
+          puts "before result"
+          result = [
+              group_loan.group_number,
+              group_loan.name, 
+              group_loan.active_group_loan_memberships.count , 
+              group_loan.number_of_collections,
+              group_loan.group_loan_weekly_collections.where(:is_collected => true, :is_confirmed => true ).count ,
+              collected_at,
+              next_collection_amount
+            ]
+            puts "After result"
+          csv <<  result
+          
+        end
+      end
+    rescue Exception => e
+      puts e
+    end
+    
+    
+    attachments[ "#{base_filename}"] = File.read(filename )
+    mail(:to => "admin@11ina.com", :subject => "Pending Group Loan #{DateTime.now}")
+  end
+  
     
     
 end
