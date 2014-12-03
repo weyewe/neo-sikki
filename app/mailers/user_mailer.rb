@@ -188,6 +188,7 @@ class UserMailer < ActionMailer::Base
         header_array = [
             "Group No",
             "Nama Kelompok",
+            "Disbursement Date",
             "Jumlah Anggota Aktif",
             "Jumlah Minggu Setoran",
             "Jumlah Minggu Terbayar",
@@ -209,7 +210,7 @@ class UserMailer < ActionMailer::Base
         list_of_group_loan_id.uniq!
         
         puts "after extracting problematic group loan id"
-        GroupLoan.includes(:group_loan_memberships, :group_loan_weekly_collections).where( :id => list_of_group_loan_id).each do |group_loan|
+        GroupLoan.includes(:group_loan_memberships, :group_loan_weekly_collections).where( :id => list_of_group_loan_id).order("disbursed_at ASC").each do |group_loan|
           last_collected = group_loan.group_loan_weekly_collections.where(:is_collected => true, :is_confirmed => true ).order("id ASC").last
 
           collected_at = nil
@@ -223,6 +224,7 @@ class UserMailer < ActionMailer::Base
           result = [
               group_loan.group_number,
               group_loan.name, 
+              group_loan.disbursed_at, 
               group_loan.active_group_loan_memberships.count , 
               group_loan.number_of_collections,
               group_loan.group_loan_weekly_collections.where(:is_collected => true, :is_confirmed => true ).count ,
