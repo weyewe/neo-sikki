@@ -3,7 +3,7 @@ class Account < ActiveRecord::Base
   
   has_many :transaction_activity_datas
   
-  validates_uniqueness_of :name  
+  # validates_uniqueness_of :name  
   
   
   
@@ -12,9 +12,9 @@ class Account < ActiveRecord::Base
   
   validate :parent_id_present_for_non_base_account
   validate :contra_account_must_be_ledger_account 
-  validate :original_account_id_must_present_in_contra_account
-  validate :original_account_id_must_be_ledger_account
-  validate :original_account_must_have_the_same_direct_ancestor
+  # validate :original_account_id_must_present_in_contra_account
+  # validate :original_account_id_must_be_ledger_account
+  # validate :original_account_must_have_the_same_direct_ancestor
   validate :valid_account_case 
   
   
@@ -283,70 +283,64 @@ class Account < ActiveRecord::Base
   Creating base account
 =end
 
-  def self.create_asset 
-    new_object = self.new
-    new_object.name = "Asset"
-    new_object.normal_balance = NORMAL_BALANCE[:debit]
-    new_object.account_case = ACCOUNT_CASE[:group]
-    new_object.classification = ACCOUNT_CLASSIFICATION[:asset]
-    new_object.is_base_account = true 
-    new_object.save 
-    return new_object
-  end
-  
-  def self.create_expense
-    new_object = self.new
-    new_object.name = "Expense"
-    new_object.normal_balance = NORMAL_BALANCE[:debit]
-    new_object.account_case = ACCOUNT_CASE[:group]
-    new_object.classification = ACCOUNT_CLASSIFICATION[:expense]
-    new_object.is_base_account = true 
-    new_object.save
-    return new_object
-  end
-  
-  def self.create_revenue
-    new_object = self.new
-    new_object.name = "Revenue"
-    new_object.normal_balance = NORMAL_BALANCE[:credit]
-    new_object.account_case = ACCOUNT_CASE[:group]
-    new_object.classification = ACCOUNT_CLASSIFICATION[:revenue]
-    new_object.is_base_account = true 
-    new_object.save
-    return new_object
-  end
-  
-  def self.create_liability
-    new_object = self.new
-    new_object.name = "Liability"
-    new_object.normal_balance = NORMAL_BALANCE[:credit]
-    new_object.account_case = ACCOUNT_CASE[:group]
-    new_object.classification = ACCOUNT_CLASSIFICATION[:liability]
-    new_object.is_base_account = true 
-    new_object.save
-    return new_object
-  end
-  
-  def self.create_equity
-    new_object = self.new
-    new_object.name = "Equity"
-    new_object.normal_balance = NORMAL_BALANCE[:credit]
-    new_object.account_case = ACCOUNT_CASE[:group]
-    new_object.classification = ACCOUNT_CLASSIFICATION[:equity]
-    new_object.is_base_account = true 
-    new_object.save
-    return new_object
-  end
+   
 
 
 
 
   def self.create_base_objects 
-    self.create_asset 
-    self.create_expense
-    self.create_revenue
-    self.create_liability
-    self.create_equity 
+    # activa
+    # Kewajiban
+    # Ekuitas
+    # Pendapatan Usaha
+    # Beban Keuangan
+    # Beban Usaha 
+    # Pendapatan Lain- Lain
+    
+    
+    
+    converted = []
+    ACCOUNT_CODE.each do |key,value|
+      converted << [ key, value[:code] ] 
+    end
+    sorted = converted.sort_by {|x| x[1]}
+    
+    #there are total 34 account in total 
+    
+
+    sorted.each do |x|
+      account = ACCOUNT_CODE[x[0]]
+      
+      parent_account = nil
+      if not account[:parent_code].nil?
+        parent_account = Account.find_by_code( account[:parent_code])
+        if parent_account.nil?
+          puts "account #{account[:name]} is erroneous"
+        end
+      end
+      
+      new_object = self.new
+      new_object.name = account[:name]
+      new_object.code = account[:code]
+      new_object.normal_balance = account[:normal_balance]
+      new_object.account_case = account[:status]
+      new_object.code = account[:code]
+      new_object.is_base_account = true 
+      
+      new_object.save
+      
+      puts "ParentAccount code: #{parent_account.code}" if not parent_account.nil?
+      puts "current Account code: #{new_object.code}" if new_object.errors.messages.count  == 0
+      
+      if new_object.errors.messages.count  != 0
+        puts "The object: #{new_object.name}"
+        new_object.errors.messages.each {|x| puts "error: #{x}"}
+      end
+      new_object.move_to_child_of(parent_account) if not parent_account.nil?
+      
+    end
+    
+   
   end
   
   
