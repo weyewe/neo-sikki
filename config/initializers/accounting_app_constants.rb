@@ -231,3 +231,44 @@ GeneralLedger.create_posting(
   Account.find_by_code( ACCOUNT_CODE[:main_cash], source_document, GL_STATUS[:debit], amount )
 )
 =end
+
+
+
+NORMAL_BALANCE = {
+  :debit => 1 , 
+  :credit => 2 
+}
+
+ACCOUNT_CASE = {
+  :group => 1,  # group => can't create transaction on group_account
+  # group account can have sub_groups and ledger_account 
+  :ledger => 2  # ledger_account is where the journal is associated to
+} 
+
+ACCOUNT_CLASSIFICATION = {
+  # Debit normal balance
+  :asset => 1, 
+  :expense => 2 , 
+  :temporary_debit => 3,
+  
+  # Credit normal balance
+  :temporary_credit => 30,
+  :revenue => 31 , 
+  :liability => 32, 
+  :equity => 33 ,
+  
+}
+
+APP_SPECIFIC_ACCOUNT_CODE = {
+  # Group Account
+  :cash => "cash",
+  
+  # Ledger Account
+  :cash_drawer => 'cash_drawer',
+  :unearned_revenue_booking_downpayment => 'unearned_revenue_booking_downpayment',
+  :field_usage_revenue => 'field_usage_revenue',
+  :salvaged_downpayment_revenue => 'salvaged_downpayment_revenue',
+  
+  :temporary_debit_account => "temporary_debit_account",
+  :temporary_credit_account => "temporary_credit_account"
+}

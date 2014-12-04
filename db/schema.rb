@@ -11,10 +11,31 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141203164931) do
+ActiveRecord::Schema.define(version: 20141204134848) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "accounts", force: true do |t|
+    t.string   "name"
+    t.integer  "parent_id"
+    t.integer  "lft"
+    t.integer  "rgt"
+    t.integer  "depth"
+    t.decimal  "amount",                                    precision: 14, scale: 2, default: 0.0
+    t.decimal  "initial_amount",                            precision: 14, scale: 2, default: 0.0
+    t.integer  "last_update_transaction_activity_entry_id"
+    t.boolean  "is_contra_account",                                                  default: false
+    t.integer  "original_account_id"
+    t.integer  "normal_balance",                                                     default: 1
+    t.integer  "account_case",                                                       default: 2
+    t.integer  "classification",                                                     default: 1
+    t.boolean  "is_base_account",                                                    default: false
+    t.boolean  "is_temporary_account",                                               default: false
+    t.string   "code"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "deceased_clearances", force: true do |t|
     t.boolean  "is_insurance_claimable",                                default: false
@@ -220,6 +241,27 @@ ActiveRecord::Schema.define(version: 20141203164931) do
     t.integer  "savings_direction"
     t.integer  "office_id"
     t.integer  "member_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "transaction_data", force: true do |t|
+    t.integer  "transaction_source_id"
+    t.string   "transaction_source_type"
+    t.datetime "transaction_datetime"
+    t.text     "description"
+    t.decimal  "amount",                  precision: 14, scale: 2, default: 0.0
+    t.boolean  "is_confirmed"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "transaction_data_details", force: true do |t|
+    t.integer  "transaction_data_id"
+    t.integer  "account_id"
+    t.integer  "entry_case"
+    t.decimal  "amount",              precision: 14, scale: 2, default: 0.0
+    t.boolean  "is_bank_transaction",                          default: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end

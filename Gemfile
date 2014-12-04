@@ -38,6 +38,8 @@ group :doc do
 end
 
 
+gem 'awesome_nested_set'
+
 gem 'devise'
 gem "kaminari"  
 gem 'uuidtools'

@@ -13,3 +13,6 @@ Corner Cases. Are they sure with the policy?
 
 
 rails destroy model Account; rails destroy model CashMutation; rails destroy model CashBankMutation; rails destroy model CashBankAdjustment; rails destroy model CashBank
+
+
+https://github.com/plentz/lol_dba
