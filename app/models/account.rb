@@ -289,6 +289,10 @@ class Account < ActiveRecord::Base
 
 
   def self.create_base_objects 
+    # account.descendants << all children
+    # account.self_and_descendants << self and all children
+    
+    
     # activa
     # Kewajiban
     # Ekuitas
