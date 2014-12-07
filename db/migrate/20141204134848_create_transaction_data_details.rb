@@ -8,6 +8,8 @@ class CreateTransactionDataDetails < ActiveRecord::Migration
       t.integer :entry_case # NORMAL_BALANCE[:debit] or [:credit]
       t.decimal :amount, :default        => 0,  :precision => 14, :scale => 2
       
+      t.string :description 
+      
       
       t.boolean :is_bank_transaction, :default => false
       

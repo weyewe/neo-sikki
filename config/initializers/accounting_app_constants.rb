@@ -478,5 +478,11 @@ GeneralLedger.create_posting(
 )
 =end
 
+TRANSACTION_DATA_CODE = {
+  :loan_disbursement => 1
+  
+  
+}
+
 
 

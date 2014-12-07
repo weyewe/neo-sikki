@@ -247,6 +247,8 @@ ActiveRecord::Schema.define(version: 20141204134848) do
     t.text     "description"
     t.decimal  "amount",                  precision: 14, scale: 2, default: 0.0
     t.boolean  "is_confirmed"
+    t.integer  "code"
+    t.boolean  "is_contra_transaction",                            default: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -256,6 +258,7 @@ ActiveRecord::Schema.define(version: 20141204134848) do
     t.integer  "account_id"
     t.integer  "entry_case"
     t.decimal  "amount",              precision: 14, scale: 2, default: 0.0
+    t.string   "description"
     t.boolean  "is_bank_transaction",                          default: false
     t.datetime "created_at"
     t.datetime "updated_at"

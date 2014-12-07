@@ -13,6 +13,9 @@ class CreateTransactionData < ActiveRecord::Migration
       # debit amount must be equal to credit amount.. ahahaha awesome shite 
       t.boolean :is_confirmed  # can only be confirmed if debit == credit.. hahaha.
       
+      t.integer :code 
+      t.boolean :is_contra_transaction, :default => false 
+      
       t.timestamps
     end
   end

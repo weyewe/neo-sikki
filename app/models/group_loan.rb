@@ -262,6 +262,63 @@ Phase: loan disbursement finalization
     # self.create_group_loan_default_payments
 
     # create GroupLoanWeeklyCollection  => it has many weird cases. new problem domain on that model.
+    self.execute_loan_disbursement_ledger_posting
+    
+  end
+  
+  
+=begin
+  Debit: 1-141	Piutang Pinjaman Sejahtera
+          1-111	Kas besar  (admin revenue) 
+          
+  Credit: 1-111	Kas besar  (money disbursed)
+         4-111	Pendapatan administrasi pinjaman Sejahtera  (admin fee revenue)   
+=end
+  def execute_loan_disbursement_ledger_posting
+    ta = TransactionData.create_object({
+      :transaction_datetime => self.disbursed_at,
+      :description => "Loan Disbursement: Group #{self.name}, #{self.group_number}" ,
+      :transaction_source_id => self.id , 
+      :transaction_source_type => self.class.to_s ,
+      :code => TRANSACTION_DATA_CODE[:loan_disbursement],
+      :is_contra_transaction => false 
+    }, true )
+    
+    TransactionDataDetail.create_object(
+      :transaction_data_id => ta.id,        
+      :account_id          => Account.find_by_code(ACCOUNT_CODE[:pinjaman_sejahtera_ar_leaf][:code]).id      ,
+      :entry_case          => NORMAL_BALANCE[:debit]     ,
+      :amount              => self.start_fund,
+      :description => "Piutang Pinjaman Sejahtera dari Group #{self.name}, #{self.group_number} "
+    )
+    
+    TransactionDataDetail.create_object(
+      :transaction_data_id => ta.id,        
+      :account_id          => Account.find_by_code(ACCOUNT_CODE[:main_cash_leaf][:code]).id        ,
+      :entry_case          => NORMAL_BALANCE[:debit]     ,
+      :amount              => self.admin_fee_revenue,
+      :description => "Pendapatan admin fee dari Group #{self.name}, #{self.group_number} "
+    )
+    
+    TransactionDataDetail.create_object(
+      :transaction_data_id => ta.id,        
+      :account_id          => Account.find_by_code(ACCOUNT_CODE[:main_cash_leaf][:code]).id      ,
+      :entry_case          => NORMAL_BALANCE[:credit]     ,
+      :amount              => self.start_fund,
+      :description => "Penggunaan cash untuk loan disbursement dari Group #{self.name}, #{self.group_number} "
+    )
+    
+    TransactionDataDetail.create_object(
+      :transaction_data_id => ta.id,        
+      :account_id          => Account.find_by_code(ACCOUNT_CODE[:pinjaman_sejahtera_administration_revenue_leaf][:code]).id        ,
+      :entry_case          => NORMAL_BALANCE[:credit]     ,
+      :amount              => self.admin_fee_revenue,
+      :description => "Pendapatan admin fee dari Group #{self.name}, #{self.group_number} "
+    )
+    
+    
+    ta.confirm
+    
   end
   
   def can_be_undisbursed?
@@ -330,7 +387,20 @@ Phase: loan disbursement finalization
     
     self.is_loan_disbursed = false
     self.disbursed_at = nil
-    self.save 
+    if self.save 
+      self.execute_loan_disbursement_contra_ledger_posting
+    end
+  end
+  
+  def execute_loan_disbursement_contra_ledger_posting
+    last_transaction_data = TransactionData.where(
+      :transaction_source_id => self.id , 
+      :transaction_source_type => self.class.to_s ,
+      :code => TRANSACTION_DATA_CODE[:loan_disbursement],
+      :is_contra_transaction => false
+    ).order("id DESC").first 
+    
+    last_transaction_data.create_contra_and_confirm
   end
   
   def can_be_canceled?
@@ -763,6 +833,16 @@ Phase: loan disbursement finalization
     end
     
     return amount 
+  end
+  
+  def admin_fee_revenue
+    amount = BigDecimal("0")
+    self.group_loan_memberships.joins(:group_loan_product).each do |glm|
+      # amount += glm.group_loan_product.weekly_payment_amount * glm.group_loan_product.total_weeks
+      amount += glm.group_loan_product.admin_fee
+    end
+    
+    return amount
   end
 
 =begin

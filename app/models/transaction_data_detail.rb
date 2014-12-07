@@ -88,84 +88,27 @@ class TransactionDataDetail < ActiveRecord::Base
     new_object.transaction_data_id = params[:transaction_data_id]
     new_object.account_id = params[:account_id]
     new_object.entry_case = params[:entry_case]
-    new_object.amount = BigDecimal(params[:amount] || '0') 
+    new_object.amount = BigDecimal(params[:amount] || '0')
+    new_object.description = params[:description] 
     new_object.save 
     
     return new_object
   end
   
-  def update_object( params ) 
-    if not self.transaction_data.transaction_source_id.nil? 
-      self.errors.add(:generic_errors, "Can't modify the automated generated transaction")
-      return self 
-    end
+  def create_contra(new_transaction_data)
     
-    if self.transaction_data.is_confirmed?
-      self.errors.add(:generic_errors, "Transaksi sudah di konfirmasi. Tidak bisa di update")
-      return self 
-    end
-    
-    self.transaction_data_id = params[:transaction_data_id]
-    self.account_id = params[:account_id]
-    self.entry_case = params[:entry_case]
-    self.amount = BigDecimal(params[:amount] || '0') 
-    self.save
-    
-    
-    return self 
-  end
-  
-  def delete_object
-    if self.transaction_data.is_confirmed?
-      self.errors.add(:generic_errors, "Transaction sudah di konfirmasi")
-      return self 
-    end
-    
-    if not self.transaction_data.transaction_source_id.nil?
-      self.errors.add(:generic_errors, "Can't modify the automated generated transaction")
-      return self
-    end
-    
-    # self.transaction_data_entries.each {|x| x.destroy }
-    self.destroy  
-  end
-  
-   
-=begin
-  Internal Object Creation
-=end
-  
-  # can only be called from the business rule 
-  
-  def internal_object_update(params)
-  end
-  
-  
-  # for the automated transaction 
-  def internal_delete_object
-    if self.transaction_data.is_confirmed?
-      self.errors.add(:generic_errors, "Transaction sudah di konfirmasi")
-      return self 
-    end
-    
-    self.destroy 
-  end
-  
-  def self.create_update_or_delete_transaction_entry(  transaction_data, transaction_data_entry, amount , account, entry_case) 
-    if amount == BigDecimal('0') 
-      transaction_data_entry.internal_delete_object if not transaction_data_entry.nil?
+    new_object = self.class.new 
+    new_object.transaction_data_id = new_transaction_data.id
+    new_object.account_id = self.account_id
+    if self.entry_case ==  NORMAL_BALANCE[:credit]  
+      new_object.entry_case =  NORMAL_BALANCE[:debit]  
     else
-      if transaction_data_entry.nil? 
-        TransactionDataDetail.create_object(
-          :transaction_data_id =>  transaction_data.id,
-          :account_id => account.id ,
-          :entry_case => entry_case,
-          :amount =>  amount.to_s
-        )
-      else
-        transaction_data_entry.amount = amount 
-        transaction_data_entry.save 
-      end
-    end  
+      new_object.entry_case =  NORMAL_BALANCE[:credit]  
+    end
+    new_object.amount = self.amount
+    new_object.description = "contra post #{DateTime.now} " + self.description
+    new_object.save
+    
+    
   end
 end
