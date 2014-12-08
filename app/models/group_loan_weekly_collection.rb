@@ -100,7 +100,6 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
   
   
   def confirm(params)
-    # puts "gonna confirm week #{self.week_number}"
     if not self.is_collected?
       self.errors.add(:generic_errors, "Belum melakukan pengumpulan di minggu ini")
       return self 
@@ -110,8 +109,6 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
       self.errors.add(:generic_errors, "Sudah dikonfirmasi")
       return self 
     end
-    
-    
     
     
     if params[:confirmed_at].nil? or not params[:confirmed_at].is_a?(DateTime)
@@ -133,6 +130,23 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
         self.confirm_premature_clearances
         self.update_group_loan_bad_debt_allowance  # from uncollectible +  run_away_member
         
+=begin
+  Accounts used for group loan weekly collection: 
+  1. 1-111	Kas besar
+  2. 1-141	Piutang Pinjaman Sejahtera
+  3. 4-121	Pendapatan bagi hasil pinjaman Sejahtera
+  4. 2-111	Tabungan Wajib
+  5. 2-112	Tabungan Pribadi
+  Run Away, Deceased
+  6. 7. 1-151	Penyisihan Piutang Tak Tertagih Pinjaman Sejahtera
+  Premature Clearance
+  8. 2-192	Uang titipan   [digunakan jika ada outstanding run_away member yang ditanggung bersama]
+  Rounding up
+  9. 7-118	Pembulatan nilai
+  Compulsory Savings Inequality
+  10. 6-211	Beban Penghapusan Piutang Pinjaman Sejahtera
+=end      
+  
       end
     rescue ActiveRecord::ActiveRecordError  
     else

@@ -479,7 +479,8 @@ GeneralLedger.create_posting(
 =end
 
 TRANSACTION_DATA_CODE = {
-  :loan_disbursement => 1
+  :loan_disbursement => 1,
+  :group_loan_weekly_collection => 2, 
   
   
 }

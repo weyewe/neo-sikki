@@ -250,19 +250,24 @@ Phase: loan disbursement finalization
       return self
     end
     
-    self.disbursed_at = params[:disbursed_at]
-    self.is_loan_disbursed = true 
-    self.save 
-    
-    
-    self.execute_loan_disbursement_payment 
-    
-    
-    self.schedule_group_loan_weekly_collection 
-    # self.create_group_loan_default_payments
+    begin
+      ActiveRecord::Base.transaction do 
+        
+        self.disbursed_at = params[:disbursed_at]
+        self.is_loan_disbursed = true
+        self.save 
 
-    # create GroupLoanWeeklyCollection  => it has many weird cases. new problem domain on that model.
-    self.execute_loan_disbursement_ledger_posting
+        self.execute_loan_disbursement_payment 
+        self.schedule_group_loan_weekly_collection 
+        self.execute_loan_disbursement_ledger_posting
+        
+      end
+    rescue ActiveRecord::ActiveRecordError  
+    else
+    end
+    
+    
+    
     
   end
   

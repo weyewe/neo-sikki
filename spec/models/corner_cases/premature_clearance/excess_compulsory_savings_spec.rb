@@ -18,6 +18,7 @@ require 'spec_helper'
 describe GroupLoan do
   
   before(:each) do
+    Account.create_base_objects
     (1..8).each do |number|
       Member.create_object({
         :name =>  "Member #{number}",

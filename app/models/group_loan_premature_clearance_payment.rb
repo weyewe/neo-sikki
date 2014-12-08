@@ -157,6 +157,18 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
     return  group_loan_membership.group_loan_product.principal * total_unpaid_week
   end
   
+  def total_compulsory_savings
+    total_unpaid_week = group_loan.number_of_collections - 
+                    group_loan_weekly_collection.week_number 
+    return  group_loan_membership.group_loan_product.compulsory_savings * total_unpaid_week
+  end
+  
+  def total_interest_payable
+    total_unpaid_week = group_loan.number_of_collections - 
+                    group_loan_weekly_collection.week_number 
+    return  group_loan_membership.group_loan_product.interest * total_unpaid_week
+  end
+  
   # including the current week that will be confirmed along with the premature clearance
   def available_compulsory_savings
     group_loan_weekly_collection.week_number  * group_loan_membership.group_loan_product.compulsory_savings 
@@ -186,6 +198,8 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
     
     
     amount_payable = total_principal_return + 
+                      total_interest_payable + 
+                      total_compulsory_savings + 
                     run_away_weekly_resolved_bail_out_contribution +
                     run_away_end_of_cycle_resolved_bail_out_contribution 
        
