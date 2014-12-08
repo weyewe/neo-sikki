@@ -3,7 +3,7 @@ require 'spec_helper'
 describe GroupLoanWeeklyCollection do
   
   before(:each) do
-    Account.create_base_objects
+    # Account.create_base_objects
     # create users 
     (1..8).each do |number|
       Member.create_object({

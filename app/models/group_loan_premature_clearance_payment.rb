@@ -205,14 +205,15 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
        
    
    
-    if available_compulsory_savings >= amount_payable
-      self.remaining_compulsory_savings = available_compulsory_savings - amount_payable
-      self.amount = BigDecimal('0')
-    else
-      self.remaining_compulsory_savings = BigDecimal('0')
-      self.amount = GroupLoan.rounding_up( amount_payable - available_compulsory_savings , DEFAULT_PAYMENT_ROUND_UP_VALUE) 
-    end               
-     
+    # if available_compulsory_savings >= amount_payable
+    #   self.remaining_compulsory_savings = available_compulsory_savings - amount_payable
+    #   self.amount = BigDecimal('0')
+    # else
+    #   self.remaining_compulsory_savings = BigDecimal('0')
+    #   self.amount = GroupLoan.rounding_up( amount_payable - available_compulsory_savings , DEFAULT_PAYMENT_ROUND_UP_VALUE) 
+    # end     
+    
+    self.amount = GroupLoan.rounding_up( amount_payable  , DEFAULT_PAYMENT_ROUND_UP_VALUE)       
     self.save 
   end
   

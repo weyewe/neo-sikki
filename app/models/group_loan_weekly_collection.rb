@@ -468,6 +468,7 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
       if number_of_premature_clearance_starting_this_week != 0 
         this_week_active_glm_count = self.active_group_loan_memberships.count 
         multiplier = this_week_active_glm_count /  (this_week_active_glm_count + number_of_premature_clearance_starting_this_week).to_f
+        # we added multiplier since there are portion of run_away_bail_out paid by the premature clearance member 
         run_away_bail_out_list = run_away_bail_out_list.map {|x| x*multiplier}
       end
         
