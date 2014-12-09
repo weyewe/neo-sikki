@@ -633,6 +633,10 @@ Phase: loan disbursement finalization
   def manifest_total_compulsory_savings_pre_closure
     self.total_compulsory_savings_pre_closure = self.total_compulsory_savings
     self.save 
+    
+    self.group_loan_memberships.each do |glm|
+      SavingsEntry.create_group_loan_closing_compulsory_savings_clearance( glm )
+    end
   end
   
   def total_compulsory_savings_post_closure
@@ -688,6 +692,8 @@ Phase: loan disbursement finalization
     self.manifest_total_compulsory_savings_pre_closure
     self.deduct_compulsory_savings_for_unsettled_default 
     self.deactivate_group_loan_memberships_due_to_group_closed
+    
+    # clear the group_loan_compulsory_savings
     
     
     # self.update_bad_debt_allowance

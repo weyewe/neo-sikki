@@ -456,6 +456,25 @@ class SavingsEntry < ActiveRecord::Base
     group_loan_membership.update_total_compulsory_savings( new_object.amount)
   end
   
+  def self.create_group_loan_closing_compulsory_savings_clearance( glm )
+    # puts "Gonna create savings_entry"
+    group_loan_membership = glm
+    member = group_loan_membership.member 
+    group_loan = group_loan_membership.group_loan
+    savings_source = group_loan
+    
+    new_object = self.create :savings_source_id => savings_source.id,
+                        :savings_source_type => savings_source.class.to_s,
+                        :amount => group_loan_membership.total_compulsory_savings ,
+                        :savings_status => SAVINGS_STATUS[:group_loan_compulsory_savings],
+                        :direction => FUND_TRANSFER_DIRECTION[:outgoing],
+                        :financial_product_id => savings_source.id ,
+                        :financial_product_type => savings_source.class.to_s,
+                        :member_id => member.id ,
+                        :is_confirmed => true, 
+                        :confirmed_at => savings_source.closed_at
+  end
+  
   
   def self.create_weekly_collection_voluntary_savings( savings_source )
     # puts "Gonna create savings_entry"
@@ -475,6 +494,39 @@ class SavingsEntry < ActiveRecord::Base
                         
     # puts "The amount: #{new_object.amount}"
     member.update_total_savings_account( new_object.amount)
+    
+    
+    # do accounting posting 
+    group_loan = group_loan_membership.group_loan
+    group_loan_weekly_collection = savings_source.group_loan_weekly_collection
+    message = "Weekly Collection Voluntary Savings: Group #{group_loan.name}, #{group_loan.group_number}, week  #{group_loan_weekly_collection.week_number}"
+    ta = TransactionData.create_object({
+      :transaction_datetime => self.disbursed_at,
+      :description =>  message,
+      :transaction_source_id => group_loan_weekly_collection.id , 
+      :transaction_source_type => group_loan_weekly_collection.class.to_s ,
+      :code => TRANSACTION_DATA_CODE[:group_loan_weekly_collection_voluntary_savings],
+      :is_contra_transaction => false 
+    }, true )
+    
+    TransactionDataDetail.create_object(
+      :transaction_data_id => ta.id,        
+      :account_id          => Account.find_by_code(ACCOUNT_CODE[:voluntary_savings_leaf][:code]).id      ,
+      :entry_case          => NORMAL_BALANCE[:credit]     ,
+      :amount              => savings_source.amount,
+      :description => message
+    )
+    
+    TransactionDataDetail.create_object(
+      :transaction_data_id => ta.id,        
+      :account_id          => Account.find_by_code(ACCOUNT_CODE[:main_cash_leaf][:code]).id        ,
+      :entry_case          => NORMAL_BALANCE[:debit]     ,
+      :amount              => savings_source.amount,
+      :description => message
+    ) 
+    
+    
+    ta.confirm
   end
    
    
@@ -577,34 +629,16 @@ class SavingsEntry < ActiveRecord::Base
   Savings Account related savings : savings withdrawal and savings addition and interest (4% annual), given monthly 
 =end
 
-  # def self.create_savings_account_addition( savings_source, amount ) 
-  #   member = savings_source.member
-  #   
-  #   new_object = self.create :savings_source_id => savings_source.id,
-  #                       :savings_source_type => savings_source.class.to_s,
-  #                       :amount => amount  ,
-  #                       :savings_status => SAVINGS_STATUS[:savings_account],
-  #                       :direction => FUND_TRANSFER_DIRECTION[:incoming],
-  #                       :financial_product_id =>  nil ,
-  #                       :financial_product_type => nil ,
-  #                       :member_id => member.id
-  # 
-  #   member.update_total_savings_account( new_object.amount)
-  # end
   
-  # def self.create_savings_account_withdrawal( savings_source, amount ) 
-  #   member = savings_source.member
-  #   
-  #   new_object = self.create :savings_source_id => savings_source.id,
-  #                       :savings_source_type => savings_source.class.to_s,
-  #                       :amount => amount  ,
-  #                       :savings_status => SAVINGS_STATUS[:savings_account],
-  #                       :direction => FUND_TRANSFER_DIRECTION[:outgoing],
-  #                       :financial_product_id =>  nil ,
-  #                       :financial_product_type => nil ,
-  #                       :member_id => member.id
-  # 
-  #   member.update_total_savings_account( -1* new_object.amount)
-  # end
+  def create_contra_and_confirm
+    last_transaction_data = TransactionData.where(
+      :transaction_source_id => self.id , 
+      :transaction_source_type => self.class.to_s ,
+      :code => TRANSACTION_DATA_CODE[:group_loan_weekly_collection_voluntary_savings],
+      :is_contra_transaction => false
+    ).order("id DESC").first 
+
+    last_transaction_data.create_contra_and_confirm
+  end
                       
 end

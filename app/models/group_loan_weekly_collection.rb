@@ -60,16 +60,8 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
                             (deactivation_case.eq  GROUP_LOAN_DEACTIVATION_CASE[:run_away] ) & 
                             (group_loan_run_away_receivable.payment_case.eq GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:weekly])
                           }.map{|x| x.id }
-                          
-                          
-    
-    
-    # active_glm_id_list = (active_glm_id_list + run_away_glm_list ).uniq
-    
-    
-    # for the normal payment 
+           
     active_glm_id_list.each do |glm_id|
-      
       GroupLoanWeeklyPayment.create :group_loan_membership_id => glm_id,
                                     :group_loan_id => self.group_loan_id,
                                     :group_loan_weekly_collection_id => self.id ,
@@ -83,6 +75,67 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
                                     :group_loan_weekly_collection_id => self.id ,
                                     :is_run_away_weekly_bailout => true
     end
+    
+    
+    total_main_cash = BigDecimal("0")
+    total_interest_revenue = BigDecimal("0")
+    total_principal = BigDecimal("0")
+    total_compulsory_savings = BigDecimal("0")
+    
+    GroupLoanMembership.where(:id =>  active_glm_id_list + run_away_glm_id_list ).joins(:group_loan_product).each do |glm|
+      total_interest_revenue +=   glm.group_loan_product.interest 
+      total_principal +=         glm.group_loan_product.principal 
+      total_compulsory_savings += glm.group_loan_product.compulsory_savings
+    end
+    
+    
+    message = "Weekly Collection: Group #{group_loan.name}, #{group_loan.group_number}, week #{group_loan_weekly_collection.week_number}"
+    ta = TransactionData.create_object({
+      :transaction_datetime => self.collected_at,
+      :description =>  message,
+      :transaction_source_id => group_loan_weekly_collection.id , 
+      :transaction_source_type => group_loan_weekly_collection.class.to_s ,
+      :code => TRANSACTION_DATA_CODE[:group_loan_weekly_collection_voluntary_savings],
+      :is_contra_transaction => false 
+    }, true )
+    
+     
+    
+    TransactionDataDetail.create_object(
+      :transaction_data_id => ta.id,        
+      :account_id          => Account.find_by_code(ACCOUNT_CODE[:main_cash_leaf][:code]).id      ,
+      :entry_case          => NORMAL_BALANCE[:debit]     ,
+      :amount              => total_compulsory_savings + total_principal +  total_interest_revenue,
+      :description => message
+    )
+    
+    TransactionDataDetail.create_object(
+      :transaction_data_id => ta.id,        
+      :account_id          => Account.find_by_code(ACCOUNT_CODE[:pinjaman_sejahtera_interest_revenue_leaf][:code]).id        ,
+      :entry_case          => NORMAL_BALANCE[:credit]     ,
+      :amount              => total_interest_revenue,
+      :description => message
+    )
+    TransactionDataDetail.create_object(
+      :transaction_data_id => ta.id,        
+      :account_id          => Account.find_by_code(ACCOUNT_CODE[:pinjaman_sejahtera_ar_leaf][:code]).id        ,
+      :entry_case          => NORMAL_BALANCE[:credit]     ,
+      :amount              => total_principal,
+      :description => message
+    )
+    TransactionDataDetail.create_object(
+      :transaction_data_id => ta.id,        
+      :account_id          => Account.find_by_code(ACCOUNT_CODE[:compulsory_savings_leaf][:code]).id        ,
+      :entry_case          => NORMAL_BALANCE[:credit]     ,
+      :amount              => total_compulsory_savings,
+      :description => message
+    )
+    
+    ta.confirm
+    
+    
+    
+    
     
     
   end
@@ -118,6 +171,7 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
     
     begin
       ActiveRecord::Base.transaction do
+        # accounting posting for each voluntary_savings paid on weekly collection 
         self.group_loan_weekly_collection_voluntary_savings_entries.each do |x|
           x.confirm
         end
@@ -125,10 +179,16 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
         self.is_confirmed = true 
         self.save 
 
+        # we create accounting posting as well: cash, account receivable, 
+        # interest revenue and compulsory savings
         self.create_group_loan_weekly_payments 
         
+        # we need to create posting: premature_clearance_deposit and premature_clearance money itself 
         self.confirm_premature_clearances
-        self.update_group_loan_bad_debt_allowance  # from uncollectible +  run_away_member
+        
+        # need to create posting: bad debt allowance 
+        # from uncollectible +  run_away_member
+        self.update_group_loan_bad_debt_allowance  
         
 =begin
   Accounts used for group loan weekly collection: 
@@ -146,11 +206,16 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
   Compulsory Savings Inequality
   10. 6-211	Beban Penghapusan Piutang Pinjaman Sejahtera
 =end      
-  
+        # self.execute_normal_collection_ledger_posting
       end
     rescue ActiveRecord::ActiveRecordError  
     else
     end
+  end
+  
+  def execute_normal_collection_ledger_posting
+    
+    
   end
   
   
@@ -237,11 +302,14 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
     ).each do |glwp|
       glwp.delete_object
     end
+    
+    # create contra posting 
   end
   
   def unconfirm_weekly_collection_voluntary_savings 
     self.group_loan_weekly_collection_voluntary_savings_entries.each do |x|
       x.unconfirm
+      
     end
   end
   
