@@ -273,7 +273,7 @@ describe GroupLoan do
                 end
               end
               
-              it 'should have increased the savings_account by the amount of compulsory_savings' do
+              it 'should NOT have increased the savings_account by the amount of compulsory_savings' do
                 @member_compulsory_savings_array.each do |pair|
                   member = pair.first
                   initial_savings =  pair[1]

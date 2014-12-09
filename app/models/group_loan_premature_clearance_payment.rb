@@ -151,21 +151,22 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
   end
   
   
+  def total_weekly_payment_amount
+    
+    return  group_loan_membership.group_loan_product.weekly_payment_amount * total_unpaid_week
+  end
+  
   def total_principal_return
-    total_unpaid_week = group_loan.number_of_collections - 
-                    group_loan_weekly_collection.week_number 
+   
     return  group_loan_membership.group_loan_product.principal * total_unpaid_week
   end
   
   def total_compulsory_savings
-    total_unpaid_week = group_loan.number_of_collections - 
-                    group_loan_weekly_collection.week_number 
     return  group_loan_membership.group_loan_product.compulsory_savings * total_unpaid_week
   end
   
   def total_interest_payable
-    total_unpaid_week = group_loan.number_of_collections - 
-                    group_loan_weekly_collection.week_number 
+ 
     return  group_loan_membership.group_loan_product.interest * total_unpaid_week
   end
   
@@ -197,9 +198,7 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
     
     
     
-    amount_payable = total_principal_return + 
-                      total_interest_payable + 
-                      total_compulsory_savings + 
+    amount_payable =  total_weekly_payment_amount + 
                     run_away_weekly_resolved_bail_out_contribution +
                     run_away_end_of_cycle_resolved_bail_out_contribution 
        
@@ -272,41 +271,34 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
     run_away_end_of_cycle_resolved_bail_out_contribution + run_away_weekly_resolved_bail_out_contribution
   end
   
+  def total_unpaid_week
+    return group_loan.number_of_collections - 
+                    group_loan_weekly_collection.week_number
+                    
+  end
+  
   def confirm
     if self.is_confirmed?
       self.errors.add(:generic_errors, "Sudah konfirmasi")
       return self
     end
     
-    
-    
     self.is_confirmed = true 
     
     if not self.save 
-      puts "inside the group loan premature clearance payment"
-      puts "The errors:"
       self.errors.messages.each {|x| puts "error: #{x}"}
     end
-    
-    
-    
     
     glm = self.group_loan_membership
     glm.is_active = false 
     glm.deactivation_case =  GROUP_LOAN_DEACTIVATION_CASE[:premature_clearance]
     glm.deactivation_week_number = self.group_loan_weekly_collection.week_number + 1 
     if glm.save  
-      SavingsEntry.create_group_loan_compulsory_savings_withdrawal( self , self.group_loan_membership.total_compulsory_savings )  
       
-      if remaining_compulsory_savings > BigDecimal('0')
-        SavingsEntry.create_savings_account_group_loan_premature_clearance_addition( self , self.remaining_compulsory_savings )  
-      end 
+      SavingsEntry.create_group_loan_premature_clearance_compulsory_savings_addition( self, self.total_compulsory_savings )
     end
     
-    
-    # amount_for_premature_clearance_deposit = self.group_loan_weekly_collection.amount_receivable - normal_weekly_collection_without_deposit
     self.group_loan.update_premature_clearance_deposit( premature_clearance_deposit_amount ) 
-    
   end
   
   
@@ -378,7 +370,6 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
     self.is_confirmed = false 
     if self.save 
     else
-      puts "44511 fail to save group loan premature clearance payment"
       self.errors.messages.each {|x| puts "Err_msg: #{x}"}
     end
     

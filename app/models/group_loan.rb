@@ -523,19 +523,28 @@ Phase: loan disbursement finalization
   end
   
   
+  
   def deduct_compulsory_savings_for_unsettled_default
-    # if the member's compulsory savings is not sufficient, calculate that as office's bad debt expense 
-    # return if self.active_group_loan_memberships.count == 0
-    # 
-    #   
-    # 
-    # self.active_group_loan_memberships.joins(:group_loan_default_payment).each do |glm|
-    #   glm.group_loan_default_payment.execute_compulsory_savings_deduction 
-    # end
+  #   default that is deducted from the total compusory savings 
+  # hence, the amount of money returned is pre
+  
+  # self.compulsory_savings_deduction_amount = 
+  
+  # 1. get the total default amount deductible from compulsory savings 
+  # 2. save the amount to compulsory_savings_deduction_amount
+  # 3. perform journal posting. 
+
+=begin
+  uang_titipan = premature_clearance_deposit 
+
+  case 1: 
+    compulsory_savings + uang_titipan > principal + interest of the run away member 
+  case 2:
+    principal < compulsory_savings + uang_titipan < principal + interest of the run away member 
+  case 3:
+    principal > compulsory_savings + uang_titipan 
+=end
     
-    # create JournalPosting
-    #  compulsory_savings is debit by the default_amount
-    #  allowance is credited by the default_amount  (Allowance is contra account of revenue)
   end
   
   def cleared_default_payment_amount
@@ -611,54 +620,7 @@ Phase: loan disbursement finalization
   
   
   
-  
-  
-  def update_default_payment_amount_receivable  
-    # update the sum in the group_loan 
-    
-        # 
-        # # update the default_payment#amount_receivable on 
-        # # 1. weekly_payment_collection#confirm  => effect from run away and uncollectible will take place 
-        # # 2. PrematureClearance#confirm  => should this be ported to be done inside weekly_payment_collection? 
-        # # 3. GroupLoanAdditionalDefaultPayment#confirm  => this is right. 
-        #   
-        # total_amount = self.default_payment_total_amount
-        #  
-        # amount_to_be_deducted  = BigDecimal('0')
-        # 
-        # # we don't need to think whether member can pay for it.. just show the amount to be paid. 
-        # # to pay or not to pay is another matter. 
-        # # if self.total_compulsory_savings < total_amount 
-        # #   amount_to_be_deducted = self.total_compulsory_savings
-        # # else # case total_compulsory_savings => total_amount 
-        # #   amount_to_be_deducted = total_amount
-        # # end
-        # 
-        # amount_to_be_deducted = total_amount
-        # 
-        # total_active_glm = self.active_group_loan_memberships.count 
-        # 
-        # return if total_active_glm == 0 
-        # 
-        # splitted_amount = amount_to_be_deducted/total_active_glm 
-        # 
-        # self.active_group_loan_memberships.joins(:group_loan_default_payment).each do |glm| 
-        #     
-        #     default_payment = glm.group_loan_default_payment 
-        #     default_payment.amount_receivable = self.class.rounding_up(splitted_amount, DEFAULT_PAYMENT_ROUND_UP_VALUE)
-        #     default_payment.save 
-        # end
-  end
-  
-  def port_compulsory_savings_to_voluntary_savings
-    self.active_group_loan_memberships.each do |glm|
-      GroupLoanPortCompulsorySavings.create :group_loan_id => self.id, 
-                                  :group_loan_membership_id => glm.id ,
-                                  :member_id => glm.member_id ,
-                                  :case =>PORT_GROUP_LOAN_COMPULSORY_SAVINGS_CASE[:group_loan_closing]
-    end
-  end 
-  
+   
   def deactivate_group_loan_memberships_due_to_group_closed
     self.active_group_loan_memberships.each do |glm|
       glm.is_active = false 

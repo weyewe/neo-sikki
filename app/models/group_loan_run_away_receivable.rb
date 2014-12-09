@@ -38,10 +38,7 @@ class GroupLoanRunAwayReceivable < ActiveRecord::Base
     # group_loan.run_away_amount_receivable =  amount 
     group_loan.save
     
-    # self.amount_receivable
     
-    # group_loan.update_default_payment_amount_receivable   
-     # by default, it is weekly. So, there is no need to update default_loan amount 
   end
   
   def set_payment_case( params ) 

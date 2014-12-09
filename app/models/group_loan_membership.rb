@@ -105,13 +105,13 @@ class GroupLoanMembership < ActiveRecord::Base
     self.destroy 
   end 
      
-  def port_compulsory_savings_to_voluntary_savings
-    GroupLoanPortCompulsorySavings.create :group_loan_membership_id => self.id 
-    
-    self.update_total_compulsory_savings
-    self.update_total_voluntary_savings
-  end
-    
+  # def port_compulsory_savings_to_voluntary_savings
+  #   GroupLoanPortCompulsorySavings.create :group_loan_membership_id => self.id 
+  #   
+  #   self.update_total_compulsory_savings
+  #   self.update_total_voluntary_savings
+  # end
+  #   
   
   
   def update_total_compulsory_savings(amount)

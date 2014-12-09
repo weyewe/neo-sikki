@@ -172,10 +172,7 @@ class Member < ActiveRecord::Base
         if group_loan.is_loan_disbursed? 
           glm.deactivation_week_number = group_loan.first_uncollected_weekly_collection.week_number
           glm.save  
-          # puts "THe deactivation week number: #{glm.deactivation_week_number}"
-          # bad_debt_allowance =   
-          
-          # group_loan.update_default_payment_amount_receivable
+       
           
           description = "Deceased Clearance for group loan: #{glm.group_loan.name}" + 
               " for member: #{glm.member.name}, #{glm.member.id_number}"

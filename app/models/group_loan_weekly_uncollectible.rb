@@ -14,12 +14,7 @@ class GroupLoanWeeklyUncollectible < ActiveRecord::Base
   validate :valid_clearance_case
   validate :valid_active_member 
   
-  # after_create :update_group_loan_default_amount_receivable
-  
-  # def update_group_loan_default_amount_receivable
-  #   group_loan.update_default_payment_amount_receivable
-  #   
-  # end
+ 
   
   def valid_active_member
     return if not all_fields_present?

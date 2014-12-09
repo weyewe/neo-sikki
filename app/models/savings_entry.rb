@@ -436,6 +436,27 @@ class SavingsEntry < ActiveRecord::Base
     group_loan_membership.update_total_compulsory_savings( new_object.amount)
   end
   
+  def self.create_group_loan_premature_clearance_compulsory_savings_addition( savings_source , compulsory_savings_amount)
+    # puts "Gonna create savings_entry"
+    group_loan_membership = savings_source.group_loan_membership
+    member = group_loan_membership.member 
+    
+    new_object = self.create :savings_source_id => savings_source.id,
+                        :savings_source_type => savings_source.class.to_s,
+                        :amount => compulsory_savings_amount,
+                        :savings_status => SAVINGS_STATUS[:group_loan_compulsory_savings],
+                        :direction => FUND_TRANSFER_DIRECTION[:incoming],
+                        :financial_product_id => savings_source.group_loan_id ,
+                        :financial_product_type => savings_source.group_loan.class.to_s,
+                        :member_id => member.id ,
+                        :is_confirmed => true, 
+                        :confirmed_at => savings_source.group_loan_weekly_collection.confirmed_at 
+                        
+    # puts "The amount: #{new_object.amount}"
+    group_loan_membership.update_total_compulsory_savings( new_object.amount)
+  end
+  
+  
   def self.create_weekly_collection_voluntary_savings( savings_source )
     # puts "Gonna create savings_entry"
     group_loan_membership = savings_source.group_loan_membership
