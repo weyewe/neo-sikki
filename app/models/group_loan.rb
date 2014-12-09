@@ -405,7 +405,7 @@ Phase: loan disbursement finalization
       :is_contra_transaction => false
     ).order("id DESC").first 
     
-    last_transaction_data.create_contra_and_confirm
+    last_transaction_data.create_contra_and_confirm if not last_transaction_data.nil?
   end
   
   def can_be_canceled?

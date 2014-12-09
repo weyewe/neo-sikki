@@ -157,7 +157,7 @@ class GroupLoanWeeklyCollectionVoluntarySavingsEntry < ActiveRecord::Base
     total_amount = BigDecimal("0")
 
     weekly_collection_voluntary_savings_array.each do |x|
-      x.create_contra_and_confirm
+      x.create_contra_and_confirm(  TRANSACTION_DATA_CODE[:group_loan_weekly_collection_voluntary_savings] )
       
       total_amount += x.amount 
       x.destroy 

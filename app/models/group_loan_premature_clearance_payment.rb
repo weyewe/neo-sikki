@@ -341,19 +341,13 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
   
   
   def create_remaining_weeks_payment
-    
     SavingsEntry.create_group_loan_premature_clearance_compulsory_savings_addition( self, self.total_compulsory_savings )
-    
     
     glp = self.group_loan_membership.group_loan_product
     total_principal = glp.principal * total_unpaid_week
     total_interest = glp.interest * total_unpaid_week
     total_compulsory_savings = glp.interest * total_unpaid_week
     
-    
-  
-                                  
-                                  
     
     member = group_loan_membership.member 
     
@@ -425,7 +419,6 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
     
     total_amount = BigDecimal("0")
     compulsory_savings_premature_clerance_array.each do |x|
-      x.create_contra_and_confirm
       total_amount += x.amount 
       x.destroy 
     end
@@ -434,11 +427,30 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
     
     # part 2 : undo group_loan_weekly_payment 
     
+    transaction_data = TransactionData.where(
+      :transaction_source_id => self.id , 
+      :transaction_source_type => self.class.to_s ,
+      :code => TRANSACTION_DATA_CODE[:group_loan_premature_clearance_remaining_weeks_payment],
+      :is_contra_transaction => false 
+      ).order("id DESC").first 
+    
+    transaction_data.create_contra_and_confirm if not transaction_data.nil? 
     
   end
   
   def undo_premature_clearance_deposit
     self.group_loan.update_premature_clearance_deposit( -1*premature_clearance_deposit_amount ) 
+    
+    transaction_data = TransactionData.where(
+      :transaction_datetime => self.group_loan_weekly_collection.collected_at,
+      :description =>  message,
+      :transaction_source_id => self.id , 
+      :transaction_source_type => self.class.to_s ,
+      :code => TRANSACTION_DATA_CODE[:group_loan_premature_clearance_deposit],
+      :is_contra_transaction => false 
+     ).order("id DESC").first 
+     
+     transaction_data.create_contra_and_confirm if not transaction_data.nil? 
   end
   
   

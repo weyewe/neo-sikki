@@ -630,15 +630,16 @@ class SavingsEntry < ActiveRecord::Base
 =end
 
   
-  def create_contra_and_confirm
+  def create_contra_and_confirm(transaction_code)
     last_transaction_data = TransactionData.where(
       :transaction_source_id => self.id , 
       :transaction_source_type => self.class.to_s ,
-      :code => TRANSACTION_DATA_CODE[:group_loan_weekly_collection_voluntary_savings],
+      :code => transaction_code,
       :is_contra_transaction => false
     ).order("id DESC").first 
+    
 
-    last_transaction_data.create_contra_and_confirm
+    last_transaction_data.create_contra_and_confirm if not  last_transaction_data.nil?
   end
                       
 end
