@@ -173,7 +173,7 @@ class UserMailer < ActionMailer::Base
     mail(:to => "admin@11ina.com", :subject => "Adjustment")
   end
   
-  def pending_group_loan
+  def pending_group_loan(email)
     base_filename = "pending_group_loan_#{DateTime.now.to_s}.csv"
     filename = "#{Rails.root}/public/#{base_filename}"
     
@@ -242,7 +242,7 @@ class UserMailer < ActionMailer::Base
     
     
     attachments[ "#{base_filename}"] = File.read(filename )
-    mail(:to => "admin@11ina.com", :subject => "Pending Group Loan #{DateTime.now}")
+    mail(:to => email, :subject => "Pending Group Loan #{DateTime.now}")
   end
   
     
