@@ -149,6 +149,14 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
                       self.extract_uncollectible_weekly_payment_default_amount + 
                       self.extract_run_away_end_of_cycle_resolution_default_amount
     )
+    
+    # total bad debt allowance is being debited
+    # credit: ? revenue?
+    # pada saat pusat menyetujui run away, paid at the end of the week:
+    # penyisihan di debit, piutang di credit 
+    
+    # jika tabungan wajib tidak cukup untuk menutupi total penyisihan, maka:
+    # beban penghapusan piutang pinjaman di debit, penyisihan piutang tak tertagih di credit.
   end
   
   
@@ -184,11 +192,11 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
         self.create_group_loan_weekly_payments 
         
         # we need to create posting: premature_clearance_deposit and premature_clearance money itself 
-        self.confirm_premature_clearances
+        self.confirm_premature_clearances # DONE , the undo is done.. 
         
         # need to create posting: bad debt allowance 
         # from uncollectible +  run_away_member
-        self.update_group_loan_bad_debt_allowance  
+        self.update_group_loan_bad_debt_allowance  # not yet.
         
 =begin
   Accounts used for group loan weekly collection: 

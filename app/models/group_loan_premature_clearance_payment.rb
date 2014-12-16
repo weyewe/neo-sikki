@@ -423,7 +423,7 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
       x.destroy 
     end
     
-    glm.update_total_compulsory_savings( total_amount )
+    glm.update_total_compulsory_savings( -1*total_amount )
     
     # part 2 : undo group_loan_weekly_payment 
     
@@ -467,20 +467,12 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
     glm.deactivation_case =  nil 
     glm.deactivation_week_number =  nil 
     
-    
-    
     self.undo_premature_clearance_deposit
     
     
     
     if glm.save  
       self.undo_remaining_weeks_payment 
-      
-      
-      
-      
-    else
-      puts "44321 fail to update glm"
     end
     
     
