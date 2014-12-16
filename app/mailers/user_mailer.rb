@@ -210,7 +210,9 @@ class UserMailer < ActionMailer::Base
         list_of_group_loan_id.uniq!
         
         puts "after extracting problematic group loan id"
+        @total_pending = 0 
         GroupLoan.includes(:group_loan_memberships, :group_loan_weekly_collections).where( :id => list_of_group_loan_id).order("disbursed_at ASC").each do |group_loan|
+          @total_pending += 1
           last_collected = group_loan.group_loan_weekly_collections.where(:is_collected => true, :is_confirmed => true ).order("id ASC").last
 
           collected_at = nil
