@@ -378,7 +378,8 @@ describe GroupLoanWeeklyCollection do
           @premature_clearance_glm.is_active.should be_false 
         end
         
-        it 'should create compulsory savings withdrawal for the premature clearance' do
+        it 'should NOT create compulsory savings withdrawal for the premature clearance' do
+          # since it will be returned at the end of the loan. 
           @savings_entry_array = SavingsEntry.where( 
                   :savings_source_id => @second_gl_pc.id,
                               :savings_source_type => @second_gl_pc.class.to_s, 
@@ -389,8 +390,7 @@ describe GroupLoanWeeklyCollection do
                               :member_id => @premature_clearance_glm.member.id,
                               :is_confirmed => true ) 
                               
-          @savings_entry_array.count.should == 1 
-          @savings_entry_array.first.amount. should == @premature_clearance_glm.group_loan_product.compulsory_savings * 2 
+          @savings_entry_array.count.should == 0 
         end
       end
     end

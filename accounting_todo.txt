@@ -16,3 +16,58 @@ rails destroy model Account; rails destroy model CashMutation; rails destroy mod
 
 
 https://github.com/plentz/lol_dba
+
+
+rspec ./spec/models/corner_cases/combination/scenario_2_spec.rb:157 # GroupLoan perform premature clearance should produce correct premature clearance amount (premature clearance 1)
+rspec ./spec/models/corner_cases/combination/scenario_2_spec.rb:350 # GroupLoan perform premature clearance weekly_collection.confirm closing week 3, going to week 4 closing the group loan should return the correct compulsory saving amount: not including the premature clearance
+rspec ./spec/models/corner_cases/combination/scenario_2_spec.rb:345 # GroupLoan perform premature clearance weekly_collection.confirm closing week 3, going to week 4 closing the group loan should not have compulsory_savings on premature_clearance
+rspec ./spec/models/corner_cases/combination/scenario_3_spec.rb:214 # GroupLoan perform run_away confirm second_week confirm up to week 5: week 5 is not confirmed nor collected should produce premature_clearance_payment including the bail_out for run_away member
+rspec ./spec/models/accounting/group_loan_weekly_collection/normal_case_spec.rb:201 # GroupLoan normal operation: no corner cases, no update, uber-ideal case create group loan membership starting the group_loan execute loan disbursement weekly payment collection: 1 week should create transaction data
+rspec ./spec/models/corner_cases/premature_clearance/excess_compulsory_savings_spec.rb:161 # GroupLoan perform weekly collection per normal perform premature clearance should produce amount receivable per normal
+rspec ./spec/models/corner_cases/premature_clearance/excess_compulsory_savings_spec.rb:180 # GroupLoan perform weekly collection per normal perform premature clearance confirm weekly collection should empty out the compulsory savings
+rspec ./spec/models/corner_cases/premature_clearance/excess_compulsory_savings_spec.rb:192 # GroupLoan perform weekly collection per normal perform premature clearance confirm weekly collection should create 2 savings_entry: compulsory savings deduction + one savings_account addition
+rspec ./spec/models/corner_cases/uncollectible/end_of_cycle_resolution_spec.rb:383 # GroupLoanWeeklyUncollectible create one uncollectible: impact on the weekly_collection.amount_receivable confirming the weekly_collection with group_loan_weekly_uncollectible closing the group loan collect uncollectibles clear uncollectibles should produce less compulsory_savings_return
+rspec ./spec/models/corner_cases/run_away/end_of_cycle_spec.rb:262 # GroupLoan a member  run away ( week 2 )  pay at the same week run_away_receivable perform all remaining collection should produce bad debt allowance equal to principal*remaining_weeks
+rspec ./spec/models/corner_cases/run_away/end_of_cycle_spec.rb:252 # GroupLoan a member  run away ( week 2 )  pay at the same week run_away_receivable perform all remaining collection should create correct amount receivable
+rspec ./spec/models/corner_cases/run_away/end_of_cycle_spec.rb:390 # GroupLoan a member  run away ( week 2 )  pay at the same week run_away_receivable perform all remaining collection closing group loan should close the group loan
+rspec ./spec/models/corner_cases/run_away/end_of_cycle_spec.rb:320 # GroupLoan a member  run away ( week 2 )  pay at the same week run_away_receivable perform all remaining collection closing group loan should return less compulsory savings, thanks to end_of_cycle run_away clearance
+rspec ./spec/models/corner_cases/run_away/end_of_cycle_spec.rb:279 # GroupLoan a member  run away ( week 2 )  pay at the same week run_away_receivable perform all remaining collection closing group loan should create incomplete group_loan_weekly_collection
+rspec ./spec/models/corner_cases/run_away/end_of_cycle_spec.rb:284 # GroupLoan a member  run away ( week 2 )  pay at the same week run_away_receivable perform all remaining collection closing group loan should reduce the weekly_collection amount receivable
+rspec ./spec/models/corner_cases/run_away/end_of_cycle_spec.rb:308 # GroupLoan a member  run away ( week 2 )  pay at the same week run_away_receivable perform all remaining collection closing group loan should create bad debt allowance
+rspec ./spec/models/corner_cases/run_away/end_of_cycle_spec.rb:394 # GroupLoan a member  run away ( week 2 )  pay at the same week run_away_receivable perform all remaining collection closing group loan should confirm all group loan weekly collections
+rspec ./spec/models/corner_cases/run_away/end_of_cycle_spec.rb:184 # GroupLoan a member  run away ( week 2 )  pay at the same week run_away_receivable made 1 payment (weekly) including the member run away should  increase group_loan.bad_debt_allowance by the remaining week*principal
+rspec ./spec/models/corner_cases/run_away/end_of_cycle_spec.rb:207 # GroupLoan a member  run away ( week 2 )  pay at the same week run_away_receivable made 1 payment (weekly) including the member run away can't change payment case  after a payment has been made
+rspec ./spec/models/corner_cases/run_away/end_of_cycle_spec.rb:192 # GroupLoan a member  run away ( week 2 )  pay at the same week run_away_receivable made 1 payment (weekly) including the member run away should not close group loan
+rspec ./spec/models/corner_cases/combination/scenario_1_spec.rb:186 # GroupLoan perform premature clearance should produce correct premature clearance amount (premature clearance 2)
+rspec ./spec/models/corner_cases/combination/scenario_1_spec.rb:164 # GroupLoan perform premature clearance should produce correct premature clearance amount (premature clearance 1)
+rspec ./spec/models/corner_cases/combination/scenario_1_spec.rb:295 # GroupLoan perform premature clearance weekly_collection.confirm closing the group loan should return the correct compulsory saving amount: not including the premature clearance
+rspec ./spec/models/corner_cases/combination/scenario_1_spec.rb:290 # GroupLoan perform premature clearance weekly_collection.confirm closing the group loan should not have compulsory_savings on premature_clearance
+rspec ./spec/models/corner_cases/premature_clearance/basic_premature_spec.rb:212 # GroupLoan perform premature clearance should produce correct premature clearance amount
+rspec ./spec/models/corner_cases/deceased/basic_deceased_spec.rb:220 # DeceasedClearance a member is passed away ( week 2 )  should increase the savings_account according to the flushed out savings account
+rspec ./spec/models/corner_cases/deceased/basic_deceased_spec.rb:215 # DeceasedClearance a member is passed away ( week 2 )  should empty out the compulsory savings, ported to savings account
+rspec ./spec/models/corner_cases/deceased/basic_deceased_spec.rb:284 # DeceasedClearance a member is passed away ( week 2 )  finishing the payment collection cycle should return the compulsory savings, not including the deceased member
+
+
+
+
+=========== only the corner cases
+
+rspec ./spec/models/corner_cases/premature_clearance/excess_compulsory_savings_spec.rb:161 # GroupLoan perform weekly collection per normal perform premature clearance should produce amount receivable per normal
+rspec ./spec/models/corner_cases/premature_clearance/excess_compulsory_savings_spec.rb:180 # GroupLoan perform weekly collection per normal perform premature clearance confirm weekly collection should empty out the compulsory savings
+rspec ./spec/models/corner_cases/premature_clearance/excess_compulsory_savings_spec.rb:192 # GroupLoan perform weekly collection per normal perform premature clearance confirm weekly collection should create 2 savings_entry: compulsory savings deduction + one savings_account addition
+rspec ./spec/models/corner_cases/combination/scenario_2_spec.rb:157 # GroupLoan perform premature clearance should produce correct premature clearance amount (premature clearance 1)
+rspec ./spec/models/corner_cases/combination/scenario_2_spec.rb:345 # GroupLoan perform premature clearance weekly_collection.confirm closing week 3, going to week 4 closing the group loan should not have compulsory_savings on premature_clearance
+rspec ./spec/models/corner_cases/combination/scenario_2_spec.rb:350 # GroupLoan perform premature clearance weekly_collection.confirm closing week 3, going to week 4 closing the group loan should return the correct compulsory saving amount: not including the premature clearance
+rspec ./spec/models/corner_cases/combination/scenario_1_spec.rb:164 # GroupLoan perform premature clearance should produce correct premature clearance amount (premature clearance 1)
+rspec ./spec/models/corner_cases/combination/scenario_1_spec.rb:186 # GroupLoan perform premature clearance should produce correct premature clearance amount (premature clearance 2)
+rspec ./spec/models/corner_cases/combination/scenario_1_spec.rb:290 # GroupLoan perform premature clearance weekly_collection.confirm closing the group loan should not have compulsory_savings on premature_clearance
+rspec ./spec/models/corner_cases/combination/scenario_1_spec.rb:295 # GroupLoan perform premature clearance weekly_collection.confirm closing the group loan should return the correct compulsory saving amount: not including the premature clearance
+rspec ./spec/models/corner_cases/premature_clearance/basic_premature_spec.rb:212 # GroupLoan perform premature clearance should produce correct premature clearance amount
+rspec ./spec/models/corner_cases/combination/scenario_3_spec.rb:214 # GroupLoan perform run_away confirm second_week confirm up to week 5: week 5 is not confirmed nor collected should produce premature_clearance_payment including the bail_out for run_away member
+rspec ./spec/models/corner_cases/uncollectible/end_of_cycle_resolution_spec.rb:383 # GroupLoanWeeklyUncollectible create one uncollectible: impact on the weekly_collection.amount_receivable confirming the weekly_collection with group_loan_weekly_uncollectible closing the group loan collect uncollectibles clear uncollectibles should produce less compulsory_savings_return
+rspec ./spec/models/corner_cases/deceased/basic_deceased_spec.rb:215 # DeceasedClearance a member is passed away ( week 2 )  should empty out the compulsory savings, ported to savings account
+rspec ./spec/models/corner_cases/deceased/basic_deceased_spec.rb:220 # DeceasedClearance a member is passed away ( week 2 )  should increase the savings_account according to the flushed out savings account
+rspec ./spec/models/corner_cases/deceased/basic_deceased_spec.rb:284 # DeceasedClearance a member is passed away ( week 2 )  finishing the payment collection cycle should return the compulsory savings, not including the deceased member
+
+
+

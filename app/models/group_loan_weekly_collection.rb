@@ -94,12 +94,12 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
     end
     
     
-    message = "Weekly Collection: Group #{group_loan.name}, #{group_loan.group_number}, week #{group_loan_weekly_collection.week_number}"
+    message = "Weekly Collection: Group #{group_loan.name}, #{group_loan.group_number}, week #{self.week_number}"
     ta = TransactionData.create_object({
       :transaction_datetime => self.collected_at,
       :description =>  message,
-      :transaction_source_id => group_loan_weekly_collection.id , 
-      :transaction_source_type => group_loan_weekly_collection.class.to_s ,
+      :transaction_source_id => self.id , 
+      :transaction_source_type => self.class.to_s ,
       :code => TRANSACTION_DATA_CODE[:group_loan_weekly_collection_voluntary_savings],
       :is_contra_transaction => false 
     }, true )
@@ -171,9 +171,9 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
       ta = TransactionData.create_object({
         :transaction_datetime => self.collected_at,
         :description =>  message,
-        :transaction_source_id => group_loan_weekly_collection.id , 
-        :transaction_source_type => group_loan_weekly_collection.class.to_s ,
-        :code => TRANSACTION_DATA_CODE[:group_loan_weekly_collection_voluntary_savings],
+        :transaction_source_id => self.id , 
+        :transaction_source_type => self.class.to_s ,
+        :code => TRANSACTION_DATA_CODE[:group_loan_weekly_collection_round_up],
         :is_contra_transaction => false 
       }, true )
 
@@ -202,11 +202,9 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
   
   def unpost_rounding_up_revenue
     ta = TransactionData.where({
-      :transaction_datetime => self.collected_at,
-      :description =>  message,
-      :transaction_source_id => group_loan_weekly_collection.id , 
-      :transaction_source_type => group_loan_weekly_collection.class.to_s ,
-      :code => TRANSACTION_DATA_CODE[:group_loan_weekly_collection_voluntary_savings],
+      :transaction_source_id => self.id , 
+      :transaction_source_type => self.class.to_s ,
+      :code => TRANSACTION_DATA_CODE[:group_loan_weekly_collection_round_up],
       :is_contra_transaction => false 
     } ).order("id DESC").first 
     
@@ -221,7 +219,7 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
           where(:payment_case => GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:end_of_cycle]).each do |x|
            
       
-      allowance_amount = x.group_loan_product.principal * self.remaining_weeks 
+      allowance_amount = x.group_loan_membership.group_loan_product.principal * self.remaining_weeks 
       
       
       message = "Penyisihan Member Kabur, diselesaikan di akhir siklus : Group #{group_loan.name}, #{group_loan.group_number}" + 

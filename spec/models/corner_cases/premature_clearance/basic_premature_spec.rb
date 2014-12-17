@@ -233,109 +233,112 @@ describe GroupLoan do
       
       current_week_compulsory_savings = @premature_clearance_glm.group_loan_product.compulsory_savings
       
-      @first_gl_pc.amount.should == remaining_principal_amount - 
-                      @premature_clearance_glm.total_compulsory_savings -   # the total compulsory savings hasn't included the current weel
-                      current_week_compulsory_savings
+      @first_gl_pc.amount.should == ( @second_group_loan_weekly_collection.remaining_weeks - 1 )*
+                    @first_gl_pc.group_loan_membership.group_loan_product.weekly_payment_amount
     end
     
-     #   
-     # 
-     # context "weekly_collection.confirm" do
-     #   before(:each) do
-     #     @second_group_loan_weekly_collection.collect(
-     #       {
-     #         :collected_at => DateTime.now 
-     #       }
-     #     )
-     #     
-     #     @second_group_loan_weekly_collection.confirm(:confirmed_at => DateTime.now) 
-     #     @premature_clearance_glm.reload 
-     #     @first_gl_pc.reload 
-     #   end
-     #   
-     #   it 'should confirm the clearance' do
-     #     @first_gl_pc.is_confirmed.should be_true 
-     #   end
-     #   
-     #   it 'should deactivate the membership' do
-     #     @premature_clearance_glm.is_active.should be_false
-     #     @premature_clearance_glm.deactivation_case.should == GROUP_LOAN_DEACTIVATION_CASE[:premature_clearance]
-     #     @premature_clearance_glm.deactivation_week_number.should == @second_group_loan_weekly_collection.week_number + 1 
-     #   end
-     #   
-     #   it 'should increase the amount_receivable in week 2 by premature_clearance amount' do
-     #     remaining_week = @group_loan.loan_duration - @premature_clearance_glm.deactivation_week_number + 1 
-     #     premature_clearance_amount = @first_gl_pc.amount
-     #      
-     #     base_collection = BigDecimal('0')
-     #     @group_loan.group_loan_memberships.each do |glm|
-     #       base_collection += glm.group_loan_product.weekly_payment_amount 
-     #     end
-     #     @second_group_loan_weekly_collection.amount_receivable.should == base_collection + premature_clearance_amount 
-     #   end
-     #   
-     #   it 'should reduce the amount_receivable in week 3' do
-     #     
-     #     base_collection = BigDecimal('0')
-     #     @group_loan.group_loan_memberships.each do |glm|
-     #       next if glm.id == @premature_clearance_glm.id 
-     #       base_collection += glm.group_loan_product.weekly_payment_amount 
-     #     end
-     #     @third_group_loan_weekly_collection.amount_receivable.should == base_collection 
-     #   end
-     #   
-     #   context "unconfirm weekly payment" do
-     #     before(:each) do
-     #       @second_group_loan_weekly_collection.unconfirm
-     #       @second_group_loan_weekly_collection.reload 
-     #       @premature_clearance_glm.reload 
-     #       @first_gl_pc.reload
-     #       puts "5555555 Gonna unconfirm weekly payment"
-     #     end
-     #     
-     #     it "should unconfirm weekly payment" do
-     #       @second_group_loan_weekly_collection.is_confirmed.should be_false 
-     #       @second_group_loan_weekly_collection.errors.size.should == 0
-     #     end
-     #     
-     #     it "should unconfirm premature clearance" do
-     #       @first_gl_pc.is_confirmed.should be_false 
-     #       @first_gl_pc.errors.size.should == 0 
-     #     end
-     #   end
-     #   
-     #   context "closing the group loan" do
-     #     before(:each) do
-     #       @group_loan.reload 
-     #       @group_loan.group_loan_weekly_collections.order("id ASC").each do |x|
-     #         next if x.is_collected? and x.is_confirmed? 
-     #         x.collect(:collected_at => DateTime.now)
-     #         x.confirm(:confirmed_at => DateTime.now)
-     #       end
-     #       
-     #       @group_loan.reload
-     #       @group_loan.close(:closed_at => @closed_at)
-     #     end
-     #     
-     #     
-     #     it 'should not have compulsory_savings on premature_clearance' do
-     #       @premature_clearance_glm.total_compulsory_savings.should == BigDecimal('0')
-     #       # @second_premature_clearance_glm.total_compulsory_savings.should == BigDecimal('0')
-     #     end
-     #     
-     #     it 'should return the correct compulsory saving amount: not including the premature clearance' do
-     #       @group_loan.is_closed.should be_true 
-     #       expected_amount = BigDecimal('0')
-     #       @group_loan.group_loan_memberships.each do |glm|
-     #         next if glm.id == @premature_clearance_glm.id 
-     #         # next if glm.id == @second_premature_clearance_glm.id 
-     #         expected_amount += glm.group_loan_product.compulsory_savings
-     #       end
-     #       @group_loan.compulsory_savings_return_amount.should == expected_amount*@group_loan.loan_duration
-     #     end
-     #   end
-     # end
-     #   
+       
+     
+     context "weekly_collection.confirm" do
+       before(:each) do
+         @second_group_loan_weekly_collection.collect(
+           {
+             :collected_at => DateTime.now 
+           }
+         )
+         
+         @second_group_loan_weekly_collection.confirm(:confirmed_at => DateTime.now) 
+         @premature_clearance_glm.reload 
+         @first_gl_pc.reload 
+       end
+       
+       it 'should confirm the clearance' do
+         @first_gl_pc.is_confirmed.should be_true 
+       end
+       
+       it 'should deactivate the membership' do
+         @premature_clearance_glm.is_active.should be_false
+         @premature_clearance_glm.deactivation_case.should == GROUP_LOAN_DEACTIVATION_CASE[:premature_clearance]
+         @premature_clearance_glm.deactivation_week_number.should == @second_group_loan_weekly_collection.week_number + 1 
+       end
+       
+       it 'should increase the amount_receivable in week 2 by premature_clearance amount' do
+         remaining_week = @group_loan.loan_duration - @premature_clearance_glm.deactivation_week_number + 1 
+         premature_clearance_amount = @first_gl_pc.amount
+          
+         base_collection = BigDecimal('0')
+         @group_loan.group_loan_memberships.each do |glm|
+           base_collection += glm.group_loan_product.weekly_payment_amount 
+         end
+         @second_group_loan_weekly_collection.amount_receivable.should == base_collection + premature_clearance_amount 
+       end
+       
+       it 'should reduce the amount_receivable in week 3' do
+         
+         base_collection = BigDecimal('0')
+         @group_loan.group_loan_memberships.each do |glm|
+           next if glm.id == @premature_clearance_glm.id 
+           base_collection += glm.group_loan_product.weekly_payment_amount 
+         end
+         @third_group_loan_weekly_collection.amount_receivable.should == base_collection 
+       end
+       
+       context "unconfirm weekly payment" do
+         before(:each) do
+           @second_group_loan_weekly_collection.unconfirm
+           @second_group_loan_weekly_collection.reload 
+           @premature_clearance_glm.reload 
+           @first_gl_pc.reload
+           puts "5555555 Gonna unconfirm weekly payment"
+         end
+         
+         it "should unconfirm weekly payment" do
+           @second_group_loan_weekly_collection.is_confirmed.should be_false 
+           @second_group_loan_weekly_collection.errors.size.should == 0
+         end
+         
+         it "should unconfirm premature clearance" do
+           @first_gl_pc.is_confirmed.should be_false 
+           @first_gl_pc.errors.size.should == 0 
+         end
+       end
+       
+       context "closing the group loan" do
+         before(:each) do
+           @group_loan.reload 
+           @group_loan.group_loan_weekly_collections.order("id ASC").each do |x|
+             next if x.is_collected? and x.is_confirmed? 
+             x.collect(:collected_at => DateTime.now)
+             x.confirm(:confirmed_at => DateTime.now)
+           end
+           
+           @group_loan.reload
+           @group_loan.close(:closed_at => @closed_at)
+         end
+         
+         
+         it 'should not have compulsory_savings on premature_clearance' do
+          
+           total_amount = @group_loan.number_of_collections * @premature_clearance_glm.group_loan_product.compulsory_savings
+           
+           @premature_clearance_glm.total_compulsory_savings.should == total_amount
+         end
+         
+         it 'should return the correct compulsory saving amount: not including the premature clearance' do
+           @group_loan.is_closed.should be_true 
+           expected_amount = BigDecimal('0')
+           
+           @group_loan.group_loan_memberships.each do |glm|
+             expected_amount += glm.group_loan_product.compulsory_savings *  @group_loan.number_of_collections
+           end
+           
+           @group_loan.compulsory_savings_return_amount.should == expected_amount 
+         end
+       end
+            
+     
+     end
+       
   
   end
 end

@@ -413,8 +413,6 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
     self.group_loan.update_premature_clearance_deposit( -1*premature_clearance_deposit_amount ) 
     
     transaction_data = TransactionData.where(
-      :transaction_datetime => self.group_loan_weekly_collection.collected_at,
-      :description =>  message,
       :transaction_source_id => self.id , 
       :transaction_source_type => self.class.to_s ,
       :code => TRANSACTION_DATA_CODE[:group_loan_premature_clearance_deposit],

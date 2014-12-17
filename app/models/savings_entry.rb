@@ -478,6 +478,7 @@ class SavingsEntry < ActiveRecord::Base
   
   def self.create_weekly_collection_voluntary_savings( savings_source )
     # puts "Gonna create savings_entry"
+    group_loan_weekly_savings_entry = savings_source
     group_loan_membership = savings_source.group_loan_membership
     member = group_loan_membership.member 
     
@@ -501,7 +502,7 @@ class SavingsEntry < ActiveRecord::Base
     group_loan_weekly_collection = savings_source.group_loan_weekly_collection
     message = "Weekly Collection Voluntary Savings: Group #{group_loan.name}, #{group_loan.group_number}, week  #{group_loan_weekly_collection.week_number}"
     ta = TransactionData.create_object({
-      :transaction_datetime => self.disbursed_at,
+      :transaction_datetime => group_loan_weekly_collection.collected_at,
       :description =>  message,
       :transaction_source_id => group_loan_weekly_collection.id , 
       :transaction_source_type => group_loan_weekly_collection.class.to_s ,
