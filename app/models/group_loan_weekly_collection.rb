@@ -53,6 +53,7 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
     # puts "inside weekly_collection: create_group_loan_weekly_payments"
     # do weekly payment for all active members
     # minus those that can't pay  (the dead and running away is considered as non active)    
+    uncollectible_glm_id_list = self.uncollectible_group_loan_membership_id_list
     active_glm_id_list = self.active_group_loan_memberships.map {|x| x.id }
     run_away_glm_id_list = group_loan.
                           group_loan_memberships.joins(:group_loan_run_away_receivable).
@@ -60,7 +61,9 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
                             (deactivation_case.eq  GROUP_LOAN_DEACTIVATION_CASE[:run_away] ) & 
                             (group_loan_run_away_receivable.payment_case.eq GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:weekly])
                           }.map{|x| x.id }
-           
+    active_glm_id_list = active_glm_id_list - uncollectible_glm_id_list
+    run_away_glm_id_list = run_away_glm_id_list - uncollectible_glm_id_list
+    
     active_glm_id_list.each do |glm_id|
       GroupLoanWeeklyPayment.create :group_loan_membership_id => glm_id,
                                     :group_loan_id => self.group_loan_id,
@@ -81,6 +84,8 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
     total_interest_revenue = BigDecimal("0")
     total_principal = BigDecimal("0")
     total_compulsory_savings = BigDecimal("0")
+    
+    # paying_member = (active_glm_id_list + run_away_glm_id_list).uniq - uncollectible_glm_id_list
     
     GroupLoanMembership.where(:id =>  active_glm_id_list + run_away_glm_id_list ).joins(:group_loan_product).each do |glm|
       total_interest_revenue +=   glm.group_loan_product.interest 
@@ -145,10 +150,13 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
   
   
   def update_group_loan_bad_debt_allowance
+    # ths will produce the final allowance
     group_loan.update_bad_debt_allowance(                 
                       self.extract_uncollectible_weekly_payment_default_amount + 
                       self.extract_run_away_end_of_cycle_resolution_default_amount
     )
+    
+    # but we need the atomic allowance (diff)
     
     # total bad debt allowance is being debited
     # credit: ? revenue?
@@ -194,9 +202,11 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
         # we need to create posting: premature_clearance_deposit and premature_clearance money itself 
         self.confirm_premature_clearances # DONE , the undo is done.. 
         
+        
         # need to create posting: bad debt allowance 
         # from uncollectible +  run_away_member
-        self.update_group_loan_bad_debt_allowance  # not yet.
+        self.update_group_loan_bad_debt_allowance  # in the run away, the posting is not being done here. 
+        self.confirm_uncollectible_allowance # allowance.. there will be expense during loan close
         
 =begin
   Accounts used for group loan weekly collection: 
@@ -444,6 +454,14 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
     end
   end
  
+ 
+  def confirm_uncollectible_allowance
+    self.group_loan_weekly_uncollectibles.each do |x|
+      x.create_allowance_transaction_data
+    end
+  end
+  
+  
   # week 1: full member. week 2: 1 member run away
   # week 3 : another member run away 
   # now we are in week 3... 
@@ -559,6 +577,10 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
   
   def extract_uncollectible_weekly_payment_amount 
     self.group_loan_weekly_uncollectibles.sum("amount")
+  end
+  
+  def uncollectible_group_loan_membership_id_list
+    self.group_loan_weekly_uncollectibles.map{|x| x.group_loan_membership_id }
   end
   
   def extract_uncollectible_weekly_payment_default_amount

@@ -326,7 +326,7 @@ class Member < ActiveRecord::Base
     ).each do |run_away_glm|
       
       
-      GroupLoanRunAwayReceivable.create(
+      GroupLoanRunAwayReceivable.where(
         :member_id => self.id,  
         :group_loan_id => run_away_glm.group_loan_id,
         :group_loan_membership_id => run_away_glm.id

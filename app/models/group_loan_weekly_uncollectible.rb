@@ -116,8 +116,92 @@ class GroupLoanWeeklyUncollectible < ActiveRecord::Base
     self.amount = self.group_loan_membership.group_loan_product.weekly_payment_amount
     self.principal = self.group_loan_membership.group_loan_product.principal
     self.save
+  end
+  
+  def create_allowance_transaction_data
+    # 1. get the principal, 
+    # 2. use that amount. credit piutang, debit allowance
+    member = self.group_loan_membership.member
+    group_loan = self.group_loan
+    group_loan_weekly_collection = self.group_loan_weekly_collection
+    message = "Uncollectible Payment. GroupLoan: #{group_loan.name}, #{group_loan.group_number} " + 
+              "Member: #{member.name}, #{member.id_number} " + 
+              "Week: #{group_loan_weekly_collection.week_number}"
+              
+    ta = TransactionData.create_object({
+      :transaction_datetime => self.group_loan_weekly_collection.collected_at,
+      :description =>  message,
+      :transaction_source_id => self.id , 
+      :transaction_source_type => self.class.to_s ,
+      :code => TRANSACTION_DATA_CODE[:group_loan_uncollectible_allowance],
+      :is_contra_transaction => false 
+    }, true )
     
+     
     
+    TransactionDataDetail.create_object(
+      :transaction_data_id => ta.id,        
+      :account_id          => Account.find_by_code(ACCOUNT_CODE[:pinjaman_sejahtera_bda_leaf][:code]).id      ,
+      :entry_case          => NORMAL_BALANCE[:debit]     ,
+      :amount              => self.principal,
+      :description => message
+    )
+    
+    TransactionDataDetail.create_object(
+      :transaction_data_id => ta.id,        
+      :account_id          => Account.find_by_code(ACCOUNT_CODE[:pinjaman_sejahtera_ar_leaf][:code]).id        ,
+      :entry_case          => NORMAL_BALANCE[:credit]     ,
+      :amount              => self.principal,
+      :description => message
+    )
+    
+    ta.confirm 
+  end
+  
+  def create_allowance_in_cycle_clearance_transaction_data
+    # 1. Cash ++ 1 week worth of payment
+    # 2. allowance is being deducted 
+    
+    member = self.group_loan_membership.member
+    group_loan = self.group_loan
+    group_loan_weekly_collection = self.group_loan_weekly_collection
+    message = "Uncollectible Payment In-Cycle Clearance. GroupLoan: #{group_loan.name}, #{group_loan.group_number} " + 
+              "Member: #{member.name}, #{member.id_number} " + 
+              "Week: #{group_loan_weekly_collection.week_number}"
+              
+    glp = group_loan_membership.group_loan_product          
+    
+    TransactionDataDetail.create_object(
+      :transaction_data_id => ta.id,        
+      :account_id          => Account.find_by_code(ACCOUNT_CODE[:main_cash_leaf][:code]).id      ,
+      :entry_case          => NORMAL_BALANCE[:debit]     ,
+      :amount              => glp.weekly_payment_amount,
+      :description => message
+    )
+
+    TransactionDataDetail.create_object(
+      :transaction_data_id => ta.id,        
+      :account_id          => Account.find_by_code(ACCOUNT_CODE[:pinjaman_sejahtera_interest_revenue_leaf][:code]).id        ,
+      :entry_case          => NORMAL_BALANCE[:credit]     ,
+      :amount              => glp.interest,
+      :description => message
+    )
+    TransactionDataDetail.create_object(
+      :transaction_data_id => ta.id,        
+      :account_id          => Account.find_by_code(ACCOUNT_CODE[:pinjaman_sejahtera_bda_leaf][:code]).id        ,
+      :entry_case          => NORMAL_BALANCE[:credit]     ,
+      :amount              => glp.principal,
+      :description => message
+    )
+    TransactionDataDetail.create_object(
+      :transaction_data_id => ta.id,        
+      :account_id          => Account.find_by_code(ACCOUNT_CODE[:compulsory_savings_leaf][:code]).id        ,
+      :entry_case          => NORMAL_BALANCE[:credit]     ,
+      :amount              => glp.compulsory_savings,
+      :description => message
+    )
+    
+    ta.confirm 
   end
   
   
@@ -128,8 +212,11 @@ class GroupLoanWeeklyUncollectible < ActiveRecord::Base
     new_object.group_loan_membership_id          = params[:group_loan_membership_id]  
     new_object.group_loan_weekly_collection_id   = params[:group_loan_weekly_collection_id]
     new_object.clearance_case = params[:clearance_case]
+    # even if it is cleared in the cycle, or at the end of cycle, there still be allowance
     
-    new_object.update_amount if new_object.save 
+    if new_object.save 
+      new_object.update_amount 
+    end
       
     
     return new_object
@@ -229,6 +316,10 @@ class GroupLoanWeeklyUncollectible < ActiveRecord::Base
     if self.save 
       self.group_loan.update_bad_debt_allowance(  -1 * self.principal)
       # update the journal posting 
+      
+      if self.clearance_case == UNCOLLECTIBLE_CLEARANCE_CASE[:in_cycle]
+        self.create_allowance_in_cycle_clearance_transaction_data
+      end
     end
   end
   

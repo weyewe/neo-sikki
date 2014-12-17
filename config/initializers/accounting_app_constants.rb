@@ -483,7 +483,8 @@ TRANSACTION_DATA_CODE = {
   :group_loan_weekly_collection => 2, 
   :group_loan_weekly_collection_voluntary_savings => 3, 
   :group_loan_premature_clearance_remaining_weeks_payment => 4 ,
-  :group_loan_premature_clearance_deposit => 5 
+  :group_loan_premature_clearance_deposit => 5 ,
+  :group_loan_uncollectible_allowance => 6, 
   
   
 }

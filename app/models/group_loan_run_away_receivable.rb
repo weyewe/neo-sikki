@@ -13,6 +13,7 @@ class GroupLoanRunAwayReceivable < ActiveRecord::Base
   belongs_to :group_loan 
   
   after_create :update_group_loan_run_away_amount_receivable  
+  after_create :create_transaction_data_for_run_away_bad_debt_allocation
   
   def valid_payment_case
     return if not payment_case.present?
@@ -37,8 +38,53 @@ class GroupLoanRunAwayReceivable < ActiveRecord::Base
     end
     # group_loan.run_away_amount_receivable =  amount 
     group_loan.save
+  end
+  
+  def create_transaction_data_for_run_away_bad_debt_allocation
+    message = ""
     
+    ta = TransactionData.create_object({
+      :transaction_datetime => self.collected_at,
+      :description =>  message,
+      :transaction_source_id => group_loan_weekly_collection.id , 
+      :transaction_source_type => group_loan_weekly_collection.class.to_s ,
+      :code => TRANSACTION_DATA_CODE[:group_loan_weekly_collection_voluntary_savings],
+      :is_contra_transaction => false 
+    }, true )
     
+     
+    
+    TransactionDataDetail.create_object(
+      :transaction_data_id => ta.id,        
+      :account_id          => Account.find_by_code(ACCOUNT_CODE[:main_cash_leaf][:code]).id      ,
+      :entry_case          => NORMAL_BALANCE[:debit]     ,
+      :amount              => total_compulsory_savings + total_principal +  total_interest_revenue,
+      :description => message
+    )
+    
+    TransactionDataDetail.create_object(
+      :transaction_data_id => ta.id,        
+      :account_id          => Account.find_by_code(ACCOUNT_CODE[:pinjaman_sejahtera_interest_revenue_leaf][:code]).id        ,
+      :entry_case          => NORMAL_BALANCE[:credit]     ,
+      :amount              => total_interest_revenue,
+      :description => message
+    )
+    TransactionDataDetail.create_object(
+      :transaction_data_id => ta.id,        
+      :account_id          => Account.find_by_code(ACCOUNT_CODE[:pinjaman_sejahtera_ar_leaf][:code]).id        ,
+      :entry_case          => NORMAL_BALANCE[:credit]     ,
+      :amount              => total_principal,
+      :description => message
+    )
+    TransactionDataDetail.create_object(
+      :transaction_data_id => ta.id,        
+      :account_id          => Account.find_by_code(ACCOUNT_CODE[:compulsory_savings_leaf][:code]).id        ,
+      :entry_case          => NORMAL_BALANCE[:credit]     ,
+      :amount              => total_compulsory_savings,
+      :description => message
+    )
+    
+    ta.confirm
   end
   
   def set_payment_case( params ) 
