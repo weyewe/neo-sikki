@@ -118,7 +118,7 @@ class GroupLoanWeeklyUncollectible < ActiveRecord::Base
     self.save
   end
   
-  def create_allowance_transaction_data
+  def create_allowance_transaction_data_from_uncollectible
     # 1. get the principal, 
     # 2. use that amount. credit piutang, debit allowance
     member = self.group_loan_membership.member
@@ -158,6 +158,17 @@ class GroupLoanWeeklyUncollectible < ActiveRecord::Base
     ta.confirm 
   end
   
+  def create_contra_allowance_transaction_data
+    ta = TransactionData.where({
+      :transaction_source_id => self.id , 
+      :transaction_source_type => self.class.to_s ,
+      :code => TRANSACTION_DATA_CODE[:group_loan_uncollectible_allowance],
+      :is_contra_transaction => false 
+    } ).order("id DESC").first 
+    
+    ta.create_contra_and_confirm if not ta.nil?
+  end
+  
   def create_allowance_in_cycle_clearance_transaction_data
     # 1. Cash ++ 1 week worth of payment
     # 2. allowance is being deducted 
@@ -169,7 +180,17 @@ class GroupLoanWeeklyUncollectible < ActiveRecord::Base
               "Member: #{member.name}, #{member.id_number} " + 
               "Week: #{group_loan_weekly_collection.week_number}"
               
-    glp = group_loan_membership.group_loan_product          
+    glp = group_loan_membership.group_loan_product   
+    
+    ta = TransactionData.create_object({
+      :transaction_datetime => self.collected_at,
+      :description =>  message,
+      :transaction_source_id => self.id , 
+      :transaction_source_type => self.class.to_s ,
+      :code => TRANSACTION_DATA_CODE[:group_loan_in_cycle_uncollectible_clearance],
+      :is_contra_transaction => false 
+    }, true )
+           
     
     TransactionDataDetail.create_object(
       :transaction_data_id => ta.id,        
@@ -203,6 +224,20 @@ class GroupLoanWeeklyUncollectible < ActiveRecord::Base
     
     ta.confirm 
   end
+  
+  def create_contra_allowance_in_cycle_clearance_transaction_data
+    ta = TransactionData.create_object({
+      :transaction_source_id => self.id , 
+      :transaction_source_type => self.class.to_s ,
+      :code => TRANSACTION_DATA_CODE[:group_loan_in_cycle_uncollectible_clearance],
+      :is_contra_transaction => false 
+    }, true )
+    
+    ta.create_contra_and_confirm if not ta.nil?
+  end
+  
+  
+  
   
   
   def self.create_object(params)
@@ -317,6 +352,7 @@ class GroupLoanWeeklyUncollectible < ActiveRecord::Base
       self.group_loan.update_bad_debt_allowance(  -1 * self.principal)
       # update the journal posting 
       
+      # in cycle is by default. if it is not in-cycle, call the #clear_end_of_cycle method 
       if self.clearance_case == UNCOLLECTIBLE_CLEARANCE_CASE[:in_cycle]
         self.create_allowance_in_cycle_clearance_transaction_data
       end
@@ -345,7 +381,11 @@ class GroupLoanWeeklyUncollectible < ActiveRecord::Base
     self.cleared_at = nil
     
     
-    self.group_loan.update_bad_debt_allowance(   self.principal)
+    if self.save
+      self.group_loan.update_bad_debt_allowance(   self.principal )
+      self.create_contra_allowance_in_cycle_clearance_transaction_data
+    end
+    
   end
   
   def clear_end_of_cycle

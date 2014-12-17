@@ -177,41 +177,12 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
   
   # manifested in the group loan clearance payment 
   def update_amount
-    # the current week is not counted. it has to be paid in full.
-    # plus 1 because the current week where premature_clearance is applied has to be paid full 
-    # example: premature_clearance is applied@week_2. If there are total 8 installments,
-    # then, week 2 has to be paid full. and 6*principal has to be returned
-    # plus + default payment 
-    # total_unpaid_week = group_loan.number_of_collections - 
-    #                 group_loan_weekly_collection.week_number 
-    # total_principal_return =  group_loan_membership.group_loan_product.principal * total_unpaid_week
-    
-    # minus compulsory savings ... ? 
-    # if compulsory savings > amount => amount == 0 
-    # compulsory_savings_return =>  (port to voluntary savings)
-    
-    
-    # premature clearance can't be created if there is uncollectible weekly payment on the name of this member. 
-    # there is nothing can be used to deduct the compulsory_savings
-    # other than end_of_cycle default payment or premature clearance
-    # available_compulsory_savings = group_loan_weekly_collection.week_number  * group_loan_membership.group_loan_product.compulsory_savings 
-    
     
     
     amount_payable =  total_weekly_payment_amount + 
                     run_away_weekly_resolved_bail_out_contribution +
                     run_away_end_of_cycle_resolved_bail_out_contribution 
-       
-   
-   
-    # if available_compulsory_savings >= amount_payable
-    #   self.remaining_compulsory_savings = available_compulsory_savings - amount_payable
-    #   self.amount = BigDecimal('0')
-    # else
-    #   self.remaining_compulsory_savings = BigDecimal('0')
-    #   self.amount = GroupLoan.rounding_up( amount_payable - available_compulsory_savings , DEFAULT_PAYMENT_ROUND_UP_VALUE) 
-    # end     
-    
+                    
     self.amount = GroupLoan.rounding_up( amount_payable  , DEFAULT_PAYMENT_ROUND_UP_VALUE)       
     self.save 
   end

@@ -185,10 +185,7 @@ class Member < ActiveRecord::Base
             :additional_savings_account => glm.total_compulsory_savings 
           )
           
-          if glm.total_compulsory_savings > BigDecimal('0')
-            SavingsEntry.create_group_loan_compulsory_savings_withdrawal( new_object , glm.total_compulsory_savings )  
-            SavingsEntry.create_savings_account_group_loan_deceased_addition( new_object , new_object.additional_savings_account)  
-          end
+     
                                   
         else
           glm.destroy
