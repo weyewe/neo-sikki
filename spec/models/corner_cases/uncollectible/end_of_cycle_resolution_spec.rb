@@ -179,55 +179,55 @@ describe GroupLoanWeeklyUncollectible do
     
     @gl_wu.should_not be_valid
   end
-  
-  context "updating the uncollectible's glm id" do
-    before(:each) do
-      @first_gl_wu = GroupLoanWeeklyUncollectible.create_object({
-        :group_loan_id => @group_loan.id,
-        :group_loan_membership_id => @uncollectible_glm.id ,
-        :group_loan_weekly_collection_id => @second_group_loan_weekly_collection.id,
-        :clearance_case => UNCOLLECTIBLE_CLEARANCE_CASE[:in_cycle]   
-      })
-      
-      @second_gl_wu = GroupLoanWeeklyUncollectible.create_object({
-        :group_loan_id => @group_loan.id,
-        :group_loan_membership_id => @second_uncollectible_glm.id ,
-        :group_loan_weekly_collection_id => @second_group_loan_weekly_collection.id  ,
-        :clearance_case => UNCOLLECTIBLE_CLEARANCE_CASE[:in_cycle]
-      })
-    end
-    
-    it 'should create first_gl_wu and second_gl_wu ' do
-      @first_gl_wu.should be_valid 
-      @second_gl_wu.should be_valid 
-    end
-    
-    it 'should allow update to the second_gl_wu' do
-      @second_gl_wu.update_object({
-        :group_loan_id => @group_loan.id,
-        :group_loan_membership_id => @third_uncollectible_glm.id ,
-        :group_loan_weekly_collection_id => @second_group_loan_weekly_collection.id ,
-        :clearance_case => UNCOLLECTIBLE_CLEARANCE_CASE[:in_cycle]
-      })
-      
-      @second_gl_wu.should be_valid 
-       
-       
-      @second_gl_wu.group_loan_membership.id.should == @third_uncollectible_glm.id
-    end
-    
-    it 'should not allow update to the first_gl_wu (create 2 uncollectibles with equal glm_id)' do
-      @second_gl_wu.update_object({
-        :group_loan_id => @group_loan.id,
-        :group_loan_membership_id => @uncollectible_glm.id ,
-        :group_loan_weekly_collection_id => @second_group_loan_weekly_collection.id ,
-        :clearance_case => UNCOLLECTIBLE_CLEARANCE_CASE[:in_cycle]
-      })
-      
-      @second_gl_wu.should_not be_valid 
-    end
-  end
-  
+  # 
+  # context "updating the uncollectible's glm id" do
+  #   before(:each) do
+  #     @first_gl_wu = GroupLoanWeeklyUncollectible.create_object({
+  #       :group_loan_id => @group_loan.id,
+  #       :group_loan_membership_id => @uncollectible_glm.id ,
+  #       :group_loan_weekly_collection_id => @second_group_loan_weekly_collection.id,
+  #       :clearance_case => UNCOLLECTIBLE_CLEARANCE_CASE[:in_cycle]   
+  #     })
+  #     
+  #     @second_gl_wu = GroupLoanWeeklyUncollectible.create_object({
+  #       :group_loan_id => @group_loan.id,
+  #       :group_loan_membership_id => @second_uncollectible_glm.id ,
+  #       :group_loan_weekly_collection_id => @second_group_loan_weekly_collection.id  ,
+  #       :clearance_case => UNCOLLECTIBLE_CLEARANCE_CASE[:in_cycle]
+  #     })
+  #   end
+  #   
+  #   it 'should create first_gl_wu and second_gl_wu ' do
+  #     @first_gl_wu.should be_valid 
+  #     @second_gl_wu.should be_valid 
+  #   end
+  #   
+  #   it 'should allow update to the second_gl_wu' do
+  #     @second_gl_wu.update_object({
+  #       :group_loan_id => @group_loan.id,
+  #       :group_loan_membership_id => @third_uncollectible_glm.id ,
+  #       :group_loan_weekly_collection_id => @second_group_loan_weekly_collection.id ,
+  #       :clearance_case => UNCOLLECTIBLE_CLEARANCE_CASE[:in_cycle]
+  #     })
+  #     
+  #     @second_gl_wu.should be_valid 
+  #      
+  #      
+  #     @second_gl_wu.group_loan_membership.id.should == @third_uncollectible_glm.id
+  #   end
+  #   
+  #   it 'should not allow update to the first_gl_wu (create 2 uncollectibles with equal glm_id)' do
+  #     @second_gl_wu.update_object({
+  #       :group_loan_id => @group_loan.id,
+  #       :group_loan_membership_id => @uncollectible_glm.id ,
+  #       :group_loan_weekly_collection_id => @second_group_loan_weekly_collection.id ,
+  #       :clearance_case => UNCOLLECTIBLE_CLEARANCE_CASE[:in_cycle]
+  #     })
+  #     
+  #     @second_gl_wu.should_not be_valid 
+  #   end
+  # end
+  # 
   
   context "create one uncollectible: impact on the weekly_collection.amount_receivable" do
     before(:each) do
@@ -341,7 +341,7 @@ describe GroupLoanWeeklyUncollectible do
         
 
         
-        it 'should  allow group loan closing if there are uncleared uncollectibles (case: end_of_cycle)' do
+        it 'should  allow group loan closing even if there are uncleared uncollectibles only with case: end_of_cycle)' do
           @group_loan.close(:closed_at => @closed_at)
           @group_loan.errors.size.should == 0 
           @group_loan.is_closed.should be_true  
@@ -353,7 +353,7 @@ describe GroupLoanWeeklyUncollectible do
             @first_gl_wu.collect(:collected_at => @uncollectible_collected_at)
           end
           
-          it 'should not be collected' do
+          it 'should not allow collection of end_of_cycle uncollectible payment' do
             @first_gl_wu.is_collected.should be_false 
           end
           
@@ -369,12 +369,12 @@ describe GroupLoanWeeklyUncollectible do
 
  
 
-            it 'should allow group loan closing if the uncollectibles are cleared' do 
+            it 'should allow group loan closing if the uncollectibles with in_cycle payment are cleared' do 
               @group_loan.is_closed.should be_true 
               @group_loan.errors.size.should == 0 
             end
             
-            it 'should clear the weekly uncollectible' do
+            it 'should clear the weekly uncollectible case end_of_cycle upon group loan closing' do
               @first_gl_wu.is_cleared.should be_true 
               @first_gl_wu.is_collected.should be_false 
               @first_gl_wu.clearance_case.should == UNCOLLECTIBLE_CLEARANCE_CASE[:end_of_cycle]

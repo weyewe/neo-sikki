@@ -689,23 +689,17 @@ Phase: loan disbursement finalization
     
     
     # perform deduction for those unpaid member
+    self.clear_end_of_cycle_uncollectibles
     self.manifest_total_compulsory_savings_pre_closure
     self.deduct_compulsory_savings_for_unsettled_default 
     self.deactivate_group_loan_memberships_due_to_group_closed
     
-    # clear the group_loan_compulsory_savings
-    
-    
-    # self.update_bad_debt_allowance
-    # self.update_bad_debt_expense 
+
     
     self.is_closed = true 
     
     if self.save
-      puts "going to clear uncollectibles from group_loan"
-      self.clear_end_of_cycle_uncollectibles
     else
-      puts "fail to save group loan"
       self.errors.messages.each {|x| puts "err close: #{x}"}
     end
     
