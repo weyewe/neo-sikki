@@ -222,7 +222,7 @@ class UserMailer < ActionMailer::Base
           next_collection = group_loan.group_loan_weekly_collections.where(:is_collected => false, :is_confirmed => false ).order("id ASC").first
 
           next_collection_amount = next_collection.amount_receivable if not next_collection.nil? 
-          puts "before result"
+          # puts "before result"
           result = [
               group_loan.group_number,
               group_loan.name, 
@@ -233,7 +233,7 @@ class UserMailer < ActionMailer::Base
               collected_at,
               next_collection_amount
             ]
-            puts "After result"
+            # puts "After result"
           csv <<  result
           
         end
