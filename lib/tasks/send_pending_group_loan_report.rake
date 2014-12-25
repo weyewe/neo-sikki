@@ -18,7 +18,7 @@ task :send_pending_group_loan_report => :environment do
                                       "lucyana_siregar@yahoo.com",
                                       "leonardo.kamilius@gmail.com"]).deliver
                                       
-                                      # UserMailer.pending_group_loan(["w.yunnal@gmail.com"]).deliver
+                                      # UserMailer.pending_group_loan(["admin@11ina.com"]).deliver
                                                                       
     else
       puts "wednesday, friday, but not 14pm"

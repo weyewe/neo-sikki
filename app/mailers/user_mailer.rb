@@ -3,7 +3,7 @@
 class UserMailer < ActionMailer::Base
   require 'csv'
   
-  default from: "from@example.com"
+  default from: "w.yunnal@gmail.com"
 
   def welcome 
     content = 'awesome banzai'
