@@ -7,6 +7,8 @@ if Rails.env.production?
     :password       => ENV['SENDGRID_PASSWORD'],
     :domain         => 'heroku.com'
   }
+  
+  
   ActionMailer::Base.delivery_method = :smtp
 elsif Rails.env.development?
   ActionMailer::Base.smtp_settings = {
