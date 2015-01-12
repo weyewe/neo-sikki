@@ -110,7 +110,7 @@ describe GroupLoan do
       }
     )
 
-    @first_group_loan_weekly_collection.is_collected.should be_true
+    @first_group_loan_weekly_collection.is_collected.should be_truthy
     @first_group_loan_weekly_collection.confirm(:confirmed_at => DateTime.now )
     @first_group_loan_weekly_collection.reload
     
@@ -118,8 +118,8 @@ describe GroupLoan do
   
   
   it 'should confirm the first group_loan_weekly_collection' do
-    @first_group_loan_weekly_collection.is_collected.should be_true 
-    @first_group_loan_weekly_collection.is_confirmed.should be_true 
+    @first_group_loan_weekly_collection.is_collected.should be_truthy 
+    @first_group_loan_weekly_collection.is_confirmed.should be_truthy 
   end
   
   context "a member  run away ( week 2 ) "  do
@@ -139,12 +139,12 @@ describe GroupLoan do
       
       
       @run_away_glm.reload 
-      @run_away_glm.is_active.should be_false 
+      @run_away_glm.is_active.should be_falsey 
       @run_away_glm.deactivation_week_number.should == @second_group_loan_weekly_collection.week_number
       @run_away_glm.deactivation_case.should == GROUP_LOAN_DEACTIVATION_CASE[:run_away]
     end
     
-    it 'should create 1 group_loan_run_away_receivable' do
+    it 'should create 1 group_loan_run_away_receivable, by default weekly payment' do
       GroupLoanRunAwayReceivable.count.should == 1 
       a = GroupLoanRunAwayReceivable.first 
       # by default, weekly 
@@ -168,7 +168,7 @@ describe GroupLoan do
     
     it 'should not contain the run away glm in the active_glm' do 
       @active_glm_id_list = @group_loan.active_group_loan_memberships.map{|x| x.id }
-      @active_glm_id_list.include?(@run_away_glm.id).should be_false 
+      @active_glm_id_list.include?(@run_away_glm.id).should be_falsey 
     end
     
     it 'should be allowed to change payment case' do

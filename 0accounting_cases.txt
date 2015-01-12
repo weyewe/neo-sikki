@@ -1,0 +1,56 @@
+Loan Disbursement
+
+1. Basic loan disbursement, no corner cases
+
+Weekly Collection, combination of 6 key-drivers of headache: 
+
+1. Pay for the weekly payment
+2. confirm uncollectibles 
+3. run_away allowance, end_of_cycle
+	==> what if it is run_away_allowance, but paid in cycle? No need for allowance then. 
+	
+	treat it as if the member	is not running away 
+	
+4. deceased_allowance
+5. premature_clearance 
+6. extra_revenue from collection rounding_up
+
+
+So, our accounting test scenario:
+Standard
+1. Test the basic loan disbursement
+2. normal: only transaction from weekly_payment_collection [1]
+3. normal +  run_away, decided to be paid_in_cycle [2]
+	a. what's gonna happen to next week's collection amount?
+	b. what's gonna happen to the end-of-loan closing? 
+	c. what's gonna happen to this week's collection amount, taking account of this corner cases?
+4. normal +  run_away, decided to be at the end of the cycle [2]
+5. normal + deceased_allowance
+6. normal + premature_clearance
+7. normal + uncollectibles 
+
+
+question to be asked on each scenarios:
+a. what's gonna happen to next week's collection amount?
+b. what's gonna happen to the end-of-loan closing? 
+c. what's gonna happen to this week's collection amount, taking account of this corner cases?
+
+when does corner cases happen?
+a. parallel: 2 corner cases happening on 1 weekly collection
+b. sequential: the corner cases happened one after another weekly collection 
+
+# if we are gonna perform integration test, taking 2 corner cases, we will have 3 x 5 x 5 x 2 cases = 150 cases 
+
+
+Combination cases: combination between run_away, deceased, premature_clearance, uncollectibles
+
+At most, there will be 4^4 cases to be tested:  4x4x4x4 = 256 cases
+
+Impossible to test. 
+
+We will take risk by testing only 1 case with all the factor presents:
+collection with 
+	run_away_weekly_collection  + 
+	premature_clearance + 
+	uncollectible + 
+	deceased    << on the same week 

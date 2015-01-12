@@ -486,8 +486,10 @@ TRANSACTION_DATA_CODE = {
   :group_loan_premature_clearance_deposit => 5 ,
   :group_loan_uncollectible_allowance => 6,
   :group_loan_in_cycle_uncollectible_clearance => 7, 
-  :group_loan_run_away_end_of_cycle_clearance => 8, 
-  :group_loan_deceased_allowance => 8, 
+  :group_loan_run_away_declaration => 8 , 
+  :group_loan_run_away_in_cycle_clearance => 9, 
+  :group_loan_run_away_end_of_cycle_clearance => 10, 
+  :group_loan_deceased_allowance => 15, 
   :group_loan_weekly_collection_round_up => 20
   
   

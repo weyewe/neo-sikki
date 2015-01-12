@@ -109,7 +109,7 @@ describe GroupLoan do
       }
     )
 
-    @first_group_loan_weekly_collection.is_collected.should be_true
+    @first_group_loan_weekly_collection.is_collected.should be_truthy
     @first_group_loan_weekly_collection.confirm(:confirmed_at => DateTime.now )
     @first_group_loan_weekly_collection.reload
     @closed_at = DateTime.new(2013,12,5,0,0,0)
@@ -118,9 +118,9 @@ describe GroupLoan do
   
   it 'should confirm the first group_loan_weekly_collection' do
     @first_group_loan_weekly_collection.errors.messages.each {|x| puts "Msg: #{x}"}
-    @first_group_loan_weekly_collection.is_collected.should be_true 
+    @first_group_loan_weekly_collection.is_collected.should be_truthy 
     
-    @first_group_loan_weekly_collection.is_confirmed.should be_true 
+    @first_group_loan_weekly_collection.is_confirmed.should be_truthy 
   end
   
   context "a member  run away ( week 2 ) "  do
@@ -190,7 +190,7 @@ describe GroupLoan do
          end
         
         it 'should not close group loan' do
-          @group_loan.is_closed.should be_false 
+          @group_loan.is_closed.should be_falsey 
         end
         
         # it 'should create group_loan_run_away_receivable_payment' do
@@ -388,13 +388,13 @@ describe GroupLoan do
           end
 
           it 'should close the group loan' do
-            @group_loan.is_closed.should be_true 
+            @group_loan.is_closed.should be_truthy 
           end
 
           it 'should confirm all group loan weekly collections' do
             @group_loan.group_loan_weekly_collections.order("id ASC").each do |x|
-              x.is_collected.should be_true 
-              x.is_confirmed.should be_true 
+              x.is_collected.should be_truthy 
+              x.is_confirmed.should be_truthy 
             end
           end
 

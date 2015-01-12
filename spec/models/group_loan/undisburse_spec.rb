@@ -89,8 +89,8 @@ describe GroupLoanWeeklyCollection do
   
   
   it 'should have started the loan' do
-    @group_loan.is_loan_disbursed.should be_true 
-    @group_loan.is_started.should be_true 
+    @group_loan.is_loan_disbursed.should be_truthy 
+    @group_loan.is_started.should be_truthy 
   end
   
   context "undisburse the loan without any weekly_collection" do
@@ -128,15 +128,15 @@ describe GroupLoanWeeklyCollection do
     
     
     it 'should have one confirmed glwc' do
-      @first_glwc.is_confirmed.should be_false
-      @first_glwc.is_collected.should be_true   
+      @first_glwc.is_confirmed.should be_falsey
+      @first_glwc.is_collected.should be_truthy   
     end
     
     it 'should not be able to undisburse' do
       @group_loan.undisburse
       # @group_loan.errors.size.should_not == 0 
       @group_loan.reload
-      @group_loan.is_loan_disbursed.should be_true 
+      @group_loan.is_loan_disbursed.should be_truthy 
     end
   end
   
@@ -158,7 +158,7 @@ describe GroupLoanWeeklyCollection do
         @group_loan.undisburse
         @group_loan.errors.size.should_not == 0
         @group_loan.reload  
-        @group_loan.is_loan_disbursed.should be_true
+        @group_loan.is_loan_disbursed.should be_truthy
       end
     end
     
@@ -174,7 +174,7 @@ describe GroupLoanWeeklyCollection do
         @group_loan.undisburse
         @group_loan.errors.size.should_not == 0
         @group_loan.reload  
-        @group_loan.is_loan_disbursed.should be_true
+        @group_loan.is_loan_disbursed.should be_truthy
       end
     end
     
@@ -194,7 +194,7 @@ describe GroupLoanWeeklyCollection do
         @group_loan.undisburse
         @group_loan.errors.size.should_not == 0
         @group_loan.reload  
-        @group_loan.is_loan_disbursed.should be_true
+        @group_loan.is_loan_disbursed.should be_truthy
       end
     end
     
@@ -215,7 +215,7 @@ describe GroupLoanWeeklyCollection do
         @group_loan.undisburse
         @group_loan.errors.size.should_not == 0
         @group_loan.reload  
-        @group_loan.is_loan_disbursed.should be_true
+        @group_loan.is_loan_disbursed.should be_truthy
       end
     end
     
@@ -238,7 +238,7 @@ describe GroupLoanWeeklyCollection do
         @group_loan.undisburse
         @group_loan.errors.size.should_not == 0
         @group_loan.reload  
-        @group_loan.is_loan_disbursed.should be_true
+        @group_loan.is_loan_disbursed.should be_truthy
       end
     end
   end

@@ -103,7 +103,7 @@ describe GroupLoanWeeklyUncollectible do
       }
     )
 
-    @first_group_loan_weekly_collection.is_collected.should be_true
+    @first_group_loan_weekly_collection.is_collected.should be_truthy
     @first_group_loan_weekly_collection.confirm(:confirmed_at => DateTime.now)
     @first_group_loan_weekly_collection.reload
     @second_group_loan_weekly_collection.reload 
@@ -120,8 +120,8 @@ describe GroupLoanWeeklyUncollectible do
   
   
   it 'should confirm the first group_loan_weekly_collection' do
-    @first_group_loan_weekly_collection.is_collected.should be_true 
-    @first_group_loan_weekly_collection.is_confirmed.should be_true 
+    @first_group_loan_weekly_collection.is_collected.should be_truthy 
+    @first_group_loan_weekly_collection.is_confirmed.should be_truthy 
   end
   
   it 'should create uncollectible_weekly_payment for first due weekly_collection' do
@@ -266,7 +266,7 @@ describe GroupLoanWeeklyUncollectible do
     
     it 'should be deletable' do
       @first_gl_wu.delete_object
-      @first_gl_wu.persisted?.should be_false 
+      @first_gl_wu.persisted?.should be_falsey 
     end
      
     
@@ -298,7 +298,7 @@ describe GroupLoanWeeklyUncollectible do
       it 'should NOT be deletable' do
         @first_gl_wu.delete_object
         @first_gl_wu.errors.size.should_not == 0 
-        @first_gl_wu.persisted?.should be_true  
+        @first_gl_wu.persisted?.should be_truthy  
       end
 
       it 'should not allow creation of uncollectible' do
@@ -318,7 +318,7 @@ describe GroupLoanWeeklyUncollectible do
         
         
       it 'should confirm the second_group_loan_weekly_collection' do
-        @second_group_loan_weekly_collection.is_confirmed.should be_true 
+        @second_group_loan_weekly_collection.is_confirmed.should be_truthy 
       end
       
        
@@ -339,7 +339,7 @@ describe GroupLoanWeeklyUncollectible do
         it 'should not allow group loan closing if there are uncleared uncollectibles' do
           @group_loan.close(:closed_at => @closed_at)
           @group_loan.errors.size.should_not == 0 
-          @group_loan.is_closed.should be_false 
+          @group_loan.is_closed.should be_falsey 
         end
         
         
@@ -349,7 +349,7 @@ describe GroupLoanWeeklyUncollectible do
           end
           
           it 'should be collected' do
-            @first_gl_wu.is_collected.should be_true 
+            @first_gl_wu.is_collected.should be_truthy 
           end
           
           context "clear uncollectibles"  do
@@ -380,14 +380,14 @@ describe GroupLoanWeeklyUncollectible do
 
             it 'should clear the gl_wu' do
               @first_gl_wu.errors.messages.each {|x| puts "msg: #{x}"}
-              @first_gl_wu .is_cleared.should be_true  
+              @first_gl_wu .is_cleared.should be_truthy  
             end
 
             it 'should allow group loan closing if the uncollectibles are cleared' do
               @group_loan.reload
               @group_loan.close(:closed_at => @closed_at )
 
-              @group_loan.is_closed.should be_true 
+              @group_loan.is_closed.should be_truthy 
               @group_loan.errors.size.should == 0 
             end
           end

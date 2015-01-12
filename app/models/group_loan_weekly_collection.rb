@@ -100,7 +100,7 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
       :description =>  message,
       :transaction_source_id => self.id , 
       :transaction_source_type => self.class.to_s ,
-      :code => TRANSACTION_DATA_CODE[:group_loan_weekly_collection_voluntary_savings],
+      :code => TRANSACTION_DATA_CODE[:group_loan_weekly_collection],
       :is_contra_transaction => false 
     }, true )
     

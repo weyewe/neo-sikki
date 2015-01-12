@@ -96,7 +96,7 @@ describe GroupLoan do
       }
     )
 
-    @first_group_loan_weekly_collection.is_collected.should be_true
+    @first_group_loan_weekly_collection.is_collected.should be_truthy
     # puts "FROM THE SPEC: Gonna confirm first weekly_collection"
     @first_group_loan_weekly_collection.confirm(:confirmed_at => DateTime.now )
     @first_group_loan_weekly_collection.reload
@@ -149,7 +149,7 @@ describe GroupLoan do
       end
       
       it 'should deactivate run_away_glm' do
-        @run_away_glm.is_active.should be_false 
+        @run_away_glm.is_active.should be_falsey 
         @run_away_glm.deactivation_case.should == GROUP_LOAN_DEACTIVATION_CASE[:run_away]   
       end
       
@@ -193,7 +193,7 @@ describe GroupLoan do
         end
         
         it "should confirm the third week" do
-          @third_group_loan_weekly_collection.is_confirmed.should be_true 
+          @third_group_loan_weekly_collection.is_confirmed.should be_truthy 
           
           
         end
@@ -203,7 +203,7 @@ describe GroupLoan do
           @first_gl_pc.errors.messages.each {|x| puts x }
           
           @fourth_group_loan_weekly_collection.errors.messages.each {|x| puts "glwc error: #{x}" }
-          @fourth_group_loan_weekly_collection.is_confirmed?.should be_true 
+          @fourth_group_loan_weekly_collection.is_confirmed?.should be_truthy 
         end
         
         it 'should create valid gl_pc' do

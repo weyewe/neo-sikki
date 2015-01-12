@@ -26,7 +26,8 @@ gem 'turbolinks'
 
 
 gem 'thin'
-gem 'roadie' # for sending email 's css
+# gem 'roadie' # for sending email 's css
+gem 'roadie', '~> 2.4'
 
 
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
@@ -40,7 +41,7 @@ end
 
 gem 'awesome_nested_set'
 
-gem 'devise'
+gem 'devise', '~> 3.0.3'
 gem "kaminari"  
 gem 'uuidtools'
 gem 'fastercsv', '~> 1.5.5'

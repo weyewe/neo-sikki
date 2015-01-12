@@ -119,7 +119,7 @@ describe GroupLoanWeeklyCollection do
         end
         
         it 'should have started group loan' do
-          @group_loan.is_started.should be_true 
+          @group_loan.is_started.should be_truthy 
         end
         
         it 'should manifest the number of collections' do

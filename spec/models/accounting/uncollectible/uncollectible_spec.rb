@@ -3,7 +3,7 @@ require 'spec_helper'
 describe GroupLoan do
   
   before(:each) do
-    # Account.create_base_objects
+    # # Account.create_base_objects
     # create users 
     (1..8).each do |number|
       Member.create_object({
@@ -104,82 +104,57 @@ describe GroupLoan do
             :member_id => member.id ,
             :group_loan_product_id => selected_glp.id
           })
-        end
-      end
-       
-      
-      context "starting the group_loan" do
-        before(:each) do
+          
           @group_loan.start(:started_at => @started_at) 
           @group_loan.reload 
+          @group_loan.disburse_loan(:disbursed_at => @disbursed_at)
+          @first_group_loan_weekly_collection = @group_loan.group_loan_weekly_collections.order("id ASC").first
+          @first_group_loan_weekly_collection.should be_valid 
+          @first_group_loan_weekly_collection.collect(
+            {
+              :collected_at => DateTime.now 
+            }
+          )
+
+          @first_group_loan_weekly_collection.is_collected.should be_truthy
+          
+          @first_glm = @group_loan.active_group_loan_memberships.first 
+          @initial_compulsory_savings = @first_glm.total_compulsory_savings
+          @first_group_loan_weekly_collection.confirm(:confirmed_at => DateTime.now)
+          @first_glm.reload
+          @group_loan.reload
+          
+          @glwc_week1 = @group_loan.group_loan_weekly_collections.order("week_number ASC")[0]
+          @glwc_week2 = @group_loan.group_loan_weekly_collections.order("week_number ASC")[1]
+          @glwc_week3 = @group_loan.group_loan_weekly_collections.order("week_number ASC")[2]
+          
+          
+        end
+      end
+     
+      it "should disburse the loan" do
+        @group_loan.is_loan_disbursed.should be_truthy 
+      end
+      
+      context "do collection up to week 2. week 3 == uncollectible" do
+        before(:each) do
+          counter = 0
+          [@glwc_week1, @glwc_week2].each do |x|
+            x.collect(:collected_at => DateTime.now   - 1.days )
+            x.confirm(:confirmed_at => DateTime.now)
+          end
+          
+        
+          [@glwc_week1, @glwc_week2, @glwc_week3].each {|x| x.reload } 
         end
         
-    
-        
-        context "execute loan disbursement" do
-          before(:each) do
-            @group_loan.disburse_loan(:disbursed_at => @disbursed_at)
-          end
-          
-       
-          
-          it "should create transaction data" do
-            TransactionData.where(:transaction_source_id => @group_loan.id, 
-              :transaction_source_type => @group_loan.class.to_s,
-              :code => TRANSACTION_DATA_CODE[:loan_disbursement]
-            ).count.should == 1 
-            
-            a = TransactionData.where(:transaction_source_id => @group_loan.id, 
-              :transaction_source_type => @group_loan.class.to_s,
-              :code => TRANSACTION_DATA_CODE[:loan_disbursement]
-            ).first
-            
-            a.total_debit.should == a.total_credit 
-          end
-          
-          context "undo loan disbursement" do
-            before(:each) do
-              @group_loan.undisburse
-            end
-            
-            it "should undisburse" do
-              @group_loan.is_loan_disbursed.should be_falsey 
-            end
-            
-            it "should create 2 transaction_data" do
-              TransactionData.where(:transaction_source_id => @group_loan.id, 
-                :transaction_source_type => @group_loan.class.to_s,
-                :code => TRANSACTION_DATA_CODE[:loan_disbursement]
-              ).count.should == 2
-
-              contra = TransactionData.where(:transaction_source_id => @group_loan.id, 
-                :transaction_source_type => @group_loan.class.to_s,
-                :code => TRANSACTION_DATA_CODE[:loan_disbursement]
-              ).order("id DESC").first
-              
-              contra.is_contra_transaction.should be_truthy 
-            end
-            
-            context " re-doing loan disbursement" do
-              before(:each) do
-                @group_loan.disburse_loan(:disbursed_at => @disbursed_at)
-              end
-              
-              it "should create 3 transaction_data" do
-                TransactionData.where(:transaction_source_id => @group_loan.id, 
-                  :transaction_source_type => @group_loan.class.to_s,
-                  :code => TRANSACTION_DATA_CODE[:loan_disbursement]
-                ).count.should == 3
-              end
-            end
-          end
-          
-       
+        it "should confirm week 2" do
+          @glwc_week2.is_confirmed.should be_truthy
+          @glwc_week3.is_confirmed.should be_falsy 
         end
         
         
       end
-      
       
     end
     

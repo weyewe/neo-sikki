@@ -87,7 +87,7 @@ describe GroupLoanWeeklyCollection do
   end
   
   it 'should have disbursed the group loan' do
-    @group_loan.is_loan_disbursed.should be_true 
+    @group_loan.is_loan_disbursed.should be_truthy 
   end
   
   context "setup the group loan to perform 2 weekly collections successfully per normal" do
@@ -129,7 +129,7 @@ describe GroupLoanWeeklyCollection do
     end
     
     it 'should have confirmed the glwc' do
-      @first_glwc.is_confirmed.should be_true 
+      @first_glwc.is_confirmed.should be_truthy 
     end
     
     
@@ -225,16 +225,16 @@ describe GroupLoanWeeklyCollection do
         end
         
         it 'should confirm premature clearance' do
-          @second_glwc.is_confirmed.should be_true
+          @second_glwc.is_confirmed.should be_truthy
           
           @second_gl_pc.errors.messages.each {|x| puts "premature learance error: #{x}"}
-          @second_gl_pc.is_confirmed.should be_true 
+          @second_gl_pc.is_confirmed.should be_truthy 
         end
         
         
         
         it 'should deactivate the glm' do
-          @premature_clearance_glm.is_active.should be_false 
+          @premature_clearance_glm.is_active.should be_falsey 
           @premature_clearance_glm.deactivation_case.should ==  GROUP_LOAN_DEACTIVATION_CASE[:premature_clearance]
         end
         

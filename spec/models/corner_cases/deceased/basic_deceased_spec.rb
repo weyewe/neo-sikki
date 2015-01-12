@@ -131,7 +131,7 @@ describe DeceasedClearance do
       }
     )
 
-    @first_group_loan_weekly_collection.is_collected.should be_true
+    @first_group_loan_weekly_collection.is_collected.should be_truthy
     @first_group_loan_weekly_collection.confirm(:confirmed_at => DateTime.now )
     @first_group_loan_weekly_collection.reload
     
@@ -139,8 +139,8 @@ describe DeceasedClearance do
   
   
   it 'should confirm the first group_loan_weekly_collection' do
-    @first_group_loan_weekly_collection.is_collected.should be_true 
-    @first_group_loan_weekly_collection.is_confirmed.should be_true 
+    @first_group_loan_weekly_collection.is_collected.should be_truthy 
+    @first_group_loan_weekly_collection.is_confirmed.should be_truthy 
   end
   
    
@@ -168,7 +168,7 @@ describe DeceasedClearance do
       
       @deceased_glm.reload 
       # dpr.week_number.should == @second_group_loan_weekly_collection.week_number 
-      @deceased_glm.is_active.should be_false 
+      @deceased_glm.is_active.should be_falsey 
       @deceased_glm.deactivation_week_number.should == @second_group_loan_weekly_collection.week_number
       @deceased_glm.deactivation_case.should == GROUP_LOAN_DEACTIVATION_CASE[:deceased]
     end
@@ -205,7 +205,7 @@ describe DeceasedClearance do
     
     it 'should not contain the deceased glm in the active_glm' do 
       @active_glm_id_list = @group_loan.active_group_loan_memberships.map{|x| x.id }
-      @active_glm_id_list.include?(@deceased_glm.id).should be_false 
+      @active_glm_id_list.include?(@deceased_glm.id).should be_falsey 
     end
     
     it 'should only create 1 group_loan_weekly_payment for deceased_glm' do
@@ -267,7 +267,7 @@ describe DeceasedClearance do
       end
       
       it 'should close the group loan' do
-         @group_loan.is_closed.should be_true 
+         @group_loan.is_closed.should be_truthy 
        end
       
       it 'should give the correct number of active group_loan_membership (though it is closed)' do

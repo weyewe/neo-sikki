@@ -118,7 +118,7 @@ describe GroupLoan do
         end
         
         it 'should have started group loan' do
-          @group_loan.is_started.should be_true 
+          @group_loan.is_started.should be_truthy 
         end
         
         it 'should manifest the number of collections' do
@@ -131,7 +131,7 @@ describe GroupLoan do
           end
           
           it 'should be marked as loan disbursed' do
-            @group_loan.is_loan_disbursed.should be_true 
+            @group_loan.is_loan_disbursed.should be_truthy 
           end
           
           it 'should have created N GroupLoanDisbursement' do
@@ -152,9 +152,9 @@ describe GroupLoan do
             )
             
             object = DateTime.now 
-            object.is_a?(DateTime).should be_true 
+            object.is_a?(DateTime).should be_truthy 
             @first_group_loan_weekly_collection.errors.messages.each {|x| puts "msg : #{x}"}
-            @first_group_loan_weekly_collection.is_collected.should be_true 
+            @first_group_loan_weekly_collection.is_collected.should be_truthy 
           end
           
           it 'should not be allowed to skip week in the GroupLoanWeeklyCollection' do 
@@ -166,14 +166,13 @@ describe GroupLoan do
               }
             )
             
-            @second_group_loan_weekly_collection.is_collected.should be_false
+            @second_group_loan_weekly_collection.is_collected.should be_falsey
             @second_group_loan_weekly_collection.errors.size.should_not == 0
           end
           
           
           context "weekly payment collection: 1 week" do
             before(:each) do
-              puts "===============> This is IT! \n"*10
               @first_group_loan_weekly_collection = @group_loan.group_loan_weekly_collections.order("id ASC").first
               @first_group_loan_weekly_collection.should be_valid 
               @first_group_loan_weekly_collection.collect(
@@ -182,7 +181,7 @@ describe GroupLoan do
                 }
               )
 
-              @first_group_loan_weekly_collection.is_collected.should be_true
+              @first_group_loan_weekly_collection.is_collected.should be_truthy
               
               @first_glm = @group_loan.active_group_loan_memberships.first 
               @initial_compulsory_savings = @first_glm.total_compulsory_savings
@@ -192,8 +191,8 @@ describe GroupLoan do
             end
             
             it "should confirm group loan weekly collection" do
-              @first_group_loan_weekly_collection.is_collected.should be_true
-              @first_group_loan_weekly_collection.is_confirmed.should be_true
+              @first_group_loan_weekly_collection.is_collected.should be_truthy
+              @first_group_loan_weekly_collection.is_confirmed.should be_truthy
             end
             
             

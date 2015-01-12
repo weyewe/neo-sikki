@@ -95,7 +95,7 @@ describe GroupLoan do
       }
     )
 
-    @first_group_loan_weekly_collection.is_collected.should be_true
+    @first_group_loan_weekly_collection.is_collected.should be_truthy
     @first_group_loan_weekly_collection.confirm
     @first_group_loan_weekly_collection.reload
     @second_group_loan_weekly_collection.reload 
@@ -106,8 +106,8 @@ describe GroupLoan do
   
   
   # it 'should confirm the first group_loan_weekly_collection' do
-  #   @first_group_loan_weekly_collection.is_collected.should be_true 
-  #   @first_group_loan_weekly_collection.is_confirmed.should be_true 
+  #   @first_group_loan_weekly_collection.is_collected.should be_truthy 
+  #   @first_group_loan_weekly_collection.is_confirmed.should be_truthy 
   # end
   
   context "create 1 uncollectible in the week 2" do
@@ -129,7 +129,7 @@ describe GroupLoan do
     end
     
     # it 'should confirm the weekly collection' do
-    #   @second_group_loan_weekly_collection.is_confirmed.should be_true 
+    #   @second_group_loan_weekly_collection.is_confirmed.should be_truthy 
     # end
     # 
     # it 'should have normal amount receivable minus the weekly_payment of uncollectible member' do
@@ -275,12 +275,12 @@ describe GroupLoan do
         end
         
         it 'should confirm the third group loan weekly collection' do
-          @fourth_group_loan_weekly_collection.is_confirmed.should be_true 
+          @fourth_group_loan_weekly_collection.is_confirmed.should be_truthy 
         end
         
         
         it 'should have deactivate @second_glm' do
-          @second_glm.is_active.should be_false 
+          @second_glm.is_active.should be_falsey 
           @second_glm.deactivation_week_number.should == @fourth_group_loan_weekly_collection.week_number 
         end
         
@@ -288,8 +288,8 @@ describe GroupLoan do
           group_loan_active_glm_id_list = @group_loan.active_group_loan_memberships.map{|x| x.id }
           weekly_collection_active_glm_id_list = @fourth_group_loan_weekly_collection.active_group_loan_memberships.map{|x| x.id}
           
-          group_loan_active_glm_id_list.include?(@second_glm.id ).should be_false 
-          weekly_collection_active_glm_id_list.include?(@second_glm.id).should be_false 
+          group_loan_active_glm_id_list.include?(@second_glm.id ).should be_falsey 
+          weekly_collection_active_glm_id_list.include?(@second_glm.id).should be_falsey 
         end
         
         it 'should create amount receivable: all members except the uncollectible + premature_clearance' do

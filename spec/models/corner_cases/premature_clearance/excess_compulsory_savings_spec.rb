@@ -103,7 +103,7 @@ describe GroupLoan do
       }
     )
 
-    @first_group_loan_weekly_collection.is_collected.should be_true
+    @first_group_loan_weekly_collection.is_collected.should be_truthy
     # puts "FROM THE SPEC: Gonna confirm first weekly_collection"
     @first_group_loan_weekly_collection.confirm(:confirmed_at => DateTime.now )
     @first_group_loan_weekly_collection.reload
@@ -130,7 +130,7 @@ describe GroupLoan do
     
     it "should confirm week 5" do
       @fifth_group_loan_weekly_collection.reload
-      @fifth_group_loan_weekly_collection.is_confirmed.should be_true 
+      @fifth_group_loan_weekly_collection.is_confirmed.should be_truthy 
     end
       
     it 'should have more compulsory savings than remaining principal' do

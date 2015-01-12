@@ -28,6 +28,7 @@ require 'spec_helper'
 describe GroupLoan do
   
   before(:each) do
+    # Account.create_base_objects
     (1..8).each do |number|
       Member.create_object({
         :name =>  "Member #{number}",
@@ -113,79 +114,39 @@ describe GroupLoan do
     @first_group_loan_weekly_collection.confirm(:confirmed_at => DateTime.now )
     @first_group_loan_weekly_collection.reload
     
-  end
-  
-  
-  it 'should confirm the first group_loan_weekly_collection' do
-    @first_group_loan_weekly_collection.is_collected.should be_truthy 
-    @first_group_loan_weekly_collection.is_confirmed.should be_truthy 
-  end
-  
-  context "a member  run away ( week 2 ) "  do
-    before(:each) do
-      @run_away_glm = @group_loan.active_group_loan_memberships.first 
-      @run_away_member = @run_away_glm.member 
-      @initial_active_glm_count = @group_loan.active_group_loan_memberships.count 
-      @first_week_amount_receivable=   @first_group_loan_weekly_collection.amount_receivable
-      
-      @run_away_member.mark_as_run_away
-      @group_loan.reload 
-      @run_away_glm.reload 
-      @second_group_loan_weekly_collection = @group_loan.group_loan_weekly_collections.order("id ASC")[1]
-    end
+    @run_away_glm = @group_loan.active_group_loan_memberships.first 
+    @run_away_member = @run_away_glm.member 
+    @initial_active_glm_count = @group_loan.active_group_loan_memberships.count 
+    @first_week_amount_receivable=   @first_group_loan_weekly_collection.amount_receivable
     
-    it 'should create one deactivated glm' do
-      
-      
-      @run_away_glm.reload 
-      @run_away_glm.is_active.should be_falsey 
-      @run_away_glm.deactivation_week_number.should == @second_group_loan_weekly_collection.week_number
-      @run_away_glm.deactivation_case.should == GROUP_LOAN_DEACTIVATION_CASE[:run_away]
-    end
-    
-    it 'should create 1 group_loan_run_away_receivable' do
-      GroupLoanRunAwayReceivable.count.should == 1 
-      a = GroupLoanRunAwayReceivable.first 
-      # by default, weekly 
-      a.payment_case.should == GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:weekly]
-      
-      a.group_loan_membership_id.should == @run_away_glm.id 
-      @run_away_glm.group_loan_run_away_receivable.should be_valid 
-      @run_away_glm.group_loan_run_away_receivable.id.should == GroupLoanRunAwayReceivable.first.id 
-    end
-    
-    it 'should extract the glm that is active at that particular week' do
-      week_2_active_glm_count = @second_group_loan_weekly_collection.active_group_loan_memberships.count 
-      week_2_active_glm_count.should == (@initial_active_glm_count - 1 ) 
-    end
-    
-    it 'should reduce the active_glm count' do
-      @final_active_glm_count = @group_loan.active_group_loan_memberships.count
-      diff = @initial_active_glm_count - @final_active_glm_count
-      diff.should == 1 
-    end
-    
-    it 'should not contain the run away glm in the active_glm' do 
-      @active_glm_id_list = @group_loan.active_group_loan_memberships.map{|x| x.id }
-      @active_glm_id_list.include?(@run_away_glm.id).should be_falsey 
-    end
-    
-    it 'should be allowed to change payment case' do
-      @gl_rar = @run_away_glm.group_loan_run_away_receivable 
-      @gl_rar.set_payment_case({
-        :payment_case => GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:weekly]
-      })
-      @gl_rar.payment_case.should ==  GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:weekly]
-      
-      @gl_rar.set_payment_case({
-        :payment_case => GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:end_of_cycle]
-      })
-      @gl_rar.payment_case.should ==  GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:end_of_cycle]
-    end
-    
+    @run_away_member.mark_as_run_away(:run_away_at => DateTime.now)
+    @group_loan.reload 
+    @run_away_glm.reload 
+    @second_group_loan_weekly_collection = @group_loan.group_loan_weekly_collections.order("id ASC")[1]
     
   end
   
+  it "should mark second_glm as run away" do
+    @run_away_glm.is_active.should be_falsy
+    @run_away_glm.deactivation_case.should == GROUP_LOAN_DEACTIVATION_CASE[:run_away]
+  end
+  
+  it "should create one group_loan_run_away_receivable" do
+    @run_away_glm.group_loan_run_away_receivable.should be_valid
+    gl_rar = @run_away_glm.group_loan_run_away_receivable
+    
+    TransactionData.where(:transaction_source_id => gl_rar.id, 
+      :transaction_source_type => gl_rar.class.to_s,
+      :code => TRANSACTION_DATA_CODE[:group_loan_run_away_declaration]
+    ).count.should == 1
+    
+    result = TransactionData.where(:transaction_source_id => gl_rar.id, 
+      :transaction_source_type => gl_rar.class.to_s,
+      :code => TRANSACTION_DATA_CODE[:group_loan_run_away_declaration]
+    ).first
+    
+    result.is_confirmed.should be_truthy
+  end
   
   
    

@@ -91,7 +91,7 @@ describe GroupLoanWeeklyCollection do
     @group_loan.cancel_start
     @group_loan.errors.size.should_not ==0 
     @group_loan.reload 
-    @group_loan.is_started.should be_true
+    @group_loan.is_started.should be_truthy
   end
   
   context "undisburse group loan" do
@@ -101,13 +101,13 @@ describe GroupLoanWeeklyCollection do
     end
     
     it 'should be undisbursed' do
-      @group_loan.is_loan_disbursed.should be_false 
+      @group_loan.is_loan_disbursed.should be_falsey 
     end
     
     it 'should be allowed to cancel start' do
       @group_loan.cancel_start
       @group_loan.reload
-      @group_loan.is_started.should be_false 
+      @group_loan.is_started.should be_falsey 
     end
   end
 
