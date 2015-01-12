@@ -7,6 +7,9 @@ Weekly Collection, combination of 6 key-drivers of headache:
 1. Pay for the weekly payment
 2. confirm uncollectibles 
 3. run_away allowance, end_of_cycle
+	# when runaway is declared, regardless of the clearance type (in_cycle of end_of_cycle) => bad debt allocation
+	# 
+
 	==> what if it is run_away_allowance, but paid in cycle? No need for allowance then. 
 	
 	treat it as if the member	is not running away 

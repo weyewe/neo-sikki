@@ -2,7 +2,7 @@ class GroupLoanRunAwayReceivable < ActiveRecord::Base
   attr_accessible :member_id, :amount_receivable, 
                   :group_loan_id, :payment_case , :group_loan_membership_id , 
                   :group_loan_weekly_collection_id
-  has_many :group_loan_run_away_receivable_payments
+  # has_many :group_loan_run_away_receivable_payments
   belongs_to :group_loan_membership 
   belongs_to :group_loan_weekly_collection
   belongs_to :member
@@ -31,40 +31,13 @@ class GroupLoanRunAwayReceivable < ActiveRecord::Base
   end
   
   def perform_run_away_declaration_posting
-    remaining_weeks = group_loan.number_of_collections - group_loan_weekly_collection.week_number + 1 
-    remaining_principal = group_loan_membership.group_loan_product.principal * remaining_weeks 
     
-    
-    
-    message = "Runaway Bad Debt Allowance: Group #{group_loan.name}, #{group_loan.group_number}, member: #{member.name}"
-    
-    ta = TransactionData.create_object({
-      :transaction_datetime => self.member.run_away_at,
-      :description =>  message,
-      :transaction_source_id => self.id , 
-      :transaction_source_type => self.class.to_s ,
-      :code => TRANSACTION_DATA_CODE[:group_loan_run_away_declaration],
-      :is_contra_transaction => false 
-    }, true )
-    
-     
-    
-    TransactionDataDetail.create_object(
-      :transaction_data_id => ta.id,        
-      :account_id          => Account.find_by_code(ACCOUNT_CODE[:pinjaman_sejahtera_arae_leaf][:code]).id      ,
-      :entry_case          => NORMAL_BALANCE[:debit]     ,
-      :amount              => remaining_principal,
-      :description => message
-    )
-    
-    TransactionDataDetail.create_object(
-      :transaction_data_id => ta.id,        
-      :account_id          => Account.find_by_code(ACCOUNT_CODE[:pinjaman_sejahtera_ar_leaf][:code]).id        ,
-      :entry_case          => NORMAL_BALANCE[:credit]     ,
-      :amount              => remaining_principal,
-      :description => message
-    )
-    ta.confirm
+    AccountingService::MemberRunAway.create_bad_debt_allocation(
+        group_loan, 
+        member, 
+        group_loan_membership, 
+        group_loan_weekly_collection,
+        self) 
   end
   
     # 

@@ -212,50 +212,50 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
   end
   
   
-  
-  def post_run_away_allowance_end_of_cycle_resolved
-    total_allowance = BigDecimal("0")
-    self.group_loan_run_away_receivables.
-          where(:payment_case => GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:end_of_cycle]).each do |x|
-           
-      
-      allowance_amount = x.group_loan_membership.group_loan_product.principal * self.remaining_weeks 
-      
-      
-      message = "Penyisihan Member Kabur, diselesaikan di akhir siklus : Group #{group_loan.name}, #{group_loan.group_number}" + 
-                  " , week #{self.week_number}" + 
-                  " , member #{x.member.name}, #{x.member.id_number}"
-
-      ta = TransactionData.create_object({
-        :transaction_datetime => self.collected_at,
-        :description =>  message,
-        :transaction_source_id => x.id , 
-        :transaction_source_type => x.class.to_s ,
-        :code => TRANSACTION_DATA_CODE[:group_loan_run_away_end_of_cycle_clearance],
-        :is_contra_transaction => false 
-      }, true )
-
-
-
-      TransactionDataDetail.create_object(
-        :transaction_data_id => ta.id,        
-        :account_id          => Account.find_by_code(ACCOUNT_CODE[:pinjaman_sejahtera_bda_leaf][:code]).id      ,
-        :entry_case          => NORMAL_BALANCE[:debit]     ,
-        :amount              => allowance_amount,
-        :description => message
-      )
-
-      TransactionDataDetail.create_object(
-        :transaction_data_id => ta.id,        
-        :account_id          => Account.find_by_code(ACCOUNT_CODE[:pinjaman_sejahtera_ar_leaf][:code]).id        ,
-        :entry_case          => NORMAL_BALANCE[:credit]     ,
-        :amount              => allowance_amount,
-        :description => message
-      )
-
-      ta.confirm 
-    end
-  end
+  # 
+  # def post_run_away_allowance_end_of_cycle_resolved
+  #   total_allowance = BigDecimal("0")
+  #   self.group_loan_run_away_receivables.
+  #         where(:payment_case => GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:end_of_cycle]).each do |x|
+  #          
+  #     
+  #     allowance_amount = x.group_loan_membership.group_loan_product.principal * self.remaining_weeks 
+  #     
+  #     
+  #     message = "Penyisihan Member Kabur, diselesaikan di akhir siklus : Group #{group_loan.name}, #{group_loan.group_number}" + 
+  #                 " , week #{self.week_number}" + 
+  #                 " , member #{x.member.name}, #{x.member.id_number}"
+  # 
+  #     ta = TransactionData.create_object({
+  #       :transaction_datetime => self.collected_at,
+  #       :description =>  message,
+  #       :transaction_source_id => x.id , 
+  #       :transaction_source_type => x.class.to_s ,
+  #       :code => TRANSACTION_DATA_CODE[:group_loan_run_away_end_of_cycle_clearance],
+  #       :is_contra_transaction => false 
+  #     }, true )
+  # 
+  # 
+  # 
+  #     TransactionDataDetail.create_object(
+  #       :transaction_data_id => ta.id,        
+  #       :account_id          => Account.find_by_code(ACCOUNT_CODE[:pinjaman_sejahtera_bda_leaf][:code]).id      ,
+  #       :entry_case          => NORMAL_BALANCE[:debit]     ,
+  #       :amount              => allowance_amount,
+  #       :description => message
+  #     )
+  # 
+  #     TransactionDataDetail.create_object(
+  #       :transaction_data_id => ta.id,        
+  #       :account_id          => Account.find_by_code(ACCOUNT_CODE[:pinjaman_sejahtera_ar_leaf][:code]).id        ,
+  #       :entry_case          => NORMAL_BALANCE[:credit]     ,
+  #       :amount              => allowance_amount,
+  #       :description => message
+  #     )
+  # 
+  #     ta.confirm 
+  #   end
+  # end
   
   def post_deceased_allowance
     remaining_weeks = self.remaining_weeks 
@@ -305,23 +305,23 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
   end
   
   
-  def undo_post_run_away_allowance_end_of_cycle_resolved
-    self.group_loan_run_away_receivables.
-          where(:payment_case => GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:end_of_cycle]).each do |x|
-           
-      
-
-      ta = TransactionData.create_object({
-        :transaction_source_id => x.id , 
-        :transaction_source_type => x.class.to_s ,
-        :code => TRANSACTION_DATA_CODE[:group_loan_run_away_end_of_cycle_clearance],
-        :is_contra_transaction => false 
-      } ).order("id DESC").first 
-
-
-      ta.create_contra_and_confirm if not ta.nil? 
-    end
-  end
+  # def undo_post_run_away_allowance_end_of_cycle_resolved
+  #   self.group_loan_run_away_receivables.
+  #         where(:payment_case => GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:end_of_cycle]).each do |x|
+  #          
+  #     
+  # 
+      # ta = TransactionData.create_object({
+      #   :transaction_source_id => x.id , 
+      #   :transaction_source_type => x.class.to_s ,
+      #   :code => TRANSACTION_DATA_CODE[:group_loan_run_away_end_of_cycle_clearance],
+      #   :is_contra_transaction => false 
+      # } ).order("id DESC").first 
+  # 
+  # 
+  #     ta.create_contra_and_confirm if not ta.nil? 
+  #   end
+  # end
   
   
   def undo_post_deceased_allowance
@@ -332,7 +332,7 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
       :deactivation_week_number => self.week_number
       ).each do |x|
       
-        ta = TransactionData.create_object({
+        ta = TransactionData.where({
           :transaction_source_id => x.id , 
           :transaction_source_type => x.class.to_s ,
           :code => TRANSACTION_DATA_CODE[:group_loan_deceased_allowance],
@@ -342,6 +342,66 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
         ta.create_contra_and_confirm if not ta.nil? 
       
     end
+  end
+  
+  def post_run_away_allowance_in_cycle_payment
+    current_week_number = self.week_number
+    run_away_glm_id_list = GroupLoanMembership.where{
+      (is_active.eq false) & 
+      (deactivation_case.eq GROUP_LOAN_DEACTIVATION_CASE[:run_away] ) & 
+      ( deactivation_week_number.lte current_week_number)
+    }.collect {|x| x.id }
+    
+    GroupLoanRunAwayReceivable.joins(:group_loan_membership => [:group_loan_product, :member]).where(
+        :group_loan_membership_id => run_away_glm_id_list, 
+        :payment_case => GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:weekly] ).each do |x|
+      member  = x.group_loan_membership.member 
+      principal = x.group_loan_membership.group_loan_product.principal
+      message = "Runaway Weekly Bad Debt clearance: Group #{group_loan.name}, #{group_loan.group_number}, member: #{member.name}"
+      
+      ta = TransactionData.create_object({
+        :transaction_datetime => self.collected_at,
+        :description =>  message,
+        :transaction_source_id => self.id , 
+        :transaction_source_type => self.class.to_s ,
+        :code => TRANSACTION_DATA_CODE[:group_loan_run_away_in_cycle_clearance],
+        :is_contra_transaction => false 
+      }, true )
+
+
+
+      TransactionDataDetail.create_object(
+        :transaction_data_id => ta.id,        
+        :account_id          => Account.find_by_code(ACCOUNT_CODE[:pinjaman_sejahtera_arae_leaf][:code]).id      ,
+        :entry_case          => NORMAL_BALANCE[:credit]     ,
+        :amount              => principal,
+        :description => message
+      )
+
+      TransactionDataDetail.create_object(
+        :transaction_data_id => ta.id,        
+        :account_id          => Account.find_by_code(ACCOUNT_CODE[:pinjaman_sejahtera_ar_leaf][:code]).id        ,
+        :entry_case          => NORMAL_BALANCE[:debit]     ,
+        :amount              => principal,
+        :description => message
+      )
+      ta.confirm
+    end
+    
+  end
+  
+  def undo_post_run_away_allowance_in_cycle_payment
+    ta = TransactionData.where({
+      :transaction_source_id => x.id , 
+      :transaction_source_type => x.class.to_s ,
+      :code => TRANSACTION_DATA_CODE[:group_loan_run_away_in_cycle_clearance],
+      :is_contra_transaction => false 
+    } ).order("id DESC").first
+    
+    
+    ta.create_contra_and_confirm if not ta.nil? 
+    
+    
   end
   
   
@@ -384,7 +444,8 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
         # from uncollectible +  run_away_member
         self.update_group_loan_bad_debt_allowance  # in the run away, the posting is not being done here. 
         self.confirm_uncollectible_allowance # allowance.. there will be expense during loan close
-        self.post_run_away_allowance_end_of_cycle_resolved
+        # self.post_run_away_allowance_end_of_cycle_resolved
+        self.post_run_away_allowance_in_cycle_payment
         self.post_deceased_allowance
         
         # we need to create posting: premature_clearance_deposit and premature_clearance money itself 
@@ -559,7 +620,7 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
         self.unpost_rounding_up_revenue 
         self.unconfirm_premature_clearances
         
-        self.undo_post_run_away_allowance_end_of_cycle_resolved
+        # self.undo_post_run_away_allowance_end_of_cycle_resolved
         self.undo_post_deceased_allowance
         self.unconfirm_uncollectible_allowance
         
