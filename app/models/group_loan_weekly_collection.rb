@@ -227,7 +227,7 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
         
         # need to create posting: bad debt allowance 
         # from uncollectible +  run_away_member
-        self.update_group_loan_bad_debt_allowance  # in the run away, the posting is not being done here. 
+        # self.update_group_loan_bad_debt_allowance  # in the run away, the posting is not being done here. 
         self.confirm_uncollectible_allowance # allowance.. there will be expense during loan close
         # self.post_run_away_allowance_end_of_cycle_resolved
         self.post_run_away_allowance_in_cycle_payment
@@ -238,22 +238,10 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
         self.post_extra_revenue_from_rounding_up
         # for run away member, now by default it is in-cycle
         # can't be edited. there should be posting. but not for now. 
-=begin
-  Accounts used for group loan weekly collection: 
-  1. 1-111	Kas besar
-  2. 1-141	Piutang Pinjaman Sejahtera
-  3. 4-121	Pendapatan bagi hasil pinjaman Sejahtera
-  4. 2-111	Tabungan Wajib
-  5. 2-112	Tabungan Pribadi
-  Run Away, Deceased
-  6. 7. 1-151	Penyisihan Piutang Tak Tertagih Pinjaman Sejahtera
-  Premature Clearance
-  8. 2-192	Uang titipan   [digunakan jika ada outstanding run_away member yang ditanggung bersama]
-  Rounding up
-  9. 7-118	Pembulatan nilai
-  Compulsory Savings Inequality
-  10. 6-211	Beban Penghapusan Piutang Pinjaman Sejahtera
-=end      
+        
+        self.update_group_loan_bad_debt_allowance  # in the run away, the posting is not being done here. 
+        # sum of principal in the uncollectible and the run_away_end_of_cycle resolution 
+        
       end
     rescue ActiveRecord::ActiveRecordError  
     else

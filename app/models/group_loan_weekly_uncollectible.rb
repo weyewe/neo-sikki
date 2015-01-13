@@ -124,49 +124,18 @@ class GroupLoanWeeklyUncollectible < ActiveRecord::Base
     member = self.group_loan_membership.member
     group_loan = self.group_loan
     group_loan_weekly_collection = self.group_loan_weekly_collection
-    message = "Uncollectible Payment. GroupLoan: #{group_loan.name}, #{group_loan.group_number} " + 
-              "Member: #{member.name}, #{member.id_number} " + 
-              "Week: #{group_loan_weekly_collection.week_number}"
-              
-    ta = TransactionData.create_object({
-      :transaction_datetime => self.group_loan_weekly_collection.collected_at,
-      :description =>  message,
-      :transaction_source_id => self.id , 
-      :transaction_source_type => self.class.to_s ,
-      :code => TRANSACTION_DATA_CODE[:group_loan_uncollectible_allowance],
-      :is_contra_transaction => false 
-    }, true )
     
-     
-    
-    TransactionDataDetail.create_object(
-      :transaction_data_id => ta.id,        
-      :account_id          => Account.find_by_code(ACCOUNT_CODE[:pinjaman_sejahtera_bda_leaf][:code]).id      ,
-      :entry_case          => NORMAL_BALANCE[:debit]     ,
-      :amount              => self.principal,
-      :description => message
+    AccountingService::UncollectibleDeclaration.create_uncollectible_declaration(
+      group_loan,
+      group_loan_weekly_collection,
+      member,
+      self
     )
     
-    TransactionDataDetail.create_object(
-      :transaction_data_id => ta.id,        
-      :account_id          => Account.find_by_code(ACCOUNT_CODE[:pinjaman_sejahtera_ar_leaf][:code]).id        ,
-      :entry_case          => NORMAL_BALANCE[:credit]     ,
-      :amount              => self.principal,
-      :description => message
-    )
-    
-    ta.confirm 
   end
   
   def create_contra_allowance_transaction_data
-    ta = TransactionData.where({
-      :transaction_source_id => self.id , 
-      :transaction_source_type => self.class.to_s ,
-      :code => TRANSACTION_DATA_CODE[:group_loan_uncollectible_allowance],
-      :is_contra_transaction => false 
-    } ).order("id DESC").first 
-    
-    ta.create_contra_and_confirm if not ta.nil?
+    AccountingService::UncollectibleDeclaration.cancel_uncollectible_declaration( self )
   end
   
   def create_allowance_in_cycle_clearance_transaction_data
@@ -176,68 +145,17 @@ class GroupLoanWeeklyUncollectible < ActiveRecord::Base
     member = self.group_loan_membership.member
     group_loan = self.group_loan
     group_loan_weekly_collection = self.group_loan_weekly_collection
-    message = "Uncollectible Payment In-Cycle Clearance. GroupLoan: #{group_loan.name}, #{group_loan.group_number} " + 
-              "Member: #{member.name}, #{member.id_number} " + 
-              "Week: #{group_loan_weekly_collection.week_number}"
-              
-    glp = group_loan_membership.group_loan_product   
+    AccountingService::UncollectibleDeclaration.create_in_cycle_clearance(group_loan,
+                                group_loan_weekly_collection,
+                                group_loan_membership,
+                                member,
+                                self)
     
-    ta = TransactionData.create_object({
-      :transaction_datetime => self.collected_at,
-      :description =>  message,
-      :transaction_source_id => self.id , 
-      :transaction_source_type => self.class.to_s ,
-      :code => TRANSACTION_DATA_CODE[:group_loan_in_cycle_uncollectible_clearance],
-      :is_contra_transaction => false 
-    }, true )
-           
-    
-    TransactionDataDetail.create_object(
-      :transaction_data_id => ta.id,        
-      :account_id          => Account.find_by_code(ACCOUNT_CODE[:main_cash_leaf][:code]).id      ,
-      :entry_case          => NORMAL_BALANCE[:debit]     ,
-      :amount              => glp.weekly_payment_amount,
-      :description => message
-    )
-
-    TransactionDataDetail.create_object(
-      :transaction_data_id => ta.id,        
-      :account_id          => Account.find_by_code(ACCOUNT_CODE[:pinjaman_sejahtera_interest_revenue_leaf][:code]).id        ,
-      :entry_case          => NORMAL_BALANCE[:credit]     ,
-      :amount              => glp.interest,
-      :description => message
-    )
-    TransactionDataDetail.create_object(
-      :transaction_data_id => ta.id,        
-      :account_id          => Account.find_by_code(ACCOUNT_CODE[:pinjaman_sejahtera_bda_leaf][:code]).id        ,
-      :entry_case          => NORMAL_BALANCE[:credit]     ,
-      :amount              => glp.principal,
-      :description => message
-    )
-    TransactionDataDetail.create_object(
-      :transaction_data_id => ta.id,        
-      :account_id          => Account.find_by_code(ACCOUNT_CODE[:compulsory_savings_leaf][:code]).id        ,
-      :entry_case          => NORMAL_BALANCE[:credit]     ,
-      :amount              => glp.compulsory_savings,
-      :description => message
-    )
-    
-    ta.confirm 
   end
   
   def create_contra_allowance_in_cycle_clearance_transaction_data
-    ta = TransactionData.create_object({
-      :transaction_source_id => self.id , 
-      :transaction_source_type => self.class.to_s ,
-      :code => TRANSACTION_DATA_CODE[:group_loan_in_cycle_uncollectible_clearance],
-      :is_contra_transaction => false 
-    }, true )
-    
-    ta.create_contra_and_confirm if not ta.nil?
+    AccountingService::UncollectibleDeclaration.cancel_in_cycle_clearance(self)
   end
-  
-  
-  
   
   
   def self.create_object(params)
@@ -383,7 +301,7 @@ class GroupLoanWeeklyUncollectible < ActiveRecord::Base
     
     if self.save
       self.group_loan.update_bad_debt_allowance(   self.principal )
-      self.create_contra_allowance_in_cycle_clearance_transaction_data
+      AccountingService::UncollectibleDeclaration.cancel_in_cycle_clearance(self)
     end
     
   end
@@ -392,6 +310,10 @@ class GroupLoanWeeklyUncollectible < ActiveRecord::Base
     self.is_cleared = true 
     self.cleared_at = self.group_loan.closed_at 
     if self.save
+      # at the end of cycle -> must absorb all shite.
+      # total amount to offset uang titipan and compulsory savings
+      # their collateral: uang titipan and compulsory savings
+      # burden: run_away_end_of_cycle_principal + total_amount weekly_collection for uncollectible_end_of_cycle_clearance
     else
       self.errors.messages.each {|x| puts "error message in uncollectible clearance: #{x}"}
     end

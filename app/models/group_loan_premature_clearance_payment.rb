@@ -273,39 +273,13 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
   end
   
   def create_premature_clearance_deposit
-    self.group_loan.update_premature_clearance_deposit( premature_clearance_deposit_amount ) 
+    deposit_amount = premature_clearance_deposit_amount
+    self.group_loan.update_premature_clearance_deposit( deposit_amount ) 
     member = group_loan_membership.member 
-    
-    message = "PrematureClearance uang titipan: Group #{group_loan.name}, #{group_loan.group_number}, Member: #{member.name}, #{member.id_number}"
-    ta = TransactionData.create_object({
-      :transaction_datetime => self.group_loan_weekly_collection.collected_at,
-      :description =>  message,
-      :transaction_source_id => self.id , 
-      :transaction_source_type => self.class.to_s ,
-      :code => TRANSACTION_DATA_CODE[:group_loan_premature_clearance_deposit],
-      :is_contra_transaction => false 
-    }, true )
-    
-     
-    
-    TransactionDataDetail.create_object(
-      :transaction_data_id => ta.id,        
-      :account_id          => Account.find_by_code(ACCOUNT_CODE[:main_cash_leaf][:code]).id      ,
-      :entry_case          => NORMAL_BALANCE[:debit]     ,
-      :amount              => premature_clearance_deposit_amount,
-      :description => message
-    )
-    
-    TransactionDataDetail.create_object(
-      :transaction_data_id => ta.id,        
-      :account_id          => Account.find_by_code(ACCOUNT_CODE[:uang_titipan_leaf][:code]).id        ,
-      :entry_case          => NORMAL_BALANCE[:credit]     ,
-      :amount              => premature_clearance_deposit_amount,
-      :description => message
-    )
-   
-    
-    ta.confirm
+    AccountingService::PrematureClearance.create_premature_clearance_deposit_posting(group_loan,
+                                  member, 
+                                  self,
+                                  deposit_amount)
     
     
   end
@@ -322,51 +296,14 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
     
     member = group_loan_membership.member 
     
-    message = "PrematureClearance remaining weeks payment: Group #{group_loan.name}, #{group_loan.group_number}, Member: #{member.name}, #{member.id_number}"
-    ta = TransactionData.create_object({
-      :transaction_datetime => self.group_loan_weekly_collection.collected_at,
-      :description =>  message,
-      :transaction_source_id => self.id , 
-      :transaction_source_type => self.class.to_s ,
-      :code => TRANSACTION_DATA_CODE[:group_loan_premature_clearance_remaining_weeks_payment],
-      :is_contra_transaction => false 
-    }, true )
-    
-    
-    
-    TransactionDataDetail.create_object(
-      :transaction_data_id => ta.id,        
-      :account_id          => Account.find_by_code(ACCOUNT_CODE[:main_cash_leaf][:code]).id      ,
-      :entry_case          => NORMAL_BALANCE[:debit]     ,
-      :amount              => total_compulsory_savings + total_principal +  total_interest,
-      :description => message
+    AccountingService::PrematureClearance.create_premature_clearance_posting(
+      group_loan,
+      member, 
+      total_principal,
+      total_interest, 
+      total_compulsory_savings,
+      self
     )
-    
-    TransactionDataDetail.create_object(
-      :transaction_data_id => ta.id,        
-      :account_id          => Account.find_by_code(ACCOUNT_CODE[:pinjaman_sejahtera_interest_revenue_leaf][:code]).id        ,
-      :entry_case          => NORMAL_BALANCE[:credit]     ,
-      :amount              => total_interest,
-      :description => message
-    )
-    TransactionDataDetail.create_object(
-      :transaction_data_id => ta.id,        
-      :account_id          => Account.find_by_code(ACCOUNT_CODE[:pinjaman_sejahtera_ar_leaf][:code]).id        ,
-      :entry_case          => NORMAL_BALANCE[:credit]     ,
-      :amount              => total_principal,
-      :description => message
-    )
-    TransactionDataDetail.create_object(
-      :transaction_data_id => ta.id,        
-      :account_id          => Account.find_by_code(ACCOUNT_CODE[:compulsory_savings_leaf][:code]).id        ,
-      :entry_case          => NORMAL_BALANCE[:credit]     ,
-      :amount              => total_compulsory_savings,
-      :description => message
-    )
-    
-    ta.confirm
-    
-    
   end
   
   
@@ -396,30 +333,13 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
     
     glm.update_total_compulsory_savings( -1*total_amount )
     
-    # part 2 : undo group_loan_weekly_payment 
-    
-    transaction_data = TransactionData.where(
-      :transaction_source_id => self.id , 
-      :transaction_source_type => self.class.to_s ,
-      :code => TRANSACTION_DATA_CODE[:group_loan_premature_clearance_remaining_weeks_payment],
-      :is_contra_transaction => false 
-      ).order("id DESC").first 
-    
-    transaction_data.create_contra_and_confirm if not transaction_data.nil? 
-    
+    AccountingService::PrematureClearance.cancel_premature_clearance_posting(self)
   end
   
   def undo_premature_clearance_deposit
     self.group_loan.update_premature_clearance_deposit( -1*premature_clearance_deposit_amount ) 
+    AccountingService::PrematureClearance.cancel_premature_clearance_deposit_posting(self)
     
-    transaction_data = TransactionData.where(
-      :transaction_source_id => self.id , 
-      :transaction_source_type => self.class.to_s ,
-      :code => TRANSACTION_DATA_CODE[:group_loan_premature_clearance_deposit],
-      :is_contra_transaction => false 
-     ).order("id DESC").first 
-     
-     transaction_data.create_contra_and_confirm if not transaction_data.nil? 
   end
   
   

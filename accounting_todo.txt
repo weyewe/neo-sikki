@@ -14,15 +14,25 @@ run away
 		weekly_payment
 			reverse the bad debt allowance OK 
 		end_of_cycle
-			reverse the bad debt allowance
+			reverse the bad debt allowance  
 			
 death
-	auto bad_debt_allowance
-	
+	auto bad_debt_allowance   OK 
+	 
 uncollectible 
 	produces bad debt allowance
+	1. in_cycle_collection
+		will revert the bad debt allowance: OK.
+	
+	2. end_of_week collection
+		bad_debt allowance will be solved at the end of the loan.
+		total amount to be offset: total_principal_from_run_away + principal_of_uncollectible 
+	
 
 premature clearance: produces liability (uang titipan)?
+
+at the end of the loan (closing)
+total_bad_debt_allowance - uang_titipan - total_compulsory_savings > 0  ? << 
 
 
 Guideline for group loan closing:
@@ -35,6 +45,17 @@ During closing, we will try to minimize bad debt allowance.
 compulsory savings - bad debt allowance. 
 	if there is still debt, expense it
 	no debt: return it. 
+	
+CASE:
+week 2: run_away in_cycle
+week 3: premature_clearance
+week 4: how much should be paid by the member? per normal. no adjustment.
+
+
+week 2: run_away_end_of_cycle
+week 3: premature_clearance
+week 4: how much should be paid by each member? per normal, no adjustment. The total== reduced
+
 
 
 

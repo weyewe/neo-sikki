@@ -479,18 +479,20 @@ GeneralLedger.create_posting(
 =end
 
 TRANSACTION_DATA_CODE = {
-  :loan_disbursement => 1,
-  :group_loan_weekly_collection => 2, 
-  :group_loan_weekly_collection_voluntary_savings => 3, 
-  :group_loan_premature_clearance_remaining_weeks_payment => 4 ,
-  :group_loan_premature_clearance_deposit => 5 ,
-  :group_loan_uncollectible_allowance => 6,
-  :group_loan_in_cycle_uncollectible_clearance => 7, 
-  :group_loan_run_away_declaration => 8 , 
-  :group_loan_run_away_in_cycle_clearance => 9, 
-  :group_loan_run_away_end_of_cycle_clearance => 10, 
-  :group_loan_deceased_declaration => 15, 
-  :group_loan_weekly_collection_round_up => 20
+  :loan_disbursement => 10,
+  :group_loan_weekly_collection => 20, 
+  :group_loan_weekly_collection_voluntary_savings => 30, 
+  :group_loan_premature_clearance_remaining_weeks_payment => 40 ,
+  :group_loan_premature_clearance_deposit => 50 ,
+  :group_loan_uncollectible_declaration => 60, 
+  :group_loan_uncollectible_in_cycle_clearance => 70 ,
+  :group_loan_uncollectible_end_of_cycle_clearance => 80 ,  
+  :group_loan_in_cycle_uncollectible_clearance => 100, 
+  :group_loan_run_away_declaration => 110 , 
+  :group_loan_run_away_in_cycle_clearance => 120, 
+  :group_loan_run_away_end_of_cycle_clearance => 130, 
+  :group_loan_deceased_declaration => 140, 
+  :group_loan_weekly_collection_round_up => 150
   
   
 }
