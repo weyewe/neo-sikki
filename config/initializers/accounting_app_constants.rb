@@ -489,7 +489,7 @@ TRANSACTION_DATA_CODE = {
   :group_loan_run_away_declaration => 8 , 
   :group_loan_run_away_in_cycle_clearance => 9, 
   :group_loan_run_away_end_of_cycle_clearance => 10, 
-  :group_loan_deceased_allowance => 15, 
+  :group_loan_deceased_declaration => 15, 
   :group_loan_weekly_collection_round_up => 20
   
   

@@ -154,6 +154,10 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
     group_loan.update_bad_debt_allowance(                 
                       self.extract_uncollectible_weekly_payment_default_amount + 
                       self.extract_run_away_end_of_cycle_resolution_default_amount
+                      # + uncollectible
+                      # + run_away_declaration
+                      # - run_away_weekly_payment
+                      
     )
     
   end
@@ -277,7 +281,7 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
           :description =>  message,
           :transaction_source_id => x.id , 
           :transaction_source_type => x.class.to_s ,
-          :code => TRANSACTION_DATA_CODE[:group_loan_deceased_allowance],
+          :code => TRANSACTION_DATA_CODE[:group_loan_deceased_declaration],
           :is_contra_transaction => false 
         }, true )
 
@@ -305,23 +309,6 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
   end
   
   
-  # def undo_post_run_away_allowance_end_of_cycle_resolved
-  #   self.group_loan_run_away_receivables.
-  #         where(:payment_case => GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:end_of_cycle]).each do |x|
-  #          
-  #     
-  # 
-      # ta = TransactionData.create_object({
-      #   :transaction_source_id => x.id , 
-      #   :transaction_source_type => x.class.to_s ,
-      #   :code => TRANSACTION_DATA_CODE[:group_loan_run_away_end_of_cycle_clearance],
-      #   :is_contra_transaction => false 
-      # } ).order("id DESC").first 
-  # 
-  # 
-  #     ta.create_contra_and_confirm if not ta.nil? 
-  #   end
-  # end
   
   
   def undo_post_deceased_allowance
@@ -335,7 +322,7 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
         ta = TransactionData.where({
           :transaction_source_id => x.id , 
           :transaction_source_type => x.class.to_s ,
-          :code => TRANSACTION_DATA_CODE[:group_loan_deceased_allowance],
+          :code => TRANSACTION_DATA_CODE[:group_loan_deceased_declaration],
           :is_contra_transaction => false 
         } ).order("id DESC").first
 
@@ -345,63 +332,12 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
   end
   
   def post_run_away_allowance_in_cycle_payment
-    current_week_number = self.week_number
-    run_away_glm_id_list = GroupLoanMembership.where{
-      (is_active.eq false) & 
-      (deactivation_case.eq GROUP_LOAN_DEACTIVATION_CASE[:run_away] ) & 
-      ( deactivation_week_number.lte current_week_number)
-    }.collect {|x| x.id }
-    
-    GroupLoanRunAwayReceivable.joins(:group_loan_membership => [:group_loan_product, :member]).where(
-        :group_loan_membership_id => run_away_glm_id_list, 
-        :payment_case => GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:weekly] ).each do |x|
-      member  = x.group_loan_membership.member 
-      principal = x.group_loan_membership.group_loan_product.principal
-      message = "Runaway Weekly Bad Debt clearance: Group #{group_loan.name}, #{group_loan.group_number}, member: #{member.name}"
-      
-      ta = TransactionData.create_object({
-        :transaction_datetime => self.collected_at,
-        :description =>  message,
-        :transaction_source_id => self.id , 
-        :transaction_source_type => self.class.to_s ,
-        :code => TRANSACTION_DATA_CODE[:group_loan_run_away_in_cycle_clearance],
-        :is_contra_transaction => false 
-      }, true )
-
-
-
-      TransactionDataDetail.create_object(
-        :transaction_data_id => ta.id,        
-        :account_id          => Account.find_by_code(ACCOUNT_CODE[:pinjaman_sejahtera_arae_leaf][:code]).id      ,
-        :entry_case          => NORMAL_BALANCE[:credit]     ,
-        :amount              => principal,
-        :description => message
-      )
-
-      TransactionDataDetail.create_object(
-        :transaction_data_id => ta.id,        
-        :account_id          => Account.find_by_code(ACCOUNT_CODE[:pinjaman_sejahtera_ar_leaf][:code]).id        ,
-        :entry_case          => NORMAL_BALANCE[:debit]     ,
-        :amount              => principal,
-        :description => message
-      )
-      ta.confirm
-    end
+    AccountingService::MemberRunAway.run_away_in_cycle_payment( self )
     
   end
   
   def undo_post_run_away_allowance_in_cycle_payment
-    ta = TransactionData.where({
-      :transaction_source_id => x.id , 
-      :transaction_source_type => x.class.to_s ,
-      :code => TRANSACTION_DATA_CODE[:group_loan_run_away_in_cycle_clearance],
-      :is_contra_transaction => false 
-    } ).order("id DESC").first
-    
-    
-    ta.create_contra_and_confirm if not ta.nil? 
-    
-    
+    AccountingService::MemberRunAway.cancel_run_away_in_cycle_payment( self )
   end
   
   
@@ -446,7 +382,6 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
         self.confirm_uncollectible_allowance # allowance.. there will be expense during loan close
         # self.post_run_away_allowance_end_of_cycle_resolved
         self.post_run_away_allowance_in_cycle_payment
-        self.post_deceased_allowance
         
         # we need to create posting: premature_clearance_deposit and premature_clearance money itself 
         self.confirm_premature_clearances # DONE , the undo is done..
@@ -609,24 +544,11 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
         
         
         
-        #2.  unconfirm all compulsory savings 
-        # puts "creating group loan weekly payments"
-        self.uncreate_group_loan_weekly_payments   # ok  
-        
-        #3. unconfirm premature clearance
-        # puts "unconfirm premature clearances"
-        
-        
+        self.uncreate_group_loan_weekly_payments 
         self.unpost_rounding_up_revenue 
         self.unconfirm_premature_clearances
-        
-        # self.undo_post_run_away_allowance_end_of_cycle_resolved
-        self.undo_post_deceased_allowance
+        self.undo_post_run_away_allowance_in_cycle_payment
         self.unconfirm_uncollectible_allowance
-        
-        # puts "all is good"
-       
-       # unconfirm uncollectible
         
       end
     rescue ActiveRecord::ActiveRecordError  
