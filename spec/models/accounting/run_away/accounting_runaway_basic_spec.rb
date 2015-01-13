@@ -124,6 +124,7 @@ describe GroupLoan do
     @run_away_glm.reload 
     @second_group_loan_weekly_collection = @group_loan.group_loan_weekly_collections.order("id ASC")[1]
     
+    @group_loan.reload
   end
   
   it "should mark second_glm as run away" do
@@ -146,6 +147,10 @@ describe GroupLoan do
     ).first
     
     result.is_confirmed.should be_truthy
+  end
+  
+  it "should produce 0 amount for group_loan.bad_debt_allowance" do
+    @group_loan.bad_debt_allowance.should == BigDecimal("0")
   end
   
   

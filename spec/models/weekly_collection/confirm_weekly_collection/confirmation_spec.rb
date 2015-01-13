@@ -156,8 +156,8 @@ describe GroupLoanWeeklyCollection do
           :amount                            =>  voluntary_savings_amount, 
           :group_loan_membership_id          => glm.id , 
           :group_loan_weekly_collection_id   => @first_glwc.id 
-          
         )
+        
         
         @initial_savings_account_array  << glm.member.total_savings_account
         count += 1
@@ -167,6 +167,18 @@ describe GroupLoanWeeklyCollection do
       @first_glwc.reload
       @first_glwc.confirm(:confirmed_at => @confirmed_at )
       @first_glwc.reload
+      @first_gl_wcvse = GroupLoanWeeklyCollectionVoluntarySavingsEntry.where(
+        :group_loan_weekly_collection_id   => @first_glwc.id 
+      ).first
+      
+    end
+    
+    it "should create one savings entry: 1 transaction data" do
+      TransactionData.where(
+        :transaction_source_id => @first_gl_wcvse.id , 
+        :transaction_source_type => @first_gl_wcvse.class.to_s ,
+        :code => TRANSACTION_DATA_CODE[:group_loan_weekly_collection_voluntary_savings],
+      ).count.should == 1 
     end
     
     it 'should increase the voluntary savings amount' do

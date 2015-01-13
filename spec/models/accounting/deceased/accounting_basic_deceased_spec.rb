@@ -1,31 +1,52 @@
-# Case 1: member run away mid-cycle 
+# Case 1: member deceased mid shite 
+
+# WE HAVE A PROBLEM: what if there is uncollectible payment.. and member deceased.. the group
+# has to pay for the uncollectible 
 
 =begin
-1. Handle the Run Away case
-     Branch Submit the form (written + double signed by Loan Officer + Branch Manager ), 
-      so that it will be deactivated by the central command.  
-      => the runaway member will be blocked from all group loan product 
+1. Handle the Deceased Case
+     Branch Submit the form (written + double signed by Loan Officer + Branch Manager ), so that it will be deactivated by the central command. 
 
-     For each GroupLoanProduct that are currently active, the branch
-     has to submit the payment decision: whether default resolved weekly, or and the end-of-cycle
+     Then, the weekly payment can be done (excluding the deceased member).
 
-     1. Weekly
-        There is extra payment to be made (total = all active members + run away member)
-        In the payment details: list all active member's payment + entry for the run away member. 
-        That's it.  => compose reports 
-
-
-     2. End of cycle
-          In the weekly payment, ignore the extra payment caused by the run away member
-          At the end of the cycle, deduct all active's compulsory savings by the amount debted.  
+     1. Mark member as deceased
+       it will deactivate all financial product membership
+       
+    2. For each financial product deactivated, it will post bad debt allowance  + 1 Deceased Clearance
+    
+    3. Then, it is admin's job to mark the deceased clearance as insurance claimable or directly
+        write off as bad debt expense 
+        
+    4. If it is written off as bad debt expense: click "Write Off Allowance"
+    
+    5. If it is claimable from insurance: click
+        "Insurance Claimable" : specify the amount to be returned by insurance: principal + donation
+        
+        On InsuranceClaimable submit : will make journal posting to 
+        1. cancel the bad debt allowance
+        2. add account receivable: donation + principal return 
+        
+        
+    6. For the claimable deceased_clearance: 
+      Click "Insurance Claim Received"  => will add $$ to BRI account. 
+      
+    7. For claimable deceased_clearance:
+      Click "Distribute Donation"  => will give out $$ to member.. deduct from main cash account. 
+        
+        
+       
+       
+      
           
-          If there is excess, 
+          
+          
+         
 
 =end
 
 require 'spec_helper'
 
-describe GroupLoan do
+describe DeceasedClearance do
   
   before(:each) do
     # Account.create_base_objects
@@ -92,9 +113,10 @@ describe GroupLoan do
     
     @started_at = DateTime.new(2013,10,5,0,0,0)
     @disbursed_at = DateTime.new(2013,10,10,0,0,0)
+    @closed_at = DateTime.new(2013,12,5,0,0,0)
     
     # start group loan 
-    @group_loan.start(:started_at =>@started_at)
+    @group_loan.start(:started_at => @started_at )
     @group_loan.reload
 
     # disburse loan 
@@ -112,7 +134,7 @@ describe GroupLoan do
     @first_group_loan_weekly_collection.is_collected.should be_truthy
     @first_group_loan_weekly_collection.confirm(:confirmed_at => DateTime.now )
     @first_group_loan_weekly_collection.reload
-    @closed_at = DateTime.new(2013,12,5,0,0,0)
+    
   end
   
   
@@ -121,58 +143,57 @@ describe GroupLoan do
     @first_group_loan_weekly_collection.is_confirmed.should be_truthy 
   end
   
-  context "a member  run away ( week 2 ) "  do
+   
+  context "a member is passed away ( week 2 ) "  do
     before(:each) do
-      @run_away_glm = @group_loan.active_group_loan_memberships.first 
-      @run_away_member = @run_away_glm.member 
+       
+      @deceased_glm = @group_loan.active_group_loan_memberships.first 
+      @deceased_glm.reload
+      @deceased_member = @deceased_glm.member 
       @initial_active_glm_count = @group_loan.active_group_loan_memberships.count 
       @first_week_amount_receivable=   @first_group_loan_weekly_collection.amount_receivable
-      
-      # @initial_group_loan_run_away_amount_receivable = @group_loan.run_away_amount_receivable
-      
-      @run_away_member.mark_as_run_away(:run_away_at => DateTime.now)
+
+      @initial_savings_account = @deceased_member.total_savings_account
+      @initial_compulsory_savings = @deceased_glm.total_compulsory_savings
+      @deceased_member.mark_as_deceased(:deceased_at => DateTime.now )
       @group_loan.reload 
-      @run_away_glm.reload 
+      @deceased_glm.reload 
       @second_group_loan_weekly_collection = @group_loan.group_loan_weekly_collections.order("id ASC")[1]
-      @third_group_loan_weekly_collection = @group_loan.group_loan_weekly_collections.order("id ASC")[2]
-      
-      @second_group_loan_weekly_collection.collect(:collected_at => DateTime.now)
-      @second_group_loan_weekly_collection.confirm(:confirmed_at => DateTime.now)
+      @deceased_member.reload 
     end
     
-    
-    
-    context "creating collection and confirm for week 3" do
-      before(:each) do
-        @third_group_loan_weekly_collection.collect(:collected_at => DateTime.now)
-        @third_group_loan_weekly_collection.confirm(:confirmed_at => DateTime.now)
-        @second_group_loan_weekly_collection.reload
-      end
+    it 'should create one DeceasedPrincipalReceivable' do
+      DeceasedClearance.count.should == 1 
+      dc = DeceasedClearance.first 
       
-      it "should confirm week 2" do
-        @second_group_loan_weekly_collection.is_confirmed.should be_truthy
-      end
-      
-      it "should create transaction to reduce bad debt allowance since there is weekly payment" do
-        
-    
-        TransactionData.where(
-          :transaction_source_id => @second_group_loan_weekly_collection.id , 
-          :transaction_source_type => @second_group_loan_weekly_collection.class.to_s ,
-          :code => TRANSACTION_DATA_CODE[:group_loan_run_away_in_cycle_clearance]
-        ).count.should ==  1
-      end
-      
-      
+      @deceased_glm.reload 
+      # dpr.week_number.should == @second_group_loan_weekly_collection.week_number 
+      @deceased_glm.is_active.should be_falsey 
+      @deceased_glm.deactivation_week_number.should == @second_group_loan_weekly_collection.week_number
+      @deceased_glm.deactivation_case.should == GROUP_LOAN_DEACTIVATION_CASE[:deceased]
     end
+    
+    it "should create on DeceasedClearance" do 
+      DeceasedClearance.where(
+        :financial_product_id => @group_loan.id,
+        :financial_product_type => @group_loan.class.to_s, 
+        :member_id => @deceased_member.id
+      ).count.should == 1 
+      
+      deceased_clearance = DeceasedClearance.where(
+        :financial_product_id => @group_loan.id,
+        :financial_product_type => @group_loan.class.to_s, 
+        :member_id => @deceased_member.id
+      ).first 
+      
+      TransactionData.where(
+        :transaction_source_id =>deceased_clearance.id ,
+        :transaction_source_type => deceased_clearance.class.to_s,
+        :is_confirmed => true 
+      ).count.should == 1 
+    end
+    
      
-    
-    
   end
-  
-  
-  
-   
-  
 end
 

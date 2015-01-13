@@ -93,56 +93,13 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
       total_compulsory_savings += glm.group_loan_product.compulsory_savings
     end
     
-    
-    message = "Weekly Collection: Group #{group_loan.name}, #{group_loan.group_number}, week #{self.week_number}"
-    ta = TransactionData.create_object({
-      :transaction_datetime => self.collected_at,
-      :description =>  message,
-      :transaction_source_id => self.id , 
-      :transaction_source_type => self.class.to_s ,
-      :code => TRANSACTION_DATA_CODE[:group_loan_weekly_collection],
-      :is_contra_transaction => false 
-    }, true )
-    
-     
-    
-    TransactionDataDetail.create_object(
-      :transaction_data_id => ta.id,        
-      :account_id          => Account.find_by_code(ACCOUNT_CODE[:main_cash_leaf][:code]).id      ,
-      :entry_case          => NORMAL_BALANCE[:debit]     ,
-      :amount              => total_compulsory_savings + total_principal +  total_interest_revenue,
-      :description => message
+    AccountingService::WeeklyPayment.create_journal_posting(
+      group_loan,
+      self,
+      total_compulsory_savings ,
+      total_principal,
+      total_interest_revenue
     )
-    
-    TransactionDataDetail.create_object(
-      :transaction_data_id => ta.id,        
-      :account_id          => Account.find_by_code(ACCOUNT_CODE[:pinjaman_sejahtera_interest_revenue_leaf][:code]).id        ,
-      :entry_case          => NORMAL_BALANCE[:credit]     ,
-      :amount              => total_interest_revenue,
-      :description => message
-    )
-    TransactionDataDetail.create_object(
-      :transaction_data_id => ta.id,        
-      :account_id          => Account.find_by_code(ACCOUNT_CODE[:pinjaman_sejahtera_ar_leaf][:code]).id        ,
-      :entry_case          => NORMAL_BALANCE[:credit]     ,
-      :amount              => total_principal,
-      :description => message
-    )
-    TransactionDataDetail.create_object(
-      :transaction_data_id => ta.id,        
-      :account_id          => Account.find_by_code(ACCOUNT_CODE[:compulsory_savings_leaf][:code]).id        ,
-      :entry_case          => NORMAL_BALANCE[:credit]     ,
-      :amount              => total_compulsory_savings,
-      :description => message
-    )
-    
-    ta.confirm
-    
-    
-    
-    
-    
-    
   end
   
   
@@ -150,13 +107,20 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
   
   
   def update_group_loan_bad_debt_allowance
+    
+    # but we don't want to use death bad debt allowance. it is force major
+    
     # ths will produce the final allowance
+    # 1. get all uncollectible, unpaid
+    # 2. get all run_away 
+    # 3. minus run_away weekly_payment 
+    
     group_loan.update_bad_debt_allowance(                 
                       self.extract_uncollectible_weekly_payment_default_amount + 
                       self.extract_run_away_end_of_cycle_resolution_default_amount
                       # + uncollectible
                       # + run_away_declaration
-                      # - run_away_weekly_payment
+                      # - run_away_weekly_payment : it has to be paid. no matter what
                       
     )
     
@@ -215,122 +179,7 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
     ta.create_contra_and_confirm if not  ta.nil?
   end
   
-  
-  # 
-  # def post_run_away_allowance_end_of_cycle_resolved
-  #   total_allowance = BigDecimal("0")
-  #   self.group_loan_run_away_receivables.
-  #         where(:payment_case => GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:end_of_cycle]).each do |x|
-  #          
-  #     
-  #     allowance_amount = x.group_loan_membership.group_loan_product.principal * self.remaining_weeks 
-  #     
-  #     
-  #     message = "Penyisihan Member Kabur, diselesaikan di akhir siklus : Group #{group_loan.name}, #{group_loan.group_number}" + 
-  #                 " , week #{self.week_number}" + 
-  #                 " , member #{x.member.name}, #{x.member.id_number}"
-  # 
-  #     ta = TransactionData.create_object({
-  #       :transaction_datetime => self.collected_at,
-  #       :description =>  message,
-  #       :transaction_source_id => x.id , 
-  #       :transaction_source_type => x.class.to_s ,
-  #       :code => TRANSACTION_DATA_CODE[:group_loan_run_away_end_of_cycle_clearance],
-  #       :is_contra_transaction => false 
-  #     }, true )
-  # 
-  # 
-  # 
-  #     TransactionDataDetail.create_object(
-  #       :transaction_data_id => ta.id,        
-  #       :account_id          => Account.find_by_code(ACCOUNT_CODE[:pinjaman_sejahtera_bda_leaf][:code]).id      ,
-  #       :entry_case          => NORMAL_BALANCE[:debit]     ,
-  #       :amount              => allowance_amount,
-  #       :description => message
-  #     )
-  # 
-  #     TransactionDataDetail.create_object(
-  #       :transaction_data_id => ta.id,        
-  #       :account_id          => Account.find_by_code(ACCOUNT_CODE[:pinjaman_sejahtera_ar_leaf][:code]).id        ,
-  #       :entry_case          => NORMAL_BALANCE[:credit]     ,
-  #       :amount              => allowance_amount,
-  #       :description => message
-  #     )
-  # 
-  #     ta.confirm 
-  #   end
-  # end
-  
-  # def post_deceased_allowance
-  #   remaining_weeks = self.remaining_weeks 
-  #   
-  #   self.group_loan.group_loan_memberships.where(
-  #     :is_active => false, 
-  #     :deactivation_case => GROUP_LOAN_DEACTIVATION_CASE[:deceased],
-  #     :deactivation_week_number => self.week_number
-  #     ).each do |x|
-  #     
-  #     
-  #       allowance_amount = x.group_loan_product.principal * remaining_weeks
-  #       message = "Penyisihan Member Meninggal : Group #{group_loan.name}, #{group_loan.group_number}" + 
-  #                   " , week #{self.week_number}" + 
-  #                   " , member #{x.member.name}, #{x.member.id_number}"
-  # 
-  #       ta = TransactionData.create_object({
-  #         :transaction_datetime => self.collected_at,
-  #         :description =>  message,
-  #         :transaction_source_id => x.id , 
-  #         :transaction_source_type => x.class.to_s ,
-  #         :code => TRANSACTION_DATA_CODE[:group_loan_deceased_declaration],
-  #         :is_contra_transaction => false 
-  #       }, true )
-  # 
-  # 
-  # 
-  #       TransactionDataDetail.create_object(
-  #         :transaction_data_id => ta.id,        
-  #         :account_id          => Account.find_by_code(ACCOUNT_CODE[:pinjaman_sejahtera_bda_leaf][:code]).id      ,
-  #         :entry_case          => NORMAL_BALANCE[:debit]     ,
-  #         :amount              => allowance_amount,
-  #         :description => message
-  #       )
-  # 
-  #       TransactionDataDetail.create_object(
-  #         :transaction_data_id => ta.id,        
-  #         :account_id          => Account.find_by_code(ACCOUNT_CODE[:pinjaman_sejahtera_ar_leaf][:code]).id        ,
-  #         :entry_case          => NORMAL_BALANCE[:credit]     ,
-  #         :amount              => allowance_amount,
-  #         :description => message
-  #       )
-  # 
-  #       ta.confirm
-  #     
-  #   end
-  # end
-  # 
-  # 
-  # 
-  # 
-  # def undo_post_deceased_allowance
-  #   
-  #   self.group_loan.group_loan_memberships.where(
-  #     :is_active => false, 
-  #     :deactivation_case => GROUP_LOAN_DEACTIVATION_CASE[:deceased],
-  #     :deactivation_week_number => self.week_number
-  #     ).each do |x|
-  #     
-  #       ta = TransactionData.where({
-  #         :transaction_source_id => x.id , 
-  #         :transaction_source_type => x.class.to_s ,
-  #         :code => TRANSACTION_DATA_CODE[:group_loan_deceased_declaration],
-  #         :is_contra_transaction => false 
-  #       } ).order("id DESC").first
-  # 
-  #       ta.create_contra_and_confirm if not ta.nil? 
-  #     
-  #   end
-  # end
-  # 
+   
   def post_run_away_allowance_in_cycle_payment
     AccountingService::MemberRunAway.run_away_in_cycle_payment( self )
     
@@ -497,6 +346,8 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
     end
     
     # create contra posting 
+    AccountingService::WeeklyPayment.cancel_journal_posting( self )
+    
   end
   
   def unconfirm_weekly_collection_voluntary_savings 
