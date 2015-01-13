@@ -476,6 +476,30 @@ class SavingsEntry < ActiveRecord::Base
   end
   
   
+  
+  def self.port_group_loan_membership_compulsory_savings( group_loan, glm )
+    # puts "Gonna create savings_entry"
+    group_loan_membership = glm
+    member = group_loan_membership.member 
+    savings_source = group_loan
+    
+    new_object = self.create :savings_source_id => savings_source.id,
+                        :savings_source_type => savings_source.class.to_s,
+                        :amount => group_loan_membership.total_compulsory_savings ,
+                        :savings_status => SAVINGS_STATUS[:group_loan_compulsory_savings],
+                        :direction => FUND_TRANSFER_DIRECTION[:outgoing],
+                        :financial_product_id => savings_source.id ,
+                        :financial_product_type => savings_source.class.to_s,
+                        :member_id => member.id ,
+                        :is_confirmed => true, 
+                        :confirmed_at => savings_source.closed_at
+                        
+                       
+                       # last info.. don't deduct the compulsory savings info
+    # group_loan_membership.update_total_compulsory_savings( -1 * new_object.amount)
+  end
+  
+  
   def self.create_weekly_collection_voluntary_savings( savings_source )
     # puts "Gonna create savings_entry"
     group_loan_weekly_savings_entry = savings_source

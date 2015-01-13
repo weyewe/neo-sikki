@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141209035235) do
+ActiveRecord::Schema.define(version: 20150113140301) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -178,6 +178,7 @@ ActiveRecord::Schema.define(version: 20141209035235) do
     t.datetime "updated_at"
     t.string   "group_number"
     t.decimal  "compulsory_savings_deduction_amount",          precision: 12, scale: 2, default: 0.0
+    t.decimal  "potential_loss_interest_revenue",              precision: 12, scale: 2, default: 0.0
   end
 
   create_table "members", force: true do |t|

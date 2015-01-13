@@ -56,6 +56,26 @@ week 2: run_away_end_of_cycle
 week 3: premature_clearance
 week 4: how much should be paid by each member? per normal, no adjustment. The total== reduced
 
+# closing group loan
+bad debts:
+	run_away end_of_cycle + uncollectible end_of_cycle [ both of them entails interest revenue ]
+	Priority:
+	1. principal
+	2. interest revenue from run_away and uncollectble
+	
+liability to be returned to member:
+1. uang titipan (deposit)
+2. compulsory savings 
+
+if principal > uang titipan + compulsory savings 
+	make it bad debt expense 
+
+if principal > uang titipan + compulsory savings, but principal + interest > uang titipan + compulsory savings
+	make partial interest revenue   
+	
+if principal + interest <  uang titipan + compulsory savings
+	make full interest revenue 
+
 
 
 

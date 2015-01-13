@@ -40,23 +40,7 @@ class GroupLoanRunAwayReceivable < ActiveRecord::Base
         self) 
   end
   
-    # 
-    # def update_group_loan_run_away_amount_receivable
-    #   # group_loan = self.group_loan 
-    #   # amount = BigDecimal('0')
-    #   # group_loan.group_loan_run_away_receivables.each do |x|
-    #   #   amount += x.amount_receivable 
-    #   # end
-    #   # # group_loan.run_away_amount_receivable =  amount 
-    #   # group_loan.save
-    #   
-    #   # create bad_debt_alowance transaction
-    #   
-    #   
-    #   
-    #   
-    # end
-    #  
+    
   
   def set_payment_case( params ) 
     # if self.group_loan_run_away_receivable_payments.count != 0 

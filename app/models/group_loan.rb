@@ -568,6 +568,10 @@ Phase: loan disbursement finalization
     self.save 
   end
   
+  def update_potential_loss_interest_revenue( amount)
+    self.potential_loss_interest_revenue += amount 
+    self.save 
+  end
   
   
    
@@ -605,6 +609,20 @@ Phase: loan disbursement finalization
     ).each { |x| x.clear_end_of_cycle}
   end
  
+
+  def port_compolsory_savings_and_deposit_to_pending_return
+    compulsory_savings_amount = total_compulsory_savings
+    deposit = premature_clearance_deposit
+    
+    AccountingService::GroupLoanClosing.port_deposit_and_compulsory_savings_to_transient_account(self, 
+                compulsory_savings_amount, deposit)
+                
+    # clear the compulsory savings
+    self.group_loan_memberships.each do |glm|
+      SavingsEntry.port_group_loan_membership_compulsory_savings( self, glm  )
+    end
+  end
+ 
   def close(params)
     if self.group_loan_weekly_collections.where(:is_confirmed => true, :is_collected => true).count != self.number_of_collections
       self.errors.add(:generic_errors, "Ada Pengumpulan mingguan yang belum selesai")
@@ -636,6 +654,55 @@ Phase: loan disbursement finalization
       return self 
     end
     
+    self.port_compolsory_savings_and_deposit_to_pending_return
+    
+    # 1 TransactionData
+    # extract compulsory_savings + deposit to transient_cash (cash to be returned) => under liability
+    
+    # this transient_cash will be deducted depending on the bad_debt_allowance clearance
+    
+    # the remnants is a liability, will be dispatched on group_loan return compulsory savings
+    
+=begin
+  we need to have:
+  1. total bad_debt amount
+  2. total potential loss_interest_revenue 
+    # sum of all run_away_end_of_cycle collection
+    # sum of all uncollectible end_of_cycle resolution 
+    
+    
+  3. group_available_compulsory_savings
+  4. group_deposit 
+=end
+    total_bad_debt_allowance = self.bad_debt_allowance
+    total_potential_interest_revenue = self.potential_loss_interest_revenue
+    total_recoverable = total_bad_debt_allowance + total_potential_interest_revenue
+    
+    total_available_compulsory_savings = self.total_compulsory_savings
+    total_available_deposit = self.premature_clearance_deposit
+    total_capital = total_available_compulsory_savings + total_available_deposit
+    remaining_capital = BigDecimal("0")
+    
+    if total_recoverable >= total_capital
+      if total_bad_debt_allowance >= total_capital
+        bad_debt_expense = total_bad_debt_allowance - total_capital 
+        recovered_allowance = total_capital 
+        interest_revenue = BigDecimal("0")
+        remaining_capital = BigDecimal("0")
+      else 
+        bad_debt_expense  = BigDecimal("0")
+        recovered_allowance = total_bad_debt_allowance
+        interest_revenue = total_capital - total_bad_debt_allowance
+        remaining_capital = BigDecimal("0")
+      end
+    end
+    
+    if total_recoverable < total_capital 
+      bad_debt_expense = BigDecimal("0")
+      recovered_allowance = total_bad_debt_allowance
+      interest_revenue = total_potential_interest_revenue
+      remaining_capital = total_capital - total_recoverable
+    end
     
     
     # perform deduction for those unpaid member

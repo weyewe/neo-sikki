@@ -175,6 +175,14 @@ ACCOUNT_CODE = {
               :status => 2, # ledger 
               :parent_code =>  "2-190"
             },
+        :pending_group_loan_member_cash_return_leaf =>   {
+              :code =>    "2-193",
+              :name => "Pending Pengembalian",
+              :normal_balance => 2,
+              :status => 2, # ledger 
+              :parent_code =>  "2-190"
+            },
+            
         
   :equity => {
         :code =>    "3-000",
@@ -492,7 +500,8 @@ TRANSACTION_DATA_CODE = {
   :group_loan_run_away_in_cycle_clearance => 120, 
   :group_loan_run_away_end_of_cycle_clearance => 130, 
   :group_loan_deceased_declaration => 140, 
-  :group_loan_weekly_collection_round_up => 150
+  :group_loan_weekly_collection_round_up => 150,
+  :port_compulsory_savings_and_premature_clearance_deposit => 160
   
   
 }

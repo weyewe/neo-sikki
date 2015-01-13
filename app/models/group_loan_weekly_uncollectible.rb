@@ -268,6 +268,8 @@ class GroupLoanWeeklyUncollectible < ActiveRecord::Base
   
     if self.save 
       self.group_loan.update_bad_debt_allowance(  -1 * self.principal)
+      self.group_loan.update_potential_loss_interest_revenue( -1* self.group_loan_membership.group_loan_product.interest)
+      
       # update the journal posting 
       
       # in cycle is by default. if it is not in-cycle, call the #clear_end_of_cycle method 
@@ -301,6 +303,7 @@ class GroupLoanWeeklyUncollectible < ActiveRecord::Base
     
     if self.save
       self.group_loan.update_bad_debt_allowance(   self.principal )
+      self.group_loan.update_potential_loss_interest_revenue( self.group_loan_membership.group_loan_product.interest)
       AccountingService::UncollectibleDeclaration.cancel_in_cycle_clearance(self)
     end
     
