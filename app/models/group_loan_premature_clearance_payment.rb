@@ -274,6 +274,7 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
   
   def create_premature_clearance_deposit
     deposit_amount = premature_clearance_deposit_amount
+    return if  deposit_amount == BigDecimal("0")
     self.group_loan.update_premature_clearance_deposit( deposit_amount ) 
     member = group_loan_membership.member 
     AccountingService::PrematureClearance.create_premature_clearance_deposit_posting(group_loan,
