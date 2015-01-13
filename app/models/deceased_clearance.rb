@@ -11,9 +11,9 @@ class DeceasedClearance < ActiveRecord::Base
              
   after_create :perform_deceased_declaration_posting
   
-  def perform_run_away_declaration_posting
+  def perform_deceased_declaration_posting
     
-    (group_loan, member, group_loan_membership, group_loan_weekly_collection,group_loan_run_away_receivable)
+    # (group_loan, member, group_loan_membership, group_loan_weekly_collection,group_loan_run_away_receivable)
     
     
     group_loan_deceased_clearance = self 
@@ -21,7 +21,6 @@ class DeceasedClearance < ActiveRecord::Base
         group_loan_membership.group_loan, 
         member, 
         group_loan_membership, 
-        group_loan_weekly_collection,
         group_loan_deceased_clearance) 
   end
   

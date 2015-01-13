@@ -195,6 +195,10 @@ class Member < ActiveRecord::Base
     end
   end
   
+  
+=begin
+  NEVER EVER DO the undo for deceased and run_away
+=end
   def undo_mark_as_deceased 
     # deceased_week_number? 
     self.group_loan_memberships.where(
@@ -222,40 +226,7 @@ class Member < ActiveRecord::Base
         :member_id => glm.member_id
       ).first 
       
-      if not deceased_clearance.nil?
-        # SavingsEntry.create_group_loan_compulsory_savings_withdrawal( new_object , glm.total_compulsory_savings )  
-        total_amount = BigDecimal("0")
-        SavingsEntry.where(
-          :savings_source_id => deceased_clearance.id,
-          :savings_source_type => deceased_clearance.class.to_s, 
-          :savings_status => SAVINGS_STATUS[:group_loan_compulsory_savings],
-          :direction => FUND_TRANSFER_DIRECTION[:outgoing],
-          :financial_product_id => glm.group_loan_id ,
-          :financial_product_type => glm.group_loan.class.to_s,
-          :member_id => self.id, 
-        ).each do |x|
-          total_amount += x.amount 
-          x.destroy 
-        end
-        
-        glm.update_total_compulsory_savings( total_amount )
-        
-        # SavingsEntry.create_savings_account_group_loan_deceased_addition( new_object , new_object.additional_savings_account)
-        total_amount = BigDecimal("0")
-        SavingsEntry.where(
-          :savings_source_id => deceased_clearance.id,
-          :savings_source_type => deceased_clearance.class.to_s, 
-          :savings_status => SAVINGS_STATUS[:savings_account],
-          :direction => FUND_TRANSFER_DIRECTION[:incoming],
-          :financial_product_id =>  deceased_clearance.group_loan.id  ,
-          :financial_product_type => deceased_clearance.group_loan.class.to_s ,
-          :member_id => self.id
-        ).each do |x|
-          total_amount += x.amount 
-          x.destroy 
-        end
-        self.update_total_savings_account( -1*total_amount)
-      end 
+   
       
       
       

@@ -15,6 +15,8 @@ Weekly Collection, combination of 6 key-drivers of headache:
 	treat it as if the member	is not running away 
 	
 4. deceased_allowance
+	ON DECEASED declaration: compulsory savings is not ported to voluntary savings. It is still locked in the
+	group loan 
 5. premature_clearance 
 6. extra_revenue from collection rounding_up
 

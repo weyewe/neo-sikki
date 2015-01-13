@@ -1,6 +1,6 @@
 module AccountingService
   class Deceased
-    def Deceased.create_bad_debt_allocation(group_loan, member, group_loan_membership, group_loan_weekly_collection,group_loan_deceased_clearance) 
+    def Deceased.create_bad_debt_allocation(group_loan, member, group_loan_membership,group_loan_deceased_clearance) 
       
       remaining_principal = group_loan_deceased_clearance.principal_return
 

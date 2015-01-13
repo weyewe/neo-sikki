@@ -261,76 +261,76 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
   #   end
   # end
   
-  def post_deceased_allowance
-    remaining_weeks = self.remaining_weeks 
-    
-    self.group_loan.group_loan_memberships.where(
-      :is_active => false, 
-      :deactivation_case => GROUP_LOAN_DEACTIVATION_CASE[:deceased],
-      :deactivation_week_number => self.week_number
-      ).each do |x|
-      
-      
-        allowance_amount = x.group_loan_product.principal * remaining_weeks
-        message = "Penyisihan Member Meninggal : Group #{group_loan.name}, #{group_loan.group_number}" + 
-                    " , week #{self.week_number}" + 
-                    " , member #{x.member.name}, #{x.member.id_number}"
-
-        ta = TransactionData.create_object({
-          :transaction_datetime => self.collected_at,
-          :description =>  message,
-          :transaction_source_id => x.id , 
-          :transaction_source_type => x.class.to_s ,
-          :code => TRANSACTION_DATA_CODE[:group_loan_deceased_declaration],
-          :is_contra_transaction => false 
-        }, true )
-
-
-
-        TransactionDataDetail.create_object(
-          :transaction_data_id => ta.id,        
-          :account_id          => Account.find_by_code(ACCOUNT_CODE[:pinjaman_sejahtera_bda_leaf][:code]).id      ,
-          :entry_case          => NORMAL_BALANCE[:debit]     ,
-          :amount              => allowance_amount,
-          :description => message
-        )
-
-        TransactionDataDetail.create_object(
-          :transaction_data_id => ta.id,        
-          :account_id          => Account.find_by_code(ACCOUNT_CODE[:pinjaman_sejahtera_ar_leaf][:code]).id        ,
-          :entry_case          => NORMAL_BALANCE[:credit]     ,
-          :amount              => allowance_amount,
-          :description => message
-        )
-
-        ta.confirm
-      
-    end
-  end
-  
-  
-  
-  
-  def undo_post_deceased_allowance
-    
-    self.group_loan.group_loan_memberships.where(
-      :is_active => false, 
-      :deactivation_case => GROUP_LOAN_DEACTIVATION_CASE[:deceased],
-      :deactivation_week_number => self.week_number
-      ).each do |x|
-      
-        ta = TransactionData.where({
-          :transaction_source_id => x.id , 
-          :transaction_source_type => x.class.to_s ,
-          :code => TRANSACTION_DATA_CODE[:group_loan_deceased_declaration],
-          :is_contra_transaction => false 
-        } ).order("id DESC").first
-
-        ta.create_contra_and_confirm if not ta.nil? 
-      
-    end
-  end
-  
+  # def post_deceased_allowance
+  #   remaining_weeks = self.remaining_weeks 
+  #   
+  #   self.group_loan.group_loan_memberships.where(
+  #     :is_active => false, 
+  #     :deactivation_case => GROUP_LOAN_DEACTIVATION_CASE[:deceased],
+  #     :deactivation_week_number => self.week_number
+  #     ).each do |x|
+  #     
+  #     
+  #       allowance_amount = x.group_loan_product.principal * remaining_weeks
+  #       message = "Penyisihan Member Meninggal : Group #{group_loan.name}, #{group_loan.group_number}" + 
+  #                   " , week #{self.week_number}" + 
+  #                   " , member #{x.member.name}, #{x.member.id_number}"
+  # 
+  #       ta = TransactionData.create_object({
+  #         :transaction_datetime => self.collected_at,
+  #         :description =>  message,
+  #         :transaction_source_id => x.id , 
+  #         :transaction_source_type => x.class.to_s ,
+  #         :code => TRANSACTION_DATA_CODE[:group_loan_deceased_declaration],
+  #         :is_contra_transaction => false 
+  #       }, true )
+  # 
+  # 
+  # 
+  #       TransactionDataDetail.create_object(
+  #         :transaction_data_id => ta.id,        
+  #         :account_id          => Account.find_by_code(ACCOUNT_CODE[:pinjaman_sejahtera_bda_leaf][:code]).id      ,
+  #         :entry_case          => NORMAL_BALANCE[:debit]     ,
+  #         :amount              => allowance_amount,
+  #         :description => message
+  #       )
+  # 
+  #       TransactionDataDetail.create_object(
+  #         :transaction_data_id => ta.id,        
+  #         :account_id          => Account.find_by_code(ACCOUNT_CODE[:pinjaman_sejahtera_ar_leaf][:code]).id        ,
+  #         :entry_case          => NORMAL_BALANCE[:credit]     ,
+  #         :amount              => allowance_amount,
+  #         :description => message
+  #       )
+  # 
+  #       ta.confirm
+  #     
+  #   end
+  # end
+  # 
+  # 
+  # 
+  # 
+  # def undo_post_deceased_allowance
+  #   
+  #   self.group_loan.group_loan_memberships.where(
+  #     :is_active => false, 
+  #     :deactivation_case => GROUP_LOAN_DEACTIVATION_CASE[:deceased],
+  #     :deactivation_week_number => self.week_number
+  #     ).each do |x|
+  #     
+  #       ta = TransactionData.where({
+  #         :transaction_source_id => x.id , 
+  #         :transaction_source_type => x.class.to_s ,
+  #         :code => TRANSACTION_DATA_CODE[:group_loan_deceased_declaration],
+  #         :is_contra_transaction => false 
+  #       } ).order("id DESC").first
+  # 
+  #       ta.create_contra_and_confirm if not ta.nil? 
+  #     
+  #   end
+  # end
+  # 
   def post_run_away_allowance_in_cycle_payment
     AccountingService::MemberRunAway.run_away_in_cycle_payment( self )
     
