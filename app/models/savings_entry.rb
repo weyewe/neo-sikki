@@ -16,7 +16,8 @@ class SavingsEntry < ActiveRecord::Base
                   :description,
                   :is_confirmed ,
                   :confirmed_at ,
-                  :is_adjustment 
+                  :is_adjustment ,
+                  :message
                   
   validates_presence_of :direction, :amount, :member_id 
   
@@ -454,6 +455,52 @@ class SavingsEntry < ActiveRecord::Base
                         
     # puts "The amount: #{new_object.amount}"
     group_loan_membership.update_total_compulsory_savings( new_object.amount)
+  end
+  
+  
+  def self.create_group_loan_closing_compulsory_savings_deduction_bad_debt_allowance( glm , amount )
+    # puts "Gonna create savings_entry"
+    group_loan_membership = glm
+    member = group_loan_membership.member 
+    group_loan = group_loan_membership.group_loan
+    savings_source = group_loan
+    
+    new_object = self.create :savings_source_id => savings_source.id,
+                        :savings_source_type => savings_source.class.to_s,
+                        :amount => amount ,
+                        :savings_status => SAVINGS_STATUS[:group_loan_compulsory_savings],
+                        :direction => FUND_TRANSFER_DIRECTION[:outgoing],
+                        :financial_product_id => savings_source.id ,
+                        :financial_product_type => savings_source.class.to_s,
+                        :member_id => member.id ,
+                        :is_confirmed => true, 
+                        :confirmed_at => savings_source.closed_at,
+                        :message => "Bad debt allowance on GroupLoan Close: Group #{group_loan.name}, #{group_loan.group_number}"
+
+    group_loan_membership.update_total_compulsory_savings( -1 * amount )
+  
+  end
+  
+  def self.create_group_loan_closing_compulsory_savings_deduction_interest_revenue( glm , amount )
+    # puts "Gonna create savings_entry"
+    group_loan_membership = glm
+    member = group_loan_membership.member 
+    group_loan = group_loan_membership.group_loan
+    savings_source = group_loan
+    
+    new_object = self.create :savings_source_id => savings_source.id,
+                        :savings_source_type => savings_source.class.to_s,
+                        :amount => amount ,
+                        :savings_status => SAVINGS_STATUS[:group_loan_compulsory_savings],
+                        :direction => FUND_TRANSFER_DIRECTION[:outgoing],
+                        :financial_product_id => savings_source.id ,
+                        :financial_product_type => savings_source.class.to_s,
+                        :member_id => member.id ,
+                        :is_confirmed => true, 
+                        :confirmed_at => savings_source.closed_at,
+                        :message => "Interest Revenue on GroupLoan Close: Group #{group_loan.name}, #{group_loan.group_number}"
+          
+    group_loan_membership.update_total_compulsory_savings( -1 * amount )
   end
   
   def self.create_group_loan_closing_compulsory_savings_clearance( glm )

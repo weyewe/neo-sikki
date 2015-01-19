@@ -511,57 +511,6 @@ Phase: loan disbursement finalization
     return sum #  BigDecimal('0')
   end
   
-  # def default_payment_total_amount  # we will redo this method
-  #   total_amount = BigDecimal('0')
-  #   # The defaults: 
-  #   # 1. + run_away_receivable (payment_case => end_of_cycle ) 
-  #   # 2. + uncollected weekly payment 
-  #   # 3. - deduct by the total amount of GroupLoanAdditionalDefaultPayment  (can come from member.. but doesn't matter)
-  #   # 4. - Deduct by the total amount of PrematureClearance 
-  #   
-  #   # on deceased member, if they have default, will be handled by the present member 
-  #   # recalculate the default resolution amount. 
-  #   
-  #   # total debt: sum of all default_payment.remaining_amount_receivable where the glm.is_active => true 
-  #   
-  #   
-  #   #### HANDLING THE DEFAULTS 1: run_away_receivable 
-  #   # cases: 
-  #   # 0. no run_away_receivable
-  #   # 1. only one run_away_receivable
-  #   # 2. many run_away_receivable 
-  #   
-  #   total_amount += self.group_loan_run_away_receivables.
-  #       where(:payment_case => GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:end_of_cycle]).
-  #       sum('amount_receivable')
-  #       
-  #   # contribution from the uncollectibles
-  #   total_amount += self.group_loan_weekly_uncollectibles.sum("amount")
-  #   
-  #   # total_amount -= self.cleared_default_payment_amount # from member premature clearce
-  #   
-  #   if total_amount < BigDecimal('0')
-  #     return BigDecimal('0')
-  #   else
-  #     return total_amount
-  #   end
-  #   
-  # end
-  
-  
-  # default payment amount_receivable will be updated on:
-  #  1. run_away member 
-  #   2. uncollectible weekly collection 
-  
-  
-  # glm.group_loan_default_payment.amount_receivable => total split must be paid 
-  # glm.group_loan_default_payment.amount_received == payment 
-  
-  # def update_default_amount( amount ) 
-  #   self.default_amount += amount
-  #   self.save 
-  # end
-  
 
   def update_bad_debt_allowance( amount ) 
     self.bad_debt_allowance += amount 
@@ -622,6 +571,62 @@ Phase: loan disbursement finalization
       SavingsEntry.port_group_loan_membership_compulsory_savings( self, glm  )
     end
   end
+  
+  def clear_member_personal_bad_debt
+    
+    self.active_group_loan_memberships.joins(:group_loan_weekly_uncollectibles).each do |glm|
+      total_uncollectible = glm.group_loan_weekly_uncollectibles.where(:clearance_case => UNCOLLECTIBLE_CLEARANCE_CASE[:end_of_cycle]).count 
+      potential_interest_revenue  = total_uncollectible * glm.group_loan_product.interest 
+      bad_debt_allowance  = total_uncollectible * glm.group_loan_product.principal
+      glm_total_compulsory_savings =  glm.total_compulsory_savings 
+      
+      compulsory_savings_deduction_for_bad_debt_allowance = BigDecimal("0")
+      compulsory_savings_deduction_for_interest_revenue = BigDecimal("0")
+      bad_debt_expense = BigDecimal("0")
+      
+      compulsory_savings_post_bad_debt_allowance = glm_total_compulsory_savings - bad_debt_allowance
+      if compulsory_savings_post_bad_debt_allowance >= BigDecimal("0")
+        compulsory_savings_deduction_for_bad_debt_allowance = bad_debt_allowance
+        
+        compulsory_savings_post_interest_revenue = compulsory_savings_post_bad_debt_allowance - potential_interest_revenue
+        
+        if compulsory_savings_post_interest_revenue >= BigDecimal("0")
+          compulsory_savings_deduction_for_interest_revenue = potential_interest_revenue
+        else
+          compulsory_savings_deduction_for_interest_revenue = compulsory_savings_post_interest_revenue
+        end
+        
+      else
+        compulsory_savings_deduction_for_bad_debt_allowance = glm_total_compulsory_savings
+        bad_debt_expense = bad_debt_allowance - glm_total_compulsory_savings
+      end
+      
+      # for bad_debt_allowance
+      AccountingService::GroupLoanClosingPersonalClearance.bad_debt_allowance_compulsory_savings_deduction(self, 
+                  glm,
+                  compulsory_savings_deduction_for_bad_debt)  if compulsory_savings_deduction_for_bad_debt > BigDecimal("0")
+
+        # 2. for interest revenue 
+      AccountingService::GroupLoanClosingPersonalClearance.interest_revenue_compulsory_savings_deduction(self, 
+                  glm,
+                  compulsory_savings_deduction_for_interest_revenue) if compulsory_savings_deduction_for_interest_revenue > BigDecimal("0")
+
+      # if there is no $$$ can be paid from compulsory savings
+      AccountingService::GroupLoanClosingPersonalClearance.bad_debt_expense_clearance(self, 
+                  glm,
+                  bad_debt_expense)   if bad_debt_expense > BigDecimal("0")
+                  
+                  
+                  
+      glm.group_loan_weekly_uncollectibles.where(:clearance_case => UNCOLLECTIBLE_CLEARANCE_CASE[:end_of_cycle])each do |gl_wu|
+        gl_wu.clear_end_of_cycle
+      end
+    end
+    
+  end
+  
+  def clear_group_bad_debt
+  end
  
   def close(params)
     if self.group_loan_weekly_collections.where(:is_confirmed => true, :is_collected => true).count != self.number_of_collections
@@ -654,7 +659,11 @@ Phase: loan disbursement finalization
       return self 
     end
     
+    self.clear_member_personal_bad_debt # from uncollectible, end_of_cycle resolution 
+    
     self.port_compolsory_savings_and_deposit_to_pending_return
+    
+    self.clear_group_bad_debt  # from run_away, 
     
     # 1 TransactionData
     # extract compulsory_savings + deposit to transient_cash (cash to be returned) => under liability
@@ -662,6 +671,12 @@ Phase: loan disbursement finalization
     # this transient_cash will be deducted depending on the bad_debt_allowance clearance
     
     # the remnants is a liability, will be dispatched on group_loan return compulsory savings
+    
+    
+    
+    
+    
+    # clean group's bad_debt_allowance 
     
 =begin
   we need to have:

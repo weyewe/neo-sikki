@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150113140301) do
+ActiveRecord::Schema.define(version: 20150119061156) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -66,12 +66,17 @@ ActiveRecord::Schema.define(version: 20150113140301) do
     t.integer  "group_loan_id"
     t.integer  "group_loan_product_id"
     t.integer  "member_id"
-    t.boolean  "is_active",                                         default: true
+    t.boolean  "is_active",                                                                    default: true
     t.integer  "deactivation_case"
     t.integer  "deactivation_week_number"
-    t.decimal  "total_compulsory_savings", precision: 10, scale: 2, default: 0.0
+    t.decimal  "total_compulsory_savings",                            precision: 10, scale: 2, default: 0.0
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.decimal  "potential_loss_interest_revenue",                     precision: 12, scale: 2, default: 0.0
+    t.decimal  "personal_bad_debt_allowance",                         precision: 12, scale: 2, default: 0.0
+    t.decimal  "compulsory_savings_deduction_for_interest_revenue",   precision: 12, scale: 2, default: 0.0
+    t.decimal  "compulsory_savings_deduction_for_bad_debt_allowance", precision: 12, scale: 2, default: 0.0
+    t.decimal  "closing_bad_debt_expense",                            precision: 12, scale: 2, default: 0.0
   end
 
   create_table "group_loan_premature_clearance_payments", force: true do |t|
@@ -226,6 +231,7 @@ ActiveRecord::Schema.define(version: 20150113140301) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.boolean  "is_adjustment",                                   default: false
+    t.string   "message"
   end
 
   create_table "transaction_activities", force: true do |t|
