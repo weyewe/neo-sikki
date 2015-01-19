@@ -663,27 +663,36 @@ Phase: loan disbursement finalization
     total_available_deposit = self.premature_clearance_deposit
     total_capital = total_available_compulsory_savings + total_available_deposit
     remaining_capital = BigDecimal("0")
-
-    if total_recoverable >= total_capital
-      if total_bad_debt_allowance >= total_capital
-        bad_debt_expense = total_bad_debt_allowance - total_capital 
-        recovered_allowance = total_capital 
-        interest_revenue = BigDecimal("0")
-        remaining_capital = BigDecimal("0")
-      else 
-        bad_debt_expense  = BigDecimal("0")
-        recovered_allowance = total_bad_debt_allowance
-        interest_revenue = total_capital - total_bad_debt_allowance
-        remaining_capital = BigDecimal("0")
+    
+    capital_deduction_for_bad_debt_allowance = BigDecimal("0")
+    capital_deduction_for_interest_revenue = BigDecimal("0")
+    bad_debt_expense_loss = BigDecimal("0")
+    
+    total_capital_post_bad_debt_allowance = total_capital - total_bad_debt_allowance
+    if total_capital_post_bad_debt_allowance >= BigDecimal("0")
+      capital_deduction_for_bad_debt_allowance = total_bad_debt_allowance
+      
+      total_capital_post_interest_revenue = total_capital_post_bad_debt_allowance - total_potential_interest_revenue
+      
+      if total_capital_post_interest_revenue >= BigDecimal("0")
+        capital_deduction_for_interest_revenue = total_potential_interest_revenue
+      else
+        capital_deduction_for_interest_revenue = total_capital_post_bad_debt_allowance
       end
+      
+    else
+      capital_deduction_for_bad_debt_allowance = total_capital
+      bad_debt_expense_loss = total_bad_debt_allowance - total_capital
     end
-
-    if total_recoverable < total_capital 
-      bad_debt_expense = BigDecimal("0")
-      recovered_allowance = total_bad_debt_allowance
-      interest_revenue = total_potential_interest_revenue
-      remaining_capital = total_capital - total_recoverable
-    end
+    
+    
+    # create transaction for deducting capital: for bad_debt and interest
+    self.bad_debt_allowance_capital_deduction =  capital_deduction_for_bad_debt_allowance
+    self.interest_revenue_capital_deduction = capital_deduction_for_interest_revenue
+    self.bad_debt_expense = bad_debt_expense_loss
+    
+    self.save 
+    
   end
  
   def close(params)
@@ -779,6 +788,16 @@ Phase: loan disbursement finalization
   
   
   
+  def actual_group_loan_return_amount
+    total_compulsory_savings_pre_closure - (
+      bad_debt_allowance_capital_deduction + 
+      interest_revenue_capital_deduction + 
+      bad_debt_expense
+    )
+         
+      
+  end
+  
   def withdraw_compulsory_savings(params)
     
     # puts "withdraw_compulsory_savings is called"
@@ -799,17 +818,20 @@ Phase: loan disbursement finalization
     self.compulsory_savings_withdrawn_at = params[:compulsory_savings_withdrawn_at]
     self.is_compulsory_savings_withdrawn = true
    
-    self.round_down_compulsory_savings_return_revenue = self.compulsory_savings_return_amount -  
-                GroupLoan.rounding_down(  
-                            self.compulsory_savings_return_amount,
-                            DEFAULT_PAYMENT_ROUND_UP_VALUE
-                )
-                
+   
+    rounding_down_amount = GroupLoan.rounding_down(  
+                self.actual_group_loan_return_amount,
+                DEFAULT_PAYMENT_ROUND_UP_VALUE
+    )
+    
+    
+    self.round_down_compulsory_savings_return_revenue = self.actual_group_loan_return_amount -  
+                                                    rounding_down_amount
     self.save 
     
     # create the journal posting.
-    # 1. to record deduction of amount_payable
-    # 2. to record extra revenue from rounding_down
+    # 1. to record deduction of amount_payable ( from transient ) 
+    # 2. to record extra revenue from rounding_down  
   end
   
   
