@@ -115,12 +115,9 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
     # 2. get all run_away 
     # 3. minus run_away weekly_payment 
     
+    # group bad_debt_allowance, not personal bad debt
     group_loan.update_bad_debt_allowance(                 
-                      self.extract_uncollectible_weekly_payment_default_amount + 
                       self.extract_run_away_end_of_cycle_resolution_default_amount
-                      # + uncollectible
-                      # + run_away_declaration
-                      # - run_away_weekly_payment : it has to be paid. no matter what
     )
     
     
@@ -129,7 +126,7 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
   
   def update_group_loan_potential_loss_interest_revenue
     group_loan.update_potential_loss_interest_revenue(
-      self.extract_uncollectible_weekly_payment_interest_amount + 
+      # self.extract_uncollectible_weekly_payment_interest_amount + 
       self.extract_run_away_end_of_cycle_resolution_interest_amount
     )
   end
@@ -373,14 +370,12 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
         # puts "cancel the bad debt"
         group_loan.update_bad_debt_allowance(      
           -1 * (
-            self.extract_uncollectible_weekly_payment_default_amount + 
             self.extract_run_away_end_of_cycle_resolution_default_amount
           )
         )
         
         group_loan.update_potential_loss_interest_revenue(
           -1 * (
-            self.extract_uncollectible_weekly_payment_interest_amount + 
             self.extract_run_away_end_of_cycle_resolution_interest_amount
           )
         )

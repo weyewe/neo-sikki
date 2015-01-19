@@ -501,7 +501,8 @@ TRANSACTION_DATA_CODE = {
   :group_loan_run_away_end_of_cycle_clearance => 130, 
   :group_loan_deceased_declaration => 140, 
   :group_loan_weekly_collection_round_up => 150,
-  :port_compulsory_savings_and_premature_clearance_deposit => 160
+  :group_loan_close_member_compulsory_savings_deduction_for_bad_debt_allowance => 160,
+  :port_compulsory_savings_and_premature_clearance_deposit => 180
   
   
 }

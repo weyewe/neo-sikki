@@ -531,25 +531,25 @@ Phase: loan disbursement finalization
       glm.save 
     end
   end
-  
-  
-  def manifest_total_compulsory_savings_pre_closure
-    self.total_compulsory_savings_pre_closure = self.total_compulsory_savings
-    self.save 
-    
-    self.group_loan_memberships.each do |glm|
-      SavingsEntry.create_group_loan_closing_compulsory_savings_clearance( glm )
-    end
-  end
-  
-  def total_compulsory_savings_post_closure
-    amount = total_compulsory_savings_pre_closure - default_amount
-    if amount > BigDecimal('0')
-      return amount
-    else
-      return BigDecimal('0')
-    end
-  end
+    # 
+    # 
+    # def manifest_total_compulsory_savings_pre_closure
+    #   self.total_compulsory_savings_pre_closure = self.total_compulsory_savings
+    #   self.save 
+    #   
+    #   self.group_loan_memberships.each do |glm|
+    #     SavingsEntry.create_group_loan_closing_compulsory_savings_clearance( glm )
+    #   end
+    # end
+  # 
+  # def total_compulsory_savings_post_closure
+  #   amount = total_compulsory_savings_pre_closure - default_amount
+  #   if amount > BigDecimal('0')
+  #     return amount
+  #   else
+  #     return BigDecimal('0')
+  #   end
+  # end
   
   def clear_end_of_cycle_uncollectibles
     self.group_loan_weekly_uncollectibles.where(
@@ -559,8 +559,11 @@ Phase: loan disbursement finalization
   end
  
 
-  def port_compolsory_savings_and_deposit_to_pending_return
+  def port_compulsory_savings_and_deposit_to_pending_return
     compulsory_savings_amount = total_compulsory_savings
+    self.total_compulsory_savings_pre_closure = compulsory_savings_amount
+    self.save 
+    
     deposit = premature_clearance_deposit
     
     AccountingService::GroupLoanClosing.port_deposit_and_compulsory_savings_to_transient_account(self, 
@@ -569,6 +572,7 @@ Phase: loan disbursement finalization
     # clear the compulsory savings
     self.group_loan_memberships.each do |glm|
       SavingsEntry.port_group_loan_membership_compulsory_savings( self, glm  )
+      
     end
   end
   
@@ -605,12 +609,20 @@ Phase: loan disbursement finalization
       AccountingService::GroupLoanClosingPersonalClearance.bad_debt_allowance_compulsory_savings_deduction(self, 
                   glm,
                   compulsory_savings_deduction_for_bad_debt)  if compulsory_savings_deduction_for_bad_debt > BigDecimal("0")
-
+                  
+      SavingsEntry.create_group_loan_closing_compulsory_savings_deduction_bad_debt_allowance( glm , 
+            compulsory_savings_deduction_for_bad_debt ) if compulsory_savings_deduction_for_bad_debt > BigDecimal("0")
+      
+      
         # 2. for interest revenue 
       AccountingService::GroupLoanClosingPersonalClearance.interest_revenue_compulsory_savings_deduction(self, 
                   glm,
                   compulsory_savings_deduction_for_interest_revenue) if compulsory_savings_deduction_for_interest_revenue > BigDecimal("0")
-
+      
+      SavingsEntry.create_group_loan_closing_compulsory_savings_deduction_interest_revenue( glm , 
+            compulsory_savings_deduction_for_interest_revenue ) if compulsory_savings_deduction_for_interest_revenue > BigDecimal("0")
+            
+            
       # if there is no $$$ can be paid from compulsory savings
       AccountingService::GroupLoanClosingPersonalClearance.bad_debt_expense_clearance(self, 
                   glm,
@@ -621,6 +633,12 @@ Phase: loan disbursement finalization
       glm.group_loan_weekly_uncollectibles.where(:clearance_case => UNCOLLECTIBLE_CLEARANCE_CASE[:end_of_cycle])each do |gl_wu|
         gl_wu.clear_end_of_cycle
       end
+      
+      
+      glm.compulsory_savings_deduction_for_interest_revenue  = compulsory_savings_deduction_for_interest_revenue
+      glm.compulsory_savings_deduction_for_bad_debt_allowance = compulsory_savings_deduction_for_bad_debt
+      glm.save 
+      
     end
     
   end
@@ -659,10 +677,13 @@ Phase: loan disbursement finalization
       return self 
     end
     
+    
     self.clear_member_personal_bad_debt # from uncollectible, end_of_cycle resolution 
     
-    self.port_compolsory_savings_and_deposit_to_pending_return
+    self.reload 
+    self.port_compulsory_savings_and_deposit_to_pending_return
     
+    self.reload 
     self.clear_group_bad_debt  # from run_away, 
     
     # 1 TransactionData

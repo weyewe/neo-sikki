@@ -540,7 +540,8 @@ class SavingsEntry < ActiveRecord::Base
                         :member_id => member.id ,
                         :is_confirmed => true, 
                         :confirmed_at => savings_source.closed_at
-                        
+  
+    group_loan_membership.update_total_compulsory_savings( -1 * amount )
                        
                        # last info.. don't deduct the compulsory savings info
     # group_loan_membership.update_total_compulsory_savings( -1 * new_object.amount)
