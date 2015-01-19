@@ -593,6 +593,8 @@ Phase: loan disbursement finalization
   end
   
   
+  # this is the static_master
+  
   def manifest_total_compulsory_savings_pre_closure
     self.total_compulsory_savings_pre_closure = self.total_compulsory_savings
     self.save 
