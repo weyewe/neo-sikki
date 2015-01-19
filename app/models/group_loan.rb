@@ -559,6 +559,7 @@ Phase: loan disbursement finalization
 
   def port_compulsory_savings_and_deposit_to_pending_return
     compulsory_savings_amount = total_compulsory_savings
+    # after personal bad_debt_allowance clearance 
     self.total_compulsory_savings_pre_closure = compulsory_savings_amount
     self.save 
     
