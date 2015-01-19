@@ -301,7 +301,6 @@ class GroupLoanWeeklyUncollectible < ActiveRecord::Base
     self.cleared_at = nil
     
     
-    # teaeafjeak jfkleawjlkf jaekljf a
     if self.save
       # self.group_loan.update_bad_debt_allowance(   self.principal )
       # self.group_loan.update_potential_loss_interest_revenue( self.group_loan_membership.group_loan_product.interest)

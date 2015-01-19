@@ -521,8 +521,6 @@ Phase: loan disbursement finalization
     self.potential_loss_interest_revenue += amount 
     self.save 
   end
-  
-  
    
   def deactivate_group_loan_memberships_due_to_group_closed
     self.active_group_loan_memberships.each do |glm|
@@ -643,7 +641,49 @@ Phase: loan disbursement finalization
     
   end
   
+   
+  
   def clear_group_bad_debt
+=begin
+  we need to have:
+  1. total bad_debt amount
+  2. total potential loss_interest_revenue 
+    # sum of all run_away_end_of_cycle collection
+    # sum of all uncollectible end_of_cycle resolution 
+
+
+  3. group_available_compulsory_savings
+  4. group_deposit 
+=end
+    total_bad_debt_allowance = self.bad_debt_allowance
+    total_potential_interest_revenue = self.potential_loss_interest_revenue
+    total_recoverable = total_bad_debt_allowance + total_potential_interest_revenue
+
+    total_available_compulsory_savings = self.total_compulsory_savings_pre_closure
+    total_available_deposit = self.premature_clearance_deposit
+    total_capital = total_available_compulsory_savings + total_available_deposit
+    remaining_capital = BigDecimal("0")
+
+    if total_recoverable >= total_capital
+      if total_bad_debt_allowance >= total_capital
+        bad_debt_expense = total_bad_debt_allowance - total_capital 
+        recovered_allowance = total_capital 
+        interest_revenue = BigDecimal("0")
+        remaining_capital = BigDecimal("0")
+      else 
+        bad_debt_expense  = BigDecimal("0")
+        recovered_allowance = total_bad_debt_allowance
+        interest_revenue = total_capital - total_bad_debt_allowance
+        remaining_capital = BigDecimal("0")
+      end
+    end
+
+    if total_recoverable < total_capital 
+      bad_debt_expense = BigDecimal("0")
+      recovered_allowance = total_bad_debt_allowance
+      interest_revenue = total_potential_interest_revenue
+      remaining_capital = total_capital - total_recoverable
+    end
   end
  
   def close(params)
@@ -685,66 +725,8 @@ Phase: loan disbursement finalization
     
     self.reload 
     self.clear_group_bad_debt  # from run_away, 
-    
-    # 1 TransactionData
-    # extract compulsory_savings + deposit to transient_cash (cash to be returned) => under liability
-    
-    # this transient_cash will be deducted depending on the bad_debt_allowance clearance
-    
-    # the remnants is a liability, will be dispatched on group_loan return compulsory savings
-    
-    
-    
-    
-    
-    # clean group's bad_debt_allowance 
-    
-=begin
-  we need to have:
-  1. total bad_debt amount
-  2. total potential loss_interest_revenue 
-    # sum of all run_away_end_of_cycle collection
-    # sum of all uncollectible end_of_cycle resolution 
-    
-    
-  3. group_available_compulsory_savings
-  4. group_deposit 
-=end
-    total_bad_debt_allowance = self.bad_debt_allowance
-    total_potential_interest_revenue = self.potential_loss_interest_revenue
-    total_recoverable = total_bad_debt_allowance + total_potential_interest_revenue
-    
-    total_available_compulsory_savings = self.total_compulsory_savings
-    total_available_deposit = self.premature_clearance_deposit
-    total_capital = total_available_compulsory_savings + total_available_deposit
-    remaining_capital = BigDecimal("0")
-    
-    if total_recoverable >= total_capital
-      if total_bad_debt_allowance >= total_capital
-        bad_debt_expense = total_bad_debt_allowance - total_capital 
-        recovered_allowance = total_capital 
-        interest_revenue = BigDecimal("0")
-        remaining_capital = BigDecimal("0")
-      else 
-        bad_debt_expense  = BigDecimal("0")
-        recovered_allowance = total_bad_debt_allowance
-        interest_revenue = total_capital - total_bad_debt_allowance
-        remaining_capital = BigDecimal("0")
-      end
-    end
-    
-    if total_recoverable < total_capital 
-      bad_debt_expense = BigDecimal("0")
-      recovered_allowance = total_bad_debt_allowance
-      interest_revenue = total_potential_interest_revenue
-      remaining_capital = total_capital - total_recoverable
-    end
-    
-    
-    # perform deduction for those unpaid member
-    self.clear_end_of_cycle_uncollectibles
-    self.manifest_total_compulsory_savings_pre_closure
-    self.deduct_compulsory_savings_for_unsettled_default 
+  
+    self.reload 
     self.deactivate_group_loan_memberships_due_to_group_closed
     
 
@@ -755,11 +737,6 @@ Phase: loan disbursement finalization
     else
       self.errors.messages.each {|x| puts "err close: #{x}"}
     end
-    
-    
-    
-    # create journal posting to recover bad_debt_allowance
-    # create journal posting to assume bad_debt_expense 
   end
   
   def expected_revenue_from_run_away_member_end_of_cycle_resolution
