@@ -137,40 +137,7 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
     
     diff = billed - total_amount_receivable
     
-    
-    # 7-118
-    if diff != BigDecimal("0")
-      message = "Pembulatan Nilai: Group #{group_loan.name}, #{group_loan.group_number}, week #{self.week_number}"
-      ta = TransactionData.create_object({
-        :transaction_datetime => self.collected_at,
-        :description =>  message,
-        :transaction_source_id => self.id , 
-        :transaction_source_type => self.class.to_s ,
-        :code => TRANSACTION_DATA_CODE[:group_loan_weekly_collection_round_up],
-        :is_contra_transaction => false 
-      }, true )
-
-
-
-      TransactionDataDetail.create_object(
-        :transaction_data_id => ta.id,        
-        :account_id          => Account.find_by_code(ACCOUNT_CODE[:main_cash_leaf][:code]).id      ,
-        :entry_case          => NORMAL_BALANCE[:debit]     ,
-        :amount              => diff,
-        :description => message
-      )
-
-      TransactionDataDetail.create_object(
-        :transaction_data_id => ta.id,        
-        :account_id          => Account.find_by_code(ACCOUNT_CODE[:other_revenue_leaf][:code]).id        ,
-        :entry_case          => NORMAL_BALANCE[:credit]     ,
-        :amount              => diff,
-        :description => message
-      )
-      
-      ta.confirm 
-    end
-     
+    AccountingService::PrematureClearance.create_extra_revenue_from_rounding_up( group_loan, group_loan_weekly_collection, diff)
   end
   
   def unpost_rounding_up_revenue

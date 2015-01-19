@@ -692,7 +692,13 @@ Phase: loan disbursement finalization
     self.interest_revenue_capital_deduction = capital_deduction_for_interest_revenue
     self.bad_debt_expense = bad_debt_expense_loss
     
+    
+    
     self.save 
+    
+    # create posting => boom! lovey dovey! 
+    AccountingService::GroupLoanClosing.clear_group_bad_debt(self , capital_deduction_for_bad_debt_allowance,
+              capital_deduction_for_interest_revenue, bad_debt_expense)
     
   end
  
@@ -826,13 +832,19 @@ Phase: loan disbursement finalization
     )
     
     
-    self.round_down_compulsory_savings_return_revenue = self.actual_group_loan_return_amount -  
-                                                    rounding_down_amount
+    self.round_down_compulsory_savings_return_revenue = self.actual_group_loan_return_amount -  rounding_down_amount
+                                                    
+                                                    
     self.save 
+    
+    # add round_down revenue
+    # withdraw_remaining_compulsory_savings_and_deposit
     
     # create the journal posting.
     # 1. to record deduction of amount_payable ( from transient ) 
-    # 2. to record extra revenue from rounding_down  
+    AccountingService::GroupLoanClosingPersonalClearance.add_round_down_revenue(self) 
+    # 2. to record extra revenue from rounding_down 
+    AccountingService::GroupLoanClosingPersonalClearance.compulsory_savings_and_deposit_return(self, rounding_down_amount)  
   end
   
   

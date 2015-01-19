@@ -502,7 +502,10 @@ TRANSACTION_DATA_CODE = {
   :group_loan_deceased_declaration => 140, 
   :group_loan_weekly_collection_round_up => 150,
   :group_loan_close_member_compulsory_savings_deduction_for_bad_debt_allowance => 160,
-  :port_compulsory_savings_and_premature_clearance_deposit => 180
+  :port_compulsory_savings_and_premature_clearance_deposit => 180,
+  :group_loan_close_compulsory_savings_deposit_deduction_for_bad_debt_allowance => 181,
+  :group_loan_close_withdrawal_return_rounding_down_revenue => 182,
+  :group_loan_close_withdrawal_return  => 183
   
   
 }

@@ -1,4 +1,17 @@
+STEP 1
+FIx the base data for current account  (those that might trigger basic posting)
+
+
+
+STEP 2
+Incorporate new account (migration database)
 1. Generate all Accounts
+2. From the existing old transaction in the old system, do the journal posting
+
+STEP 3
+
+
+
 2. Generate unpaid interest revenue in group_loan (group_scope) and group_loan_membership (personal) 
 3. Generate bad debt allowance in group_loan (group_scope) and group_loan_membership (personal)
 
