@@ -292,7 +292,7 @@ describe GroupLoan do
                 @glm_list.each do |glm|
                   glm.reload
                   # puts "the total compulsory savings: #{glm.total_compulsory_savings.to_s} "
-                  glm.total_compulsory_savings.should_not == BigDecimal('0')
+                  glm.total_compulsory_savings.should == BigDecimal('0')
                 end
                 
               end

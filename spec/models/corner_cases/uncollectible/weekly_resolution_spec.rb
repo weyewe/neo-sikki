@@ -272,6 +272,8 @@ describe GroupLoanWeeklyUncollectible do
     
     context "confirming the weekly_collection with group_loan_weekly_uncollectible" do
       before(:each) do
+        
+        # @initial_personal_bad_debt_allowance = @uncollectible_glm.personal_bad_debt_allowance
         @second_group_loan_weekly_collection.collect({
           :collected_at => DateTime.now 
         })
@@ -284,11 +286,30 @@ describe GroupLoanWeeklyUncollectible do
         @group_loan.reload 
       end
       
-      it 'should update the bad_debt_allowance amount by the uncollectible\'s principal' do
+      it 'should NOT update the bad_debt_allowance amount by the uncollectible\'s principal' do
+        # reason: uncollectible is personal's bad debt allowance
         @final_bad_debt_allowance = @group_loan.bad_debt_allowance
         diff = @final_bad_debt_allowance  - @initial_bad_debt_allowance
-        diff.should == @uncollectible_glm.group_loan_product.principal 
+        diff.should == BigDecimal("0")  #@uncollectible_glm.group_loan_product.principal 
       end
+      
+      # it "should increase personal bad debt allowance" do
+      #   @uncollectible_glm.reload 
+      #   @final_personal_bad_debt_allowance = @uncollectible_glm.personal_bad_debt_allowance
+      #   @initial_personal_bad_debt_allowance
+      #   
+      #   diff = @final_personal_bad_debt_allowance - @initial_personal_bad_debt_allowance
+      #   diff.should == @uncollectible_glm.group_loan_product.principal 
+      # end
+      # 
+      # it "should increase personal potential loss interest revenue" do
+      #   @uncollectible_glm.reload 
+      #   @final_potential_loss_interest_revenue = @uncollectible_glm.potential_loss_interest_revenue
+      #   @initial_potential_loss_interest_revenue
+      #   
+      #   diff = @final_potential_loss_interest_revenue - @initial_potential_loss_interest_revenue
+      #   diff.should == @uncollectible_glm.group_loan_product.interest 
+      # end
       
       it 'should allow uncollectible amount' do
         final_uncollectible_weekly_payment_amount = @second_group_loan_weekly_collection.extract_uncollectible_weekly_payment_amount
@@ -356,6 +377,7 @@ describe GroupLoanWeeklyUncollectible do
             before(:each) do
               @group_loan.reload
               @initial_group_loan_bad_debt_allowance = @group_loan.bad_debt_allowance
+              
               @first_gl_wu.clear(:cleared_at => @cleared_at)
 
               @first_gl_wu .reload
@@ -368,12 +390,13 @@ describe GroupLoanWeeklyUncollectible do
             end
 
 
-            it 'should update the group loan default amount' do
+            it 'should NOT update the group loan default amount' do
+              # because it has nothing to do with group. it is personal member's allowance
               @group_loan.reload
               final_group_loan_bad_debt_allowance = @group_loan.bad_debt_allowance
               diff = final_group_loan_bad_debt_allowance - @initial_group_loan_bad_debt_allowance
               
-              diff.should == -1*@uncollectible_glm.group_loan_product.principal 
+              diff.should == BigDecimal("0") # -1*@uncollectible_glm.group_loan_product.principal 
             end
 
 

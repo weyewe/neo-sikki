@@ -126,6 +126,16 @@ class GroupLoanMembership < ActiveRecord::Base
     #   puts "The msg: #{msg}"
     # end
   end
+  
+  # def update_personal_bad_debt_allowance(amount)
+  #   self.personal_bad_debt_allowance += amount 
+  #   self.save 
+  # end
+  # 
+  # def update_potential_loss_interest_revenue( amount ) 
+  #   self.potential_loss_interest_revenue += amount 
+  #   self.save
+  # end
    
   
 =begin

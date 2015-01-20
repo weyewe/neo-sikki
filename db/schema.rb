@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150119061156) do
+ActiveRecord::Schema.define(version: 20150119073535) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -72,8 +72,6 @@ ActiveRecord::Schema.define(version: 20150119061156) do
     t.decimal  "total_compulsory_savings",                            precision: 10, scale: 2, default: 0.0
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.decimal  "potential_loss_interest_revenue",                     precision: 12, scale: 2, default: 0.0
-    t.decimal  "personal_bad_debt_allowance",                         precision: 12, scale: 2, default: 0.0
     t.decimal  "compulsory_savings_deduction_for_interest_revenue",   precision: 12, scale: 2, default: 0.0
     t.decimal  "compulsory_savings_deduction_for_bad_debt_allowance", precision: 12, scale: 2, default: 0.0
     t.decimal  "closing_bad_debt_expense",                            precision: 12, scale: 2, default: 0.0
@@ -184,6 +182,8 @@ ActiveRecord::Schema.define(version: 20150119061156) do
     t.string   "group_number"
     t.decimal  "compulsory_savings_deduction_amount",          precision: 12, scale: 2, default: 0.0
     t.decimal  "potential_loss_interest_revenue",              precision: 12, scale: 2, default: 0.0
+    t.decimal  "bad_debt_allowance_capital_deduction",         precision: 12, scale: 2, default: 0.0
+    t.decimal  "interest_revenue_capital_deduction",           precision: 12, scale: 2, default: 0.0
   end
 
   create_table "members", force: true do |t|

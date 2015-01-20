@@ -137,7 +137,7 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
     
     diff = billed - total_amount_receivable
     
-    AccountingService::PrematureClearance.create_extra_revenue_from_rounding_up( group_loan, group_loan_weekly_collection, diff)
+    AccountingService::PrematureClearance.create_extra_revenue_from_rounding_up( group_loan, self, diff)
   end
   
   def unpost_rounding_up_revenue
@@ -402,12 +402,17 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
   def confirm_uncollectible_allowance
     self.group_loan_weekly_uncollectibles.each do |x|
       x.create_allowance_transaction_data_from_uncollectible
+      glm = x.group_loan_membership
+      # glm.update_personal_bad_debt_allowance( glm.group_loan_product.principal)
+      # glm.update_potential_loss_interest_revenue( glm.group_loan_product.interest)
     end
   end
   
   def unconfirm_uncollectible_allowance
     self.group_loan_weekly_uncollectibles.each do |x|
       x.create_contra_allowance_transaction_data
+      # glm.update_personal_bad_debt_allowance( -1*glm.group_loan_product.principal)
+      # glm.update_potential_loss_interest_revenue( -1*glm.group_loan_product.interest)
     end
   end
   

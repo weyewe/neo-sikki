@@ -288,7 +288,7 @@ describe DeceasedClearance do
           expected_amount += x.group_loan_product.compulsory_savings
         end
         
-        @group_loan.compulsory_savings_return_amount.should == expected_amount*@group_loan.loan_duration + @deceased_glm.total_compulsory_savings
+        @group_loan.total_compulsory_savings_pre_closure.should == expected_amount*@group_loan.loan_duration + @deceased_glm.total_compulsory_savings
       end
     end
 

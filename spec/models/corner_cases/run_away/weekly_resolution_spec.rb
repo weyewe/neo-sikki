@@ -268,7 +268,7 @@ describe GroupLoan do
           # puts "normal_compulsory-savings = #{normal_total_compulsory_savings} "
           # puts "compulsory_savings-return amount: #{@group_loan.compulsory_savings_return_amount}"
                   
-          (normal_total_compulsory_savings - @group_loan.compulsory_savings_return_amount).should == diff
+          (normal_total_compulsory_savings - @group_loan.total_compulsory_savings_pre_closure).should == diff
         end
         
         it 'should confirm all group loan weekly collections' do

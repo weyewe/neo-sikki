@@ -289,10 +289,11 @@ describe GroupLoanWeeklyUncollectible do
         @group_loan.reload 
       end
       
-      it 'should update the bad_debt_allowance amount by the uncollectible\'s principal' do
+      it 'should NOT update the bad_debt_allowance amount by the uncollectible\'s principal' do
         @final_bad_debt_allowance = @group_loan.bad_debt_allowance
         diff = @final_bad_debt_allowance  - @initial_bad_debt_allowance
-        diff.should == @uncollectible_glm.group_loan_product.principal 
+        # diff.should == @uncollectible_glm.group_loan_product.principal 
+        diff.should == BigDecimal("0")
       end
       
       it 'should allow uncollectible amount' do
@@ -361,6 +362,8 @@ describe GroupLoanWeeklyUncollectible do
             before(:each) do
               @group_loan.reload
               @initial_group_loan_bad_debt_allowance = @group_loan.bad_debt_allowance
+              @uncollectible_glm.reload
+              @available_compulsory_savings = @uncollectible_glm.total_compulsory_savings
               @group_loan.close(:closed_at => @closed_at )
 
               @first_gl_wu .reload
@@ -382,18 +385,60 @@ describe GroupLoanWeeklyUncollectible do
             
             it 'should produce less compulsory_savings_return' do
               normal_total_compulsory_savings = BigDecimal('0')
-
               weekly_compulsory_savings_increment = BigDecimal('0')
 
               @group_loan.group_loan_memberships.joins(:group_loan_product).each do |glm|
                 weekly_compulsory_savings_increment += glm.group_loan_product.compulsory_savings 
               end
+              
+              # the one with uncollectible. end of cycle clearance
+              
+              
+              potential_deduction_for_interest_revenue =  @uncollectible_glm.group_loan_product.interest
+              potential_deduction_for_principal = @uncollectible_glm.group_loan_product.principal
+              
+              
+              actual_deduction_for_interest_revenue =  BigDecimal("0")
+              actual_deduction_for_principal = BigDecimal("0")
+              
+              compulsory_savings_post_bad_debt_allowance = @available_compulsory_savings - potential_deduction_for_principal
+              
+              if compulsory_savings_post_bad_debt_allowance >= BigDecimal("0")
+                actual_deduction_for_principal = potential_deduction_for_principal
+                compulsory_savings_post_interest= compulsory_savings_post_bad_debt_allowance - potential_deduction_for_interest_revenue
+                
+                
+                if compulsory_savings_post_interest >= BigDecimal("0")
+                  actual_deduction_for_interest_revenue = potential_deduction_for_interest_revenue
+                else
+                  actual_deduction_for_interest_revenue = compulsory_savings_post_bad_debt_allowance
+                end
+                
+              else
+                actual_deduction_for_principal = @available_compulsory_savings
+                actual_deduction_for_interest_revenue = BigDecimal("0")
+                
+              end
+              
+              
+              
+              
+              
+              puts "Interest Element: #{potential_deduction_for_interest_revenue}"
+              puts "Principal element: #{potential_deduction_for_principal}"
 
               normal_total_compulsory_savings = weekly_compulsory_savings_increment*@group_loan.loan_duration
               
-              @group_loan.compulsory_savings_return_amount.should_not == normal_total_compulsory_savings
-              @group_loan.compulsory_savings_return_amount.should == 
-                      (normal_total_compulsory_savings - @uncollectible_glm.group_loan_product.principal)
+              actual_compulsory_savings_return = (normal_total_compulsory_savings - 
+                        (actual_deduction_for_principal + actual_deduction_for_interest_revenue + @uncollectible_glm.group_loan_product.compulsory_savings)  )
+              
+              
+              puts "normal_total_compulsory_savings : #{normal_total_compulsory_savings}"
+              puts "actual_compulsory_savings_return : #{actual_compulsory_savings_return}"
+              puts "compulsory_savings_from_system: #{@group_loan.total_compulsory_savings_pre_closure}"
+              
+              @group_loan.total_compulsory_savings_pre_closure.should == actual_compulsory_savings_return
+                      
             end
           end
         end

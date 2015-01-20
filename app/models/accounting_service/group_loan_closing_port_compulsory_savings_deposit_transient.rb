@@ -1,7 +1,7 @@
 module AccountingService
   class GroupLoanClosingPortCompulsorySavingsDepositTransient
     def GroupLoanClosingPortCompulsorySavingsDepositTransient.port_deposit_and_compulsory_savings_to_transient_account(group_loan, 
-                compulsory_savings, deposit) 
+                compulsory_savings_amount, deposit) 
       message = "Port Compulsory Savings: Group #{group_loan.name}, #{group_loan.group_number}"
 
       ta = TransactionData.create_object({

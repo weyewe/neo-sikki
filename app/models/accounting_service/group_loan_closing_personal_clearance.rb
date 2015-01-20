@@ -1,5 +1,5 @@
 module AccountingService
-  class GroupLoanClosingPersonalClearancePersonalClearance
+  class GroupLoanClosingPersonalClearance
     def GroupLoanClosingPersonalClearance.bad_debt_allowance_compulsory_savings_deduction(group_loan, 
                 glm, compulsory_savings_deduction_for_bad_debt) 
       message = "Member Bad Debt Allowance compulsory savings deduction: Group #{group_loan.name}, #{group_loan.group_number}" + 

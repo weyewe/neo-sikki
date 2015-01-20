@@ -565,7 +565,8 @@ Phase: loan disbursement finalization
     
     deposit = premature_clearance_deposit
     
-    AccountingService::GroupLoanClosing.port_deposit_and_compulsory_savings_to_transient_account(self, 
+    AccountingService::GroupLoanClosingPortCompulsorySavingsDepositTransient.
+                  port_deposit_and_compulsory_savings_to_transient_account(self, 
                 compulsory_savings_amount, deposit)
                 
     # clear the compulsory savings
@@ -577,7 +578,7 @@ Phase: loan disbursement finalization
   
   def clear_member_personal_bad_debt
     
-    self.active_group_loan_memberships.joins(:group_loan_weekly_uncollectibles).each do |glm|
+    self.active_group_loan_memberships.includes(:group_loan_weekly_uncollectibles).each do |glm|
       total_uncollectible = glm.group_loan_weekly_uncollectibles.where(:clearance_case => UNCOLLECTIBLE_CLEARANCE_CASE[:end_of_cycle]).count 
       potential_interest_revenue  = total_uncollectible * glm.group_loan_product.interest 
       bad_debt_allowance  = total_uncollectible * glm.group_loan_product.principal
@@ -607,10 +608,10 @@ Phase: loan disbursement finalization
       # for bad_debt_allowance
       AccountingService::GroupLoanClosingPersonalClearance.bad_debt_allowance_compulsory_savings_deduction(self, 
                   glm,
-                  compulsory_savings_deduction_for_bad_debt)  if compulsory_savings_deduction_for_bad_debt > BigDecimal("0")
+                  compulsory_savings_deduction_for_bad_debt_allowance)  if compulsory_savings_deduction_for_bad_debt_allowance > BigDecimal("0")
                   
       SavingsEntry.create_group_loan_closing_compulsory_savings_deduction_bad_debt_allowance( glm , 
-            compulsory_savings_deduction_for_bad_debt ) if compulsory_savings_deduction_for_bad_debt > BigDecimal("0")
+            compulsory_savings_deduction_for_bad_debt_allowance ) if compulsory_savings_deduction_for_bad_debt_allowance > BigDecimal("0")
       
       
         # 2. for interest revenue 
@@ -629,13 +630,13 @@ Phase: loan disbursement finalization
                   
                   
                   
-      glm.group_loan_weekly_uncollectibles.where(:clearance_case => UNCOLLECTIBLE_CLEARANCE_CASE[:end_of_cycle])each do |gl_wu|
+      glm.group_loan_weekly_uncollectibles.where(:clearance_case => UNCOLLECTIBLE_CLEARANCE_CASE[:end_of_cycle]).each do |gl_wu|
         gl_wu.clear_end_of_cycle
       end
       
       
       glm.compulsory_savings_deduction_for_interest_revenue  = compulsory_savings_deduction_for_interest_revenue
-      glm.compulsory_savings_deduction_for_bad_debt_allowance = compulsory_savings_deduction_for_bad_debt
+      glm.compulsory_savings_deduction_for_bad_debt_allowance = compulsory_savings_deduction_for_bad_debt_allowance
       glm.save 
       
     end
@@ -842,9 +843,9 @@ Phase: loan disbursement finalization
     
     # create the journal posting.
     # 1. to record deduction of amount_payable ( from transient ) 
-    AccountingService::GroupLoanClosingPersonalClearance.add_round_down_revenue(self) 
+    AccountingService::GroupLoanClosingWithdrawCompulsorySavingsDeposit.add_round_down_revenue(self) 
     # 2. to record extra revenue from rounding_down 
-    AccountingService::GroupLoanClosingPersonalClearance.compulsory_savings_and_deposit_return(self, rounding_down_amount)  
+    AccountingService::GroupLoanClosingWithdrawCompulsorySavingsDeposit.compulsory_savings_and_deposit_return(self, rounding_down_amount)  
   end
   
   

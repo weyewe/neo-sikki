@@ -332,7 +332,7 @@ describe GroupLoan do
              expected_amount += glm.group_loan_product.compulsory_savings *  @group_loan.number_of_collections
            end
            
-           @group_loan.compulsory_savings_return_amount.should == expected_amount 
+           @group_loan.total_compulsory_savings_pre_closure.should == expected_amount 
          end
        end
             

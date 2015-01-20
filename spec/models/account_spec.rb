@@ -3,6 +3,6 @@ require 'spec_helper'
 describe Account do
   pending "add some examples to (or delete) #{__FILE__}"
   it "should have 35 accounts " do
-    Account.count.should == 35 
+    Account.count.should == 36
   end
 end

@@ -1,6 +1,6 @@
 module AccountingService
   class GroupLoanClosingWithdrawCompulsorySavingsDeposit
-    def GroupLoanClosingPersonalClearance.add_round_down_revenue(group_loan) 
+    def GroupLoanClosingWithdrawCompulsorySavingsDeposit.add_round_down_revenue(group_loan) 
       message = "Round down revenue: Group #{group_loan.name}, #{group_loan.group_number}." + 
                 " Amount: #{group_loan.round_down_compulsory_savings_return_revenue}." 
 
@@ -34,9 +34,9 @@ module AccountingService
       ta.confirm
     end
     
-    def GroupLoanClosingPersonalClearance.compulsory_savings_and_deposit_return(group_loan, amount ) 
+    def GroupLoanClosingWithdrawCompulsorySavingsDeposit.compulsory_savings_and_deposit_return(group_loan, amount ) 
       message = "Compulsory Savings + Deposit return: Group #{group_loan.name}, #{group_loan.group_number}." + 
-                " Amount: #{group_loan.amount}." 
+                " Amount: #{amount}." 
 
       ta = TransactionData.create_object({
         :transaction_datetime => group_loan.closed_at,

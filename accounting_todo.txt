@@ -78,17 +78,16 @@ if principal + interest <  uang titipan + compulsory savings
 
 
 
-
-	rspec ./spec/models/corner_cases/combination/scenario_2_spec.rb:157 # GroupLoan perform premature clearance should produce correct premature clearance amount (premature clearance 1)
-	rspec ./spec/models/corner_cases/combination/scenario_2_spec.rb:350 # GroupLoan perform premature clearance weekly_collection.confirm closing week 3, going to week 4 closing the group loan should return the correct compulsory saving amount: not including the premature clearance
-	rspec ./spec/models/corner_cases/combination/scenario_2_spec.rb:345 # GroupLoan perform premature clearance weekly_collection.confirm closing week 3, going to week 4 closing the group loan should not have compulsory_savings on premature_clearance
-	rspec ./spec/models/corner_cases/uncollectible/end_of_cycle_resolution_spec.rb:383 # GroupLoanWeeklyUncollectible create one uncollectible: impact on the weekly_collection.amount_receivable confirming the weekly_collection with group_loan_weekly_uncollectible closing the group loan collect uncollectibles clear uncollectibles should produce less compulsory_savings_return
 	rspec ./spec/models/corner_cases/combination/scenario_3_spec.rb:214 # GroupLoan perform run_away confirm second_week confirm up to week 5: week 5 is not confirmed nor collected should produce premature_clearance_payment including the bail_out for run_away member
-	rspec ./spec/models/corner_cases/combination/scenario_1_spec.rb:186 # GroupLoan perform premature clearance should produce correct premature clearance amount (premature clearance 2)
 	rspec ./spec/models/corner_cases/combination/scenario_1_spec.rb:164 # GroupLoan perform premature clearance should produce correct premature clearance amount (premature clearance 1)
+	rspec ./spec/models/corner_cases/combination/scenario_1_spec.rb:186 # GroupLoan perform premature clearance should produce correct premature clearance amount (premature clearance 2)
 	rspec ./spec/models/corner_cases/combination/scenario_1_spec.rb:290 # GroupLoan perform premature clearance weekly_collection.confirm closing the group loan should not have compulsory_savings on premature_clearance
 	rspec ./spec/models/corner_cases/combination/scenario_1_spec.rb:295 # GroupLoan perform premature clearance weekly_collection.confirm closing the group loan should return the correct compulsory saving amount: not including the premature clearance
 
-
-
-
+	rspec ./spec/models/corner_cases/combination/scenario_2_spec.rb:157 # GroupLoan perform premature clearance should produce correct premature clearance amount (premature clearance 1)
+	rspec ./spec/models/corner_cases/combination/scenario_2_spec.rb:328 # GroupLoan perform premature clearance weekly_collection.confirm closing week 3, going to week 4 closing the group loan should confirm the premature clearance
+	rspec ./spec/models/corner_cases/combination/scenario_2_spec.rb:323 # GroupLoan perform premature clearance weekly_collection.confirm closing week 3, going to week 4 closing the group loan should confirm week 4
+	rspec ./spec/models/corner_cases/combination/scenario_2_spec.rb:345 # GroupLoan perform premature clearance weekly_collection.confirm closing week 3, going to week 4 closing the group loan should not have compulsory_savings on premature_clearance
+	rspec ./spec/models/corner_cases/combination/scenario_2_spec.rb:350 # GroupLoan perform premature clearance weekly_collection.confirm closing week 3, going to week 4 closing the group loan should return the correct compulsory saving amount: not including the premature clearance
+	rspec ./spec/models/corner_cases/combination/scenario_2_spec.rb:334 # GroupLoan perform premature clearance weekly_collection.confirm closing week 3, going to week 4 closing the group loan should deduct the first and second premature_clearance glm on fifth_weekly_collection
+ 
