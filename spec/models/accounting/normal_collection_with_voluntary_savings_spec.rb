@@ -175,6 +175,15 @@ describe GroupLoan do
             before(:each) do
               @first_group_loan_weekly_collection = @group_loan.group_loan_weekly_collections.order("id ASC").first
               @first_group_loan_weekly_collection.should be_valid 
+              @first_glm = @group_loan.group_loan_memberships.first 
+              
+              @glwc_vs =   GroupLoanWeeklyCollectionVoluntarySavingsEntry.create_object( 
+                :amount        => BigDecimal( "150000"),
+                :group_loan_membership_id => @first_glm.id ,
+                :group_loan_weekly_collection_id => @first_group_loan_weekly_collection.id 
+              )
+              
+              
               @first_group_loan_weekly_collection.collect(
                 {
                   :collected_at => DateTime.now 
@@ -197,7 +206,7 @@ describe GroupLoan do
             
             
             
-            it "should create transaction data" do
+            it "should create transaction data for weekly collection" do
               TransactionData.where(:transaction_source_id => @first_group_loan_weekly_collection.id, 
                 :transaction_source_type => @first_group_loan_weekly_collection.class.to_s,
                 :code => TRANSACTION_DATA_CODE[:group_loan_weekly_collection]
@@ -208,6 +217,22 @@ describe GroupLoan do
                 :code => TRANSACTION_DATA_CODE[:group_loan_weekly_collection]
               ).first
 
+              a.total_debit.should == a.total_credit
+              a.is_confirmed.should be_truthy 
+            end
+            
+            it "should create transaction data for voluntary savings" do
+              TransactionData.where(:transaction_source_id => @glwc_vs.id, 
+                :transaction_source_type => @glwc_vs.class.to_s,
+                :code => TRANSACTION_DATA_CODE[:group_loan_weekly_collection_voluntary_savings]
+              ).count.should == 1 
+
+              a = TransactionData.where(:transaction_source_id => @glwc_vs.id, 
+                :transaction_source_type => @glwc_vs.class.to_s,
+                :code => TRANSACTION_DATA_CODE[:group_loan_weekly_collection_voluntary_savings]
+              ).first
+
+              a.is_confirmed.should be_truthy 
               a.total_debit.should == a.total_credit
             end
             
@@ -225,6 +250,17 @@ describe GroupLoan do
                 
                 contra.is_confirmed.should be_truthy
               end
+              
+              it "should create transaction data to unconfirm weekly_collection voluntary savings" do
+                contra = TransactionData.where(:transaction_source_id => @glwc_vs.id, 
+                  :transaction_source_type => @glwc_vs.class.to_s,
+                  :code => TRANSACTION_DATA_CODE[:group_loan_weekly_collection_voluntary_savings],
+                  :is_contra_transaction => true 
+                ).order("id DESC").first
+                
+                contra.is_confirmed.should be_truthy
+              end
+              
             end
             
             

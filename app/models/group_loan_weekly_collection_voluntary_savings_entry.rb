@@ -155,9 +155,11 @@ class GroupLoanWeeklyCollectionVoluntarySavingsEntry < ActiveRecord::Base
     )
     
     total_amount = BigDecimal("0")
+    
+    puts "5585 Inside the unconfirm"
 
     weekly_collection_voluntary_savings_array.each do |x|
-      x.create_contra_and_confirm(  TRANSACTION_DATA_CODE[:group_loan_weekly_collection_voluntary_savings] )
+      x.create_contra_and_confirm_for_group_loan_weekly_collection_voluntary_savings( self, TRANSACTION_DATA_CODE[:group_loan_weekly_collection_voluntary_savings] )
       
       total_amount += x.amount 
       x.destroy 

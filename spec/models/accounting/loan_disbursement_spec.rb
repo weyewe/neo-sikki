@@ -154,10 +154,12 @@ describe GroupLoan do
 
               contra = TransactionData.where(:transaction_source_id => @group_loan.id, 
                 :transaction_source_type => @group_loan.class.to_s,
-                :code => TRANSACTION_DATA_CODE[:loan_disbursement]
+                :code => TRANSACTION_DATA_CODE[:loan_disbursement],
+                :is_contra_transaction => true 
               ).order("id DESC").first
               
               contra.is_contra_transaction.should be_truthy 
+              contra.is_confirmed.should be_truthy
             end
             
             context " re-doing loan disbursement" do

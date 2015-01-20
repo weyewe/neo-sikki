@@ -683,12 +683,30 @@ class SavingsEntry < ActiveRecord::Base
 
   
   def create_contra_and_confirm(transaction_code)
+    puts "5585444 savings_entry.create_contra_and_confirm"
     last_transaction_data = TransactionData.where(
       :transaction_source_id => self.id , 
       :transaction_source_type => self.class.to_s ,
       :code => transaction_code,
       :is_contra_transaction => false
     ).order("id DESC").first 
+    
+    puts "last_transaction_data : #{last_transaction_data}"
+    
+
+    last_transaction_data.create_contra_and_confirm if not  last_transaction_data.nil?
+  end
+  
+  def create_contra_and_confirm_for_group_loan_weekly_collection_voluntary_savings(savings_source, transaction_code)
+    puts "5585444 savings_entry.create_contra_and_confirm"
+    last_transaction_data = TransactionData.where(
+      :transaction_source_id => savings_source.id , 
+      :transaction_source_type => savings_source.class.to_s ,
+      :code => transaction_code,
+      :is_contra_transaction => false
+    ).order("id DESC").first 
+    
+    puts "last_transaction_data : #{last_transaction_data}"
     
 
     last_transaction_data.create_contra_and_confirm if not  last_transaction_data.nil?
