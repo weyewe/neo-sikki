@@ -127,6 +127,13 @@ describe GroupLoan do
     @group_loan.reload
   end
   
+  it "should produce weekly-resolution group_loan_run_away_receivable" do
+    GroupLoanRunAwayReceivable.where(
+      :group_loan_membership_id => @run_away_glm.id ,
+      :payment_case => GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:weekly] 
+    ).count.should == 1 
+  end
+  
   it "should mark second_glm as run away" do
     @run_away_glm.is_active.should be_falsy
     @run_away_glm.deactivation_case.should == GROUP_LOAN_DEACTIVATION_CASE[:run_away]
@@ -151,6 +158,60 @@ describe GroupLoan do
   
   it "should produce 0 amount for group_loan.bad_debt_allowance" do
     @group_loan.bad_debt_allowance.should == BigDecimal("0")
+  end
+  
+  context "confirm the weekly collection" do
+    before(:each) do
+      @second_group_loan_weekly_collection.collect(
+        {
+          :collected_at => DateTime.now 
+        }
+      )
+      
+      @second_group_loan_weekly_collection.confirm(:confirmed_at => DateTime.now )
+    end
+    
+    it "should create transaction data to confirm weekly run away resolution" do
+      TransactionData.where(
+        :transaction_source_id => @second_group_loan_weekly_collection.id, 
+        :transaction_source_type => @second_group_loan_weekly_collection.class.to_s,
+        :code => TRANSACTION_DATA_CODE[:group_loan_run_away_in_cycle_clearance]
+      ).count.should == 1
+      
+      a = TransactionData.where(
+        :transaction_source_id => @second_group_loan_weekly_collection.id, 
+        :transaction_source_type => @second_group_loan_weekly_collection.class.to_s,
+        :code => TRANSACTION_DATA_CODE[:group_loan_run_away_in_cycle_clearance]
+      ).order("id DESC").first 
+      
+      a.is_confirmed.should be_truthy 
+    end
+    
+    context "unconfirm weekly collection" do
+      before(:each) do
+        @second_group_loan_weekly_collection.unconfirm
+        @second_group_loan_weekly_collection.reload 
+        
+      end
+      
+      it "should create contra" do
+        TransactionData.where(
+          :transaction_source_id => @second_group_loan_weekly_collection.id, 
+          :transaction_source_type => @second_group_loan_weekly_collection.class.to_s,
+          :code => TRANSACTION_DATA_CODE[:group_loan_run_away_in_cycle_clearance],
+          :is_contra_transaction => true 
+        ).count.should == 1
+
+        a = TransactionData.where(
+          :transaction_source_id => @second_group_loan_weekly_collection.id, 
+          :transaction_source_type => @second_group_loan_weekly_collection.class.to_s,
+          :code => TRANSACTION_DATA_CODE[:group_loan_run_away_in_cycle_clearance],
+          :is_contra_transaction => true 
+        ).order("id DESC").first 
+
+        a.is_confirmed.should be_truthy
+      end
+    end
   end
   
   

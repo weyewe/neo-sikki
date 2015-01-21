@@ -558,6 +558,7 @@ Phase: loan disbursement finalization
  
 
   def port_compulsory_savings_and_deposit_to_pending_return
+    # puts "123123 Inside port "
     compulsory_savings_amount = total_compulsory_savings
     # after personal bad_debt_allowance clearance 
     self.total_compulsory_savings_pre_closure = compulsory_savings_amount
@@ -704,11 +705,13 @@ Phase: loan disbursement finalization
   end
  
   def close(params)
+    # puts "1 inside the close"
     if self.group_loan_weekly_collections.where(:is_confirmed => true, :is_collected => true).count != self.number_of_collections
       self.errors.add(:generic_errors, "Ada Pengumpulan mingguan yang belum selesai")
       return self 
     end
     
+    # puts "2 checking uncollectible"
     if self.group_loan_weekly_uncollectibles.where(
           :is_cleared => false, 
           :clearance_case => UNCOLLECTIBLE_CLEARANCE_CASE[:in_cycle] ).count != 0 
@@ -717,42 +720,51 @@ Phase: loan disbursement finalization
     end
     
     
+    # puts "3 check the closing status"
     if self.is_closed?
       self.errors.add(:generic_errors, "Sudah ditutup")
       return self 
     end
     
+    # puts "4 check the closed_at "
     if params[:closed_at].nil? or not params[:closed_at].is_a?(DateTime)
       self.errors.add(:closed_at, "Harus ada tanggal tutup")
       return self 
     end
     
+     
+    
+    
+       
+    
+    # puts "5 clear personal bad debt"
+    
     self.closed_at = params[:closed_at]
-    
-    if self.closed_at.nil?
-      self.errors.add(:closed_at, "Harus ada tanggal penutupan")
-      return self 
-    end
-    
-    
     self.clear_member_personal_bad_debt # from uncollectible, end_of_cycle resolution 
     
     self.reload 
+    # puts "6 port comulsory savings"
+    # puts "99933 gonna port compulsory savings and deposit"
+    self.closed_at = params[:closed_at]
     self.port_compulsory_savings_and_deposit_to_pending_return
     
     self.reload 
+    # puts "clear bad debt"
+    self.closed_at = params[:closed_at] ## or else, will be gone upon self.reload 
     self.clear_group_bad_debt  # from run_away, 
   
     self.reload 
+    # puts "7 deactivate glm"
+    self.closed_at = params[:closed_at]
     self.deactivate_group_loan_memberships_due_to_group_closed
     
 
-    
+    self.closed_at = params[:closed_at]
     self.is_closed = true 
     
     if self.save
     else
-      self.errors.messages.each {|x| puts "err close: #{x}"}
+      self.errors.messages.each {|x| puts "99999 err close: #{x}"}
     end
   end
   
@@ -827,19 +839,18 @@ Phase: loan disbursement finalization
     self.is_compulsory_savings_withdrawn = true
    
    
+   
+   # this is the amount returned to the user 
     rounding_down_amount = GroupLoan.rounding_down(  
                 self.actual_group_loan_return_amount,
                 DEFAULT_PAYMENT_ROUND_UP_VALUE
     )
     
-    
+    # this is the revenue. 
     self.round_down_compulsory_savings_return_revenue = self.actual_group_loan_return_amount -  rounding_down_amount
                                                     
                                                     
     self.save 
-    
-    # add round_down revenue
-    # withdraw_remaining_compulsory_savings_and_deposit
     
     # create the journal posting.
     # 1. to record deduction of amount_payable ( from transient ) 

@@ -2,6 +2,7 @@ module AccountingService
   class GroupLoanClosingPortCompulsorySavingsDepositTransient
     def GroupLoanClosingPortCompulsorySavingsDepositTransient.port_deposit_and_compulsory_savings_to_transient_account(group_loan, 
                 compulsory_savings_amount, deposit) 
+                
       message = "Port Compulsory Savings: Group #{group_loan.name}, #{group_loan.group_number}"
 
       ta = TransactionData.create_object({
@@ -12,6 +13,8 @@ module AccountingService
         :code => TRANSACTION_DATA_CODE[:port_compulsory_savings_and_premature_clearance_deposit],
         :is_contra_transaction => false 
       }, true )
+      
+       
 
 
 
@@ -40,6 +43,8 @@ module AccountingService
       )
 
       ta.confirm
+      
+    
     end
      
     

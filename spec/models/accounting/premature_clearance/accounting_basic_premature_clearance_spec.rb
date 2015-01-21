@@ -211,6 +211,21 @@ describe GroupLoan do
       ).count.should == 1
     end
     
+    context "unconfirm group loan weekly collection" do
+      before(:each) do
+        @second_group_loan_weekly_collection.unconfirm 
+        @second_group_loan_weekly_collection.reload
+        @second_group_loan_weekly_collection.is_confirmed.should be_falsy 
+        TransactionData.where(
+          :transaction_source_id => @first_gl_pc.id , 
+          :transaction_source_type => @first_gl_pc.class.to_s ,
+          :code => TRANSACTION_DATA_CODE[:group_loan_premature_clearance_remaining_weeks_payment],
+          :is_contra_transaction => true 
+        ).order("id DESC").count.should == 1
+        
+      end
+    end
+    
     
   
   end

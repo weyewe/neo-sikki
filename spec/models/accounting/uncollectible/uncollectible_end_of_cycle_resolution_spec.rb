@@ -207,8 +207,6 @@ describe GroupLoanWeeklyUncollectible do
         
         contra.is_confirmed.should be_truthy
       end
-      
-      
     end
     
     
