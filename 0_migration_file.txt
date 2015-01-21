@@ -1,0 +1,41 @@
+1. Savings non loan
+	
+	SavingsEntry.where(
+		:savings_status => [
+			SAVINGS_STATUS[:savings_account],
+      SAVINGS_STATUS[:membership],
+      SAVINGS_STATUS[:locked]
+		],
+		:is_confirmed => true 
+	)
+	
+	# create csv savings_entry ..... date = confirmed_at. DONE! that is the posting 
+	#	column:
+	1. savings_status
+	2. amount 
+	3. direction (in / out?)
+	4. Member 
+	
+2. Group Loan disbursement 
+
+	Loop all group loan disbursement, create csv 
+	column:
+	1. start_fund
+	2. admin_fee_revenue
+	3. disbursed_at
+	
+	
+3. Group Loan weekly collection
+	Loop all group_loan_weekly_collection. get the amount received. create CSV
+	1. weekly payment element
+	2. weekly_collection_voluntary_savings    
+	3. uncollectible_allowance   >> NOt available 
+	4. run_away_allowance_in_cycle_payment   >> not available 
+	5. confirm_premature_clearances   >> YES 
+	6. round_up_revenue   >> NO 
+	 
+4. GroupLoan uncollectible  > NO 
+
+5. Deceased declaration   YES 
+
+6. Premature Clereance YES
