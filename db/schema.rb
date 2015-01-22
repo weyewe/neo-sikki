@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150119073535) do
+ActiveRecord::Schema.define(version: 20150122015526) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -205,6 +205,30 @@ ActiveRecord::Schema.define(version: 20150119073535) do
     t.integer  "rt"
     t.integer  "rw"
     t.string   "village"
+  end
+
+  create_table "memorial_details", force: true do |t|
+    t.datetime "transaction_datetime"
+    t.integer  "memorial_id"
+    t.integer  "transaction_data_id"
+    t.integer  "account_id"
+    t.integer  "entry_case"
+    t.decimal  "amount",               precision: 14, scale: 2, default: 0.0
+    t.string   "description"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "memorials", force: true do |t|
+    t.datetime "transaction_datetime"
+    t.text     "description"
+    t.boolean  "is_confirmed"
+    t.datetime "confirmed_at"
+    t.string   "code"
+    t.boolean  "is_deleted"
+    t.datetime "deleted_at"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "roles", force: true do |t|

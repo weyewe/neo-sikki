@@ -516,7 +516,8 @@ TRANSACTION_DATA_CODE = {
   
   :savings_account => 200,
   :membership_savings_account => 201,
-  :locked_savings_account => 203
+  :locked_savings_account => 203,
+  :memorial_general => 300
   
   
 }

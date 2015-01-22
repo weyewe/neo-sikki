@@ -1,8 +1,6 @@
 class MemorialDetail < ActiveRecord::Base
   belongs_to :memorial 
-  
-  validates_presence_of :description
-  
+   
   validates_presence_of :entry_case
   validates_presence_of :memorial_id 
   validates_presence_of :amount
@@ -12,7 +10,7 @@ class MemorialDetail < ActiveRecord::Base
   validate :valid_entry_case
   validate :amount_not_zero
   validate :valid_memorial_id
-  validate :account_id_must_be_leaf_account
+  validate :account_id_must_be_leaf_account 
   
   def account_id_must_be_leaf_account
     return if not account_id.present?
@@ -87,8 +85,8 @@ class MemorialDetail < ActiveRecord::Base
     
 
     if new_object.save
-      new_object.transaction_datetime = memorial.transaction_datetime
-      new_object.description = memorial.description
+      new_object.transaction_datetime = new_object.memorial.transaction_datetime
+      new_object.description = new_object.memorial.description
       new_object.save 
     end
     

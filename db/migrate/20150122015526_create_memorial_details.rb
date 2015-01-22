@@ -4,6 +4,7 @@ class CreateMemorialDetails < ActiveRecord::Migration
 
       t.datetime :transaction_datetime 
       
+      t.integer :memorial_id
       t.integer :transaction_data_id 
       t.integer :account_id
       

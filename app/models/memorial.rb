@@ -46,6 +46,14 @@ class Memorial < ActiveRecord::Base
     return self 
   end
   
+  def total_debit
+    self.memorial_details.where(:entry_case => NORMAL_BALANCE[:debit]).sum("amount ")
+  end
+  
+  def total_credit
+    self.memorial_details.where(:entry_case => NORMAL_BALANCE[:credit]).sum("amount")
+  end
+  
   def confirm( params )
     if self.is_deleted
       self.errors.add(:generic_errors, "Sudah dihapus")
@@ -60,6 +68,11 @@ class Memorial < ActiveRecord::Base
     if self.total_debit != self.total_credit
       self.errors.add(:generic_errors, "Tidak balance. Debit: #{self.total_debit}, Credit: #{self.total_credit}")
       return self 
+    end
+    
+    if self.memorial_details.count == 0 
+      self.errors.add(:generic_errors, "Harus ada detail")
+      return self
     end
     
     self.is_confirmed = true 

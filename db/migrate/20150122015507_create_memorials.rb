@@ -8,6 +8,7 @@ class CreateMemorials < ActiveRecord::Migration
 
       # debit amount must be equal to credit amount.. ahahaha awesome shite 
       t.boolean :is_confirmed  # can only be confirmed if debit == credit.. hahaha.
+      t.datetime :confirmed_at 
       t.string :code 
       
       t.boolean :is_deleted
