@@ -77,12 +77,13 @@ class Memorial < ActiveRecord::Base
     
     self.is_confirmed = true 
     self.confirmed_at = params[:confirmed_at]
-    self.save
-    
+    if self.save
+    end
+    AccountingService::MemorialTransaction.create_posting( self)
     return self 
   end
   
-  def unconfirm( params ) 
+  def unconfirm 
     if self.is_deleted?
       self.errors.add(:generic_errors, "Sudah dihapus")
       return self 
@@ -95,7 +96,9 @@ class Memorial < ActiveRecord::Base
     
     self.is_confirmed=  false 
     self.confirmed_at = nil 
-    self.save 
+    if self.save 
+      AccountingService::MemorialTransaction.cancel_posting( self)
+    end
     
     return self 
   end
