@@ -154,6 +154,13 @@ ACCOUNT_CODE = {
           :status => 2 ,# ledger
           :parent_code =>  "2-110"
         },
+        :membership_savings_leaf => {
+          :code =>    "2-114",
+          :name => "Tabungan Keanggotaan",
+          :normal_balance => 2,
+          :status => 2 ,# ledger
+          :parent_code =>  "2-110"
+        },
       :other_current_liability =>   {
           :code =>    "2-190",
           :name => "Utang Lancar Lainnya",
@@ -505,7 +512,11 @@ TRANSACTION_DATA_CODE = {
   :port_compulsory_savings_and_premature_clearance_deposit => 180,
   :group_loan_close_compulsory_savings_deposit_deduction_for_bad_debt_allowance => 181,
   :group_loan_close_withdrawal_return_rounding_down_revenue => 182,
-  :group_loan_close_withdrawal_return  => 183
+  :group_loan_close_withdrawal_return  => 183,
+  
+  :savings_account => 200,
+  :membership_savings_account => 201,
+  :locked_savings_account => 203
   
   
 }
