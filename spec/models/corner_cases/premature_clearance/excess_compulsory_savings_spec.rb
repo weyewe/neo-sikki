@@ -18,6 +18,7 @@ require 'spec_helper'
 describe GroupLoan do
   
   before(:each) do
+    # Account.create_base_objects
     (1..8).each do |number|
       Member.create_object({
         :name =>  "Member #{number}",
@@ -93,7 +94,8 @@ describe GroupLoan do
     @first_group_loan_weekly_collection = @group_loan.group_loan_weekly_collections.order("id ASC").first
     @second_group_loan_weekly_collection = @group_loan.group_loan_weekly_collections.order("id ASC")[1]
     @third_group_loan_weekly_collection = @group_loan.group_loan_weekly_collections.order("id ASC")[2]
-    @sixth_group_loan_weekly_collection = @group_loan.group_loan_weekly_collections[5] 
+    @fifth_group_loan_weekly_collection = @group_loan.group_loan_weekly_collections.order("id ASC")[4] 
+    @sixth_group_loan_weekly_collection = @group_loan.group_loan_weekly_collections.order("id ASC")[5] 
     @first_group_loan_weekly_collection.should be_valid 
     @first_group_loan_weekly_collection.collect(
       {
@@ -101,7 +103,7 @@ describe GroupLoan do
       }
     )
 
-    @first_group_loan_weekly_collection.is_collected.should be_true
+    @first_group_loan_weekly_collection.is_collected.should be_truthy
     # puts "FROM THE SPEC: Gonna confirm first weekly_collection"
     @first_group_loan_weekly_collection.confirm(:confirmed_at => DateTime.now )
     @first_group_loan_weekly_collection.reload
@@ -111,11 +113,7 @@ describe GroupLoan do
     @third_premature_clearance_glm = @group_loan.active_group_loan_memberships[2] 
     
   end
-  
-    
-  it 'should create awesome shite' do
-    (1+1).should == 2 
-  end
+   
   
   context "perform weekly collection per normal" do
     before(:each) do
@@ -129,15 +127,17 @@ describe GroupLoan do
       @group_loan.reload 
       @premature_clearance_glm.reload 
     end
+    
+    it "should confirm week 5" do
+      @fifth_group_loan_weekly_collection.reload
+      @fifth_group_loan_weekly_collection.is_confirmed.should be_truthy 
+    end
       
     it 'should have more compulsory savings than remaining principal' do
       remaining_week = @group_loan.loan_duration - @sixth_group_loan_weekly_collection.week_number   
       
       remaining_principal_amount =  remaining_week * @premature_clearance_glm.group_loan_product.principal 
       
-      # puts "current_week_number: #{@group_loan.first_uncollected_weekly_collection.week_number}"
-      # puts "remaining_principal_amount: #{remaining_principal_amount}"
-      # puts "total_compulsory_savings: #{@premature_clearance_glm.total_compulsory_savings}"
       @premature_clearance_glm.total_compulsory_savings.should > remaining_principal_amount
     end
       
@@ -146,7 +146,7 @@ describe GroupLoan do
     context "perform premature clearance" do
       before(:each) do
         @initial_weekly_collection_amount_receivable = @sixth_group_loan_weekly_collection.amount_receivable
-        
+        puts "initial_weekly_amount_receivable: #{@initial_weekly_collection_amount_receivable.to_s}"
         @first_gl_pc = GroupLoanPrematureClearancePayment.create_object({
           :group_loan_id => @group_loan.id,
           :group_loan_membership_id => @premature_clearance_glm.id ,
@@ -154,9 +154,12 @@ describe GroupLoan do
           })
         @sixth_group_loan_weekly_collection.reload
         @premature_clearance_glm.reload 
+        @fifth_group_loan_weekly_collection.reload
+        puts "The weekly amount_receivable of week 5: #{@fifth_group_loan_weekly_collection.amount_receivable.to_s}"
+        puts "The premature_clearance_weekly_payment: #{@premature_clearance_glm.group_loan_product.weekly_payment_amount.to_s}"
       end
         
-  
+      
       it 'should produce amount receivable per normal' do
         # puts "awesome bitch"
         # since there is more compulsory savings than payable 
@@ -164,8 +167,15 @@ describe GroupLoan do
         @group_loan.group_loan_memberships.each do |glm|
           expected_amount += glm.group_loan_product.weekly_payment_amount 
         end
-        @sixth_group_loan_weekly_collection.amount_receivable.should == expected_amount
+        puts "expected_amount = #{expected_amount.to_s}"
+        puts "actual: #{@sixth_group_loan_weekly_collection.amount_receivable.to_s}"
+        
+        remaining_week = @group_loan.number_of_collections - @sixth_group_loan_weekly_collection.week_number
+        @sixth_group_loan_weekly_collection.amount_receivable.should == expected_amount + 
+                          remaining_week*@premature_clearance_glm.group_loan_product.weekly_payment_amount
       end
+      
+      
       
       context 'confirm weekly collection' do
         before(:each) do
@@ -176,32 +186,25 @@ describe GroupLoan do
           @premature_clearance_glm.reload
         end
         
-        it 'should empty out the compulsory savings' do
-          @premature_clearance_glm.total_compulsory_savings.should == BigDecimal("0")
+        it 'should NOT empty out the compulsory savings' do
+          @premature_clearance_glm.total_compulsory_savings.should_not == BigDecimal("0")
         end
         
         it 'should increase savings_account amount' do
           @final_savings_account_amount = @premature_clearance_glm.member.total_savings_account
           
-          diff = @initial_compulsory_savings + 
-                    @premature_clearance_glm.group_loan_product.compulsory_savings - 
-                    @first_gl_pc.amount  
+          diff = BigDecimal("0")
         end
         
-        it 'should create 2 savings_entry: compulsory savings deduction + one savings_account addition' do
-          @first_gl_pc.savings_entries.count.should == 2  
+        it 'should create 1 savings_entry: compulsory savings ADDITION' do
+          @first_gl_pc.savings_entries.count.should == 1    
+          first_savings_entries = @first_gl_pc.savings_entries.first
           
-          @compulsory_savings_deduction_savings_entry = @first_gl_pc.savings_entries.where(:savings_status => SAVINGS_STATUS[:group_loan_compulsory_savings]).first
-          @savings_account_addition_savings_entry = @first_gl_pc.savings_entries.where(:savings_status => SAVINGS_STATUS[:savings_account]).first
-          
-          @compulsory_savings_deduction_savings_entry.should be_valid
-          @savings_account_addition_savings_entry.should be_valid 
-          
-          
-          @compulsory_savings_deduction_savings_entry.direction.should ==  FUND_TRANSFER_DIRECTION[:outgoing]
-          @savings_account_addition_savings_entry.direction.should == FUND_TRANSFER_DIRECTION[:incoming]
+          first_savings_entries.savings_status.should == SAVINGS_STATUS[:group_loan_compulsory_savings]
         end
       end
+         
+   
     end
   end
 end

@@ -1,9 +1,12 @@
-pending:
+GroupLoan operational posting:
 
-rspec ./spec/models/corner_cases/combination/scenario_3_spec.rb:188 # GroupLoan perform run_away confirm second_week confirm up to week 5 should confirm the fourth week
+on weekly confirmation:
+1. Pay for the weekly payment
+2. confirm uncollectibles 
+3. run_away allowance, end_of_cycle
+	==> what if it is run_away_allowance, but paid in cycle? No need for allowance then. 
+	
+4. deceased_allowance
+5. premature_clearance 
+6. extra_revenue from collection rounding_up 
 
-bambu 54 
-4649 kaedah
-
-PorTimur 331
-3932 atik

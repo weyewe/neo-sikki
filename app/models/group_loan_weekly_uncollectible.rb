@@ -14,12 +14,7 @@ class GroupLoanWeeklyUncollectible < ActiveRecord::Base
   validate :valid_clearance_case
   validate :valid_active_member 
   
-  # after_create :update_group_loan_default_amount_receivable
-  
-  # def update_group_loan_default_amount_receivable
-  #   group_loan.update_default_payment_amount_receivable
-  #   
-  # end
+ 
   
   def valid_active_member
     return if not all_fields_present?
@@ -121,8 +116,45 @@ class GroupLoanWeeklyUncollectible < ActiveRecord::Base
     self.amount = self.group_loan_membership.group_loan_product.weekly_payment_amount
     self.principal = self.group_loan_membership.group_loan_product.principal
     self.save
+  end
+  
+  def create_allowance_transaction_data_from_uncollectible
+    # 1. get the principal, 
+    # 2. use that amount. credit piutang, debit allowance
+    member = self.group_loan_membership.member
+    group_loan = self.group_loan
+    group_loan_weekly_collection = self.group_loan_weekly_collection
     
+    AccountingService::UncollectibleDeclaration.create_uncollectible_declaration(
+      group_loan,
+      group_loan_weekly_collection,
+      member,
+      self
+    )
     
+  end
+  
+  def create_contra_allowance_transaction_data
+    AccountingService::UncollectibleDeclaration.cancel_uncollectible_declaration( self )
+  end
+  
+  def create_allowance_in_cycle_clearance_transaction_data
+    # 1. Cash ++ 1 week worth of payment
+    # 2. allowance is being deducted 
+    
+    member = self.group_loan_membership.member
+    group_loan = self.group_loan
+    group_loan_weekly_collection = self.group_loan_weekly_collection
+    AccountingService::UncollectibleDeclaration.create_in_cycle_clearance(group_loan,
+                                group_loan_weekly_collection,
+                                group_loan_membership,
+                                member,
+                                self)
+    
+  end
+  
+  def create_contra_allowance_in_cycle_clearance_transaction_data
+    AccountingService::UncollectibleDeclaration.cancel_in_cycle_clearance(self)
   end
   
   
@@ -133,8 +165,11 @@ class GroupLoanWeeklyUncollectible < ActiveRecord::Base
     new_object.group_loan_membership_id          = params[:group_loan_membership_id]  
     new_object.group_loan_weekly_collection_id   = params[:group_loan_weekly_collection_id]
     new_object.clearance_case = params[:clearance_case]
+    # even if it is cleared in the cycle, or at the end of cycle, there still be allowance
     
-    new_object.update_amount if new_object.save 
+    if new_object.save 
+      new_object.update_amount 
+    end
       
     
     return new_object
@@ -232,8 +267,15 @@ class GroupLoanWeeklyUncollectible < ActiveRecord::Base
     self.cleared_at = params[:cleared_at]
   
     if self.save 
-      self.group_loan.update_bad_debt_allowance(  -1 * self.principal)
+      # self.group_loan.update_bad_debt_allowance(  -1 * self.principal)
+      # self.group_loan.update_potential_loss_interest_revenue( -1* self.group_loan_membership.group_loan_product.interest)
+      
       # update the journal posting 
+      
+      # in cycle is by default. if it is not in-cycle, call the #clear_end_of_cycle method 
+      if self.clearance_case == UNCOLLECTIBLE_CLEARANCE_CASE[:in_cycle]
+        self.create_allowance_in_cycle_clearance_transaction_data
+      end
     end
   end
   
@@ -259,13 +301,22 @@ class GroupLoanWeeklyUncollectible < ActiveRecord::Base
     self.cleared_at = nil
     
     
-    self.group_loan.update_bad_debt_allowance(   self.principal)
+    if self.save
+      # self.group_loan.update_bad_debt_allowance(   self.principal )
+      # self.group_loan.update_potential_loss_interest_revenue( self.group_loan_membership.group_loan_product.interest)
+      AccountingService::UncollectibleDeclaration.cancel_in_cycle_clearance(self)
+    end
+    
   end
   
   def clear_end_of_cycle
     self.is_cleared = true 
     self.cleared_at = self.group_loan.closed_at 
     if self.save
+      # at the end of cycle -> must absorb all shite.
+      # total amount to offset uang titipan and compulsory savings
+      # their collateral: uang titipan and compulsory savings
+      # burden: run_away_end_of_cycle_principal + total_amount weekly_collection for uncollectible_end_of_cycle_clearance
     else
       self.errors.messages.each {|x| puts "error message in uncollectible clearance: #{x}"}
     end

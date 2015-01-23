@@ -9,7 +9,7 @@ require 'spec_helper'
 describe GroupLoanWeeklyCollection do
   
   before(:each) do
-    
+    # Account.create_base_objects
     (1..8).each do |number|
       Member.create_object({
         :name =>  "Member #{number}",
@@ -87,7 +87,7 @@ describe GroupLoanWeeklyCollection do
   end
   
   it 'should have disbursed the group loan' do
-    @group_loan.is_loan_disbursed.should be_true 
+    @group_loan.is_loan_disbursed.should be_truthy 
   end
   
   context "setup the group loan to perform 2 weekly collections successfully per normal" do
@@ -122,7 +122,7 @@ describe GroupLoanWeeklyCollection do
       
       @first_glwc.errors.size.should_not == 0 
       @first_glwc.reload
-      @first_glwc.is_confirmed.should be_true 
+      @first_glwc.is_confirmed.should be_truthy 
     end
   end
   
@@ -138,7 +138,7 @@ describe GroupLoanWeeklyCollection do
     end
     
     it 'should have confirmed the glwc' do
-      @first_glwc.is_confirmed.should be_true 
+      @first_glwc.is_confirmed.should be_truthy 
     end
     
     it 'should have created group loan weekly paymetns' do
@@ -155,7 +155,7 @@ describe GroupLoanWeeklyCollection do
       end
       
       it 'should unconfirm the glwc' do
-        @first_glwc.is_confirmed.should be_false 
+        @first_glwc.is_confirmed.should be_falsey 
       end
     end
     
@@ -176,14 +176,14 @@ describe GroupLoanWeeklyCollection do
     end
     
     it 'should be allowed to unconfirm if there is nothing in the next weekly collection'  do
-      @second_glwc.is_confirmed.should be_false 
+      @second_glwc.is_confirmed.should be_falsey 
       @first_glwc.reload 
-      @first_glwc.is_confirmed.should be_true
+      @first_glwc.is_confirmed.should be_truthy
       @first_glwc.unconfirm 
       @first_glwc.errors.size.should == 0 
-      @first_glwc.is_confirmed.should be_false 
+      @first_glwc.is_confirmed.should be_falsey 
       # @first_glwc.reload
-      #   @first_glwc.is_confirmed.should be_false 
+      #   @first_glwc.is_confirmed.should be_falsey 
     end
     
     context "next week has member deceased" do
@@ -199,7 +199,7 @@ describe GroupLoanWeeklyCollection do
         @first_glwc.unconfirm
         @first_glwc.errors.size.should_not == 0
         @first_glwc.reload  
-        @first_glwc.is_confirmed.should be_true
+        @first_glwc.is_confirmed.should be_truthy
       end
     end
     
@@ -216,7 +216,7 @@ describe GroupLoanWeeklyCollection do
         @first_glwc.unconfirm
         @first_glwc.errors.size.should_not == 0
         @first_glwc.reload  
-        @first_glwc.is_confirmed.should be_true
+        @first_glwc.is_confirmed.should be_truthy
       end
     end
     
@@ -237,7 +237,7 @@ describe GroupLoanWeeklyCollection do
         @first_glwc.unconfirm
         @first_glwc.errors.size.should_not == 0
         @first_glwc.reload  
-        @first_glwc.is_confirmed.should be_true
+        @first_glwc.is_confirmed.should be_truthy
       end
     end
     
@@ -258,7 +258,7 @@ describe GroupLoanWeeklyCollection do
         @first_glwc.unconfirm
         @first_glwc.errors.size.should_not == 0
         @first_glwc.reload  
-        @first_glwc.is_confirmed.should be_true
+        @first_glwc.is_confirmed.should be_truthy
       end
     end
     
@@ -281,7 +281,7 @@ describe GroupLoanWeeklyCollection do
         @first_glwc.unconfirm
         @first_glwc.errors.size.should_not == 0
         @first_glwc.reload  
-        @first_glwc.is_confirmed.should be_true
+        @first_glwc.is_confirmed.should be_truthy
       end
     end
     
@@ -371,14 +371,15 @@ describe GroupLoanWeeklyCollection do
         end
         
         it 'should create compulsory savings withdrawal' do
-          @second_gl_pc.is_confirmed.should be_true 
+          @second_gl_pc.is_confirmed.should be_truthy 
         end
         
         it 'should deactivate the glm' do
-          @premature_clearance_glm.is_active.should be_false 
+          @premature_clearance_glm.is_active.should be_falsey 
         end
         
-        it 'should create compulsory savings withdrawal for the premature clearance' do
+        it 'should NOT create compulsory savings withdrawal for the premature clearance' do
+          # since it will be returned at the end of the loan. 
           @savings_entry_array = SavingsEntry.where( 
                   :savings_source_id => @second_gl_pc.id,
                               :savings_source_type => @second_gl_pc.class.to_s, 
@@ -389,8 +390,7 @@ describe GroupLoanWeeklyCollection do
                               :member_id => @premature_clearance_glm.member.id,
                               :is_confirmed => true ) 
                               
-          @savings_entry_array.count.should == 1 
-          @savings_entry_array.first.amount. should == @premature_clearance_glm.group_loan_product.compulsory_savings * 2 
+          @savings_entry_array.count.should == 0 
         end
       end
     end

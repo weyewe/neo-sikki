@@ -22,6 +22,7 @@ require 'spec_helper'
 describe GroupLoanWeeklyUncollectible do
   
   before(:each) do
+    # Account.create_base_objects
     (1..8).each do |number|
       Member.create_object({
         :name =>  "Member #{number}",
@@ -104,7 +105,7 @@ describe GroupLoanWeeklyUncollectible do
       }
     )
 
-    @first_group_loan_weekly_collection.is_collected.should be_true
+    @first_group_loan_weekly_collection.is_collected.should be_truthy
     @first_group_loan_weekly_collection.confirm(:confirmed_at => DateTime.now)
     @first_group_loan_weekly_collection.reload
     @second_group_loan_weekly_collection.reload 
@@ -121,8 +122,8 @@ describe GroupLoanWeeklyUncollectible do
   
   
   it 'should confirm the first group_loan_weekly_collection' do
-    @first_group_loan_weekly_collection.is_collected.should be_true 
-    @first_group_loan_weekly_collection.is_confirmed.should be_true 
+    @first_group_loan_weekly_collection.is_collected.should be_truthy 
+    @first_group_loan_weekly_collection.is_confirmed.should be_truthy 
   end
   
   it 'should create uncollectible_weekly_payment for first due weekly_collection' do
@@ -178,55 +179,55 @@ describe GroupLoanWeeklyUncollectible do
     
     @gl_wu.should_not be_valid
   end
-  
-  context "updating the uncollectible's glm id" do
-    before(:each) do
-      @first_gl_wu = GroupLoanWeeklyUncollectible.create_object({
-        :group_loan_id => @group_loan.id,
-        :group_loan_membership_id => @uncollectible_glm.id ,
-        :group_loan_weekly_collection_id => @second_group_loan_weekly_collection.id,
-        :clearance_case => UNCOLLECTIBLE_CLEARANCE_CASE[:in_cycle]   
-      })
-      
-      @second_gl_wu = GroupLoanWeeklyUncollectible.create_object({
-        :group_loan_id => @group_loan.id,
-        :group_loan_membership_id => @second_uncollectible_glm.id ,
-        :group_loan_weekly_collection_id => @second_group_loan_weekly_collection.id  ,
-        :clearance_case => UNCOLLECTIBLE_CLEARANCE_CASE[:in_cycle]
-      })
-    end
-    
-    it 'should create first_gl_wu and second_gl_wu ' do
-      @first_gl_wu.should be_valid 
-      @second_gl_wu.should be_valid 
-    end
-    
-    it 'should allow update to the second_gl_wu' do
-      @second_gl_wu.update_object({
-        :group_loan_id => @group_loan.id,
-        :group_loan_membership_id => @third_uncollectible_glm.id ,
-        :group_loan_weekly_collection_id => @second_group_loan_weekly_collection.id ,
-        :clearance_case => UNCOLLECTIBLE_CLEARANCE_CASE[:in_cycle]
-      })
-      
-      @second_gl_wu.should be_valid 
-       
-       
-      @second_gl_wu.group_loan_membership.id.should == @third_uncollectible_glm.id
-    end
-    
-    it 'should not allow update to the first_gl_wu (create 2 uncollectibles with equal glm_id)' do
-      @second_gl_wu.update_object({
-        :group_loan_id => @group_loan.id,
-        :group_loan_membership_id => @uncollectible_glm.id ,
-        :group_loan_weekly_collection_id => @second_group_loan_weekly_collection.id ,
-        :clearance_case => UNCOLLECTIBLE_CLEARANCE_CASE[:in_cycle]
-      })
-      
-      @second_gl_wu.should_not be_valid 
-    end
-  end
-  
+  # 
+  # context "updating the uncollectible's glm id" do
+  #   before(:each) do
+  #     @first_gl_wu = GroupLoanWeeklyUncollectible.create_object({
+  #       :group_loan_id => @group_loan.id,
+  #       :group_loan_membership_id => @uncollectible_glm.id ,
+  #       :group_loan_weekly_collection_id => @second_group_loan_weekly_collection.id,
+  #       :clearance_case => UNCOLLECTIBLE_CLEARANCE_CASE[:in_cycle]   
+  #     })
+  #     
+  #     @second_gl_wu = GroupLoanWeeklyUncollectible.create_object({
+  #       :group_loan_id => @group_loan.id,
+  #       :group_loan_membership_id => @second_uncollectible_glm.id ,
+  #       :group_loan_weekly_collection_id => @second_group_loan_weekly_collection.id  ,
+  #       :clearance_case => UNCOLLECTIBLE_CLEARANCE_CASE[:in_cycle]
+  #     })
+  #   end
+  #   
+  #   it 'should create first_gl_wu and second_gl_wu ' do
+  #     @first_gl_wu.should be_valid 
+  #     @second_gl_wu.should be_valid 
+  #   end
+  #   
+  #   it 'should allow update to the second_gl_wu' do
+  #     @second_gl_wu.update_object({
+  #       :group_loan_id => @group_loan.id,
+  #       :group_loan_membership_id => @third_uncollectible_glm.id ,
+  #       :group_loan_weekly_collection_id => @second_group_loan_weekly_collection.id ,
+  #       :clearance_case => UNCOLLECTIBLE_CLEARANCE_CASE[:in_cycle]
+  #     })
+  #     
+  #     @second_gl_wu.should be_valid 
+  #      
+  #      
+  #     @second_gl_wu.group_loan_membership.id.should == @third_uncollectible_glm.id
+  #   end
+  #   
+  #   it 'should not allow update to the first_gl_wu (create 2 uncollectibles with equal glm_id)' do
+  #     @second_gl_wu.update_object({
+  #       :group_loan_id => @group_loan.id,
+  #       :group_loan_membership_id => @uncollectible_glm.id ,
+  #       :group_loan_weekly_collection_id => @second_group_loan_weekly_collection.id ,
+  #       :clearance_case => UNCOLLECTIBLE_CLEARANCE_CASE[:in_cycle]
+  #     })
+  #     
+  #     @second_gl_wu.should_not be_valid 
+  #   end
+  # end
+  # 
   
   context "create one uncollectible: impact on the weekly_collection.amount_receivable" do
     before(:each) do
@@ -270,7 +271,7 @@ describe GroupLoanWeeklyUncollectible do
     
     it 'should be deletable' do
       @first_gl_wu.delete_object
-      @first_gl_wu.persisted?.should be_false 
+      @first_gl_wu.persisted?.should be_falsey 
     end
      
     
@@ -288,10 +289,11 @@ describe GroupLoanWeeklyUncollectible do
         @group_loan.reload 
       end
       
-      it 'should update the bad_debt_allowance amount by the uncollectible\'s principal' do
+      it 'should NOT update the bad_debt_allowance amount by the uncollectible\'s principal' do
         @final_bad_debt_allowance = @group_loan.bad_debt_allowance
         diff = @final_bad_debt_allowance  - @initial_bad_debt_allowance
-        diff.should == @uncollectible_glm.group_loan_product.principal 
+        # diff.should == @uncollectible_glm.group_loan_product.principal 
+        diff.should == BigDecimal("0")
       end
       
       it 'should allow uncollectible amount' do
@@ -302,7 +304,7 @@ describe GroupLoanWeeklyUncollectible do
       it 'should NOT be deletable' do
         @first_gl_wu.delete_object
         @first_gl_wu.errors.size.should_not == 0 
-        @first_gl_wu.persisted?.should be_true  
+        @first_gl_wu.persisted?.should be_truthy  
       end
       
       it 'should not allow creation of uncollectible' do
@@ -322,7 +324,7 @@ describe GroupLoanWeeklyUncollectible do
         
         
       it 'should confirm the second_group_loan_weekly_collection' do
-        @second_group_loan_weekly_collection.is_confirmed.should be_true 
+        @second_group_loan_weekly_collection.is_confirmed.should be_truthy 
       end
       
        
@@ -340,10 +342,10 @@ describe GroupLoanWeeklyUncollectible do
         
 
         
-        it 'should  allow group loan closing if there are uncleared uncollectibles (case: end_of_cycle)' do
+        it 'should  allow group loan closing even if there are uncleared uncollectibles only with case: end_of_cycle)' do
           @group_loan.close(:closed_at => @closed_at)
           @group_loan.errors.size.should == 0 
-          @group_loan.is_closed.should be_true  
+          @group_loan.is_closed.should be_truthy  
         end
         
         
@@ -352,14 +354,16 @@ describe GroupLoanWeeklyUncollectible do
             @first_gl_wu.collect(:collected_at => @uncollectible_collected_at)
           end
           
-          it 'should not be collected' do
-            @first_gl_wu.is_collected.should be_false 
+          it 'should not allow collection of end_of_cycle uncollectible payment' do
+            @first_gl_wu.is_collected.should be_falsey 
           end
           
           context "clear uncollectibles"  do
             before(:each) do
               @group_loan.reload
               @initial_group_loan_bad_debt_allowance = @group_loan.bad_debt_allowance
+              @uncollectible_glm.reload
+              @available_compulsory_savings = @uncollectible_glm.total_compulsory_savings
               @group_loan.close(:closed_at => @closed_at )
 
               @first_gl_wu .reload
@@ -368,31 +372,73 @@ describe GroupLoanWeeklyUncollectible do
 
  
 
-            it 'should allow group loan closing if the uncollectibles are cleared' do 
-              @group_loan.is_closed.should be_true 
+            it 'should allow group loan closing if the uncollectibles with in_cycle payment are cleared' do 
+              @group_loan.is_closed.should be_truthy 
               @group_loan.errors.size.should == 0 
             end
             
-            it 'should clear the weekly uncollectible' do
-              @first_gl_wu.is_cleared.should be_true 
-              @first_gl_wu.is_collected.should be_false 
+            it 'should clear the weekly uncollectible case end_of_cycle upon group loan closing' do
+              @first_gl_wu.is_cleared.should be_truthy 
+              @first_gl_wu.is_collected.should be_falsey 
               @first_gl_wu.clearance_case.should == UNCOLLECTIBLE_CLEARANCE_CASE[:end_of_cycle]
             end
             
             it 'should produce less compulsory_savings_return' do
               normal_total_compulsory_savings = BigDecimal('0')
-
               weekly_compulsory_savings_increment = BigDecimal('0')
 
               @group_loan.group_loan_memberships.joins(:group_loan_product).each do |glm|
                 weekly_compulsory_savings_increment += glm.group_loan_product.compulsory_savings 
               end
+              
+              # the one with uncollectible. end of cycle clearance
+              
+              
+              potential_deduction_for_interest_revenue =  @uncollectible_glm.group_loan_product.interest
+              potential_deduction_for_principal = @uncollectible_glm.group_loan_product.principal
+              
+              
+              actual_deduction_for_interest_revenue =  BigDecimal("0")
+              actual_deduction_for_principal = BigDecimal("0")
+              
+              compulsory_savings_post_bad_debt_allowance = @available_compulsory_savings - potential_deduction_for_principal
+              
+              if compulsory_savings_post_bad_debt_allowance >= BigDecimal("0")
+                actual_deduction_for_principal = potential_deduction_for_principal
+                compulsory_savings_post_interest= compulsory_savings_post_bad_debt_allowance - potential_deduction_for_interest_revenue
+                
+                
+                if compulsory_savings_post_interest >= BigDecimal("0")
+                  actual_deduction_for_interest_revenue = potential_deduction_for_interest_revenue
+                else
+                  actual_deduction_for_interest_revenue = compulsory_savings_post_bad_debt_allowance
+                end
+                
+              else
+                actual_deduction_for_principal = @available_compulsory_savings
+                actual_deduction_for_interest_revenue = BigDecimal("0")
+                
+              end
+              
+              
+              
+              
+              
+              puts "Interest Element: #{potential_deduction_for_interest_revenue}"
+              puts "Principal element: #{potential_deduction_for_principal}"
 
               normal_total_compulsory_savings = weekly_compulsory_savings_increment*@group_loan.loan_duration
               
-              @group_loan.compulsory_savings_return_amount.should_not == normal_total_compulsory_savings
-              @group_loan.compulsory_savings_return_amount.should == 
-                      (normal_total_compulsory_savings - @uncollectible_glm.group_loan_product.principal)
+              actual_compulsory_savings_return = (normal_total_compulsory_savings - 
+                        (actual_deduction_for_principal + actual_deduction_for_interest_revenue + @uncollectible_glm.group_loan_product.compulsory_savings)  )
+              
+              
+              puts "normal_total_compulsory_savings : #{normal_total_compulsory_savings}"
+              puts "actual_compulsory_savings_return : #{actual_compulsory_savings_return}"
+              puts "compulsory_savings_from_system: #{@group_loan.total_compulsory_savings_pre_closure}"
+              
+              @group_loan.total_compulsory_savings_pre_closure.should == actual_compulsory_savings_return
+                      
             end
           end
         end

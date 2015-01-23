@@ -14,56 +14,338 @@ ACCOUNT_GROUP = {
 }
 
 
+
+NORMAL_BALANCE = {
+  :debit => 1 , 
+  :credit => 2 
+}
+
+ACCOUNT_CASE = {
+  :group => 1,  # group => can't create transaction on group_account
+  # group account can have sub_groups and ledger_account 
+  :ledger => 2  # ledger_account is where the journal is associated to
+} 
+ 
+
+ 
+=begin
+counter = 0 
+ACCOUNT_CODE.each do |key,value|
+  counter++
+end
+
+convert ACCOUNT_CODE into 2 dimensional array 
+[
+  [symbol, code ]
+]
+
+converted = []
+ACCOUNT_CODE.each do |key,value|
+  converted << [ key, value[:code] ] 
+end
+sorted = converted.sort_by {|x| x[1]}
+
+
+sorted.each do |x|
+  account = ACCOUNT_CODE[x[0]]
+  
+end
+=end
  
 # level 0
 ACCOUNT_CODE = {
-  :asset => "1-000",
-    :current_asset => "1-100",
-      :cash_and_others => "1-110",
-        :main_cash_leaf => "1-111",
-    :account_receivable => "1-140",
-      :pinjaman_sejahtera_ar_leaf => "1-141",
-    :bad_debt_allocation => "1-150",
-      :pinjaman_sejahtera_bda_leaf => "1-151",
+  :activa => {
+    :code => "1-000",
+    :name => "AKTIVA",
+    :normal_balance => 1,
+    :status => 1,
+    :parent_code => nil
+  },
+    :current_asset => {
+      :code => "1-100",
+      :name => "AKTIVA LANCAR",
+      :normal_balance => 1,
+      :status => 1,
+      :parent_code => "1-000"
+    },
+      :cash_and_others => {
+        :code => "1-110",
+        :name => "Kas dan setara kas",
+        :normal_balance => 1,
+        :status => 1,
+        :parent_code =>  "1-100"
+      },
+        :main_cash_leaf => {
+          :code => "1-111",
+          :name => "Kas Besar",
+          :normal_balance => 1,
+          :status => 2, # ledger# 
+          :parent_code =>  "1-110"
+        },
+    :account_receivable =>     {
+          :code => "1-140",
+          :name => "Piutang",
+          :normal_balance => 1,
+          :status => 1,
+          :parent_code =>  "1-100"
+        },
+      :pinjaman_sejahtera_ar_leaf =>   {
+              :code => "1-141",
+              :name => "Piutang Pinjaman Sejahtera",
+              :normal_balance => 1,
+              :status => 2, # ledger
+              :parent_code =>  "1-140"
+            },
+    :bad_debt_allocation =>         {
+                    :code => "1-150",
+                    :name => "Penyisihan Piutang Tak Tertagih",
+                    :normal_balance => 1,
+                    :status => 1,
+                    :parent_code =>  "1-100"
+                  },
+      :pinjaman_sejahtera_bda_leaf =>             {
+                                  :code => "1-151",
+                                  :name => "Penyisihan Piutang Tak Tertagih Pinjaman Sejahtera",
+                                  :normal_balance => 1,
+                                  :status => 2, # ledger
+                                  :parent_code =>  "1-150"
+                                },
       
       
-  :liability => "2-000",
-    :current_liability => "2-100",
-      :savings => "2-110",
-        :compulsory_savings_leaf => "2-111",
-        :voluntary_savings_leaf => "2-112",
-        :locked_savings_leaf => "2-113",
-      :other_current_liability => "2-190",
-        :utang_santunan_leaf => "2-191",
-        :uang_titipan_leaf => "2-192",
+  :liability =>  {
+    :code => "2-000",
+    :name => "KEWAJIBAN",
+    :normal_balance => 2,
+    :status => 1,
+    :parent_code =>  nil
+  },
+    :current_liability =>{
+      :code =>  "2-100",
+      :name => "KEWAJIBAN LANCAR",
+      :normal_balance => 2,
+      :status => 1,
+      :parent_code =>  "2-000"
+    },
+      :savings =>{
+        :code =>   "2-110",
+        :name => "Tabungan",
+        :normal_balance => 2,
+        :status => 1,
+        :parent_code =>  "2-100"
+      },
+        :compulsory_savings_leaf =>{
+          :code =>    "2-111",
+          :name => "Tabungan Wajib",
+          :normal_balance => 2,
+          :status => 2, # ledger
+          :parent_code =>  "2-110"
+        },
+        :voluntary_savings_leaf => {
+          :code =>    "2-112",
+          :name => "Tabungan Pribadi",
+          :normal_balance => 2,
+          :status => 2, # ledger
+          :parent_code =>  "2-110"
+        },
+        :locked_savings_leaf => {
+          :code =>    "2-113",
+          :name => "Tabungan Masa Depan",
+          :normal_balance => 2,
+          :status => 2 ,# ledger
+          :parent_code =>  "2-110"
+        },
+        :membership_savings_leaf => {
+          :code =>    "2-114",
+          :name => "Tabungan Keanggotaan",
+          :normal_balance => 2,
+          :status => 2 ,# ledger
+          :parent_code =>  "2-110"
+        },
+      :other_current_liability =>   {
+          :code =>    "2-190",
+          :name => "Utang Lancar Lainnya",
+          :normal_balance => 2,
+          :status => 1 ,# group
+          :parent_code =>  "2-113"
+        },
+        :utang_santunan_leaf => {
+            :code =>    "2-191",
+            :name => "Utang santunan",
+            :normal_balance => 2,
+            :status => 2, # ledger
+            :parent_code =>  "2-190"
+          },
+        :uang_titipan_leaf =>   {
+              :code =>    "2-192",
+              :name => "Uang titipan",
+              :normal_balance => 2,
+              :status => 2, # ledger 
+              :parent_code =>  "2-190"
+            },
+        :pending_group_loan_member_cash_return_leaf =>   {
+              :code =>    "2-193",
+              :name => "Pending Pengembalian",
+              :normal_balance => 2,
+              :status => 2, # ledger 
+              :parent_code =>  "2-190"
+            },
+            
         
-  :equity => "3-000",
+  :equity => {
+        :code =>    "3-000",
+        :name => "EKUITAS",
+        :normal_balance => 2,
+        :status => 1, # group 
+        :parent_code =>  nil 
+      },
+      :equity_1 =>      {
+                  :code =>  "3-100",
+                  :name => "Ekuitas",
+                  :normal_balance => 2,
+                  :status => 1,  
+                  :parent_code =>  "3-000" 
+                } ,
+         :equity_2 =>        {
+                      :code =>    "3-110",
+                      :name => "Ekuitas",
+                      :normal_balance => 2,
+                      :status => 1,
+                      :parent_code =>  "3-100" 
+                    } ,
+            :net_earning_leaf =>        {
+                          :code =>    "3-111",
+                          :name => "Net Earning",
+                          :normal_balance => 2,
+                          :status => 1,
+                          :parent_code =>  "3-110" 
+                        } ,
   
   
-  :operating_revenue => "4-000",
-    :loan_revenue => "4-100",
-      :loan_administration_revenue => "4-110",
-        :pinjaman_sejahtera_administration_revenue_leaf => "4-111",
-      :interest_revenue => "4-120",
-        :pinjaman_sejahtera_interest_revenue_leaf => "4-121",
+  :operating_revenue =>     {
+            :code =>    "4-000",
+            :name => "PENDAPATAN USAHA",
+            :normal_balance => 2,
+            :status => 1, # group 
+            :parent_code =>  nil 
+          },
+    :loan_revenue =>      {
+                :code =>  "4-100",
+                :name => "Pendapatan pinjaman",
+                :normal_balance => 2,
+                :status => 1,  
+                :parent_code =>  "4-000" 
+              } ,
+      :loan_administration_revenue =>        {
+                    :code =>    "4-110",
+                    :name => "Pendapatan administrasi pinjaman",
+                    :normal_balance => 2,
+                    :status => 1,
+                    :parent_code =>  "4-100" 
+                  } ,
+        :pinjaman_sejahtera_administration_revenue_leaf => {
+              :code =>    "4-111",
+              :name => "Pendapatan administrasi pinjaman Sejahtera",
+              :normal_balance => 2,
+              :status => 2,
+              :parent_code =>  "4-110" 
+            },
+      :interest_revenue =>      {
+                  :code =>   "4-120",
+                  :name => "Pendapatan bagi hasil pinjaman",
+                  :normal_balance => 2,
+                  :status => 1, # group 
+                  :parent_code =>   "4-100" 
+                } ,
+        :pinjaman_sejahtera_interest_revenue_leaf =>{
+              :code =>    "4-121",
+              :name => "Pendapatan bagi hasil pinjaman Sejahtera",
+              :normal_balance => 2,
+              :status => 2, 
+              :parent_code =>  "4-120" 
+            },
         
-  :financial_expense => "5-000",
+  :financial_expense =>          {
+                  :code =>    "5-000",
+                  :name => "BEBAN KEUANGAN",
+                  :normal_balance => 1,
+                  :status => 1, # group 
+                  :parent_code =>  nil 
+                } ,
   
-  :operating_expense => "6-000" ,
-    :account_receivable_allowance_expense => "6-200",
-      :account_receivable_allowance_expense => "6-210",
-        :pinjaman_sejahtera_arae_leaf => "6-211",
+  :operating_expense =>  {
+          :code =>   "6-000" ,
+          :name => "BEBAN USAHA",
+          :normal_balance => 1,
+          :status => 1, # group 
+          :parent_code =>  nil 
+        } ,
+    :account_receivable_allowance_expense =>  {
+            :code =>   "6-200",
+            :name => "Beban Penghapusan Piutang",
+            :normal_balance => 1,
+            :status => 1, # group 
+            :parent_code =>  "6-000"  
+          } ,
+      :account_receivable_allowance_expense_1 =>    {
+                :code =>   "6-210",
+                :name => "Beban Penghapusan Piutang",
+                :normal_balance => 1,
+                :status => 1, # group 
+                :parent_code =>   "6-200" 
+              } ,
+        :pinjaman_sejahtera_arae_leaf =>      {
+                    :code =>    "6-211",
+                    :name => "Beban Penghapusan Piutang Pinjaman Sejahtera",
+                    :normal_balance => 1,
+                    :status => 2,
+                    :parent_code =>  "6-210" 
+                  } ,
         
-  :other_revenue => "7-000",
-    :other_revenue_1 => "7-100",
-      :other_revenue_2 => "7-110",
-        :other_revenue_leaf => "7-118",
+  :other_revenue => {
+        :code =>    "7-000",
+        :name => "PENDAPATAN LAIN-LAIN",
+        :normal_balance => 2,
+        :status => 1, # group 
+        :parent_code =>  nil 
+      } ,
+    :other_revenue_1 =>  {
+            :code =>    "7-100",
+            :name => "Pendapatan lain-lain",
+            :normal_balance => 2,
+            :status => 1, # group 
+            :parent_code =>   "7-000" 
+          } ,
+      :other_revenue_2 =>    {
+                :code =>   "7-110",
+                :name => "Pendapatan lain-lain",
+                :normal_balance => 2,
+                :status => 1, # group 
+                :parent_code =>   "7-100" 
+              } ,
+        :other_revenue_leaf =>{
+              :code =>   "7-118",
+              :name => "Pembulatan nilai",
+              :normal_balance => 2,
+              :status => 2,
+              :parent_code =>   "7-110" 
+            } ,
         
-  :other_expense => "8-000",
+  :other_expense =>          {
+                  :code =>    "8-000",
+                  :name => "BEBAN LAIN-LAIN",
+                  :normal_balance => 1,
+                  :status => 1, # group 
+                  :parent_code =>  nil 
+                } ,
   
-  :coop_expense => "9-000",
+  :coop_expense => {
+        :code =>    "9-000",
+        :name => "BEBAN PERKOPERASIAN",
+        :normal_balance => 1,
+        :status => 1, # group 
+        :parent_code =>  nil 
+      },
 }
-
 
 # public class AccountCode
 # {
@@ -231,3 +513,35 @@ GeneralLedger.create_posting(
   Account.find_by_code( ACCOUNT_CODE[:main_cash], source_document, GL_STATUS[:debit], amount )
 )
 =end
+
+TRANSACTION_DATA_CODE = {
+  :loan_disbursement => 10,
+  :group_loan_weekly_collection => 20, 
+  :group_loan_weekly_collection_voluntary_savings => 30, 
+  :group_loan_premature_clearance_remaining_weeks_payment => 40 ,
+  :group_loan_premature_clearance_deposit => 50 ,
+  :group_loan_uncollectible_declaration => 60, 
+  :group_loan_uncollectible_in_cycle_clearance => 70 ,
+  :group_loan_uncollectible_end_of_cycle_clearance => 80 ,  
+  :group_loan_in_cycle_uncollectible_clearance => 100, 
+  :group_loan_run_away_declaration => 110 , 
+  :group_loan_run_away_in_cycle_clearance => 120, 
+  :group_loan_run_away_end_of_cycle_clearance => 130, 
+  :group_loan_deceased_declaration => 140, 
+  :group_loan_weekly_collection_round_up => 150,
+  :group_loan_close_member_compulsory_savings_deduction_for_bad_debt_allowance => 160,
+  :port_compulsory_savings_and_premature_clearance_deposit => 180,
+  :group_loan_close_compulsory_savings_deposit_deduction_for_bad_debt_allowance => 181,
+  :group_loan_close_withdrawal_return_rounding_down_revenue => 182,
+  :group_loan_close_withdrawal_return  => 183,
+  
+  :savings_account => 200,
+  :membership_savings_account => 201,
+  :locked_savings_account => 203,
+  :memorial_general => 300
+  
+  
+}
+
+
+

@@ -151,10 +151,23 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
   end
   
   
+  def total_weekly_payment_amount
+    
+    return  group_loan_membership.group_loan_product.weekly_payment_amount * total_unpaid_week
+  end
+  
   def total_principal_return
-    total_unpaid_week = group_loan.number_of_collections - 
-                    group_loan_weekly_collection.week_number 
+   
     return  group_loan_membership.group_loan_product.principal * total_unpaid_week
+  end
+  
+  def total_compulsory_savings
+    return  group_loan_membership.group_loan_product.compulsory_savings * total_unpaid_week
+  end
+  
+  def total_interest_payable
+ 
+    return  group_loan_membership.group_loan_product.interest * total_unpaid_week
   end
   
   # including the current week that will be confirmed along with the premature clearance
@@ -164,41 +177,13 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
   
   # manifested in the group loan clearance payment 
   def update_amount
-    # the current week is not counted. it has to be paid in full.
-    # plus 1 because the current week where premature_clearance is applied has to be paid full 
-    # example: premature_clearance is applied@week_2. If there are total 8 installments,
-    # then, week 2 has to be paid full. and 6*principal has to be returned
-    # plus + default payment 
-    # total_unpaid_week = group_loan.number_of_collections - 
-    #                 group_loan_weekly_collection.week_number 
-    # total_principal_return =  group_loan_membership.group_loan_product.principal * total_unpaid_week
-    
-    # minus compulsory savings ... ? 
-    # if compulsory savings > amount => amount == 0 
-    # compulsory_savings_return =>  (port to voluntary savings)
     
     
-    # premature clearance can't be created if there is uncollectible weekly payment on the name of this member. 
-    # there is nothing can be used to deduct the compulsory_savings
-    # other than end_of_cycle default payment or premature clearance
-    # available_compulsory_savings = group_loan_weekly_collection.week_number  * group_loan_membership.group_loan_product.compulsory_savings 
-    
-    
-    
-    amount_payable = total_principal_return + 
+    amount_payable =  total_weekly_payment_amount + 
                     run_away_weekly_resolved_bail_out_contribution +
                     run_away_end_of_cycle_resolved_bail_out_contribution 
-       
-   
-   
-    if available_compulsory_savings >= amount_payable
-      self.remaining_compulsory_savings = available_compulsory_savings - amount_payable
-      self.amount = BigDecimal('0')
-    else
-      self.remaining_compulsory_savings = BigDecimal('0')
-      self.amount = GroupLoan.rounding_up( amount_payable - available_compulsory_savings , DEFAULT_PAYMENT_ROUND_UP_VALUE) 
-    end               
-     
+                    
+    self.amount = GroupLoan.rounding_up( amount_payable  , DEFAULT_PAYMENT_ROUND_UP_VALUE)       
     self.save 
   end
   
@@ -257,113 +242,133 @@ class GroupLoanPrematureClearancePayment < ActiveRecord::Base
     run_away_end_of_cycle_resolved_bail_out_contribution + run_away_weekly_resolved_bail_out_contribution
   end
   
+  def total_unpaid_week
+    return group_loan.number_of_collections - 
+                    group_loan_weekly_collection.week_number
+                    
+  end
+  
   def confirm
     if self.is_confirmed?
       self.errors.add(:generic_errors, "Sudah konfirmasi")
       return self
     end
     
-    
-    
     self.is_confirmed = true 
     
     if not self.save 
-      puts "inside the group loan premature clearance payment"
-      puts "The errors:"
       self.errors.messages.each {|x| puts "error: #{x}"}
     end
-    
-    
-    
     
     glm = self.group_loan_membership
     glm.is_active = false 
     glm.deactivation_case =  GROUP_LOAN_DEACTIVATION_CASE[:premature_clearance]
     glm.deactivation_week_number = self.group_loan_weekly_collection.week_number + 1 
     if glm.save  
-      SavingsEntry.create_group_loan_compulsory_savings_withdrawal( self , self.group_loan_membership.total_compulsory_savings )  
-      
-      if remaining_compulsory_savings > BigDecimal('0')
-        SavingsEntry.create_savings_account_group_loan_premature_clearance_addition( self , self.remaining_compulsory_savings )  
-      end 
+      self.create_remaining_weeks_payment 
+      self.create_premature_clearance_deposit 
     end
     
     
-    # amount_for_premature_clearance_deposit = self.group_loan_weekly_collection.amount_receivable - normal_weekly_collection_without_deposit
-    self.group_loan.update_premature_clearance_deposit( premature_clearance_deposit_amount ) 
+  end
+  
+  def create_premature_clearance_deposit
+    deposit_amount = premature_clearance_deposit_amount
+    return if  deposit_amount == BigDecimal("0")
+    self.group_loan.update_premature_clearance_deposit( deposit_amount ) 
+    member = group_loan_membership.member 
+    AccountingService::PrematureClearance.create_premature_clearance_deposit_posting(group_loan,
+                                  member, 
+                                  self,
+                                  deposit_amount)
+    
     
   end
   
   
+  def create_remaining_weeks_payment
+    SavingsEntry.create_group_loan_premature_clearance_compulsory_savings_addition( self, self.total_compulsory_savings )
+    
+    glp = self.group_loan_membership.group_loan_product
+    total_principal = glp.principal * total_unpaid_week
+    total_interest = glp.interest * total_unpaid_week
+    total_compulsory_savings = glp.interest * total_unpaid_week
+    
+    
+    member = group_loan_membership.member 
+    
+    AccountingService::PrematureClearance.create_premature_clearance_posting(
+      group_loan,
+      member, 
+      total_principal,
+      total_interest, 
+      total_compulsory_savings,
+      self
+    )
+  end
+  
+  
   # GroupLoanPrematureClearancePayment.where(:group_loan_id => 19).each {|x| x.is_confirmed = false; x.save}
+  
+  
+  def undo_remaining_weeks_payment
+    glm = group_loan_membership
+    
+    # part 1 : undo the bulk compulsory savings addition 
+    compulsory_savings_premature_clerance_array = SavingsEntry.where(
+      :savings_source_id => self.id,
+      :savings_source_type => self.class.to_s, 
+      :savings_status => SAVINGS_STATUS[:group_loan_compulsory_savings],
+      :direction => FUND_TRANSFER_DIRECTION[:incoming],
+      :financial_product_id => self.group_loan_id ,
+      :financial_product_type => self.group_loan.class.to_s,
+      :member_id => glm.member.id,
+      :is_confirmed => true 
+    )
+    
+    total_amount = BigDecimal("0")
+    compulsory_savings_premature_clerance_array.each do |x|
+      total_amount += x.amount 
+      x.destroy 
+    end
+    
+    glm.update_total_compulsory_savings( -1*total_amount )
+    
+    AccountingService::PrematureClearance.cancel_premature_clearance_posting(self)
+  end
+  
+  def undo_premature_clearance_deposit
+    self.group_loan.update_premature_clearance_deposit( -1*premature_clearance_deposit_amount ) 
+    AccountingService::PrematureClearance.cancel_premature_clearance_deposit_posting(self)
+    
+  end
+  
+  
   
   def unconfirm
     if not self.is_confirmed?
       self.errors.add(:generic_errors, "Belum konfirmasi premature clearance")
       return self 
     end
-    self.group_loan.update_premature_clearance_deposit( -1*premature_clearance_deposit_amount ) 
+    
     
     glm = self.group_loan_membership
     glm.is_active = true 
     glm.deactivation_case =  nil 
     glm.deactivation_week_number =  nil 
+    
+    self.undo_premature_clearance_deposit
+    
+    
+    
     if glm.save  
-      
-      # SavingsEntry.create_group_loan_compulsory_savings_withdrawal( self , self.group_loan_membership.total_compulsory_savings )  
-      
-      compulsory_savings_withdrawal_array = SavingsEntry.where(
-        :savings_source_id => self.id,
-        :savings_source_type => self.class.to_s, 
-        :savings_status => SAVINGS_STATUS[:group_loan_compulsory_savings],
-        :direction => FUND_TRANSFER_DIRECTION[:outgoing],
-        :financial_product_id => self.group_loan_id ,
-        :financial_product_type => self.group_loan.class.to_s,
-        :member_id => glm.member.id,
-        :is_confirmed => true 
-      )
-      total_amount = BigDecimal("0")
-      compulsory_savings_withdrawal_array.each do |x|
-        total_amount += x.amount 
-        x.destroy 
-      end
-      
-      glm.update_total_compulsory_savings( total_amount )
-      
-      
-      
-      # if remaining_compulsory_savings > BigDecimal('0')
-      #   SavingsEntry.create_savings_account_group_loan_premature_clearance_addition( self , self.remaining_compulsory_savings )  
-      # end 
-      
-      remaining_compulsory_savings_array = SavingsEntry.where(
-        :savings_source_id => self.id,
-        :savings_source_type => self.class.to_s,
-        :savings_status => SAVINGS_STATUS[:savings_account],
-        :direction => FUND_TRANSFER_DIRECTION[:incoming],
-        :financial_product_id =>  self.group_loan.id  ,
-        :financial_product_type => self.group_loan.class.to_s ,
-        :member_id => glm.member.id,
-        :is_confirmed => true 
-      )
-      
-      total_remaining_amount = BigDecimal("0")
-      remaining_compulsory_savings_array.each do |x|
-        total_amount += x.amount 
-        x.destroy
-      end
-      
-      member = glm.member 
-      member.update_total_savings_account( -1*total_amount)
-    else
-      puts "44321 fail to update glm"
+      self.undo_remaining_weeks_payment 
     end
     
     
     self.is_confirmed = false 
     if self.save 
     else
-      puts "44511 fail to save group loan premature clearance payment"
       self.errors.messages.each {|x| puts "Err_msg: #{x}"}
     end
     

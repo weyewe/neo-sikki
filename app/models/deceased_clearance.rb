@@ -9,7 +9,22 @@ class DeceasedClearance < ActiveRecord::Base
                   :description                           ,
                   :additional_savings_account       
              
-             
+  after_create :perform_deceased_declaration_posting
+  
+  def perform_deceased_declaration_posting
+    
+    # (group_loan, member, group_loan_membership, group_loan_weekly_collection,group_loan_run_away_receivable)
+    
+    
+    group_loan_deceased_clearance = self 
+    AccountingService::Deceased.create_bad_debt_allocation(
+        group_loan_membership.group_loan, 
+        member, 
+        group_loan_membership, 
+        group_loan_deceased_clearance) 
+  end
+  
+            
 =begin
   For GroupLoan financial product 
 =end     

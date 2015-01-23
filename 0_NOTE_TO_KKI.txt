@@ -1,0 +1,12 @@
+1. Limit the corner cases:
+	1. Deceased
+	2. Uncollectible   : in_cycle resolution 
+	3. Premature Clearance 
+	
+	
+2. Other corner cases needs verification [MIGHT causes round-down revenue on end-of-cycle resolution, and round-up-revenue in premature clearance deposit]:
+
+	NOT Stable 
+	1. run_away end_of_cycle resolution
+	2. uncollectible end_of_cycle resolution
+	

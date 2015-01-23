@@ -9,6 +9,7 @@ require 'spec_helper'
 describe GroupLoan do
   
   before(:each) do
+    # Account.create_base_objects
     (1..8).each do |number|
       Member.create_object({
         :name =>  "Member #{number}",
@@ -94,7 +95,7 @@ describe GroupLoan do
       }
     )
 
-    @first_group_loan_weekly_collection.is_collected.should be_true
+    @first_group_loan_weekly_collection.is_collected.should be_truthy
     # puts "FROM THE SPEC: Gonna confirm first weekly_collection"
     @first_group_loan_weekly_collection.confirm(:confirmed_at => DateTime.now )
     @first_group_loan_weekly_collection.reload
@@ -107,7 +108,7 @@ describe GroupLoan do
   
   it 'should confirm weekly_collection' do
     @first_group_loan_weekly_collection.errors.messages.each {|x| puts  "Msg: #{x}"}
-    @first_group_loan_weekly_collection.is_confirmed.should be_true 
+    @first_group_loan_weekly_collection.is_confirmed.should be_truthy 
   end
   
   it 'should create compulsory savings for each member' do
@@ -144,7 +145,7 @@ describe GroupLoan do
     
     it 'shoud allow deletion if the weekly_collection has not been confirmed' do
       @first_gl_pc.delete_object
-      @first_gl_pc.persisted?.should be_false 
+      @first_gl_pc.persisted?.should be_falsey 
     end
     
     
@@ -154,7 +155,7 @@ describe GroupLoan do
     end
     
     it 'should produce correct premature clearance amount (premature clearance 1)' do
-      @second_group_loan_weekly_collection.is_confirmed.should be_false 
+      @second_group_loan_weekly_collection.is_confirmed.should be_falsey 
       
       # puts "compulsory_savings weekly: #{@premature_clearance_glm.group_loan_product.compulsory_savings}"
       # puts "total_compulsory_savings: #{@premature_clearance_glm.total_compulsory_savings}"
@@ -207,16 +208,16 @@ describe GroupLoan do
       end
       
       it 'should confirm the clearance' do
-        @first_gl_pc.is_confirmed.should be_true 
-        # @second_gl_pc.is_confirmed.should be_true 
+        @first_gl_pc.is_confirmed.should be_truthy 
+        # @second_gl_pc.is_confirmed.should be_truthy 
       end
       
       it 'should deactivate the membership' do
-        @premature_clearance_glm.is_active.should be_false
+        @premature_clearance_glm.is_active.should be_falsey
         @premature_clearance_glm.deactivation_case.should == GROUP_LOAN_DEACTIVATION_CASE[:premature_clearance]
         @premature_clearance_glm.deactivation_week_number.should == @second_group_loan_weekly_collection.week_number + 1 
         
-        # @second_premature_clearance_glm.is_active.should be_false
+        # @second_premature_clearance_glm.is_active.should be_falsey
         # @second_premature_clearance_glm.deactivation_case.should == GROUP_LOAN_DEACTIVATION_CASE[:premature_clearance]
         # @second_premature_clearance_glm.deactivation_week_number.should == @second_group_loan_weekly_collection.week_number + 1
       end
@@ -263,13 +264,13 @@ describe GroupLoan do
         
         it 'should confirm week 3' do
           @third_group_loan_weekly_collection.errors.size.should == 0 
-          @third_group_loan_weekly_collection.is_confirmed.should be_true 
+          @third_group_loan_weekly_collection.is_confirmed.should be_truthy 
         end
     
         it 'should create second group_loan_premature_clearance' do
-          @second_gl_pc.persisted?.should be_true 
+          @second_gl_pc.persisted?.should be_truthy 
           @second_gl_pc.errors.size.should == 0 
-          @second_premature_clearance_glm.is_active.should be_true 
+          @second_premature_clearance_glm.is_active.should be_truthy 
         end
         
         it 'should change the fourth group loan amount receivable: base (minus premature_glm_1) + premature_clearance_2' do
@@ -285,11 +286,11 @@ describe GroupLoan do
         
         it 'should be allowed to confirm week 4' do
           @fourth_group_loan_weekly_collection.collect(:collected_at => DateTime.now)
-          @fourth_group_loan_weekly_collection.is_collected.should be_true
+          @fourth_group_loan_weekly_collection.is_collected.should be_truthy
           @fourth_group_loan_weekly_collection.errors.size.should == 0 
           
           @fourth_group_loan_weekly_collection.confirm(:confirmed_at => DateTime.now )
-          @fourth_group_loan_weekly_collection.is_confirmed.should be_true 
+          @fourth_group_loan_weekly_collection.is_confirmed.should be_truthy 
           @fourth_group_loan_weekly_collection.errors.size.should == 0  
         end
         
@@ -320,14 +321,14 @@ describe GroupLoan do
           end
           
           it 'should confirm week 4' do
-            @fourth_group_loan_weekly_collection.is_confirmed.should be_true 
+            @fourth_group_loan_weekly_collection.is_confirmed.should be_truthy 
           end
           
           
           it 'should confirm the premature clearance' do 
-            @first_gl_pc.is_confirmed.should be_true 
+            @first_gl_pc.is_confirmed.should be_truthy 
             @second_gl_pc.errors.messages.each {|x| puts "The error: #{x}"}
-            @second_gl_pc.is_confirmed.should be_true 
+            @second_gl_pc.is_confirmed.should be_truthy 
           end
           
           it 'should deduct the first and second premature_clearance glm on fifth_weekly_collection' do
@@ -347,7 +348,7 @@ describe GroupLoan do
           end
               
           it 'should return the correct compulsory saving amount: not including the premature clearance' do
-            @group_loan.is_closed.should be_true 
+            @group_loan.is_closed.should be_truthy 
             expected_amount = BigDecimal('0')
             @group_loan.group_loan_memberships.each do |glm|
               next if glm.id == @premature_clearance_glm.id 

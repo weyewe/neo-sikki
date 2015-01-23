@@ -3,6 +3,7 @@ require 'spec_helper'
 describe GroupLoan do
   
   before(:each) do
+    # Account.create_base_objects
     # create users 
     (1..8).each do |number|
       Member.create_object({
@@ -117,7 +118,7 @@ describe GroupLoan do
         end
         
         it 'should have started group loan' do
-          @group_loan.is_started.should be_true 
+          @group_loan.is_started.should be_truthy 
         end
         
         it 'should manifest the number of collections' do
@@ -130,7 +131,7 @@ describe GroupLoan do
           end
           
           it 'should be marked as loan disbursed' do
-            @group_loan.is_loan_disbursed.should be_true 
+            @group_loan.is_loan_disbursed.should be_truthy 
           end
           
           it 'should have created N GroupLoanDisbursement' do
@@ -151,9 +152,9 @@ describe GroupLoan do
             )
             
             object = DateTime.now 
-            object.is_a?(DateTime).should be_true 
+            object.is_a?(DateTime).should be_truthy 
             @first_group_loan_weekly_collection.errors.messages.each {|x| puts "msg : #{x}"}
-            @first_group_loan_weekly_collection.is_collected.should be_true 
+            @first_group_loan_weekly_collection.is_collected.should be_truthy 
           end
           
           it 'should not be allowed to skip week in the GroupLoanWeeklyCollection' do 
@@ -165,7 +166,7 @@ describe GroupLoan do
               }
             )
             
-            @second_group_loan_weekly_collection.is_collected.should be_false
+            @second_group_loan_weekly_collection.is_collected.should be_falsey
             @second_group_loan_weekly_collection.errors.size.should_not == 0
           end
           
@@ -181,7 +182,7 @@ describe GroupLoan do
                 }
               )
 
-              @first_group_loan_weekly_collection.is_collected.should be_true
+              @first_group_loan_weekly_collection.is_collected.should be_truthy
               
               @first_glm = @group_loan.active_group_loan_memberships.first 
               @initial_compulsory_savings = @first_glm.total_compulsory_savings
@@ -191,7 +192,7 @@ describe GroupLoan do
             end
             
             # it 'should confirm the first group_loan_weekly_collection' do
-            #   @first_group_loan_weekly_collection.is_confirmed.should be_true 
+            #   @first_group_loan_weekly_collection.is_confirmed.should be_truthy 
             # end
             
             # it 'should have increased group loan total compulsory savings' do
@@ -267,12 +268,12 @@ describe GroupLoan do
               it 'should deactivate all glm' do
                 @glm_list.each do |glm|
                   glm.reload
-                  glm.is_active.should be_false 
+                  glm.is_active.should be_falsey 
                   glm.deactivation_case.should == GROUP_LOAN_DEACTIVATION_CASE[:finished_group_loan]
                 end
               end
               
-              it 'should have increased the savings_account by the amount of compulsory_savings' do
+              it 'should NOT have increased the savings_account by the amount of compulsory_savings' do
                 @member_compulsory_savings_array.each do |pair|
                   member = pair.first
                   initial_savings =  pair[1]
@@ -291,7 +292,7 @@ describe GroupLoan do
                 @glm_list.each do |glm|
                   glm.reload
                   # puts "the total compulsory savings: #{glm.total_compulsory_savings.to_s} "
-                  glm.total_compulsory_savings.should_not == BigDecimal('0')
+                  glm.total_compulsory_savings.should == BigDecimal('0')
                 end
                 
               end
@@ -303,7 +304,7 @@ describe GroupLoan do
                 end
                 
                 it 'should withdraw compulsory savings' do
-                  @group_loan.is_compulsory_savings_withdrawn .should be_true 
+                  @group_loan.is_compulsory_savings_withdrawn .should be_truthy 
                 end
                 
                 

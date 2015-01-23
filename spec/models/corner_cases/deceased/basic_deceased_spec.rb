@@ -49,6 +49,7 @@ require 'spec_helper'
 describe DeceasedClearance do
   
   before(:each) do
+    # Account.create_base_objects
     (1..8).each do |number|
       Member.create_object({
         :name =>  "Member #{number}",
@@ -130,7 +131,7 @@ describe DeceasedClearance do
       }
     )
 
-    @first_group_loan_weekly_collection.is_collected.should be_true
+    @first_group_loan_weekly_collection.is_collected.should be_truthy
     @first_group_loan_weekly_collection.confirm(:confirmed_at => DateTime.now )
     @first_group_loan_weekly_collection.reload
     
@@ -138,8 +139,8 @@ describe DeceasedClearance do
   
   
   it 'should confirm the first group_loan_weekly_collection' do
-    @first_group_loan_weekly_collection.is_collected.should be_true 
-    @first_group_loan_weekly_collection.is_confirmed.should be_true 
+    @first_group_loan_weekly_collection.is_collected.should be_truthy 
+    @first_group_loan_weekly_collection.is_confirmed.should be_truthy 
   end
   
    
@@ -167,7 +168,7 @@ describe DeceasedClearance do
       
       @deceased_glm.reload 
       # dpr.week_number.should == @second_group_loan_weekly_collection.week_number 
-      @deceased_glm.is_active.should be_false 
+      @deceased_glm.is_active.should be_falsey 
       @deceased_glm.deactivation_week_number.should == @second_group_loan_weekly_collection.week_number
       @deceased_glm.deactivation_case.should == GROUP_LOAN_DEACTIVATION_CASE[:deceased]
     end
@@ -204,16 +205,16 @@ describe DeceasedClearance do
     
     it 'should not contain the deceased glm in the active_glm' do 
       @active_glm_id_list = @group_loan.active_group_loan_memberships.map{|x| x.id }
-      @active_glm_id_list.include?(@deceased_glm.id).should be_false 
+      @active_glm_id_list.include?(@deceased_glm.id).should be_falsey 
     end
     
     it 'should only create 1 group_loan_weekly_payment for deceased_glm' do
       @deceased_glm.group_loan_weekly_payments.count.should == 1 
     end
     
-    it 'should empty out the compulsory savings, ported to savings account' do
+    it 'should NOT empty out the compulsory savings, ported to savings account' do
       
-      @deceased_glm.total_compulsory_savings.should == BigDecimal('0')
+      @deceased_glm.total_compulsory_savings.should_not == BigDecimal('0')
     end
     
     it 'should increase the savings_account according to the flushed out savings account' do
@@ -225,9 +226,9 @@ describe DeceasedClearance do
       @final_compulsory_savings = @deceased_glm.total_compulsory_savings
       
       diff_savings_account = @final_savings_account - @initial_savings_account
-      diff_savings_account.should == @initial_compulsory_savings
+      diff_savings_account.should == BigDecimal('0')
       
-      @final_compulsory_savings.should == BigDecimal('0')
+      @final_compulsory_savings.should_not == BigDecimal('0')
     end
     
     it 'should not introduce bad debt ' do
@@ -266,7 +267,7 @@ describe DeceasedClearance do
       end
       
       it 'should close the group loan' do
-         @group_loan.is_closed.should be_true 
+         @group_loan.is_closed.should be_truthy 
        end
       
       it 'should give the correct number of active group_loan_membership (though it is closed)' do
@@ -283,11 +284,11 @@ describe DeceasedClearance do
       it 'should return the compulsory savings, not including the deceased member' do
         expected_amount = BigDecimal('0')
         @group_loan.group_loan_memberships.each do |x|
-          next if x.id == @deceased_glm.id 
+          next if x.id == @deceased_glm.id  
           expected_amount += x.group_loan_product.compulsory_savings
         end
         
-        @group_loan.compulsory_savings_return_amount.should == expected_amount*@group_loan.loan_duration
+        @group_loan.total_compulsory_savings_pre_closure.should == expected_amount*@group_loan.loan_duration + @deceased_glm.total_compulsory_savings
       end
     end
 

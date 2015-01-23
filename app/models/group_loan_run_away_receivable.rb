@@ -2,7 +2,7 @@ class GroupLoanRunAwayReceivable < ActiveRecord::Base
   attr_accessible :member_id, :amount_receivable, 
                   :group_loan_id, :payment_case , :group_loan_membership_id , 
                   :group_loan_weekly_collection_id
-  has_many :group_loan_run_away_receivable_payments
+  # has_many :group_loan_run_away_receivable_payments
   belongs_to :group_loan_membership 
   belongs_to :group_loan_weekly_collection
   belongs_to :member
@@ -12,7 +12,8 @@ class GroupLoanRunAwayReceivable < ActiveRecord::Base
   
   belongs_to :group_loan 
   
-  after_create :update_group_loan_run_away_amount_receivable  
+  # after_create :update_group_loan_run_away_amount_receivable  
+  after_create :perform_run_away_declaration_posting
   
   def valid_payment_case
     return if not payment_case.present?
@@ -29,20 +30,17 @@ class GroupLoanRunAwayReceivable < ActiveRecord::Base
     
   end
   
-  def update_group_loan_run_away_amount_receivable
-    group_loan = self.group_loan 
-    amount = BigDecimal('0')
-    group_loan.group_loan_run_away_receivables.each do |x|
-      amount += x.amount_receivable 
-    end
-    # group_loan.run_away_amount_receivable =  amount 
-    group_loan.save
+  def perform_run_away_declaration_posting
     
-    # self.amount_receivable
-    
-    # group_loan.update_default_payment_amount_receivable   
-     # by default, it is weekly. So, there is no need to update default_loan amount 
+    AccountingService::MemberRunAway.create_bad_debt_allocation(
+        group_loan, 
+        member, 
+        group_loan_membership, 
+        group_loan_weekly_collection,
+        self) 
   end
+  
+    
   
   def set_payment_case( params ) 
     # if self.group_loan_run_away_receivable_payments.count != 0 

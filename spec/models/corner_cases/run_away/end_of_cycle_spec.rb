@@ -28,6 +28,7 @@ require 'spec_helper'
 describe GroupLoan do
   
   before(:each) do
+    # Account.create_base_objects
     (1..8).each do |number|
       Member.create_object({
         :name =>  "Member #{number}",
@@ -108,7 +109,7 @@ describe GroupLoan do
       }
     )
 
-    @first_group_loan_weekly_collection.is_collected.should be_true
+    @first_group_loan_weekly_collection.is_collected.should be_truthy
     @first_group_loan_weekly_collection.confirm(:confirmed_at => DateTime.now )
     @first_group_loan_weekly_collection.reload
     @closed_at = DateTime.new(2013,12,5,0,0,0)
@@ -117,9 +118,9 @@ describe GroupLoan do
   
   it 'should confirm the first group_loan_weekly_collection' do
     @first_group_loan_weekly_collection.errors.messages.each {|x| puts "Msg: #{x}"}
-    @first_group_loan_weekly_collection.is_collected.should be_true 
+    @first_group_loan_weekly_collection.is_collected.should be_truthy 
     
-    @first_group_loan_weekly_collection.is_confirmed.should be_true 
+    @first_group_loan_weekly_collection.is_confirmed.should be_truthy 
   end
   
   context "a member  run away ( week 2 ) "  do
@@ -189,7 +190,7 @@ describe GroupLoan do
          end
         
         it 'should not close group loan' do
-          @group_loan.is_closed.should be_false 
+          @group_loan.is_closed.should be_falsey 
         end
         
         # it 'should create group_loan_run_away_receivable_payment' do
@@ -328,15 +329,6 @@ describe GroupLoan do
             @group_loan.bad_debt_allowance.should == expected_principal
             
             
-            
-            
-            # puts "\n============= about bad debt allowance"
-            # puts "remaining_week: #{remaining_week}"
-            # puts "principal : #{principal_amount}"
-            # puts "expected_bad_debt: #{expected_principal}"
-            # puts "expected interest: #{expected_interest}"
-            
-
             weekly_compulsory_savings_increment = BigDecimal('0')
 
             @group_loan.group_loan_memberships.joins(:group_loan_product).each do |glm|
@@ -348,52 +340,22 @@ describe GroupLoan do
             run_away_week_number = @gl_rar.group_loan_weekly_collection.week_number
             remaining_week = @group_loan.loan_duration - run_away_week_number + 1 
 
-            # diff = ( @gl_rar.group_loan_membership.group_loan_product.principal +
-            #         @gl_rar.group_loan_membership.group_loan_product.interest)*remaining_week
-                    
-            diff = @gl_rar.group_loan_membership.group_loan_product.weekly_payment_amount*remaining_week
 
-            @group_loan.compulsory_savings_return_amount.should_not == normal_total_compulsory_savings
-
-            actual_diff = normal_total_compulsory_savings - @group_loan.compulsory_savings_return_amount
-
-            actual_diff.should > BigDecimal('0')
-
-            # puts "loan_duration: #{@group_loan.loan_duration}"
-            # puts "\n ==== inspect run_away_glm ====\n"
-            # puts "principal: #{@run_away_glm.group_loan_product.principal}"
-            # puts "interest: #{@run_away_glm.group_loan_product.interest}"
-            # puts "compulsory savings: #{@run_away_glm.group_loan_product.compulsory_savings}"
-            # 
-            # puts "\n ====== done group_loan_product_inspect\n\n"
-            # 
-            # puts "normal total compulsory_savings: #{normal_total_compulsory_savings}"      
-            # puts "actual_total_compulsory_savings: #{@group_loan.total_compulsory_savings}"
-            # puts "remaining_premature_clearance_deposit: #{@group_loan.remaining_premature_clearance_deposit}"
-            # puts "bad_debt_allowance: #{@group_loan.bad_debt_allowance}"
-            # puts "expected_revenue_from_run_away_member_end_of_cycle_resolution: #{@group_loan.expected_revenue_from_run_away_member_end_of_cycle_resolution}"
-            # 
-            # puts "compulsory_savings_return_amount: #{@group_loan.compulsory_savings_return_amount}"
-            # 
-            # puts "\n\n ======> The aftermath:\n"
-            # # puts "expected diff: #{expected_principal + expected_interest}"
-            # puts "actual_diff: #{actual_diff}"
-            # puts "The calculated diff: #{diff}"
-
-
-
-
-            actual_diff.should == diff
+            compulsory_savings_deduction = @group_loan.interest_revenue_capital_deduction + 
+                     @group_loan.bad_debt_allowance_capital_deduction
+                     
+            
+             
           end
 
           it 'should close the group loan' do
-            @group_loan.is_closed.should be_true 
+            @group_loan.is_closed.should be_truthy 
           end
 
           it 'should confirm all group loan weekly collections' do
             @group_loan.group_loan_weekly_collections.order("id ASC").each do |x|
-              x.is_collected.should be_true 
-              x.is_confirmed.should be_true 
+              x.is_collected.should be_truthy 
+              x.is_confirmed.should be_truthy 
             end
           end
 

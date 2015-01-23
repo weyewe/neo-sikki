@@ -8,7 +8,7 @@ task :undo_group_loan => :environment do
       puts "The weeklycollection: #{group_loan_weekly_collection.id}"
       group_loan_weekly_collection.unconfirm
       group_loan_weekly_collection.uncollect
-      group_loan_weekly_collection.uncreate_things
+      # group_loan_weekly_collection.uncreate_things
       
       disbursed_group_loan.is_loan_disbursed = false
       disbursed_group_loan.disbursed_at = nil 

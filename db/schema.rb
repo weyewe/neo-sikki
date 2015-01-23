@@ -11,10 +11,43 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141203164931) do
+ActiveRecord::Schema.define(version: 20150122110407) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "accounts", force: true do |t|
+    t.string   "name"
+    t.integer  "parent_id"
+    t.integer  "lft"
+    t.integer  "rgt"
+    t.integer  "depth"
+    t.decimal  "amount",            precision: 14, scale: 2, default: 0.0
+    t.boolean  "is_contra_account",                          default: false
+    t.integer  "normal_balance",                             default: 1
+    t.integer  "account_case",                               default: 2
+    t.boolean  "is_base_account",                            default: false
+    t.string   "code"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "closings", force: true do |t|
+    t.boolean  "is_first_closing",                                   default: false
+    t.datetime "start_period"
+    t.datetime "end_period"
+    t.string   "description"
+    t.decimal  "expense_adjustment_amount", precision: 14, scale: 2, default: 0.0
+    t.integer  "expense_adjustment_case"
+    t.decimal  "revenue_adjustment_amount", precision: 14, scale: 2, default: 0.0
+    t.integer  "revenue_adjustment_case"
+    t.decimal  "net_earnings_amount",       precision: 14, scale: 2, default: 0.0
+    t.integer  "net_earnings_case"
+    t.boolean  "is_confirmed",                                       default: false
+    t.datetime "confirmed_at"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "deceased_clearances", force: true do |t|
     t.boolean  "is_insurance_claimable",                                default: false
@@ -50,12 +83,15 @@ ActiveRecord::Schema.define(version: 20141203164931) do
     t.integer  "group_loan_id"
     t.integer  "group_loan_product_id"
     t.integer  "member_id"
-    t.boolean  "is_active",                                         default: true
+    t.boolean  "is_active",                                                                    default: true
     t.integer  "deactivation_case"
     t.integer  "deactivation_week_number"
-    t.decimal  "total_compulsory_savings", precision: 10, scale: 2, default: 0.0
+    t.decimal  "total_compulsory_savings",                            precision: 10, scale: 2, default: 0.0
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.decimal  "compulsory_savings_deduction_for_interest_revenue",   precision: 12, scale: 2, default: 0.0
+    t.decimal  "compulsory_savings_deduction_for_bad_debt_allowance", precision: 12, scale: 2, default: 0.0
+    t.decimal  "closing_bad_debt_expense",                            precision: 12, scale: 2, default: 0.0
   end
 
   create_table "group_loan_premature_clearance_payments", force: true do |t|
@@ -161,6 +197,10 @@ ActiveRecord::Schema.define(version: 20141203164931) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "group_number"
+    t.decimal  "compulsory_savings_deduction_amount",          precision: 12, scale: 2, default: 0.0
+    t.decimal  "potential_loss_interest_revenue",              precision: 12, scale: 2, default: 0.0
+    t.decimal  "bad_debt_allowance_capital_deduction",         precision: 12, scale: 2, default: 0.0
+    t.decimal  "interest_revenue_capital_deduction",           precision: 12, scale: 2, default: 0.0
   end
 
   create_table "members", force: true do |t|
@@ -182,6 +222,30 @@ ActiveRecord::Schema.define(version: 20141203164931) do
     t.integer  "rt"
     t.integer  "rw"
     t.string   "village"
+  end
+
+  create_table "memorial_details", force: true do |t|
+    t.datetime "transaction_datetime"
+    t.integer  "memorial_id"
+    t.integer  "transaction_data_id"
+    t.integer  "account_id"
+    t.integer  "entry_case"
+    t.decimal  "amount",               precision: 14, scale: 2, default: 0.0
+    t.string   "description"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "memorials", force: true do |t|
+    t.datetime "transaction_datetime"
+    t.text     "description"
+    t.boolean  "is_confirmed",         default: false
+    t.datetime "confirmed_at"
+    t.string   "code"
+    t.boolean  "is_deleted"
+    t.datetime "deleted_at"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "roles", force: true do |t|
@@ -208,6 +272,7 @@ ActiveRecord::Schema.define(version: 20141203164931) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.boolean  "is_adjustment",                                   default: false
+    t.string   "message"
   end
 
   create_table "transaction_activities", force: true do |t|
@@ -220,6 +285,30 @@ ActiveRecord::Schema.define(version: 20141203164931) do
     t.integer  "savings_direction"
     t.integer  "office_id"
     t.integer  "member_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "transaction_data", force: true do |t|
+    t.integer  "transaction_source_id"
+    t.string   "transaction_source_type"
+    t.datetime "transaction_datetime"
+    t.text     "description"
+    t.decimal  "amount",                  precision: 14, scale: 2, default: 0.0
+    t.boolean  "is_confirmed"
+    t.integer  "code"
+    t.boolean  "is_contra_transaction",                            default: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "transaction_data_details", force: true do |t|
+    t.integer  "transaction_data_id"
+    t.integer  "account_id"
+    t.integer  "entry_case"
+    t.decimal  "amount",              precision: 14, scale: 2, default: 0.0
+    t.string   "description"
+    t.boolean  "is_bank_transaction",                          default: false
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -255,6 +344,15 @@ ActiveRecord::Schema.define(version: 20141203164931) do
     t.integer  "year"
     t.integer  "savings_status"
     t.decimal  "amount",         precision: 12, scale: 2, default: 0.0
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "valid_combs", force: true do |t|
+    t.integer  "closing_id"
+    t.integer  "account_id"
+    t.decimal  "amount",     precision: 14, scale: 2, default: 0.0
+    t.integer  "entry_case"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

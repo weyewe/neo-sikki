@@ -3,6 +3,7 @@ require 'spec_helper'
 describe GroupLoanWeeklyCollection do
   
   before(:each) do
+    # Account.create_base_objects
     # create users 
     (1..8).each do |number|
       Member.create_object({
@@ -118,7 +119,7 @@ describe GroupLoanWeeklyCollection do
         end
         
         it 'should have started group loan' do
-          @group_loan.is_started.should be_true 
+          @group_loan.is_started.should be_truthy 
         end
         
         it 'should manifest the number of collections' do

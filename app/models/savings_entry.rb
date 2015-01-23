@@ -16,7 +16,8 @@ class SavingsEntry < ActiveRecord::Base
                   :description,
                   :is_confirmed ,
                   :confirmed_at ,
-                  :is_adjustment 
+                  :is_adjustment ,
+                  :message
                   
   validates_presence_of :direction, :amount, :member_id 
   
@@ -354,15 +355,19 @@ class SavingsEntry < ActiveRecord::Base
      # voluntary savings account 
       if self.savings_status == SAVINGS_STATUS[:savings_account]
         member.update_total_savings_account( multiplier  *self.amount )
+        AccountingService::IndependentSavings.post_savings_account(self, multiplier, amount  )
         
     # one off savings so that the member is elligible for borrowing $$ from KKI
       elsif  self.savings_status == SAVINGS_STATUS[:membership]
         member.update_total_membership_savings_account( multiplier  *self.amount )
-        
+        AccountingService::IndependentSavings.post_membership_savings_account(self, multiplier, amount  )
     # kept $$ to sustain group loan membership
       elsif self.savings_status == SAVINGS_STATUS[:locked]
         member.update_total_locked_savings_account( multiplier  *self.amount )
+        AccountingService::IndependentSavings.post_locked_savings_account(self, multiplier, amount  )
       end
+      
+      
       
     end
   end
@@ -392,6 +397,7 @@ class SavingsEntry < ActiveRecord::Base
     
     
     # member.update_total_savings_account( multiplier  *self.amount )
+    AccountingService::IndependentSavings.cancel_journal_posting( self ) 
   end
   
   
@@ -436,8 +442,120 @@ class SavingsEntry < ActiveRecord::Base
     group_loan_membership.update_total_compulsory_savings( new_object.amount)
   end
   
+  def self.create_group_loan_premature_clearance_compulsory_savings_addition( savings_source , compulsory_savings_amount)
+    # puts "Gonna create savings_entry"
+    group_loan_membership = savings_source.group_loan_membership
+    member = group_loan_membership.member 
+    
+    new_object = self.create :savings_source_id => savings_source.id,
+                        :savings_source_type => savings_source.class.to_s,
+                        :amount => compulsory_savings_amount,
+                        :savings_status => SAVINGS_STATUS[:group_loan_compulsory_savings],
+                        :direction => FUND_TRANSFER_DIRECTION[:incoming],
+                        :financial_product_id => savings_source.group_loan_id ,
+                        :financial_product_type => savings_source.group_loan.class.to_s,
+                        :member_id => member.id ,
+                        :is_confirmed => true, 
+                        :confirmed_at => savings_source.group_loan_weekly_collection.confirmed_at 
+                        
+    # puts "The amount: #{new_object.amount}"
+    group_loan_membership.update_total_compulsory_savings( new_object.amount)
+  end
+  
+  
+  def self.create_group_loan_closing_compulsory_savings_deduction_bad_debt_allowance( glm , amount )
+    # puts "Gonna create savings_entry"
+    group_loan_membership = glm
+    member = group_loan_membership.member 
+    group_loan = group_loan_membership.group_loan
+    savings_source = group_loan
+    
+    new_object = self.create :savings_source_id => savings_source.id,
+                        :savings_source_type => savings_source.class.to_s,
+                        :amount => amount ,
+                        :savings_status => SAVINGS_STATUS[:group_loan_compulsory_savings],
+                        :direction => FUND_TRANSFER_DIRECTION[:outgoing],
+                        :financial_product_id => savings_source.id ,
+                        :financial_product_type => savings_source.class.to_s,
+                        :member_id => member.id ,
+                        :is_confirmed => true, 
+                        :confirmed_at => savings_source.closed_at,
+                        :message => "Bad debt allowance on GroupLoan Close: Group #{group_loan.name}, #{group_loan.group_number}"
+
+    group_loan_membership.update_total_compulsory_savings( -1 * amount )
+  
+  end
+  
+  def self.create_group_loan_closing_compulsory_savings_deduction_interest_revenue( glm , amount )
+    # puts "Gonna create savings_entry"
+    group_loan_membership = glm
+    member = group_loan_membership.member 
+    group_loan = group_loan_membership.group_loan
+    savings_source = group_loan
+    
+    new_object = self.create :savings_source_id => savings_source.id,
+                        :savings_source_type => savings_source.class.to_s,
+                        :amount => amount ,
+                        :savings_status => SAVINGS_STATUS[:group_loan_compulsory_savings],
+                        :direction => FUND_TRANSFER_DIRECTION[:outgoing],
+                        :financial_product_id => savings_source.id ,
+                        :financial_product_type => savings_source.class.to_s,
+                        :member_id => member.id ,
+                        :is_confirmed => true, 
+                        :confirmed_at => savings_source.closed_at,
+                        :message => "Interest Revenue on GroupLoan Close: Group #{group_loan.name}, #{group_loan.group_number}"
+          
+    group_loan_membership.update_total_compulsory_savings( -1 * amount )
+  end
+  
+  def self.create_group_loan_closing_compulsory_savings_clearance( glm )
+    # puts "Gonna create savings_entry"
+    group_loan_membership = glm
+    member = group_loan_membership.member 
+    group_loan = group_loan_membership.group_loan
+    savings_source = group_loan
+    
+    new_object = self.create :savings_source_id => savings_source.id,
+                        :savings_source_type => savings_source.class.to_s,
+                        :amount => group_loan_membership.total_compulsory_savings ,
+                        :savings_status => SAVINGS_STATUS[:group_loan_compulsory_savings],
+                        :direction => FUND_TRANSFER_DIRECTION[:outgoing],
+                        :financial_product_id => savings_source.id ,
+                        :financial_product_type => savings_source.class.to_s,
+                        :member_id => member.id ,
+                        :is_confirmed => true, 
+                        :confirmed_at => savings_source.closed_at
+  end
+  
+  
+  
+  def self.port_group_loan_membership_compulsory_savings( group_loan, glm )
+    # puts "Gonna create savings_entry"
+    group_loan_membership = glm
+    member = group_loan_membership.member 
+    savings_source = group_loan
+    
+    new_object = self.create :savings_source_id => savings_source.id,
+                        :savings_source_type => savings_source.class.to_s,
+                        :amount => group_loan_membership.total_compulsory_savings ,
+                        :savings_status => SAVINGS_STATUS[:group_loan_compulsory_savings],
+                        :direction => FUND_TRANSFER_DIRECTION[:outgoing],
+                        :financial_product_id => savings_source.id ,
+                        :financial_product_type => savings_source.class.to_s,
+                        :member_id => member.id ,
+                        :is_confirmed => true, 
+                        :confirmed_at => savings_source.closed_at
+  
+    group_loan_membership.update_total_compulsory_savings( -1 * group_loan_membership.total_compulsory_savings )
+                       
+                       # last info.. don't deduct the compulsory savings info
+    # group_loan_membership.update_total_compulsory_savings( -1 * new_object.amount)
+  end
+  
+  
   def self.create_weekly_collection_voluntary_savings( savings_source )
     # puts "Gonna create savings_entry"
+    group_loan_weekly_savings_entry = savings_source
     group_loan_membership = savings_source.group_loan_membership
     member = group_loan_membership.member 
     
@@ -454,6 +572,18 @@ class SavingsEntry < ActiveRecord::Base
                         
     # puts "The amount: #{new_object.amount}"
     member.update_total_savings_account( new_object.amount)
+    
+    
+    # do accounting posting 
+    group_loan = group_loan_membership.group_loan
+    group_loan_weekly_collection = savings_source.group_loan_weekly_collection
+    AccountingService::WeeklyCollectionVoluntarySavings.create_journal_posting(
+      group_loan,
+      group_loan_weekly_collection,
+      savings_source
+    )
+    
+    
   end
    
    
@@ -556,34 +686,35 @@ class SavingsEntry < ActiveRecord::Base
   Savings Account related savings : savings withdrawal and savings addition and interest (4% annual), given monthly 
 =end
 
-  # def self.create_savings_account_addition( savings_source, amount ) 
-  #   member = savings_source.member
-  #   
-  #   new_object = self.create :savings_source_id => savings_source.id,
-  #                       :savings_source_type => savings_source.class.to_s,
-  #                       :amount => amount  ,
-  #                       :savings_status => SAVINGS_STATUS[:savings_account],
-  #                       :direction => FUND_TRANSFER_DIRECTION[:incoming],
-  #                       :financial_product_id =>  nil ,
-  #                       :financial_product_type => nil ,
-  #                       :member_id => member.id
-  # 
-  #   member.update_total_savings_account( new_object.amount)
-  # end
   
-  # def self.create_savings_account_withdrawal( savings_source, amount ) 
-  #   member = savings_source.member
-  #   
-  #   new_object = self.create :savings_source_id => savings_source.id,
-  #                       :savings_source_type => savings_source.class.to_s,
-  #                       :amount => amount  ,
-  #                       :savings_status => SAVINGS_STATUS[:savings_account],
-  #                       :direction => FUND_TRANSFER_DIRECTION[:outgoing],
-  #                       :financial_product_id =>  nil ,
-  #                       :financial_product_type => nil ,
-  #                       :member_id => member.id
-  # 
-  #   member.update_total_savings_account( -1* new_object.amount)
-  # end
+  def create_contra_and_confirm(transaction_code)
+    puts "5585444 savings_entry.create_contra_and_confirm"
+    last_transaction_data = TransactionData.where(
+      :transaction_source_id => self.id , 
+      :transaction_source_type => self.class.to_s ,
+      :code => transaction_code,
+      :is_contra_transaction => false
+    ).order("id DESC").first 
+    
+    puts "last_transaction_data : #{last_transaction_data}"
+    
+
+    last_transaction_data.create_contra_and_confirm if not  last_transaction_data.nil?
+  end
+  
+  def create_contra_and_confirm_for_group_loan_weekly_collection_voluntary_savings(savings_source, transaction_code)
+    puts "5585444 savings_entry.create_contra_and_confirm"
+    last_transaction_data = TransactionData.where(
+      :transaction_source_id => savings_source.id , 
+      :transaction_source_type => savings_source.class.to_s ,
+      :code => transaction_code,
+      :is_contra_transaction => false
+    ).order("id DESC").first 
+    
+    puts "last_transaction_data : #{last_transaction_data}"
+    
+
+    last_transaction_data.create_contra_and_confirm if not  last_transaction_data.nil?
+  end
                       
 end

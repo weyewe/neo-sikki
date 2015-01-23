@@ -96,7 +96,7 @@ describe GroupLoan do
       }
     )
 
-    @first_group_loan_weekly_collection.is_collected.should be_true
+    @first_group_loan_weekly_collection.is_collected.should be_truthy
     @first_group_loan_weekly_collection.confirm
     @first_group_loan_weekly_collection.reload
     @second_group_loan_weekly_collection.reload 
@@ -107,8 +107,8 @@ describe GroupLoan do
   
   # 
   # it 'should confirm the first group_loan_weekly_collection' do
-  #   @first_group_loan_weekly_collection.is_collected.should be_true 
-  #   @first_group_loan_weekly_collection.is_confirmed.should be_true 
+  #   @first_group_loan_weekly_collection.is_collected.should be_truthy 
+  #   @first_group_loan_weekly_collection.is_confirmed.should be_truthy 
   # end
   # 
   # 
@@ -200,7 +200,7 @@ describe GroupLoan do
     
     it 'shoud allow deletion if the weekly_collection has not been confirmed' do
       @first_gl_pc.delete_object
-      @first_gl_pc.persisted?.should be_false 
+      @first_gl_pc.persisted?.should be_falsey 
     end
     
     it 'should not allow double creation' do
@@ -232,11 +232,11 @@ describe GroupLoan do
       end
       
       it 'should confirm the clearance' do
-        @first_gl_pc.is_confirmed.should be_true 
+        @first_gl_pc.is_confirmed.should be_truthy 
       end
       
       it 'should deactivate the membership' do
-        @premature_clearance_glm.is_active.should be_false
+        @premature_clearance_glm.is_active.should be_falsey
         @premature_clearance_glm.deactivation_case.should == GROUP_LOAN_DEACTIVATION_CASE[:premature_clearance]
         @premature_clearance_glm.deactivation_week_number.should == @second_group_loan_weekly_collection.week_number + 1 
       end

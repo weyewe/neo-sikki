@@ -20,6 +20,7 @@ require 'spec_helper'
 describe GroupLoanWeeklyUncollectible do
   
   before(:each) do
+    # Account.create_base_objects
     (1..8).each do |number|
       Member.create_object({
         :name =>  "Member #{number}",
@@ -102,7 +103,7 @@ describe GroupLoanWeeklyUncollectible do
       }
     )
 
-    @first_group_loan_weekly_collection.is_collected.should be_true
+    @first_group_loan_weekly_collection.is_collected.should be_truthy
     @first_group_loan_weekly_collection.confirm(:confirmed_at => DateTime.now)
     @first_group_loan_weekly_collection.reload
     @second_group_loan_weekly_collection.reload 
@@ -119,8 +120,8 @@ describe GroupLoanWeeklyUncollectible do
   
   
   it 'should confirm the first group_loan_weekly_collection' do
-    @first_group_loan_weekly_collection.is_collected.should be_true 
-    @first_group_loan_weekly_collection.is_confirmed.should be_true 
+    @first_group_loan_weekly_collection.is_collected.should be_truthy 
+    @first_group_loan_weekly_collection.is_confirmed.should be_truthy 
   end
   
   it 'should create uncollectible_weekly_payment for first due weekly_collection' do
@@ -265,12 +266,14 @@ describe GroupLoanWeeklyUncollectible do
     
     it 'should be deletable' do
       @first_gl_wu.delete_object
-      @first_gl_wu.persisted?.should be_false 
+      @first_gl_wu.persisted?.should be_falsey 
     end
      
     
     context "confirming the weekly_collection with group_loan_weekly_uncollectible" do
       before(:each) do
+        
+        # @initial_personal_bad_debt_allowance = @uncollectible_glm.personal_bad_debt_allowance
         @second_group_loan_weekly_collection.collect({
           :collected_at => DateTime.now 
         })
@@ -283,11 +286,30 @@ describe GroupLoanWeeklyUncollectible do
         @group_loan.reload 
       end
       
-      it 'should update the bad_debt_allowance amount by the uncollectible\'s principal' do
+      it 'should NOT update the bad_debt_allowance amount by the uncollectible\'s principal' do
+        # reason: uncollectible is personal's bad debt allowance
         @final_bad_debt_allowance = @group_loan.bad_debt_allowance
         diff = @final_bad_debt_allowance  - @initial_bad_debt_allowance
-        diff.should == @uncollectible_glm.group_loan_product.principal 
+        diff.should == BigDecimal("0")  #@uncollectible_glm.group_loan_product.principal 
       end
+      
+      # it "should increase personal bad debt allowance" do
+      #   @uncollectible_glm.reload 
+      #   @final_personal_bad_debt_allowance = @uncollectible_glm.personal_bad_debt_allowance
+      #   @initial_personal_bad_debt_allowance
+      #   
+      #   diff = @final_personal_bad_debt_allowance - @initial_personal_bad_debt_allowance
+      #   diff.should == @uncollectible_glm.group_loan_product.principal 
+      # end
+      # 
+      # it "should increase personal potential loss interest revenue" do
+      #   @uncollectible_glm.reload 
+      #   @final_potential_loss_interest_revenue = @uncollectible_glm.potential_loss_interest_revenue
+      #   @initial_potential_loss_interest_revenue
+      #   
+      #   diff = @final_potential_loss_interest_revenue - @initial_potential_loss_interest_revenue
+      #   diff.should == @uncollectible_glm.group_loan_product.interest 
+      # end
       
       it 'should allow uncollectible amount' do
         final_uncollectible_weekly_payment_amount = @second_group_loan_weekly_collection.extract_uncollectible_weekly_payment_amount
@@ -297,7 +319,7 @@ describe GroupLoanWeeklyUncollectible do
       it 'should NOT be deletable' do
         @first_gl_wu.delete_object
         @first_gl_wu.errors.size.should_not == 0 
-        @first_gl_wu.persisted?.should be_true  
+        @first_gl_wu.persisted?.should be_truthy  
       end
 
       it 'should not allow creation of uncollectible' do
@@ -317,7 +339,7 @@ describe GroupLoanWeeklyUncollectible do
         
         
       it 'should confirm the second_group_loan_weekly_collection' do
-        @second_group_loan_weekly_collection.is_confirmed.should be_true 
+        @second_group_loan_weekly_collection.is_confirmed.should be_truthy 
       end
       
        
@@ -338,7 +360,7 @@ describe GroupLoanWeeklyUncollectible do
         it 'should not allow group loan closing if there are uncleared uncollectibles' do
           @group_loan.close(:closed_at => @closed_at)
           @group_loan.errors.size.should_not == 0 
-          @group_loan.is_closed.should be_false 
+          @group_loan.is_closed.should be_falsey 
         end
         
         
@@ -348,13 +370,14 @@ describe GroupLoanWeeklyUncollectible do
           end
           
           it 'should be collected' do
-            @first_gl_wu.is_collected.should be_true 
+            @first_gl_wu.is_collected.should be_truthy 
           end
           
           context "clear uncollectibles"  do
             before(:each) do
               @group_loan.reload
               @initial_group_loan_bad_debt_allowance = @group_loan.bad_debt_allowance
+              
               @first_gl_wu.clear(:cleared_at => @cleared_at)
 
               @first_gl_wu .reload
@@ -367,26 +390,27 @@ describe GroupLoanWeeklyUncollectible do
             end
 
 
-            it 'should update the group loan default amount' do
+            it 'should NOT update the group loan default amount' do
+              # because it has nothing to do with group. it is personal member's allowance
               @group_loan.reload
               final_group_loan_bad_debt_allowance = @group_loan.bad_debt_allowance
               diff = final_group_loan_bad_debt_allowance - @initial_group_loan_bad_debt_allowance
               
-              diff.should == -1*@uncollectible_glm.group_loan_product.principal 
+              diff.should == BigDecimal("0") # -1*@uncollectible_glm.group_loan_product.principal 
             end
 
 
 
             it 'should clear the gl_wu' do
               @first_gl_wu.errors.messages.each {|x| puts "msg: #{x}"}
-              @first_gl_wu .is_cleared.should be_true  
+              @first_gl_wu .is_cleared.should be_truthy  
             end
 
             it 'should allow group loan closing if the uncollectibles are cleared' do
               @group_loan.reload
               @group_loan.close(:closed_at => @closed_at )
 
-              @group_loan.is_closed.should be_true 
+              @group_loan.is_closed.should be_truthy 
               @group_loan.errors.size.should == 0 
             end
           end

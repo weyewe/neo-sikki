@@ -28,6 +28,7 @@ require 'spec_helper'
 describe GroupLoan do
   
   before(:each) do
+    # Account.create_base_objects
     (1..8).each do |number|
       Member.create_object({
         :name =>  "Member #{number}",
@@ -108,7 +109,7 @@ describe GroupLoan do
       }
     )
 
-    @first_group_loan_weekly_collection.is_collected.should be_true
+    @first_group_loan_weekly_collection.is_collected.should be_truthy
     @first_group_loan_weekly_collection.confirm(:confirmed_at => DateTime.now )
     @first_group_loan_weekly_collection.reload
     @closed_at = DateTime.new(2013,12,5,0,0,0)
@@ -116,8 +117,8 @@ describe GroupLoan do
   
   
   it 'should confirm the first group_loan_weekly_collection' do
-    @first_group_loan_weekly_collection.is_collected.should be_true 
-    @first_group_loan_weekly_collection.is_confirmed.should be_true 
+    @first_group_loan_weekly_collection.is_collected.should be_truthy 
+    @first_group_loan_weekly_collection.is_confirmed.should be_truthy 
   end
   
   context "a member  run away ( week 2 ) "  do
@@ -206,7 +207,7 @@ describe GroupLoan do
         
         it 'should not close group loan' do
           @group_loan.errors.size.should_not ==0 
-          @group_loan.is_closed.should be_false 
+          @group_loan.is_closed.should be_falsey 
         end
          
       
@@ -241,7 +242,7 @@ describe GroupLoan do
         end
         
         it 'should close the group loan' do
-          @group_loan.is_closed.should be_true 
+          @group_loan.is_closed.should be_truthy 
         end
         
         it 'should return compulsory savings per normal' do
@@ -267,13 +268,13 @@ describe GroupLoan do
           # puts "normal_compulsory-savings = #{normal_total_compulsory_savings} "
           # puts "compulsory_savings-return amount: #{@group_loan.compulsory_savings_return_amount}"
                   
-          (normal_total_compulsory_savings - @group_loan.compulsory_savings_return_amount).should == diff
+          (normal_total_compulsory_savings - @group_loan.total_compulsory_savings_pre_closure).should == diff
         end
         
         it 'should confirm all group loan weekly collections' do
           @group_loan.group_loan_weekly_collections.order("id ASC").each do |x|
-            x.is_collected.should be_true 
-            x.is_confirmed.should be_true 
+            x.is_collected.should be_truthy 
+            x.is_confirmed.should be_truthy 
           end
         end
         

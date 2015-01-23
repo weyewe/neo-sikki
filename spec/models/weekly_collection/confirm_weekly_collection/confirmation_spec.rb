@@ -9,7 +9,7 @@ require 'spec_helper'
 describe GroupLoanWeeklyCollection do
   
   before(:each) do
-    
+    # Account.create_base_objects
     (1..8).each do |number|
       Member.create_object({
         :name =>  "Member #{number}",
@@ -87,7 +87,7 @@ describe GroupLoanWeeklyCollection do
   end
   
   it 'should have disbursed the group loan' do
-    @group_loan.is_loan_disbursed.should be_true 
+    @group_loan.is_loan_disbursed.should be_truthy 
   end
   
   context "setup the group loan to perform 2 weekly collections successfully per normal" do
@@ -129,7 +129,7 @@ describe GroupLoanWeeklyCollection do
     end
     
     it 'should have confirmed the glwc' do
-      @first_glwc.is_confirmed.should be_true 
+      @first_glwc.is_confirmed.should be_truthy 
     end
     
     
@@ -156,8 +156,8 @@ describe GroupLoanWeeklyCollection do
           :amount                            =>  voluntary_savings_amount, 
           :group_loan_membership_id          => glm.id , 
           :group_loan_weekly_collection_id   => @first_glwc.id 
-          
         )
+        
         
         @initial_savings_account_array  << glm.member.total_savings_account
         count += 1
@@ -167,6 +167,18 @@ describe GroupLoanWeeklyCollection do
       @first_glwc.reload
       @first_glwc.confirm(:confirmed_at => @confirmed_at )
       @first_glwc.reload
+      @first_gl_wcvse = GroupLoanWeeklyCollectionVoluntarySavingsEntry.where(
+        :group_loan_weekly_collection_id   => @first_glwc.id 
+      ).first
+      
+    end
+    
+    it "should create one savings entry: 1 transaction data" do
+      TransactionData.where(
+        :transaction_source_id => @first_gl_wcvse.id , 
+        :transaction_source_type => @first_gl_wcvse.class.to_s ,
+        :code => TRANSACTION_DATA_CODE[:group_loan_weekly_collection_voluntary_savings],
+      ).count.should == 1 
     end
     
     it 'should increase the voluntary savings amount' do
@@ -225,22 +237,23 @@ describe GroupLoanWeeklyCollection do
         end
         
         it 'should confirm premature clearance' do
-          @second_glwc.is_confirmed.should be_true
+          @second_glwc.is_confirmed.should be_truthy
           
           @second_gl_pc.errors.messages.each {|x| puts "premature learance error: #{x}"}
-          @second_gl_pc.is_confirmed.should be_true 
+          @second_gl_pc.is_confirmed.should be_truthy 
         end
         
         
         
         it 'should deactivate the glm' do
-          @premature_clearance_glm.is_active.should be_false 
+          @premature_clearance_glm.is_active.should be_falsey 
           @premature_clearance_glm.deactivation_case.should ==  GROUP_LOAN_DEACTIVATION_CASE[:premature_clearance]
         end
         
         
         
-        it 'should create compulsory savings withdrawal for the premature clearance' do
+        it 'should NOT create compulsory savings withdrawal for the premature clearance' do
+          # since it will be returned at the end of the loan 
           @savings_entry_array = SavingsEntry.where( 
                   :savings_source_id => @second_gl_pc.id,
                               :savings_source_type => @second_gl_pc.class.to_s, 
@@ -251,8 +264,7 @@ describe GroupLoanWeeklyCollection do
                               :member_id => @premature_clearance_glm.member.id,
                               :is_confirmed => true ) 
                               
-          @savings_entry_array.count.should == 1 
-          @savings_entry_array.first.amount. should == @premature_clearance_glm.group_loan_product.compulsory_savings * 2 
+          @savings_entry_array.count.should == 0 
         end
               
               

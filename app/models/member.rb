@@ -172,10 +172,7 @@ class Member < ActiveRecord::Base
         if group_loan.is_loan_disbursed? 
           glm.deactivation_week_number = group_loan.first_uncollected_weekly_collection.week_number
           glm.save  
-          # puts "THe deactivation week number: #{glm.deactivation_week_number}"
-          # bad_debt_allowance =   
-          
-          # group_loan.update_default_payment_amount_receivable
+       
           
           description = "Deceased Clearance for group loan: #{glm.group_loan.name}" + 
               " for member: #{glm.member.name}, #{glm.member.id_number}"
@@ -188,10 +185,7 @@ class Member < ActiveRecord::Base
             :additional_savings_account => glm.total_compulsory_savings 
           )
           
-          if glm.total_compulsory_savings > BigDecimal('0')
-            SavingsEntry.create_group_loan_compulsory_savings_withdrawal( new_object , glm.total_compulsory_savings )  
-            SavingsEntry.create_savings_account_group_loan_deceased_addition( new_object , new_object.additional_savings_account)  
-          end
+     
                                   
         else
           glm.destroy
@@ -201,6 +195,10 @@ class Member < ActiveRecord::Base
     end
   end
   
+  
+=begin
+  NEVER EVER DO the undo for deceased and run_away
+=end
   def undo_mark_as_deceased 
     # deceased_week_number? 
     self.group_loan_memberships.where(
@@ -228,40 +226,7 @@ class Member < ActiveRecord::Base
         :member_id => glm.member_id
       ).first 
       
-      if not deceased_clearance.nil?
-        # SavingsEntry.create_group_loan_compulsory_savings_withdrawal( new_object , glm.total_compulsory_savings )  
-        total_amount = BigDecimal("0")
-        SavingsEntry.where(
-          :savings_source_id => deceased_clearance.id,
-          :savings_source_type => deceased_clearance.class.to_s, 
-          :savings_status => SAVINGS_STATUS[:group_loan_compulsory_savings],
-          :direction => FUND_TRANSFER_DIRECTION[:outgoing],
-          :financial_product_id => glm.group_loan_id ,
-          :financial_product_type => glm.group_loan.class.to_s,
-          :member_id => self.id, 
-        ).each do |x|
-          total_amount += x.amount 
-          x.destroy 
-        end
-        
-        glm.update_total_compulsory_savings( total_amount )
-        
-        # SavingsEntry.create_savings_account_group_loan_deceased_addition( new_object , new_object.additional_savings_account)
-        total_amount = BigDecimal("0")
-        SavingsEntry.where(
-          :savings_source_id => deceased_clearance.id,
-          :savings_source_type => deceased_clearance.class.to_s, 
-          :savings_status => SAVINGS_STATUS[:savings_account],
-          :direction => FUND_TRANSFER_DIRECTION[:incoming],
-          :financial_product_id =>  deceased_clearance.group_loan.id  ,
-          :financial_product_type => deceased_clearance.group_loan.class.to_s ,
-          :member_id => self.id
-        ).each do |x|
-          total_amount += x.amount 
-          x.destroy 
-        end
-        self.update_total_savings_account( -1*total_amount)
-      end 
+   
       
       
       
@@ -329,7 +294,7 @@ class Member < ActiveRecord::Base
     ).each do |run_away_glm|
       
       
-      GroupLoanRunAwayReceivable.create(
+      GroupLoanRunAwayReceivable.where(
         :member_id => self.id,  
         :group_loan_id => run_away_glm.group_loan_id,
         :group_loan_membership_id => run_away_glm.id
