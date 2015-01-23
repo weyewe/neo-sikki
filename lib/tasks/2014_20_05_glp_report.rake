@@ -8,3 +8,13 @@ task :problematic_member_2014_20_05 => :environment do
   File.open("member_interest_problem.csv", "w") {|f| f.write(rows.inject([]) { |csv, row|  csv << CSV.generate_line(row) }.join(""))}
    
 end
+
+# SavingsEntry.where(
+#   :savings_status => [
+#     SAVINGS_STATUS[:savings_account],
+#     SAVINGS_STATUS[:membership],
+#     SAVINGS_STATUS[:locked]
+#   ],
+#   :is_confirmed => true 
+# ).count
+# 

@@ -2,6 +2,10 @@ module AccountingService
   class IndependentSavings
     def IndependentSavings.post_savings_account( savings_entry , multiplier, absolut_amount ) 
         member = savings_entry.member
+        member_name = ""
+        
+        return if member.nil? 
+        
         message = "" 
         main_cash_entry_case = 0 
         savings_account_entry_case = 0 

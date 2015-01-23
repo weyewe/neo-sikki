@@ -19,15 +19,7 @@ class AttachEmail
     
 
   def generate_csv
-    DeceasedClearance.all.each do |x|
-      
-      
-      AccountingService::Deceased.create_bad_debt_allocation(
-          x.group_loan_membership.group_loan, 
-          member, 
-          x.group_loan_membership, 
-          x)
-    end
+    
    
 
   end
@@ -37,8 +29,20 @@ end
 
 task :generate_deceased_gl => :environment do
   
-
-  generate = AttachEmail.new
-  generate.generate_csv
+  deceased_list =  DeceasedClearance.all
+  total = deceased_list.length
   
+  counter = 1 
+  
+  deceased_list.each do |x|
+    puts "deceased #{counter}/#{total}"
+    
+    AccountingService::Deceased.create_bad_debt_allocation(
+        x.group_loan_membership.group_loan, 
+        x.member, 
+        x.group_loan_membership, 
+        x)
+    
+    counter += 1 
+  end
 end

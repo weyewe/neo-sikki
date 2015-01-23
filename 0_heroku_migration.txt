@@ -1,0 +1,4 @@
+heroku run rake db:migrate
+heroku run rake create_base_account
+heroku run rake generate_non_product_savings_gl
+heroku run rake generate_loan_disbursement_gl
