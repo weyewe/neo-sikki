@@ -198,6 +198,27 @@ ACCOUNT_CODE = {
         :status => 1, # group 
         :parent_code =>  nil 
       },
+      :equity_1 =>      {
+                  :code =>  "3-100",
+                  :name => "Ekuitas",
+                  :normal_balance => 2,
+                  :status => 1,  
+                  :parent_code =>  "3-000" 
+                } ,
+         :equity_2 =>        {
+                      :code =>    "3-110",
+                      :name => "Ekuitas",
+                      :normal_balance => 2,
+                      :status => 1,
+                      :parent_code =>  "3-100" 
+                    } ,
+            :net_earning_leaf =>        {
+                          :code =>    "3-111",
+                          :name => "Net Earning",
+                          :normal_balance => 2,
+                          :status => 1,
+                          :parent_code =>  "3-110" 
+                        } ,
   
   
   :operating_revenue =>     {

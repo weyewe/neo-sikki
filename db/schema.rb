@@ -33,6 +33,18 @@ ActiveRecord::Schema.define(version: 20150122110407) do
   end
 
   create_table "closings", force: true do |t|
+    t.boolean  "is_first_closing",                                   default: false
+    t.datetime "start_period"
+    t.datetime "end_period"
+    t.string   "description"
+    t.decimal  "expense_adjustment_amount", precision: 14, scale: 2, default: 0.0
+    t.integer  "expense_adjustment_case"
+    t.decimal  "revenue_adjustment_amount", precision: 14, scale: 2, default: 0.0
+    t.integer  "revenue_adjustment_case"
+    t.decimal  "net_earnings_amount",       precision: 14, scale: 2, default: 0.0
+    t.integer  "net_earnings_case"
+    t.boolean  "is_confirmed",                                       default: false
+    t.datetime "confirmed_at"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -227,7 +239,7 @@ ActiveRecord::Schema.define(version: 20150122110407) do
   create_table "memorials", force: true do |t|
     t.datetime "transaction_datetime"
     t.text     "description"
-    t.boolean  "is_confirmed"
+    t.boolean  "is_confirmed",         default: false
     t.datetime "confirmed_at"
     t.string   "code"
     t.boolean  "is_deleted"
@@ -337,6 +349,10 @@ ActiveRecord::Schema.define(version: 20150122110407) do
   end
 
   create_table "valid_combs", force: true do |t|
+    t.integer  "closing_id"
+    t.integer  "account_id"
+    t.decimal  "amount",     precision: 14, scale: 2, default: 0.0
+    t.integer  "entry_case"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
