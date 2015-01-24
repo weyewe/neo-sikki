@@ -49,12 +49,12 @@ describe Closing do
     
     @glp_array  = [@group_loan_product_1, @group_loan_product_2]
     
-    @started_at = DateTime.new(2013,10,5,0,0,0)
-    @disbursed_at = DateTime.new(2013,10,10,0,0,0)
-    @closed_at = DateTime.new(2013,12,5,0,0,0)
-    @withdrawn_at = DateTime.new(2013,12,6,0,0,0)
+    @started_at = DateTime.now 
+    @disbursed_at = DateTime.now  + 1.day 
+    @closed_at = DateTime.now  + 20.days 
+    @withdrawn_at = DateTime.now + 21.days
     
-    @accounting_closing_datetime = DateTime.new(2014,12,6,0,0,0)
+    @accounting_closing_datetime = DateTime.now + 24.days
     
     @group_loan = GroupLoan.create_object({
       :name                             => "Group Loan 1" ,
@@ -81,7 +81,7 @@ describe Closing do
     @first_group_loan_weekly_collection.should be_valid 
     @first_group_loan_weekly_collection.collect(
       {
-        :collected_at => DateTime.now 
+        :collected_at => @disbursed_at + 1.day
       }
     )
 
@@ -89,12 +89,12 @@ describe Closing do
     
     @first_glm = @group_loan.active_group_loan_memberships.first 
     @initial_compulsory_savings = @first_glm.total_compulsory_savings
-    @first_group_loan_weekly_collection.confirm(:confirmed_at => DateTime.now)
+    @first_group_loan_weekly_collection.confirm(:confirmed_at => @disbursed_at + 2.days)
     @first_glm.reload 
     
     @group_loan.group_loan_weekly_collections.order("id ASC").each do |x|
-      x.collect(:collected_at => DateTime.now)
-      x.confirm(:confirmed_at => DateTime.now)
+      x.collect(:collected_at => @disbursed_at + 1.day)
+      x.confirm(:confirmed_at => @disbursed_at + 2.days)
     end
     
     @group_loan.reload 
@@ -121,33 +121,58 @@ describe Closing do
     @group_loan.is_compulsory_savings_withdrawn.should be_truthy
   end
   
+  it "should create GL for main_cash account" do
+    main_cash_account = Account.find_by_code(ACCOUNT_CODE[:main_cash_leaf][:code])
+    
+    
+    TransactionDataDetail.where{ 
+      ( account_id.eq main_cash_account.id ) 
+    }.count.should_not ==  0 
+    
+    
+    total_debit = TransactionDataDetail.where{
+      ( account_id.eq main_cash_account.id ) & 
+      ( entry_case.eq NORMAL_BALANCE[:debit])
+    }.sum("amount")
+    
+    total_credit = TransactionDataDetail.where{
+      ( account_id.eq main_cash_account.id ) & 
+      ( entry_case.eq NORMAL_BALANCE[:credit])
+    }.sum("amount")
+    
+    puts "Total debit: #{total_debit}"
+    puts "Total debit: #{total_credit}"
+    
+    
+  end
+
   context "create closing" do
     before(:each) do
       @accounting_closing_datetime
-      
+    
       @closing = Closing.create_object(
         :end_period => @accounting_closing_datetime,
         :description => "This is the description" 
       )
-      
-    end
     
+    end
+  
     it "should create closing" do
       @closing.errors.size.should == 0 
       @closing.should be_valid
     end
-    
+  
     it "should mark closing as first closing " do
       @closing.is_first_closing.should be_truthy 
     end
-    
+  
     context "confirming the closing" do
       before(:each) do 
         puts "Start_datetime: #{DateTime.now}"
         @closing.confirm(:confirmed_at => DateTime.now )
         puts "End_Datetime: #{DateTime.now }"
       end
-      
+    
       it "should produce valid comb gl" do
         
         
@@ -155,12 +180,73 @@ describe Closing do
         
         valid_comb_account_id_list = ValidComb.where(:closing_id => @closing.id).order("account_id ASC").map {|x| x.account_id }
         
-        puts account_id_list
-        puts "===>"
-        puts valid_comb_account_id_list
-        
         Account.count.should == ValidComb.where(:closing_id => @closing.id).count 
       end
+    
+      it "should produce correct valid comb for compulsory_savings" do
+        account = Account.find_by_code(ACCOUNT_CODE[:compulsory_savings_leaf][:code])
+        valid_comb = ValidComb.where(
+          :closing_id => @closing.id, 
+          :account_id => account.id  
+        ).first 
+        
+        valid_comb.amount.should == BigDecimal("0")
+        
+        while not account.parent.nil?
+          account = account.parent 
+          
+          valid_comb = ValidComb.where(
+            :closing_id => @closing.id, 
+            :account_id => account.id  
+          ).first 
+      
+          valid_comb.amount.should == BigDecimal("0")
+        end
+        
+        
+      end
+    
+      it "should produce correct valid_comb for cash" do
+        account = Account.find_by_code(ACCOUNT_CODE[:main_cash_leaf][:code])
+        valid_comb = ValidComb.where(
+          :closing_id => @closing.id, 
+          :account_id => account.id  
+        ).first 
+        
+        
+        
+        
+        expected_revenue_amount = @group_loan.admin_fee_revenue + @group_loan.expected_total_interest_revenue
+        puts "The main_cash_leaf valid comb amount: #{valid_comb.amount}"
+        puts "The expected_amount : #{expected_revenue_amount}"
+        
+        valid_comb.amount.should == expected_revenue_amount
+        
+        while not account.parent.nil?
+          account = account.parent 
+          
+          valid_comb = ValidComb.where(
+            :closing_id => @closing.id, 
+            :account_id => account.id  
+          ).first 
+      
+          valid_comb.amount.should == expected_revenue_amount 
+        end
+      end
+    
+      it "should produce final valid comb" do
+        
+        puts "\n\n\n the end \n\n"
+        ValidComb.joins(:account).order("account_id ASC").each do |x|
+          puts "Account Code: #{x.account.name}- #{x.account.code} : #{x.amount}"
+        end
+      end
+    
+    
     end
+  
+  
   end
+
+
 end

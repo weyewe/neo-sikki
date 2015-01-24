@@ -3,6 +3,7 @@ class Closing < ActiveRecord::Base
   validates_presence_of :end_period
   
   validate :end_period_must_be_later_than_any_start_period
+  has_many :valid_combs
   
   def end_period_must_be_later_than_any_start_period
     return if not end_period.present? 
@@ -132,19 +133,38 @@ class Closing < ActiveRecord::Base
     
     leaves_account.each do |leaf_account|
       valid_comb_amount = BigDecimal("0")
-      total_debit = TransactionDataDetail.joins(:transaction_data).where{
-        ( transaction_data.transaction_datetime.gte start_transaction) & 
-        ( transaction_data.transaction_datetime.lt end_transaction) & 
-        ( account_id.eq leaf_account.id ) & 
-        ( entry_case.eq NORMAL_BALANCE[:debit])
-      }.sum("amount")
       
-      total_credit = TransactionDataDetail.joins(:transaction_data).where{
-        ( transaction_data.transaction_datetime.gte start_transaction) & 
-        ( transaction_data.transaction_datetime.lt end_transaction) & 
-        ( account_id.eq leaf_account.id ) & 
-        ( entry_case.eq NORMAL_BALANCE[:credit])
-      }.sum("amount")
+      total_debit = BigDecimal("0")
+      total_credit = BigDecimal("0")
+      
+      if not start_transaction.nil?
+        total_debit = TransactionDataDetail.joins(:transaction_data).where{
+          ( transaction_data.transaction_datetime.gte start_transaction) & 
+          ( transaction_data.transaction_datetime.lt end_transaction) & 
+          ( account_id.eq leaf_account.id ) & 
+          ( entry_case.eq NORMAL_BALANCE[:debit])
+        }.sum("amount")
+
+        total_credit = TransactionDataDetail.joins(:transaction_data).where{
+          ( transaction_data.transaction_datetime.gte start_transaction) & 
+          ( transaction_data.transaction_datetime.lt end_transaction) & 
+          ( account_id.eq leaf_account.id ) & 
+          ( entry_case.eq NORMAL_BALANCE[:credit])
+        }.sum("amount")
+      else
+        total_debit = TransactionDataDetail.joins(:transaction_data).where{
+          ( transaction_data.transaction_datetime.lt end_transaction) & 
+          ( account_id.eq leaf_account.id ) & 
+          ( entry_case.eq NORMAL_BALANCE[:debit])
+        }.sum("amount")
+
+        total_credit = TransactionDataDetail.joins(:transaction_data).where{
+          ( transaction_data.transaction_datetime.lt end_transaction) & 
+          ( account_id.eq leaf_account.id ) & 
+          ( entry_case.eq NORMAL_BALANCE[:credit])
+        }.sum("amount")
+      end
+      
       
       if leaf_account.normal_balance == NORMAL_BALANCE[:debit]
         valid_comb_amount = total_debit - total_credit
@@ -161,6 +181,10 @@ class Closing < ActiveRecord::Base
         entry_case = NORMAL_BALANCE[:debit] if leaf_account.normal_balance == NORMAL_BALANCE[:credit] 
         entry_case = NORMAL_BALANCE[:credit] if leaf_account.normal_balance == NORMAL_BALANCE[:debit] 
       end
+      
+      
+      puts " #{leaf_account.name} (#{leaf_account.code}) :: #{valid_comb_amount}   ===  #{final_valid_comb_amount.abs}"
+      
       
       
       valid_comb = ValidComb.create_object(

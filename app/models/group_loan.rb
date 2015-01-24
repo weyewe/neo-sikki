@@ -888,6 +888,17 @@ Phase: loan disbursement finalization
     
     return amount
   end
+  
+  def expected_total_interest_revenue
+    amount = BigDecimal("0")
+    self.group_loan_memberships.joins(:group_loan_product).each do |glm|
+      # amount += glm.group_loan_product.weekly_payment_amount * glm.group_loan_product.total_weeks
+      amount += glm.group_loan_product.interest * glm.group_loan_product.total_weeks
+    end
+    
+    return amount
+    
+  end
 
 =begin
   Disburse Group Loan

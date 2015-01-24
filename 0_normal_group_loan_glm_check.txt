@@ -1,0 +1,23 @@
+1. Disbursement 
+	admin_fee_revenue
+	account_receivable
+	
+	cash 
+
+2. GroupLoanWeeklyCollection 
+	compulsory_savings, interest revenue, account_receivable 
+	
+	main_cash
+
+3. Group Loan Close 
+	compulsory_savings => temporary
+
+4. Group Loan Withdraw
+	temporary => debit
+	cash credit  
+	
+	
+Total compulsory savings = 0 
+TOtAL cash= admin_fee_revenue + interest_revenue 
+Total interest revenue = interest_revenue
+Total_admin_fee = admin_fee

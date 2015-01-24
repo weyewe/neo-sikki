@@ -1,6 +1,8 @@
 class Account < ActiveRecord::Base
   acts_as_nested_set
   
+  has_many :valid_combs
+  
   has_many :transaction_activity_datas
   
   # validates_uniqueness_of :name  
