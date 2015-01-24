@@ -2,3 +2,14 @@ heroku run rake db:migrate
 heroku run rake create_base_account
 heroku run rake generate_non_product_savings_gl
 heroku run rake generate_loan_disbursement_gl
+heroku run rake generate_weekly_collection_gl
+heroku run rake generate_loan_close_gl
+heroku run rake generate_deceased_gl
+
+
+bundle exec rake generate_non_product_savings_gl # pending 
+bundle exec rake generate_loan_disbursement_gl  OK 
+bundle exec rake generate_weekly_collection_gl  # pending 
+bundle exec rake generate_loan_close_gl  OK 
+bundle exec rake generate_deceased_gl   OK 
+
