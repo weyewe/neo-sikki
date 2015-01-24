@@ -82,7 +82,9 @@ class Closing < ActiveRecord::Base
   
   def previous_closing 
     previous_closing = nil 
+    current_end_period = self.end_period
     if self.persisted?
+      current_id = self.id 
       previous_closing = Closing.where{
         (id.not_eq current_id) & (
           (end_period.lt current_end_period)
@@ -91,7 +93,6 @@ class Closing < ActiveRecord::Base
       }.order("id DESC").first
     else
       previous_closing = Closing.where{
-        (id.not_eq current_id) & 
         (end_period.lt current_end_period)
       }.order("id DESC").first
     end
@@ -187,6 +188,10 @@ class Closing < ActiveRecord::Base
     node_account_list = Account.where(:id => node_id_list)
     
     node_account_list.each do | node | 
+      
+      next if ValidComb.where(:closing_id => self.id, :account_id => node.id).count == 1 
+        
+      
       children = node.children
       
       total_debit = ValidComb.where(
@@ -216,13 +221,13 @@ class Closing < ActiveRecord::Base
       entry_case = node.normal_balance  
       
       if final_valid_comb_amount < BigDecimal("0")
-        entry_case = NORMAL_BALANCE[:debit] if leaf_account.normal_balance == NORMAL_BALANCE[:credit] 
-        entry_case = NORMAL_BALANCE[:credit] if leaf_account.normal_balance == NORMAL_BALANCE[:debit] 
+        entry_case = NORMAL_BALANCE[:debit] if node.normal_balance == NORMAL_BALANCE[:credit] 
+        entry_case = NORMAL_BALANCE[:credit] if node.normal_balance == NORMAL_BALANCE[:debit] 
       end
       
       
       valid_comb = ValidComb.create_object(
-        :account_id => leaf_account.id,
+        :account_id => node.id,
         :closing_id => self.id,
         :amount => final_valid_comb_amount.abs,
         :entry_case => entry_case
@@ -330,7 +335,7 @@ class Closing < ActiveRecord::Base
     if self.save 
       # self.generate_closing_entries # revenue = 0, expense = 0
       self.generate_valid_combs
-      self.extract_closing_entries
+      # self.extract_closing_entries
     end 
     
     

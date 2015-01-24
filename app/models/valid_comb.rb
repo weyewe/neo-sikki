@@ -9,4 +9,14 @@ class ValidComb < ActiveRecord::Base
     
     return previous_valid_comb.amount 
   end
+  
+  def self.create_object(params)
+    new_object = self.new 
+    new_object.account_id =  params[:account_id  ]
+    new_object.closing_id =  params[:closing_id  ]
+    new_object.amount     =  params[:amount      ]
+    new_object.entry_case =  params[:entry_case  ]
+    new_object.save 
+    return new_object 
+  end
 end
