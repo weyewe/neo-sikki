@@ -2,49 +2,52 @@ Ext.define('AM.view.operation.memorial.List' ,{
   	extend: 'Ext.grid.Panel',
   	alias : 'widget.memoriallist',
 
-  	store: 'Memorials', 
-		allowCRUD: true, 
+  	store: 'Memorials',  
  
 
 	initComponent: function() {
 		this.columns = [
 			// { header: 'ID', dataIndex: 'id'},
-			{ header: 'Title',  dataIndex: 'title', flex: 1},
-			{	header: 'Description', dataIndex: 'description', flex: 1 },
-			// {	header: 'Color', dataIndex: 'color', flex: 1 },
-			
-			// {
-			// 	xtype : 'templatecolumn',
-			// 	text : "Color",
-			// 	flex : 1,
-			// 	tpl : '<div class="x-combo-list-item x-cal-{color}' + 
-			// 					'<div class="ext-cal-picker-icon">{color}</div>'+ 
-			// 				'</div>'
-			// },
+			{ header: 'Kode',  dataIndex: 'code', flex: 1},
+			{	header: 'Description', dataIndex: 'description', flex: 2 },
+		 
 			
 			
 			
 			
-
-
-			{	header: 'Sewa Per Jam', dataIndex: 'amount', flex: 1 },
-			{	header: '% Downpayment', dataIndex: 'downpayment_percentage', flex: 1 },
+ 
+			{
+				xtype : 'templatecolumn',
+				text : "Transaksi",
+				flex : 3,
+				tpl : 'Tanggal Transaksi: <b>{transaction_datetime}</b>' + '<br />' + '<br />' +
+							'Status Konfirmasi:  <b>{is_confirmed}</b>'  + '<br />' + '<br />' +
+							'Tanggal Konfirmasi: <b>{confirmed_at}</b>' 
+			},
+			
+			
 		];
 
 		this.addObjectButton = new Ext.Button({
-			text: 'Add Facility',
+			text: 'Add',
 			action: 'addObject'
 		});
 
 		this.editObjectButton = new Ext.Button({
-			text: 'Edit Facility',
+			text: 'Edit',
 			action: 'editObject',
 			disabled: true
 		});
 
 		this.deleteObjectButton = new Ext.Button({
-			text: 'Delete Facility',
+			text: 'Delete',
 			action: 'deleteObject',
+			disabled: true
+		});
+		
+		this.confirmObjectButton = new Ext.Button({
+			text: 'Confirm',
+			action: 'confirmObject',
 			disabled: true
 		});
 		
@@ -56,14 +59,9 @@ Ext.define('AM.view.operation.memorial.List' ,{
 			checkChangeBuffer: 300
 		});
 		
-		
-		if(this.allowCRUD === true ){
-			
-			this.tbar = [this.addObjectButton, this.editObjectButton, this.deleteObjectButton ];
-		}else
-		{
-			this.tbar = [] 
-		}
+		 
+			this.tbar = [this.addObjectButton, this.editObjectButton, this.deleteObjectButton , this.confirmObjectButton ];
+	 
 
 
 		
@@ -86,10 +84,12 @@ Ext.define('AM.view.operation.memorial.List' ,{
 	enableRecordButtons: function() {
 		this.editObjectButton.enable();
 		this.deleteObjectButton.enable();
+		this.confirmObjectButton.enable(); 
 	},
 
 	disableRecordButtons: function() {
 		this.editObjectButton.disable();
 		this.deleteObjectButton.disable();
+		this.confirmObjectButton.disable(); 
 	}
 });

@@ -2,12 +2,14 @@ Ext.define('AM.view.operation.Memorial', {
     extend: 'AM.view.Worksheet',
     alias: 'widget.memorialProcess',
 	 
-		
-		
 		layout : {
 			type : 'hbox',
 			align : 'stretch'
 		},
+		
+		header: false, 
+		headerAsText : false,
+		selectedParentId : null,
 		
 		
 		items : [
@@ -22,7 +24,5 @@ Ext.define('AM.view.operation.Memorial', {
 				flex : 1
 			} 
 		],
-		
-		selectedObject : null, 
-		selectedChild : null 
+ 
 });

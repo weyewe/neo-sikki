@@ -59,6 +59,13 @@ class Memorial < ActiveRecord::Base
   end
   
   def confirm( params )
+    
+    if params[:confirmed_at].nil? or not params[:confirmed_at].is_a?(DateTime)
+      self.errors.add(:confirmed_at, "Harus ada tanggal konfirmasi")
+      return self 
+    end
+    
+    
     if self.is_deleted
       self.errors.add(:generic_errors, "Sudah dihapus")
       return self 

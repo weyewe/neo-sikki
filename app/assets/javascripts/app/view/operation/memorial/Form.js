@@ -1,3 +1,4 @@
+
 Ext.define('AM.view.operation.memorial.Form', {
   extend: 'Ext.window.Window',
   alias : 'widget.memorialform',
@@ -11,6 +12,9 @@ Ext.define('AM.view.operation.memorial.Form', {
 // if autoShow == true.. on instantiation, will automatically be called 
 	
   initComponent: function() {
+	
+	 
+		
     this.items = [{
       xtype: 'form',
 			msgTarget	: 'side',
@@ -26,49 +30,20 @@ Ext.define('AM.view.operation.memorial.Form', {
 	        name : 'id',
 	        fieldLabel: 'id'
 	      },{
-	        xtype: 'textfield',
-	        name : 'title',
-	        fieldLabel: ' Nama Fasilitas'
-				},
-				{
-					xtype: 'textarea',
-					name : 'description',
-					fieldLabel: 'Deskripsi Fasilitas'
-				},
-				{
-					xtype: 'textfield',
-					name : 'amount',
-					fieldLabel: 'Harga Per Jam'
-				},
-				{
-					xtype: 'numberfield',
-					name : 'downpayment_percentage',
-					fieldLabel: 'Besar Downpayment (%)'
-				},
-				
-				{
-					xtype: 'hidden',
-	        name : 'color',
-	        fieldLabel: ' Indicator Warna'
-				},
-				{
-					xtype: 'container',
-					layout : 'vbox',
-					items : [
-						{
-			        xtype: 'container',
-			        html : 'Pilih Indicator Warna',
-						},
-						
-						{
-			        xtype: 'customcolorpicker',
-			        name : 'color_picker',
-			        fieldLabel: ' Indicator Warna'
-						},
-					]
-				}
-				
-				 
+		        xtype: 'displayfield',
+		        name : 'code',
+		        fieldLabel: 'Kode'
+		    },{
+					xtype: 'datefield',
+					name : 'transaction_datetime',
+					fieldLabel: 'Tanggal Transaksi',
+					format: 'Y-m-d',
+				},{
+	        xtype: 'textarea',
+	        name : 'description',
+	        fieldLabel: 'Deskripsi'
+	      },
+			
 			]
     }];
 
@@ -83,14 +58,9 @@ Ext.define('AM.view.operation.memorial.Form', {
 
     this.callParent(arguments);
   },
-
-	setColorPickerData: function( record ) {
-		// console.log("Inside setColorPickerData");
-		// console.log( record ) ;
-		var colorId =  record.get("color")
-		if(!colorId){
-			colorId = 0 ;
-		}
-		this.down('customcolorpicker').select(colorId);
-	}
+ 
 });
+
+
+
+

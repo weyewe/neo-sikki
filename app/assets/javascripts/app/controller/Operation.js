@@ -191,12 +191,12 @@ Ext.define("AM.controller.Operation", {
         
       { 
           text:'Memorial', 
-          viewClass:'AM.view.operation.SavingsEntry', 
+          viewClass:'AM.view.operation.Memorial', 
           leaf:true, 
           iconCls:'text',
  					conditions : [
 						{
-							controller : "savings_entries",
+							controller : "memorials",
 							action  : 'index'
 						}
 					]

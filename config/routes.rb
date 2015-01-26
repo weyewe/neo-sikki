@@ -34,6 +34,7 @@ NeoSikki::Application.routes.draw do
     
     resources :memorials
     resources :memorial_details 
+    put 'confirm_memorial' => 'memorials#confirm' , :as => :confirm_memorial
     
     put 'confirm_savings_entry' => 'savings_entries#confirm' , :as => :confirm_savings_entry
     
