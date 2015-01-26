@@ -3,6 +3,10 @@ class Memorial < ActiveRecord::Base
   
   validates_presence_of :description
   
+  def self.active_objects
+    self.where(:is_deleted => false ) 
+  end
+  
   def self.create_object(params)
     new_object           = self.new
     

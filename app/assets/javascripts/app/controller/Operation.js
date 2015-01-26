@@ -182,6 +182,28 @@ Ext.define("AM.controller.Operation", {
     ]
 	},
 	
+	accountingFolder : {
+		text 			: "Akunting", 
+		viewClass : '',
+		iconCls		: 'text-folder', 
+    expanded	: true,
+		children 	: [
+        
+      { 
+          text:'Memorial', 
+          viewClass:'AM.view.operation.SavingsEntry', 
+          leaf:true, 
+          iconCls:'text',
+ 					conditions : [
+						{
+							controller : "savings_entries",
+							action  : 'index'
+						}
+					]
+      } 
+    ]
+	},
+	
 	onActiveProtectedContent: function( panel, options) {
 		var me  = this; 
 		var currentUser = Ext.decode( localStorage.getItem('currentUser'));
@@ -191,7 +213,8 @@ Ext.define("AM.controller.Operation", {
 			this.setupFolder ,
 			this.deceasedFolder,
 			this.runAwayFolder,
-			this.savingsFolder
+			this.savingsFolder,
+			this.accountingFolder
 		];
 		
 		var processList = panel.down('operationProcessList');

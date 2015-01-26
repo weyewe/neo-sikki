@@ -154,6 +154,13 @@ describe Closing do
         :end_period => @accounting_closing_datetime,
         :description => "This is the description" 
       )
+      
+      
+      # closing = Closing.create_object(
+      #   :end_period => DateTime.now,
+      #   :description => "This is the description" 
+      # )
+      
     
     end
   
@@ -237,8 +244,11 @@ describe Closing do
       it "should produce final valid comb" do
         
         puts "\n\n\n the end \n\n"
+        text = []
         ValidComb.joins(:account).order("account_id ASC").each do |x|
-          puts "Account Code: #{x.account.name}- #{x.account.code} : #{x.amount}"
+          msg =  "#{x.account.name} (#{x.account.code}) : #{x.amount}"
+          text << msg 
+          puts msg 
         end
       end
     
