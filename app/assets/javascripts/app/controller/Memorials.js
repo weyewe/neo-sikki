@@ -24,7 +24,11 @@ Ext.define('AM.controller.Memorials', {
 		{
 			ref : 'form',
 			selector : 'memorialform'
-		}
+		},
+		{
+			ref: 'viewport',
+			selector: 'vp'
+		},
 	],
 
   init: function() {
@@ -54,8 +58,16 @@ Ext.define('AM.controller.Memorials', {
 			'memorialProcess memoriallist button[action=confirmObject]': {
         click: this.confirmObject
       },
+
+			'memorialProcess memoriallist button[action=unconfirmObject]': {
+        click: this.unconfirmObject
+      },
 			'confirmmemorialform button[action=confirm]' : {
 				click : this.executeConfirm
+			},
+			
+			'unconfirmmemorialform button[action=confirm]' : {
+				click : this.executeUnconfirm
 			},
 
 			'memorialProcess memoriallist textfield[name=searchField]': {
@@ -161,6 +173,7 @@ Ext.define('AM.controller.Memorials', {
 			 
 		}else{
 			//  no record at all  => gonna create the new one 
+			console.log("This is the new record")
 			var me  = this; 
 			var newObject = new AM.model.Memorial( values ) ; 
 			
@@ -171,10 +184,14 @@ Ext.define('AM.controller.Memorials', {
 			newObject.save({
 				success: function(record){
 					//  since the grid is backed by store, if store changes, it will be updated
+					// console.log("create new record");
+					// console.log( record )
+					
 					store.load();
 					form.setLoading(false);
 					win.close();
-					
+					// console.log("The record details");
+					// console.log(record);
 					me.updateChildGrid(record );
 					
 				},
@@ -189,62 +206,108 @@ Ext.define('AM.controller.Memorials', {
 		} 
   },
 
+	unconfirmObject: function(){
+		// console.log("the startObject callback function");
+		var view = Ext.widget('unconfirmmemorialform');
+		var record = this.getList().getSelectedObject();
+		view.setParentData( record );
+    view.show();
+		// this.reloadRecordView( record, view ) ; 
+	},
+	
 	executeConfirm: function(button){
+		var me = this; 
 		var win = button.up('window');
     var form = win.down('form');
-
-		var me  = this;
-		var record = this.getList().getSelectedObject();
 		var list = this.getList();
-		
-		// me.getViewport().setLoading( true ) ;
-		// win.setLoading(true);
-		
-		if(!record){return;}
-		
-		Ext.Ajax.request({
-		    url: 'api/confirm_memorial',
-		    method: 'PUT',
-		    params: {
-					id : record.get('id')
-		    },
-		    jsonData: {},
-		    success: function(result, request ) {
-						// me.getViewport().setLoading( false );
-						list.getStore().load({
-							callback : function(records, options, success){
-								// this => refers to a store 
-								record = this.getById(record.get('id'));
-								// record = records.getById( record.get('id'))
-								list.fireEvent('confirmed', record);
-							}
-						});
-						win.close();
-						
-		    },
-		    // failure: function(result, request ) {
-		    // 						me.getViewport().setLoading( false ) ;
-		    // 						
-		    // 						
-		    // }
-				failure : function(record,op ){
-					list.setLoading(false);
+
+    var store = this.getMemorialsStore();
+		var record = this.getList().getSelectedObject();
+    var values = form.getValues();
+ 
+		if(record){
+			var rec_id = record.get("id");
+			record.set( 'confirmed_at' , values['confirmed_at'] );
+			 
+			// form.query('checkbox').forEach(function(checkbox){
+			// 	record.set( checkbox['name']  ,checkbox['checked'] ) ;
+			// });
+			// 
+			form.setLoading(true);
+			record.save({
+				params : {
+					confirm: true 
+				},
+				success : function(record){
+					form.setLoading(false);
 					
+					me.reloadRecord( record ) ; 
+					
+					list.enableRecordButtons(); 
+					
+					
+					win.close();
+				},
+				failure : function(record,op ){
+					// console.log("Fail update");
+					form.setLoading(false);
 					var message  = op.request.scope.reader.jsonData["message"];
 					var errors = message['errors'];
-					
-					if( errors["generic_errors"] ){
-						Ext.MessageBox.show({
-						           title: 'FAIL',
-						           msg: errors["generic_errors"],
-						           buttons: Ext.MessageBox.OK, 
-						           icon: Ext.MessageBox.ERROR
-						       });
-					}
-					
+					form.getForm().markInvalid(errors);
+					record.reject(); 
+					// this.reject(); 
 				}
-		});
+			});
+		}
 	},
+	
+	
+	
+	executeUnconfirm: function(button){
+		var me = this; 
+		var win = button.up('window');
+    var form = win.down('form');
+		var list = this.getList();
+
+    var store = this.getMemorialsStore();
+		var record = this.getList().getSelectedObject();
+    var values = form.getValues();
+ 
+		if(record){
+			var rec_id = record.get("id");
+			record.set( 'confirmed_at' , values['confirmed_at'] );
+			 
+			// form.query('checkbox').forEach(function(checkbox){
+			// 	record.set( checkbox['name']  ,checkbox['checked'] ) ;
+			// });
+			// 
+			form.setLoading(true);
+			record.save({
+				params : {
+					unconfirm: true 
+				},
+				success : function(record){
+					form.setLoading(false);
+					
+					me.reloadRecord( record ) ; 
+					list.enableRecordButtons(); 
+					
+					win.close();
+				},
+				failure : function(record,op ){
+					// console.log("Fail update");
+					form.setLoading(false);
+					var message  = op.request.scope.reader.jsonData["message"];
+					var errors = message['errors'];
+					form.getForm().markInvalid(errors);
+					record.reject(); 
+					// this.reject(); 
+				}
+			});
+		}
+	},
+	
+
 
   deleteObject: function() {
     var record = this.getList().getSelectedObject();
@@ -268,7 +331,7 @@ Ext.define('AM.controller.Memorials', {
 		}
 		
 		
-		// me.updateChildGrid(record );
+		me.updateChildGrid(record );
 		
 		
 		
@@ -281,25 +344,51 @@ Ext.define('AM.controller.Memorials', {
   },
 
 	updateChildGrid: function(record){
-		var memorialDetailGrid = this.getMemorialList();
+		var memorialDetailGrid = this.getMemorialDetailList();
 		// memorialDetailGrid.setTitle("Purchase Order: " + record.get('code'));
 		memorialDetailGrid.setObjectTitle( record ) ;
+		
+		// console.log("record id: " + record.get("id"));
+		
+		memorialDetailGrid.getStore().getProxy().extraParams.memorial_id =  record.get('id') ;
+		 
 		memorialDetailGrid.getStore().load({
 			params : {
-				calendar_id : record.get('id')
+				memorial_id : record.get('id')
 			},
 			callback : function(records, options, success){
-				
-				var totalObject  = records.length;
-				if( totalObject ===  0 ){
-					memorialDetailGrid.enableRecordButtons(); 
-				}else{
-					memorialDetailGrid.enableRecordButtons(); 
-				}
+				memorialDetailGrid.enableAddButton(); 
 			}
 		});
 		
-	}
+	},
+	
+	reloadRecord: function(record){
+		
+		var list = this.getList();
+		var store = this.getList().getStore();
+		var modifiedId = record.get('id');
+		
+		// console.log("modifiedId:  " + modifiedId);
+		 
+		AM.model.Memorial.load( modifiedId , {
+		    scope: list,
+		    failure: function(record, operation) {
+		        //do something if the load failed
+		    },
+		    success: function(new_record, operation) {
+					// console.log("The new record");
+					// 				console.log( new_record);
+					recToUpdate = store.getById(modifiedId);
+					recToUpdate.set(new_record.getData());
+					recToUpdate.commit();
+					list.getView().refreshNode(store.indexOfId(modifiedId));
+		    },
+		    callback: function(record, operation) {
+		        //do something whether the load succeeded or failed
+		    }
+		});
+	},
 
 	
 

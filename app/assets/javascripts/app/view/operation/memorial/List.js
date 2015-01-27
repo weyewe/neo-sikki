@@ -50,6 +50,13 @@ Ext.define('AM.view.operation.memorial.List' ,{
 			action: 'confirmObject',
 			disabled: true
 		});
+	
+		this.unconfirmObjectButton = new Ext.Button({
+			text: 'Unconfirm',
+			action: 'unconfirmObject',
+			disabled: true,
+			hidden : true
+		});
 		
 		this.searchField = new Ext.form.field.Text({
 			name: 'searchField',
@@ -60,7 +67,9 @@ Ext.define('AM.view.operation.memorial.List' ,{
 		});
 		
 		 
-			this.tbar = [this.addObjectButton, this.editObjectButton, this.deleteObjectButton , this.confirmObjectButton ];
+			this.tbar = [this.addObjectButton, this.editObjectButton, this.deleteObjectButton , 
+				'-',
+					this.confirmObjectButton, this.unconfirmObjectButton ];
 	 
 
 
@@ -83,8 +92,19 @@ Ext.define('AM.view.operation.memorial.List' ,{
 
 	enableRecordButtons: function() {
 		this.editObjectButton.enable();
-		this.deleteObjectButton.enable();
-		this.confirmObjectButton.enable(); 
+		this.deleteObjectButton.enable(); 
+		
+		selectedObject = this.getSelectedObject();
+		
+		if( selectedObject && selectedObject.get("is_confirmed") == true ){
+			this.confirmObjectButton.hide();
+			this.unconfirmObjectButton.show();
+			this.unconfirmObjectButton.enable();
+		}else{
+			this.confirmObjectButton.enable();
+			this.confirmObjectButton.show();
+			this.unconfirmObjectButton.hide();
+		}
 	},
 
 	disableRecordButtons: function() {

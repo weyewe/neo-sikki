@@ -1,5 +1,6 @@
 class MemorialDetail < ActiveRecord::Base
   belongs_to :memorial 
+  belongs_to :account
    
   validates_presence_of :entry_case
   validates_presence_of :memorial_id 
@@ -11,6 +12,22 @@ class MemorialDetail < ActiveRecord::Base
   validate :amount_not_zero
   validate :valid_memorial_id
   validate :account_id_must_be_leaf_account 
+  validate :memorial_is_not_confirmed
+  validate :memorial_is_not_deleted
+
+  def memorial_is_not_confirmed
+    return if memorial_id.nil?
+    if memorial.is_confirmed?
+      self.errors.add(:generic_errors, "Sudah konfirmasi memorial")
+    end
+  end
+  
+  def memorial_is_not_deleted
+    return if memorial_id.nil?
+    if memorial.is_deleted?
+      self.errors.add(:generic_errors, "Sudah hapus memorial")
+    end
+  end
   
   def account_id_must_be_leaf_account
     return if not account_id.present?
@@ -79,6 +96,7 @@ class MemorialDetail < ActiveRecord::Base
     new_object.account_id = params[:account_id]
     new_object.entry_case = params[:entry_case]
     new_object.amount = params[:amount]
+    new_object.description = params[:description]
     
     
      
@@ -86,7 +104,7 @@ class MemorialDetail < ActiveRecord::Base
 
     if new_object.save
       new_object.transaction_datetime = new_object.memorial.transaction_datetime
-      new_object.description = new_object.memorial.description
+      # new_object.description = new_object.memorial.description
       new_object.save 
     end
     
@@ -95,11 +113,20 @@ class MemorialDetail < ActiveRecord::Base
   
   def update_object( params ) 
     
+    if self.memorial.is_confirmed
+      self.errors.add(:generic_errors, "Sudah konfirmasi memorial")
+      return self
+    end
     
+    if self.memorial.is_deleted
+      self.errors.add(:generic_errors, "Sudah hapus memorial")
+      return self
+    end
     
     self.account_id = params[:account_id]
     self.entry_case = params[:entry_case]
     self.amount = params[:amount]
+    self.description = params[:description]
     self.save
     
     return self 
@@ -109,9 +136,11 @@ class MemorialDetail < ActiveRecord::Base
   def delete_object
     if self.memorial.is_confirmed?
       self.errors.add(:generic_errors, "Sudah konfirmasi memorial")
+      return self 
     end
     if self.memorial.is_deleted?
       self.errors.add(:generic_errors, "Sudah hapus memorial")
+      return self 
     end
     
     self.destroy 

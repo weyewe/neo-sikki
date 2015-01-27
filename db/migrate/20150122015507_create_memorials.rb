@@ -11,7 +11,7 @@ class CreateMemorials < ActiveRecord::Migration
       t.datetime :confirmed_at 
       t.string :code 
       
-      t.boolean :is_deleted
+      t.boolean :is_deleted, :default => false 
       t.datetime :deleted_at 
   
       t.timestamps

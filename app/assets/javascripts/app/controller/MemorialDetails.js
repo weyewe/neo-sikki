@@ -69,7 +69,7 @@ Ext.define('AM.controller.MemorialDetails', {
 		
 		store.load({
 			params : {
-				calendar_id : record.get('id')
+				memorial_id : record.get('id')
 			}
 		});
 		
@@ -99,7 +99,7 @@ Ext.define('AM.controller.MemorialDetails', {
     var view = Ext.widget(widgetName , {
 			parentRecord : record 
 		});
-		// view.setParentData( record );
+		view.setParentData( record );
 		
     view.show(); 
   },
@@ -120,10 +120,10 @@ Ext.define('AM.controller.MemorialDetails', {
 		});
 
     view.down('form').loadRecord(record);
-		// view.setParentData( parentRecord );
+		view.setParentData( parentRecord );
 		// console.log("selected record id: " + record.get('id'));
 		// console.log("The selected poe id: " + record.get('purchase_order_entry_id'));
-		// view.setComboBoxData(record); 
+		view.setComboBoxData(record); 
   },
 
   updateObject: function(button) {
@@ -135,7 +135,8 @@ Ext.define('AM.controller.MemorialDetails', {
     var store = this.getMemorialDetailsStore();
     var record = form.getRecord();
     var values = form.getValues();
-
+		console.log("The values: " );
+		console.log( values ) 
 		
 		if( record ){
 			record.set( values );
@@ -147,7 +148,7 @@ Ext.define('AM.controller.MemorialDetails', {
 			form.setLoading(true);
 			record.save({
 				params : {
-					calendar_id : parentRecord.get('id')
+					memorial_id : parentRecord.get('id')
 				},
 				success : function(record){
 					form.setLoading(false);
@@ -155,7 +156,7 @@ Ext.define('AM.controller.MemorialDetails', {
 					// form.fireEvent('item_quantity_changed');
 					store.load({
 						params: {
-							calendar_id : parentRecord.get('id')
+							memorial_id : parentRecord.get('id')
 						}
 					});
 					
@@ -192,13 +193,13 @@ Ext.define('AM.controller.MemorialDetails', {
 			form.setLoading(true);
 			newObject.save({
 				params : {
-					calendar_id : parentRecord.get('id')
+					memorial_id : parentRecord.get('id')
 				},
 				success: function(record){
 					//  since the grid is backed by store, if store changes, it will be updated
 					store.load({
 						params: {
-							calendar_id : parentRecord.get('id')
+							memorial_id : parentRecord.get('id')
 						}
 					});
 					// form.fireEvent('item_quantity_changed');
@@ -221,7 +222,7 @@ Ext.define('AM.controller.MemorialDetails', {
 	deleteObject: function() {
     var record = this.getList().getSelectedObject();
 		if(!record){return;}
-		var parent_id = record.get('calendar_id');
+		var parent_id = record.get('memorial_id');
 		var list  = this.getList();
 		list.setLoading(true); 
 		
@@ -235,7 +236,7 @@ Ext.define('AM.controller.MemorialDetails', {
 					// this.getPurchaseOrdersStore.load();
 					list.getStore().load({
 						params : {
-							calendar_id : parent_id
+							memorial_id : parent_id
 						}
 					});
 				},

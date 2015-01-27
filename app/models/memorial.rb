@@ -1,10 +1,15 @@
 class Memorial < ActiveRecord::Base
   has_many :memorial_details 
   
+  
   validates_presence_of :description
   
   def self.active_objects
     self.where(:is_deleted => false ) 
+  end
+  
+  def  active_memorial_details
+    self.memorial_details
   end
   
   def self.create_object(params)
@@ -20,6 +25,7 @@ class Memorial < ActiveRecord::Base
 
     if new_object.save
       new_object.code = Memorial.count.to_s
+      new_object.is_deleted = false 
       new_object.save 
     end
     
@@ -44,7 +50,7 @@ class Memorial < ActiveRecord::Base
     
     
     self.transaction_datetime = params[:transaction_datetime]
-    self.name      = params[:description]
+    self.description      = params[:description]
     self.save
     
     return self 
@@ -60,7 +66,9 @@ class Memorial < ActiveRecord::Base
   
   def confirm( params )
     
+    puts "gonna enter confirm"
     if params[:confirmed_at].nil? or not params[:confirmed_at].is_a?(DateTime)
+      puts "44311.. this is confirm fail"
       self.errors.add(:confirmed_at, "Harus ada tanggal konfirmasi")
       return self 
     end
@@ -117,6 +125,11 @@ class Memorial < ActiveRecord::Base
   def delete_object
     if self.is_confirmed == true 
       self.errors.add(:generic_errors, "Sudah di konfirmasi")
+      return self 
+    end
+    
+    if self.memorial_details.count != 0 
+      self.errors.add(:generic_errors, "Ada memorial detail")
       return self 
     end
     

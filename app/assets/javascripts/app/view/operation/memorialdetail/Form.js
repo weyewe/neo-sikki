@@ -1,38 +1,157 @@
+
 Ext.define('AM.view.operation.memorialdetail.Form', {
   extend: 'Ext.window.Window',
   alias : 'widget.memorialdetailform',
 
-  title : 'Add / Edit Price Rule',
+  title : 'Add / Edit Memorial Detail',
   layout: 'fit',
-	width	: 800,
+	width	: 500,
   autoShow: true,  // does it need to be called?
 	modal : true, 
 // win.show() 
 // if autoShow == true.. on instantiation, will automatically be called 
 	
   initComponent: function() {
-		var me = this; 
+	
+		var localJsonStoreEntryCase = Ext.create(Ext.data.Store, {
+			type : 'array',
+			storeId : 'entry_case_search',
+			fields	: [ 
+				{ name : "entry_case"}, 
+				{ name : "entry_case_text"}  
+			], 
+			data : [
+				{ entry_case : 1, entry_case_text : "Debit"},
+				{ entry_case : 2, entry_case_text : "Credit"}
+			] 
+		});
 		
-		this.items = [{
+		var remoteJsonStoreAccount = Ext.create(Ext.data.JsonStore, {
+			storeId : 'memorial_detail_account_search',
+			fields	: [
+			 		{
+						name : 'account_name',
+						mapping : "name"
+					}, 
+					{
+						name : 'account_id',
+						mapping : 'id'
+					},
+					{
+						name : 'account_account_case',
+						mapping : "account_case"
+					}, 
+					{
+						name : 'account_account_case_text',
+						mapping : 'account_case_text'
+					},
+					{
+						name : 'account_code',
+						mapping : 'code'
+					}
+			],
+			proxy  	: {
+				type : 'ajax',
+				url : 'api/search_ledger_accounts',
+				reader : {
+					type : 'json',
+					root : 'records', 
+					totalProperty  : 'total'
+				}
+			},
+			autoLoad : false 
+		});
+		
+	
+	 
+		
+    this.items = [{
       xtype: 'form',
 			msgTarget	: 'side',
 			border: false,
       bodyPadding: 10,
 			fieldDefaults: {
-          labelWidth: 100,
+          labelWidth: 165,
 					anchor: '100%'
       },
-			height : 350,
-			overflowY : 'auto', 
-			layout : 'hbox', 
-			// height : 400,
-			items : [
-				me.dayInfo(),
-				me.priceInfo()
+      items: [
+				{
+	        xtype: 'hidden',
+	        name : 'id',
+	        fieldLabel: 'id'
+	      },
+				{
+	        xtype: 'hidden',
+	        name : 'memorial_id',
+	        fieldLabel: 'memorial_id'
+	      },{
+		      xtype: 'displayfield',
+	        name : 'memorial_code',
+	        fieldLabel: 'Kode Memorial'
+		    },
+				{
+					fieldLabel: 'Entry Case',
+					xtype: 'combo',
+					queryMode: 'remote',
+					forceSelection: true, 
+					displayField : 'entry_case_text',
+					valueField : 'entry_case',
+					pageSize : 5,
+					minChars : 1, 
+					allowBlank : false, 
+					triggerAction: 'all',
+					store : localJsonStoreEntryCase , 
+					listConfig : {
+						getInnerTpl: function(){
+							return  	'<div data-qtip="{entry_case_text}">' +  
+													'<div class="combo-name">{entry_case_text}</div>' +  
+							 					'</div>';
+						}
+					},
+					name : 'entry_case' 
+				},
+				{
+					fieldLabel: 'Account',
+					xtype: 'combo',
+					queryMode: 'remote',
+					forceSelection: true, 
+					displayField : 'account_name',
+					valueField : 'account_id',
+					pageSize : 5,
+					minChars : 1, 
+					allowBlank : false, 
+					triggerAction: 'all',
+					store : remoteJsonStoreAccount , 
+					listConfig : {
+						getInnerTpl: function(){
+							return  	'<div data-qtip="{entry_case_text}">' +  
+													'<div class="combo-name">'  + 
+																" ({account_code}) " 		+ "<br />" 	 + 
+																'{account_name}' 			+ 
+																
+																"[{account_account_case_text}] "		+	
+													 "</div>" +  
+							 					'</div>';
+						}
+					},
+					name : 'account_id' 
+				},
+				
+				{
+	        xtype: 'textfield',
+	        name : 'amount',
+	        fieldLabel: 'Jumlah'
+	      },
+		
+				{
+	        xtype: 'textarea',
+	        name : 'description',
+	        fieldLabel: 'Deskripsi'
+	      },
+			
 			]
     }];
 
-   
     this.buttons = [{
       text: 'Save',
       action: 'save'
@@ -44,96 +163,40 @@ Ext.define('AM.view.operation.memorialdetail.Form', {
 
     this.callParent(arguments);
   },
- 	
-	dayInfo : function(){
-		return {
-			xtype : 'fieldset',
-			title : "Hari",
-			flex : 1 , 
-			border : true, 
-			labelWidth: 30,
-			width : '90%',
-			defaultType : 'field',
-			defaults : {
-				anchor : '-10'
+
+	setSelectedAccount: function( account_id ){
+		// console.log("inside set selected original account id ");
+		var comboBox = this.down('form').getForm().findField('account_id'); 
+		var me = this; 
+		var store = comboBox.store;  
+		store.load({
+			params: {
+				selected_id : account_id 
 			},
-			items : [
-				{
-					fieldLabel : 'Senin',
-					name : 'is_monday',
-					xtype : 'checkbox'
-				}, 
-				{
-					fieldLabel : 'Selasa',
-					name : 'is_tuesday',
-					xtype : 'checkbox'
-				},
-				{
-					fieldLabel : 'Rabu',
-					name : 'is_wednesday',
-					xtype : 'checkbox'
-				},
-				{
-					fieldLabel : 'Kamis',
-					name : 'is_thursday',
-					xtype : 'checkbox'
-				},
-				{
-					fieldLabel : 'Jumat',
-					name : 'is_friday',
-					xtype : 'checkbox'
-				},
-				{
-					fieldLabel : 'Sabtu',
-					name : 'is_saturday',
-					xtype : 'checkbox'
-				},
-				{
-					fieldLabel : 'Minggu',
-					name : 'is_sunday',
-					xtype : 'checkbox'
-				},
-			]
-		};
+			callback : function(records, options, success){
+				me.setLoading(false);
+				comboBox.setValue( account_id );
+			}
+		});
 	},
 	
-	priceInfo : function(){
-		return  {
-			xtype : 'fieldset',
-			title : "Harga dan Waktu",
-			flex : 1 , 
-			border : true, 
-			labelWidth: 30,
-			width : '90%',
-			defaultType : 'field',
-			defaults : {
-				anchor : '-10'
-			},
-			items : [
-				{
-					fieldLabel : 'Jam Mulai (0-23)',
-					name : 'hour_start' ,
-					xtype: 'numberfield'
-				},
-				{
-					fieldLabel : 'Jam Selesai (0-23)',
-					name : 'hour_end' ,
-					xtype : 'numberfield'
-				},
-				{
-					fieldLabel : 'Harga per jam',
-					name : 'amount' ,
-					xtype : 'textfield'
-				}
-			]
-		};
+	
+	
+	setComboBoxData : function( record){
+		var me = this; 
+		me.setLoading(true);
+		
+		
+		me.setSelectedAccount( record.get("account_id")  ) ; 
 	},
-
-	setColorPickerData: function( record ) {
-		var colorId =  record.get("color")
-		if(!colorId){
-			colorId = 0 ;
-		}
-		this.down('customcolorpicker').select(colorId);
+	
+	setParentData: function( record) {
+		this.down('form').getForm().findField('memorial_code').setValue(record.get('code')); 
+		this.down('form').getForm().findField('memorial_id').setValue(record.get('id'));
 	}
+ 
 });
+
+
+
+

@@ -22,7 +22,7 @@ class Account < ActiveRecord::Base
   
   
   def self.active_accounts
-    self.where(:is_temporary_account => false )
+    self 
   end
   
   def all_base_fields_present? 
@@ -167,7 +167,7 @@ class Account < ActiveRecord::Base
     new_object                           = self.new 
     new_object.name                      = params[:name]
     new_object.parent_id                 = params[:parent_id]
-    new_object.account_case              = params[:account_case]
+    new_object.account_case              = params[:account_case]  # ledger or group
     new_object.is_contra_account         = params[:is_contra_account]
     new_object.original_account_id       = params[:original_account_id]
     
