@@ -69,7 +69,9 @@ Ext.define('AM.view.operation.memorial.List' ,{
 		 
 			this.tbar = [this.addObjectButton, this.editObjectButton, this.deleteObjectButton , 
 				'-',
-					this.confirmObjectButton, this.unconfirmObjectButton ];
+					this.confirmObjectButton, this.unconfirmObjectButton,
+					'->',
+					this.searchField ];
 	 
 
 

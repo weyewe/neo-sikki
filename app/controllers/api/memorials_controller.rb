@@ -3,8 +3,34 @@ class Api::MemorialsController < Api::BaseApiController
   def index
      
      
-     @objects = Memorial.active_objects.page(params[:page]).per(params[:limit]).order("id DESC")
-     @total = Memorial.active_objects.count
+     if params[:livesearch].present? 
+       livesearch = "%#{params[:livesearch]}%"
+       @objects = Memorial.active_objects.where{
+         (is_deleted.eq false ) & 
+         (
+           (description =~  livesearch ) | 
+           ( code =~ livesearch)
+         )
+
+       }.page(params[:page]).per(params[:limit]).order("id DESC")
+
+       @total = Memorial.active_objects.where{
+         (is_deleted.eq false ) & 
+         (
+           (description =~  livesearch ) | 
+            ( code =~ livesearch)
+         )
+       }.count
+ 
+
+     else
+       @objects = Memorial.active_objects.page(params[:page]).per(params[:limit]).order("id DESC")
+       @total = Memorial.active_objects.count
+     end
+     
+     
+     
+     
   end
 
   def create
