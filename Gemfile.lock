@@ -177,6 +177,7 @@ GEM
     uuidtools (2.1.5)
     warden (1.2.3)
       rack (>= 1.0)
+    writeexcel (1.0.5)
 
 PLATFORMS
   ruby
@@ -204,3 +205,4 @@ DEPENDENCIES
   turbolinks
   uglifier (>= 1.3.0)
   uuidtools
+  writeexcel (~> 1.0.5)

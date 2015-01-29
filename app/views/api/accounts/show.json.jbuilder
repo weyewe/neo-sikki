@@ -1,7 +1,7 @@
 json.success true 
 json.total @total
 json.accounts @objects do |object|
-	json.id 								object.id 
+	json.id 								object.id  
 	
 	if @parent
 		json.parent_id					@parent.id  
@@ -14,7 +14,8 @@ json.accounts @objects do |object|
 	
 	
 	json.name 	object.name
-	json.code		object.code 
+	json.code		object.code
+	
 	
 	if object.account_case == ACCOUNT_CASE[:ledger] 
 		json.leaf true 
@@ -25,7 +26,9 @@ json.accounts @objects do |object|
 		json.account_case ACCOUNT_CASE[:group]
 		json.account_case_text "Group"
 	end
-	 
+	
+	json.amount object.amount.to_s
+	
 	if object.normal_balance  ==  NORMAL_BALANCE[:debit]
 		json.normal_balance_text  "Debit"
 		json.normal_balance  NORMAL_BALANCE[:debit]
@@ -33,11 +36,9 @@ json.accounts @objects do |object|
 		json.normal_balance_text  "Credit"
 		json.normal_balance  NORMAL_BALANCE[:credit]
 	end
-	
-	json.is_contra_account object.is_contra_account 
+ 
+	 
 	
 
-
-	
 	
 end

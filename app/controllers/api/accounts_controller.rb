@@ -11,7 +11,7 @@ class Api::AccountsController < Api::BaseApiController
           (code =~ livesearch)
         )
         
-      }.page(params[:page]).per(params[:limit]).order("id DESC")
+      }.page(params[:page]).per(params[:limit]).order("id ASC")
       
       @total = Account.where{
         (is_deleted.eq false) & 

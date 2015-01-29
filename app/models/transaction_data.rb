@@ -85,6 +85,8 @@ class TransactionData < ActiveRecord::Base
     self.transaction_data_details.where(:entry_case => NORMAL_BALANCE[:debit]).sum("amount")
   end
   
+  
+  
   def total_credit
     self.transaction_data_details.where(:entry_case => NORMAL_BALANCE[:credit]).sum("amount")
   end 

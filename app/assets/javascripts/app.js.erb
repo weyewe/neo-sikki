@@ -17,6 +17,7 @@ Ext.Loader.setConfig({ enabled: false });
 
 
 
+
 Ext.application({
 	<% Dir[File.expand_path('../app/*/', __FILE__)].each do |subdir| %>
 		<% next if File.basename(subdir) == 'src' %> 
@@ -42,6 +43,8 @@ Ext.override(Ext.Container, {
     }
 });
 
+ 
+
 
 Ext.define("AM.view.Constants",{
 	singleton	: true,
@@ -51,6 +54,11 @@ Ext.define("AM.view.Constants",{
 	
 	GET_USERS_URL	:  "/users/all",
 	GET_USER_URL	: "/users/get",
+	
+	account_case: {
+		group : 1 , 
+		ledger : 2
+	},
 	
 	switchPersonalReport : 0,
 	switchOperation : 1 ,

@@ -189,6 +189,18 @@ Ext.define("AM.controller.Operation", {
     expanded	: true,
 		children 	: [
         
+			{ 
+	        text:'CoA', 
+	        viewClass:'AM.view.operation.Account', 
+	        leaf:true, 
+	        iconCls:'text',
+					conditions : [
+						{
+							controller : "accounts",
+							action  : 'index'
+						}
+					]
+	    }, 
       { 
           text:'Memorial', 
           viewClass:'AM.view.operation.Memorial', 
