@@ -119,6 +119,13 @@ Ext.define('AM.view.operation.account.ChartOfAccounts', {
 						//                 dataIndex: 'amount' 
 						//             },
 						{
+                text: 'Kode',
+								header: 'Kode',
+                flex: 1,
+                dataIndex: 'code' 
+            },
+
+						{
                 text: 'Normal Balance',
 								header: 'Normal Balance',
                 flex: 1,

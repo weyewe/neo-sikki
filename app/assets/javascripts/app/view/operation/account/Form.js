@@ -106,6 +106,11 @@ Ext.define('AM.view.operation.account.Form', {
 			        fieldLabel: 'Nama Account'
 						},
 						{
+			        xtype: 'textfield',
+			        name : 'code',
+			        fieldLabel: 'Kode Account'
+						},
+						{
 							fieldLabel: 'Account Case',
 							xtype: 'combo',
 							queryMode: 'remote',
@@ -130,42 +135,7 @@ Ext.define('AM.view.operation.account.Form', {
 				},
 	
 				
-				
-				
-				{
-					// Fieldset in Column 2 - collapsible via checkbox, collapsed by default, contains a panel
-					xtype:'fieldset',
-					title: 'Contra Account', // title or checkboxToggle creates fieldset header  
-					layout:'anchor',
-					items :[
-						{
-							xtype: 'checkbox',
-							name : 'is_contra_account',
-							fieldLabel: 'Contra Account?'
-						},
-						{
-							fieldLabel: 'Normal Account',
-							xtype: 'combo',
-							queryMode: 'remote',
-							forceSelection: true, 
-							displayField : 'account_name',
-							valueField : 'account_id',
-							pageSize : 5,
-							minChars : 1, 
-							allowBlank : false, 
-							triggerAction: 'all',
-							store : remoteJsonStoreAccount , 
-							listConfig : {
-								getInnerTpl: function(){
-									return  	'<div data-qtip="{account_name}">' +  
-															'<div class="combo-name">{account_name}</div>' +  
-									 					'</div>';
-								}
-							},
-							name : 'original_account_id' 
-						}, 
-					]
-				}
+			
 			]
     }];
 
@@ -190,27 +160,27 @@ Ext.define('AM.view.operation.account.Form', {
  
 	setSelectedOriginalAccountId: function( original_account_id ){
 		// console.log("inside set selected original account id ");
-		var comboBox = this.down('form').getForm().findField('original_account_id'); 
-		var me = this; 
-		var store = comboBox.store; 
-		store.load({
-			params: {
-				selected_id : original_account_id 
-			},
-			callback : function(records, options, success){
-				me.setLoading(false);
-				comboBox.setValue( original_account_id );
-			}
-		});
+		// var comboBox = this.down('form').getForm().findField('original_account_id'); 
+		// var me = this; 
+		// var store = comboBox.store; 
+		// store.load({
+		// 	params: {
+		// 		selected_id : original_account_id 
+		// 	},
+		// 	callback : function(records, options, success){
+		// 		me.setLoading(false);
+		// 		comboBox.setValue( original_account_id );
+		// 	}
+		// });
 	},
 	
 	
 	
 	setComboBoxData : function( record){
-		var me = this; 
-		me.setLoading(true);
+		// var me = this; 
+		// me.setLoading(true);
 		
 		
-		me.setSelectedOriginalAccountId( record.get("original_account_id")  ) ; 
+		// me.setSelectedOriginalAccountId( record.get("original_account_id")  ) ; 
 	}
 });

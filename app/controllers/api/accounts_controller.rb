@@ -49,7 +49,7 @@ class Api::AccountsController < Api::BaseApiController
     puts "\n\n============>"
     
     puts "The name is : #{params[:account][:name]}\n\n"
-    @object = Account.create_object( params[:account] , false  )
+    @object = Account.create_object( params[:account]   )
     if @object.errors.size == 0 
       render :json => { :success => true, 
                         :accounts => [@object] , 
@@ -78,7 +78,7 @@ class Api::AccountsController < Api::BaseApiController
     # puts "The name is : #{params[:account][:name]}\n\n"
     
     
-    @object.update_object( params[:account]  , false )
+    @object.update_object( params[:account]  )
     
     if @object.errors.size == 0 
       render :json => { :success => true,   
