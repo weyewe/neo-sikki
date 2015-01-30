@@ -212,6 +212,18 @@ Ext.define("AM.controller.Operation", {
 							action  : 'index'
 						}
 					]
+      },
+			{ 
+          text:'TransactionData', 
+          viewClass:'AM.view.operation.TransactionData', 
+          leaf:true, 
+          iconCls:'text',
+ 					conditions : [
+						{
+							controller : "transaction_datas",
+							action  : 'index'
+						}
+					]
       } 
     ]
 	},

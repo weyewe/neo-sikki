@@ -571,10 +571,13 @@ Ext.define('AM.controller.GroupLoans', {
 		
 		// var anotherwindow = window.open(
 		// 	'reports/billofsale.php?id='+id,'PDF','width='+ps_width+',height='+ps_height+',resizable');
-		console.log("Gonna download pending");
+		// console.log("Gonna download pending");
 			window.open(
 				'group_loans/pending_fulfillment', 'CSV');
 				
+				
+				// var myOtherUrl = 
+				       // "http://example.com/index.html?url=" + encodeURIComponent(myUrl);
 				
 		// window.open( '/bookings/payment_receipt/'+ record.get('id')  );
 	},

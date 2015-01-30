@@ -3,6 +3,7 @@ NeoSikki::Application.routes.draw do
   root :to => 'home#extjs' , :method => :get
   
   get 'group_loans/pending_fulfillment' => 'group_loans#download_pending', :as => :download_pending  
+  get 'transaction_datas/download_xls' => 'transaction_datas#download_xls', :as => :download_transaction
   
   namespace :api do 
     devise_for :users
@@ -35,6 +36,9 @@ NeoSikki::Application.routes.draw do
     resources :memorials
     resources :memorial_details 
     resources :accounts
+    resources :transaction_datas
+    resources :transaction_data_details 
+    
     get 'search_ledger_accounts' => 'accounts#search_ledger', :as => :search_ledger_accounts 
     
     put 'confirm_memorial' => 'memorials#confirm' , :as => :confirm_memorial

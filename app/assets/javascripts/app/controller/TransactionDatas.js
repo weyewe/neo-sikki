@@ -1,29 +1,32 @@
-Ext.define('AM.controller.Memorials', {
+Ext.define('AM.controller.TransactionDatas', {
   extend: 'Ext.app.Controller',
 
-  stores: ['Memorials'],
-  models: ['Memorial'],
+  stores: ['TransactionDatas'],
+  models: ['TransactionData'],
 
+	startDate : null,
+	endDate: null, 
+	isPeriodSet : false ,
   views: [
-    'operation.memorial.List',
-    'operation.memorial.Form',
-		'operation.memorialdetail.List',
+    'operation.transactiondata.List',
+    'operation.transactiondata.Form',
+		'operation.transactiondatadetail.List',
 		'Viewport'
   ],
 
   	refs: [
 		{
 			ref: 'list',
-			selector: 'memoriallist'
+			selector: 'transactiondatalist'
 		},
 		{
-			ref : 'memorialDetailList',
-			selector : 'memorialdetaillist'
+			ref : 'transactiondataDetailList',
+			selector : 'transactiondatadetaillist'
 		},
 		
 		{
 			ref : 'form',
-			selector : 'memorialform'
+			selector : 'transactiondataform'
 		},
 		{
 			ref: 'viewport',
@@ -33,49 +36,47 @@ Ext.define('AM.controller.Memorials', {
 
   init: function() {
     this.control({
-      'memorialProcess memoriallist': {
+      'transactiondataProcess transactiondatalist': {
         itemdblclick: this.editObject,
         selectionchange: this.selectionChange,
 				afterrender : this.loadObjectList,
       },
-      'memorialProcess memorialform button[action=save]': {
-        click: this.updateObject
+      'transactiondataProcess transactiondataform button[action=save]': {
+        click: this.executeSetPeriod
       },
-			'memorialProcess memorialform customcolorpicker' : {
+			'transactiondataProcess transactiondataform customcolorpicker' : {
 				'colorSelected' : this.onColorPickerSelect
 			},
 
-      'memorialProcess memoriallist button[action=addObject]': {
-        click: this.addObject
+      'transactiondataProcess transactiondatalist button[action=setPeriodObject]': {
+        click: this.setPeriod
       },
-      'memorialProcess memoriallist button[action=editObject]': {
+      'transactiondataProcess transactiondatalist button[action=editObject]': {
         click: this.editObject
       },
-      'memorialProcess memoriallist button[action=deleteObject]': {
+      'transactiondataProcess transactiondatalist button[action=deleteObject]': {
         click: this.deleteObject
 			}	,
 			
-			'memorialProcess memoriallist button[action=confirmObject]': {
+			'transactiondataProcess transactiondatalist button[action=confirmObject]': {
         click: this.confirmObject
       },
 
-			'memorialProcess memoriallist button[action=unconfirmObject]': {
+			'transactiondataProcess transactiondatalist button[action=unconfirmObject]': {
         click: this.unconfirmObject
       },
-			'confirmmemorialform button[action=confirm]' : {
-				click : this.executeConfirm
-			},
-			
-			'unconfirmmemorialform button[action=confirm]' : {
-				click : this.executeUnconfirm
-			},
+	 
 
-			'memorialProcess memoriallist textfield[name=searchField]': {
+			'transactiondataProcess transactiondatalist textfield[name=searchField]': {
 				change: this.liveSearch
 			},
-			'memorialform button[action=save]': {
-        click: this.updateObject
-      }
+			'transactiondataform button[action=save]': {
+        click: this.executeSetPeriod
+      },
+
+			'transactiondatalist button[action=downloadObject]': {
+        click: this.downloadObject
+			}	,
 		
     });
   },
@@ -98,11 +99,11 @@ Ext.define('AM.controller.Memorials', {
 	liveSearch : function(grid, newValue, oldValue, options){
 		var me = this;
 
-		me.getMemorialsStore().getProxy().extraParams = {
+		me.getTransactionDatasStore().getProxy().extraParams = {
 		    livesearch: newValue
 		};
 	 
-		me.getMemorialsStore().load();
+		me.getTransactionDatasStore().load();
 	},
  
 
@@ -111,16 +112,73 @@ Ext.define('AM.controller.Memorials', {
 		me.getStore().load();
 	},
 
-  addObject: function() {
-	var view = Ext.widget('memorialform');
+  setPeriod: function() {
+	var view = Ext.widget('transactiondataform');
   view.show();
 
 	 
   },
 
+	executeSetPeriod: function(button){
+		var win = button.up('window');
+    var form = win.down('form');
+		var me = this; 
+ 
+    var values = form.getValues();
+
+		console.log( values ) 
+		console.log( values["start_date"])
+		console.log( values["end_date"])
+		
+		var transactiondataDetailGrid = this.getTransactiondataDetailList();
+		
+		
+		var transactiondataGrid = this.getList();
+		console.log("the list");
+		console.log( transactiondataGrid );
+		// transactiondataDetailGrid.setTitle("Purchase Order: " + record.get('code'));
+		var start_date = values["start_date"];
+		var end_date = values["end_date"]
+		transactiondataGrid.setTitle( "From: "  + start_date + " to " + end_date ) ;
+		
+		// console.log("record id: " + record.get("id"));
+		
+		
+		if(start_date && end_date) {
+			this.startDate = start_date;
+			this.endDate = end_date ; 
+
+			transactiondataGrid.enableDownloadButton();
+			
+			transactiondataGrid.getStore().getProxy().extraParams.start_date =  start_date ;
+			transactiondataGrid.getStore().getProxy().extraParams.end_date =  end_date ;
+
+
+			transactiondataGrid.getStore().load(); 
+
+			transactiondataDetailGrid.getStore().loadData([],false);
+			
+			
+			var transactiondataDetailGrid = this.getTransactiondataDetailList(); 
+			console.log("The transactiondataDetailGrid");
+			console.log( transactiondataDetailGrid );
+			transactiondataDetailGrid.setObjectTitle( "" ) ;
+			
+			win.close();
+		}
+		
+		
+		
+		
+		
+		
+		
+		
+	},
+
   editObject: function() {
     var record = this.getList().getSelectedObject();
-    var view = Ext.widget('memorialform');
+    var view = Ext.widget('transactiondataform');
 
     view.down('form').loadRecord(record);
   },
@@ -129,7 +187,7 @@ Ext.define('AM.controller.Memorials', {
 		// console.log("the startObject callback function");
 		var record = this.getList().getSelectedObject();
 		if(record){
-			var view = Ext.widget('confirmmemorialform');
+			var view = Ext.widget('confirmtransactiondataform');
 
 			view.setParentData( record );
 	    view.show();
@@ -144,7 +202,7 @@ Ext.define('AM.controller.Memorials', {
     var form = win.down('form');
 		var me = this; 
 
-    var store = this.getMemorialsStore();
+    var store = this.getTransactionDatasStore();
     var record = form.getRecord();
     var values = form.getValues();
  
@@ -175,7 +233,7 @@ Ext.define('AM.controller.Memorials', {
 			//  no record at all  => gonna create the new one 
 			console.log("This is the new record")
 			var me  = this; 
-			var newObject = new AM.model.Memorial( values ) ; 
+			var newObject = new AM.model.TransactionData( values ) ; 
 			
 			// learnt from here
 			// http://www.sencha.com/forum/showthread.php?137580-ExtJS-4-Sync-and-success-failure-processing
@@ -208,7 +266,7 @@ Ext.define('AM.controller.Memorials', {
 
 	unconfirmObject: function(){
 		// console.log("the startObject callback function");
-		var view = Ext.widget('unconfirmmemorialform');
+		var view = Ext.widget('unconfirmtransactiondataform');
 		var record = this.getList().getSelectedObject();
 		view.setParentData( record );
     view.show();
@@ -221,7 +279,7 @@ Ext.define('AM.controller.Memorials', {
     var form = win.down('form');
 		var list = this.getList();
 
-    var store = this.getMemorialsStore();
+    var store = this.getTransactionDatasStore();
 		var record = this.getList().getSelectedObject();
     var values = form.getValues();
  
@@ -269,7 +327,7 @@ Ext.define('AM.controller.Memorials', {
     var form = win.down('form');
 		var list = this.getList();
 
-    var store = this.getMemorialsStore();
+    var store = this.getTransactionDatasStore();
 		var record = this.getList().getSelectedObject();
     var values = form.getValues();
  
@@ -313,7 +371,7 @@ Ext.define('AM.controller.Memorials', {
     var record = this.getList().getSelectedObject();
 
     if (record) {
-      var store = this.getMemorialsStore();
+      var store = this.getTransactionDatasStore();
 			store.remove(record);
 			store.sync( );
  
@@ -323,9 +381,11 @@ Ext.define('AM.controller.Memorials', {
   },
 
   selectionChange: function(selectionModel, selections) {
+	
     var grid = this.getList();
+
 		var me= this;
-		var record = this.getList().getSelectedObject();
+		var record = this.getList().getSelectedObject(); 
 		if(!record){
 			return; 
 		}
@@ -333,31 +393,25 @@ Ext.define('AM.controller.Memorials', {
 		
 		me.updateChildGrid(record );
 		
-		
-		
-
-    if (selections.length > 0) {
-      grid.enableRecordButtons();
-    } else {
-      grid.disableRecordButtons();
-    }
+		 
   },
 
 	updateChildGrid: function(record){
-		var memorialDetailGrid = this.getMemorialDetailList();
-		// memorialDetailGrid.setTitle("Purchase Order: " + record.get('code'));
-		memorialDetailGrid.setObjectTitle( record ) ;
+		console.log("Inside updateChildGrid");
+		var transactiondataDetailGrid = this.getTransactiondataDetailList();
+		// transactiondataDetailGrid.setTitle("Purchase Order: " + record.get('code'));
+		transactiondataDetailGrid.setObjectTitle( record ) ;
 		
 		// console.log("record id: " + record.get("id"));
 		
-		memorialDetailGrid.getStore().getProxy().extraParams.memorial_id =  record.get('id') ;
+		transactiondataDetailGrid.getStore().getProxy().extraParams.transaction_data_id =  record.get('id') ;
 		 
-		memorialDetailGrid.getStore().load({
+		transactiondataDetailGrid.getStore().load({
 			params : {
-				memorial_id : record.get('id')
+				transaction_data_id : record.get('id')
 			},
 			callback : function(records, options, success){
-				memorialDetailGrid.enableAddButton(); 
+				transactiondataDetailGrid.enableAddButton(); 
 			}
 		});
 		
@@ -371,7 +425,7 @@ Ext.define('AM.controller.Memorials', {
 		
 		// console.log("modifiedId:  " + modifiedId);
 		 
-		AM.model.Memorial.load( modifiedId , {
+		AM.model.TransactionData.load( modifiedId , {
 		    scope: list,
 		    failure: function(record, operation) {
 		        //do something if the load failed
@@ -389,6 +443,17 @@ Ext.define('AM.controller.Memorials', {
 		    }
 		});
 	},
+	
+	downloadObject: function(){
+			var url = "transaction_datas/download_xls?start_date=" + encodeURIComponent(this.startDate) + "&" + 
+							"end_date=" + encodeURIComponent(this.endDate);
+							
+			window.open(
+				url, 'xls');
+				
+				// var myOtherUrl = 
+				       // "http://example.com/index.html?url=" + encodeURIComponent(myUrl);
+	}
 
 	
 

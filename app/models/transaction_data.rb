@@ -3,6 +3,10 @@ class TransactionData < ActiveRecord::Base
   validates_presence_of :transaction_datetime 
   
   
+  def self.active_objects
+    self
+  end
+  
   def self.create_object( params, is_automated_transaction ) 
     new_object = self.new 
     new_object.transaction_datetime = params[:transaction_datetime]
