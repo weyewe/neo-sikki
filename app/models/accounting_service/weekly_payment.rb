@@ -4,6 +4,7 @@ module AccountingService
               total_compulsory_savings , total_principal,
               total_interest_revenue) 
       
+        # message = "#{group_loan.name} #{TRANSACTION_DATA_CODE[:group_loan_weekly_collection][:text_message]} #{group_loan_weekly_collection.week_number}"
         message = "Weekly Collection: Group #{group_loan.name}, #{group_loan.group_number}, week #{group_loan_weekly_collection.week_number}"
         ta = TransactionData.create_object({
           :transaction_datetime => group_loan_weekly_collection.collected_at,

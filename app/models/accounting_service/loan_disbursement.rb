@@ -1,9 +1,12 @@
 module AccountingService
   class LoanDisbursement
     def LoanDisbursement.create_loan_disbursement(object) 
+      
+      msg = "Loan Disbursement #{object.name}, GroupNumber: #{object.group_number}"
+      
       ta = TransactionData.create_object({
         :transaction_datetime => object.disbursed_at,
-        :description => "Loan Disbursement: Group #{object.name}, #{object.group_number}" ,
+        :description => msg ,
         :transaction_source_id => object.id , 
         :transaction_source_type => object.class.to_s ,
         :code => TRANSACTION_DATA_CODE[:loan_disbursement],
