@@ -27,6 +27,8 @@ gem 'jquery-rails'
 # Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks
 gem 'turbolinks'
 
+gem 'delayed_job_active_record'
+
 
 gem 'thin'
 # gem 'roadie' # for sending email 's css
