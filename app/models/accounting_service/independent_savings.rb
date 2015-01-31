@@ -1,9 +1,9 @@
 module AccountingService
   class IndependentSavings
-    def IndependentSavings.post_savings_account( savings_entry , multiplier, absolut_amount ) 
+    def IndependentSavings.post_savings_account( savings_entry , multiplier  ) 
         member = savings_entry.member
         member_name = ""
-        
+        absolut_amount = savings_entry.amount 
         return if member.nil? 
         
         message = "" 

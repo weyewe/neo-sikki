@@ -31,14 +31,16 @@ end
 
 task :generate_loan_close_gl => :environment do
   
-  group_loan_list = GroupLoan.where(
+  total = GroupLoan.where(
     :is_loan_disbursed => true ,
     :is_closed => true 
-  )
-  
-  total = group_loan_list.length 
+  ).count
+   
   count = 1 
-  group_loan_list.each do |group_loan|
+  GroupLoan.where(
+    :is_loan_disbursed => true ,
+    :is_closed => true 
+  ).find_each do |group_loan|
     puts "group_loan #{count}/ #{ total}"
     # port from compulsory savings to transient 
     total_compulsory_savings = BigDecimal("0")

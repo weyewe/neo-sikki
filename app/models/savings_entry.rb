@@ -355,16 +355,16 @@ class SavingsEntry < ActiveRecord::Base
      # voluntary savings account 
       if self.savings_status == SAVINGS_STATUS[:savings_account]
         member.update_total_savings_account( multiplier  *self.amount )
-        AccountingService::IndependentSavings.post_savings_account(self, multiplier, amount  )
+        AccountingService::IndependentSavings.post_savings_account(self, multiplier  )
         
     # one off savings so that the member is elligible for borrowing $$ from KKI
       elsif  self.savings_status == SAVINGS_STATUS[:membership]
         member.update_total_membership_savings_account( multiplier  *self.amount )
-        AccountingService::IndependentSavings.post_membership_savings_account(self, multiplier, amount  )
+        AccountingService::IndependentSavings.post_membership_savings_account(self, multiplier   )
     # kept $$ to sustain group loan membership
       elsif self.savings_status == SAVINGS_STATUS[:locked]
         member.update_total_locked_savings_account( multiplier  *self.amount )
-        AccountingService::IndependentSavings.post_locked_savings_account(self, multiplier, amount  )
+        AccountingService::IndependentSavings.post_locked_savings_account(self, multiplier  )
       end
       
       
