@@ -10,6 +10,11 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
   has_many :group_loan_weekly_collection_voluntary_savings_entries
   
   
+  
+  # def self.test_awesome
+  #   "banzaiaiiaiaiia"
+  # end
+  
   def first_non_collected?
     group_loan.group_loan_weekly_collection.where(
       :is_collected => false 

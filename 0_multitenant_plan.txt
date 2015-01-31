@@ -1,0 +1,33 @@
+a. make helper method: current_account 
+
+b. all entities belongs_to current_account
+
+c. 
+		On index:
+			current_account.group_loans.where()
+	
+			instead of GroupLoan.where()
+	
+		On show/update
+			input: entity id 
+		
+			Our existing method to extract object:  GroupLoan.find_by_id( params[:id] )
+		
+			In the multitenant: current_account.group_loans.find_by_id( params[:id] )
+			
+			If the Id is not registered @ the current account, it will simply return nil, and internal error. fixed.
+			
+		On create
+			input: entity object
+			
+			Existing create method: GroupLoan.create_object( params[:id] )
+			
+			In the multitenant: current_account.group_loans.create_object( params[:id])
+			
+			Multitenant solved! muach! 
+		
+		
+		
+We can go multitenant for all shite. 
+
+Ah one thing: for the by product. How to get them? No need. later. 

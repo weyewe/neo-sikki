@@ -27,6 +27,7 @@ gem 'jquery-rails'
 # Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks
 gem 'turbolinks'
 
+gem 'protected_attributes'
 gem 'delayed_job_active_record'
 
 
@@ -53,7 +54,7 @@ gem 'fastercsv', '~> 1.5.5'
 
 gem 'bootstrap-sass', '~> 2.3.1.0'
 gem 'the_role', '~> 2.0.0'
-gem 'protected_attributes'
+
 gem 'squeel', :git => "git://github.com/ernie/squeel.git"
  
 group :production do
