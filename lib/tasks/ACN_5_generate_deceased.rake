@@ -37,7 +37,7 @@ task :generate_deceased_gl => :environment do
   deceased_list.each do |x|
     puts "deceased #{counter}/#{total}"
     
-    AccountingService::Deceased.create_bad_debt_allocation(
+    AccountingService::Deceased.delay.create_bad_debt_allocation(
         x.group_loan_membership.group_loan, 
         x.member, 
         x.group_loan_membership, 

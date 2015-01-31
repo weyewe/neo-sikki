@@ -117,14 +117,14 @@ Column:
 
 
         # perform posting for group_loan_weekly_collection voluntary-savings_entries
-        perform_weekly_voluntary_savings_posting( group_loan, gl_wc)
+        self.delay.perform_weekly_voluntary_savings_posting( group_loan, gl_wc)
 
         # PERFORM POSTING FOR WEEKLY PAYMENT 
-        perform_weekly_payment_posting(group_loan, gl_wc)
+        self.delay.perform_weekly_payment_posting(group_loan, gl_wc)
 
 
         # PERFORM POSTING FOR PREMATURE CLEARANCE
-        perform_premature_clearance_posting( group_loan, gl_wc)
+        self.delay.perform_premature_clearance_posting( group_loan, gl_wc)
 
 
       end

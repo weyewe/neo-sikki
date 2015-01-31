@@ -16,7 +16,7 @@ task :generate_loan_disbursement_gl => :environment do
   counter = 1 
   group_loan_list.each do |x|
     puts "group_loan #{counter}/#{total}"
-    AccountingService::LoanDisbursement.create_loan_disbursement(x ) 
+    AccountingService::LoanDisbursement.delay.create_loan_disbursement(x ) 
     counter += 1 
   end
   
