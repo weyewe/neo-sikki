@@ -23,10 +23,10 @@ class TransactionData < ActiveRecord::Base
   end
    
   def update_affected_accounts_due_to_confirmation
-    self.transaction_data_details.each do |ta_entry|
-      account = ta_entry.account 
-      account.update_amount_from_posting_confirm(ta_entry)
-    end
+    # self.transaction_data_details.each do |ta_entry|
+    #   account = ta_entry.account 
+    #   account.update_amount_from_posting_confirm(ta_entry)
+    # end
   end
   
   def update_affected_accounts_due_to_un_confirmation
