@@ -11,7 +11,7 @@ class UserMailer < ActionMailer::Base
     #    :content => content }
     #  
     
-    mail(:to => "admin@11ina.com", :subject => "banzai New account information")
+    mail(:to => "admin@11ina.com", :subject => "banzai New account information").deliver
   end
   
   def sales_for_yesterday 
