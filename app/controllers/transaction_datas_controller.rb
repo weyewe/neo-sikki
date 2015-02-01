@@ -23,7 +23,12 @@ class TransactionDatasController < ApplicationController
     @filepath = "#{Rails.root}/tmp/" + @awesome_filename
     
      
-    File.delete( @filepath )
+    # File.delete( @filepath ) if File.exists?( @filepath )
+    if File.exists?( @filepath )
+      puts "234 the file at #{@filepath} EXISTS"
+      File.delete( @filepath ) 
+    end
+    
     
     
     workbook = WriteExcel.new( @filepath )
@@ -94,8 +99,13 @@ class TransactionDatasController < ApplicationController
     
     send_file "#{@filepath}", :type => "application/vnd.ms-excel", :filename => "#{@awesome_filename}"#, :stream => false
     
+    if File.exists?( @filepath )
+      puts "234 the file at #{@filepath} EXISTS"
+      # File.delete( @filepath ) 
+    end
+    
     # File.delete("#{@awesome_filename}") 
-    # FileUtils.rm(@filepath)
+    # FileUtils.rm(@filepath)d
     
     
   end
