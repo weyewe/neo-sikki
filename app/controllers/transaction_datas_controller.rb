@@ -1,7 +1,6 @@
 require 'csv'
 require 'writeexcel'
-require 'stringio'
-require 'FileUtils'
+# require 'stringio' 
 
 class TransactionDatasController < ApplicationController
   
@@ -23,7 +22,8 @@ class TransactionDatasController < ApplicationController
     @awesome_filename = "TransactionReport-#{start_date}_to_#{end_date}.xls"
     @filepath = "#{Rails.root}/tmp/" + @awesome_filename
     
-    FileUtils.rm(@filepath)
+     
+    File.delete( @filepath )
     
     
     workbook = WriteExcel.new( @filepath )

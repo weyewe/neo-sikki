@@ -32,6 +32,8 @@ gem 'delayed_job_active_record'
 
 gem "lol_dba"
 
+# gem 'fileutils', '~> 0.7'
+
 
 gem 'thin'
 # gem 'roadie' # for sending email 's css
