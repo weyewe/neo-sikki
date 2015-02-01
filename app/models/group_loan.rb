@@ -856,7 +856,7 @@ Phase: loan disbursement finalization
     # 1. to record deduction of amount_payable ( from transient ) 
     AccountingService::GroupLoanClosingWithdrawCompulsorySavingsDeposit.add_round_down_revenue(self) 
     # 2. to record extra revenue from rounding_down 
-    AccountingService::GroupLoanClosingWithdrawCompulsorySavingsDeposit.compulsory_savings_and_deposit_return(self, rounding_down_amount)  
+    AccountingService::GroupLoanClosingWithdrawCompulsorySavingsDeposit.compulsory_savings_and_deposit_return(self, rounding_down_amount.truncate(2))  
   end
   
   

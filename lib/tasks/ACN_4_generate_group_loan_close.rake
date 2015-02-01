@@ -55,12 +55,12 @@ task :generate_loan_close_gl => :environment do
     # now, the total compulsory savings is collected.. to be ported to the transient
     AccountingService::GroupLoanClosingPortCompulsorySavingsDepositTransient.delay.port_deposit_and_compulsory_savings_to_transient_account(
               group_loan, 
-                total_compulsory_savings, BigDecimal("0"))
+                total_compulsory_savings.truncate(2), BigDecimal("0").truncate(2))
                 
     if group_loan.is_compulsory_savings_withdrawn?
       AccountingService::GroupLoanClosingWithdrawCompulsorySavingsDeposit.delay.compulsory_savings_and_deposit_return(
             group_loan, 
-            total_compulsory_savings) 
+            total_compulsory_savings.truncate(2)) 
     end
     
     count += 1 

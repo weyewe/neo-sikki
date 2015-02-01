@@ -15,3 +15,13 @@ bundle exec rake generate_deceased_gl   OK
 
 
 UserMailer.delay.welcome.deliver 
+
+
+# all generate_loan_close_gl fails 
+
+all_transaction_data_for_close_gl  = TransactionData.where(:code => TRANSACTION_DATA_CODE[:port_compulsory_savings_and_premature_clearance_deposit]).map{|x| x.id }  + TransactionData.where(:code => TRANSACTION_DATA_CODE[:group_loan_close_withdrawal_return]).map{|x| x.id }
+
+
+TransactionDataDetail.where(:transaction_data_id => all_transaction_data_for_close_gl).destroy_all
+
+TransactionData.where(:id => all_transaction_data_for_close_gl ).destroy_all
