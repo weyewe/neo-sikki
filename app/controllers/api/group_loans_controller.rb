@@ -65,8 +65,18 @@ class Api::GroupLoansController < Api::BaseApiController
         return
       end
       
+      begin
+        ActiveRecord::Base.transaction do 
+          @object.start(:started_at => params[:group_loan][:started_at] )
+        end
+      rescue ActiveRecord::ActiveRecordError  
+      else
+      end
       
-      @object.start(:started_at => params[:group_loan][:started_at] )
+      
+      
+      
+      
     elsif params[:unstart].present?    
       
       if not current_user.has_role?( :group_loans, :unstart)
@@ -74,36 +84,75 @@ class Api::GroupLoansController < Api::BaseApiController
         return
       end
       
-      @object.cancel_start
+      begin
+        ActiveRecord::Base.transaction do 
+          @object.cancel_start
+        end
+      rescue ActiveRecord::ActiveRecordError  
+      else
+      end
+      
+      
     elsif params[:disburse].present?
       if not current_user.has_role?( :group_loans, :disburse)
         render :json => {:success => false, :access_denied => "Tidak punya authorisasi"}
         return
       end
       
-      @object.disburse_loan( :disbursed_at => params[:group_loan][:disbursed_at] )
+      
+      begin
+        ActiveRecord::Base.transaction do 
+          @object.disburse_loan( :disbursed_at => params[:group_loan][:disbursed_at] )
+        end
+      rescue ActiveRecord::ActiveRecordError  
+      else
+      end
+      
+      
+      
     elsif params[:undisburse].present?  
       if not current_user.has_role?( :group_loans, :undisburse)
         render :json => {:success => false, :access_denied => "Tidak punya authorisasi"}
         return
       end
       
-        
-      @object.undisburse
+      begin
+        ActiveRecord::Base.transaction do 
+          @object.undisburse
+        end
+      rescue ActiveRecord::ActiveRecordError  
+      else
+      end
+      
     elsif params[:close].present?
       if not current_user.has_role?( :group_loans, :close)
         render :json => {:success => false, :access_denied => "Tidak punya authorisasi"}
         return
       end
       
-      @object.close( :closed_at => params[:group_loan][:closed_at] )
+      begin
+        ActiveRecord::Base.transaction do 
+          @object.close( :closed_at => params[:group_loan][:closed_at] )
+        end
+      rescue ActiveRecord::ActiveRecordError  
+      else
+      end
+      
     elsif params[:withdraw].present?
       if not current_user.has_role?( :group_loans, :withdraw)
         render :json => {:success => false, :access_denied => "Tidak punya authorisasi"}
         return
       end
       
-      @object.withdraw_compulsory_savings( :compulsory_savings_withdrawn_at => params[:group_loan][:compulsory_savings_withdrawn_at] )
+      begin
+        ActiveRecord::Base.transaction do 
+          @object.withdraw_compulsory_savings( :compulsory_savings_withdrawn_at => params[:group_loan][:compulsory_savings_withdrawn_at] )
+        end
+      rescue ActiveRecord::ActiveRecordError  
+      else
+      end
+      
+      
     else
       # puts "==========> Inside the update object\n"*100
       # puts "params[:group_loan][:group_number]: #{params[:group_loan][:group_number]}"
@@ -191,7 +240,17 @@ class Api::GroupLoansController < Api::BaseApiController
 
   def destroy
     @object = GroupLoan.find(params[:id])
-    @object.delete_object 
+    
+    begin
+      ActiveRecord::Base.transaction do 
+        @object.delete_object 
+      end
+    rescue ActiveRecord::ActiveRecordError  
+    else
+    end
+    
+    
+    
 
     if ( not @object.persisted?   )  
       render :json => { :success => true, :total => GroupLoan.count }  

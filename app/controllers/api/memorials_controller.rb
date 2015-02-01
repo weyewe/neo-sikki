@@ -97,8 +97,17 @@ class Api::MemorialsController < Api::BaseApiController
         return
       end
       
+      begin
+        ActiveRecord::Base.transaction do 
+          @object.confirm(:confirmed_at => params[:memorial][:confirmed_at] ) 
+        end
+      rescue ActiveRecord::ActiveRecordError  
+      else
+      end
       
-      @object.confirm(:confirmed_at => params[:memorial][:confirmed_at] )
+      
+      
+      
     elsif params[:unconfirm].present?    
       
       if not current_user.has_role?( :memorials, :unconfirm)
@@ -106,7 +115,15 @@ class Api::MemorialsController < Api::BaseApiController
         return
       end
       
-      @object.unconfirm
+      begin
+        ActiveRecord::Base.transaction do 
+          @object.unconfirm
+        end
+      rescue ActiveRecord::ActiveRecordError  
+      else
+      end
+      
+      
     else
       @object.update_object(params[:memorial])
     end

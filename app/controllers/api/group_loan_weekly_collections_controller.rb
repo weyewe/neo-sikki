@@ -64,8 +64,16 @@ class Api::GroupLoanWeeklyCollectionsController < Api::BaseApiController
         return
       end
       
+      begin
+        ActiveRecord::Base.transaction do 
+          @object.collect(:collected_at => params[:group_loan_weekly_collection][:collected_at] )
+        end
+      rescue ActiveRecord::ActiveRecordError  
+      else
+      end
       
-      @object.collect(:collected_at => params[:group_loan_weekly_collection][:collected_at] )
+      
+      
     elsif params[:uncollect].present?
       
       if not current_user.has_role?( :group_loan_weekly_collections, :uncollect)
@@ -73,8 +81,16 @@ class Api::GroupLoanWeeklyCollectionsController < Api::BaseApiController
         return
       end
       
+      begin
+        ActiveRecord::Base.transaction do 
+          @object.uncollect 
+        end
+      rescue ActiveRecord::ActiveRecordError  
+      else
+      end
       
-      @object.uncollect 
+      
+      
     elsif params[:confirm].present?
       
       if not current_user.has_role?( :group_loan_weekly_collections, :confirm)
@@ -82,8 +98,16 @@ class Api::GroupLoanWeeklyCollectionsController < Api::BaseApiController
         return
       end
       
+      begin
+        ActiveRecord::Base.transaction do 
+          @object.confirm( :confirmed_at => params[:group_loan_weekly_collection][:confirmed_at] )
+        end
+      rescue ActiveRecord::ActiveRecordError  
+      else
+      end
       
-      @object.confirm( :confirmed_at => params[:group_loan_weekly_collection][:confirmed_at] )
+      
+      
     elsif params[:unconfirm].present?
       
       if not current_user.has_role?( :group_loan_weekly_collections, :unconfirm)
@@ -91,7 +115,15 @@ class Api::GroupLoanWeeklyCollectionsController < Api::BaseApiController
         return
       end
       
-      @object.unconfirm 
+      begin
+        ActiveRecord::Base.transaction do 
+          @object.unconfirm 
+        end
+      rescue ActiveRecord::ActiveRecordError  
+      else
+      end
+      
+      
     else
       @object.update_object(params[:group_loan_weekly_collection])
     end

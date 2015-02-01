@@ -109,11 +109,29 @@ class Api::MembersController < Api::BaseApiController
     params[:member][:birthday_date] =  parse_date( params[:member][:birthday_date] ) 
     
     if params[:mark_as_deceased].present?  
-      @object.mark_as_deceased(:deceased_at => params[:member][:deceased_at] )
+      
+      begin
+        ActiveRecord::Base.transaction do 
+          @object.mark_as_deceased(:deceased_at => params[:member][:deceased_at] )
+        end
+      rescue ActiveRecord::ActiveRecordError  
+      else
+      end
+      
+      
     elsif params[:mark_as_run_away].present?  
       puts "\n\n"
       puts "=========> GOnna mark as run away\n"*10
-      @object.mark_as_run_away(:run_away_at => params[:member][:run_away_at] )
+      
+      begin
+        ActiveRecord::Base.transaction do 
+          @object.mark_as_run_away(:run_away_at => params[:member][:run_away_at] )
+        end
+      rescue ActiveRecord::ActiveRecordError  
+      else
+      end
+      
+      
     else
       @object.update_object( params[:member] )
     end
@@ -157,7 +175,16 @@ class Api::MembersController < Api::BaseApiController
 
   def destroy
     @object = Member.find(params[:id])
-    @object.delete_object 
+    
+    begin
+      ActiveRecord::Base.transaction do 
+        @object.delete_object 
+      end
+    rescue ActiveRecord::ActiveRecordError  
+    else
+    end
+    
+    
 
     if not @object.persisted?  
       render :json => { :success => true, :total => Member.active_objects.count }  

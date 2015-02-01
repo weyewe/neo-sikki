@@ -72,7 +72,16 @@ class Api::SavingsEntriesController < Api::BaseApiController
       end
       
       
-      @object.confirm(:confirmed_at => params[:savings_entry][:confirmed_at] )
+      begin
+        ActiveRecord::Base.transaction do 
+          @object.confirm(:confirmed_at => params[:savings_entry][:confirmed_at] )
+        end
+      rescue ActiveRecord::ActiveRecordError  
+      else
+      end
+      
+      
+      
     elsif params[:unconfirm].present?
       
       if not current_user.has_role?( :savings_entries, :unconfirm)
@@ -81,7 +90,15 @@ class Api::SavingsEntriesController < Api::BaseApiController
       end
       
       
-      @object.unconfirm 
+      begin
+        ActiveRecord::Base.transaction do 
+          @object.unconfirm 
+        end
+      rescue ActiveRecord::ActiveRecordError  
+      else
+      end
+      
+      
       
     else
       @object.update_object( params[:savings_entry] )
@@ -151,7 +168,16 @@ class Api::SavingsEntriesController < Api::BaseApiController
   def confirm
     @object = SavingsEntry.find_by_id params[:id]
     # add some defensive programming.. current user has role admin, and current_user is indeed belongs to the company 
-    @object.confirm(:confirmed_at => DateTime.now )
+    
+    begin
+      ActiveRecord::Base.transaction do 
+        @object.confirm(:confirmed_at => DateTime.now )
+      end
+    rescue ActiveRecord::ActiveRecordError  
+    else
+    end
+    
+    
     
     if @object.errors.size == 0  and @object.is_confirmed? 
       render :json => { :success => true, :total => SavingsEntry.count }  
