@@ -1,6 +1,7 @@
 require 'csv'
 require 'writeexcel'
 require 'stringio'
+require 'FileUtils'
 
 class TransactionDatasController < ApplicationController
   
@@ -9,17 +10,23 @@ class TransactionDatasController < ApplicationController
     
     start_date =  parse_date( params[:start_date] )
     end_date =  parse_date( params[:end_date] )
-    @objects = TransactionData.joins(:transaction_data_details => [:account]).where{
+    @objects = TransactionData.includes(:transaction_data_details => [:account]).where{
       (is_confirmed.eq true ) & 
       (transaction_datetime.gte start_date) & 
       ( transaction_datetime.lt end_date )
       }.order("transaction_datetime DESC")
 
 
+    puts "1111 length: #{@objects.length}"
     data_array = @objects 
      
     @awesome_filename = "TransactionReport-#{start_date}_to_#{end_date}.xls"
-    workbook = WriteExcel.new( @awesome_filename )
+    @filepath = "#{Rails.root}/tmp/" + @awesome_filename
+    
+    FileUtils.rm(@filepath)
+    
+    
+    workbook = WriteExcel.new( @filepath )
   
     worksheet = workbook.add_worksheet
 
@@ -85,9 +92,10 @@ class TransactionDatasController < ApplicationController
 
     workbook.close
     
-    send_file "#{@awesome_filename}", :type => "application/vnd.ms-excel", :filename => "#{@awesome_filename}", :stream => false
+    send_file "#{@filepath}", :type => "application/vnd.ms-excel", :filename => "#{@awesome_filename}"#, :stream => false
     
-    File.delete("#{@awesome_filename}") 
+    # File.delete("#{@awesome_filename}") 
+    # FileUtils.rm(@filepath)
     
     
   end
