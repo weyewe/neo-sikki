@@ -9,7 +9,7 @@ class TransactionDatasController < ApplicationController
     
     start_date =  parse_date( params[:start_date] )
     end_date =  parse_date( params[:end_date] )
-    @objects = TransactionData.includes(:transaction_data_details => [:account]).where{
+    @objects = TransactionData.eager_load(:transaction_data_details => [:account]).where{
       (is_confirmed.eq true ) & 
       (transaction_datetime.gte start_date) & 
       ( transaction_datetime.lt end_date )

@@ -108,6 +108,9 @@ Ext.define('AM.controller.TransactionDatas', {
  
 
 	loadObjectList : function(me){
+		var transactiondataGrid = this.getList();
+		transactiondataGrid.getStore().getProxy().extraParams.start_date =  null ;
+		transactiondataGrid.getStore().getProxy().extraParams.end_date =  null ;
 		// console.log( "I am inside the load object list" ); 
 		me.getStore().load();
 	},
