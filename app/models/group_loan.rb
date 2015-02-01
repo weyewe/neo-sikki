@@ -568,7 +568,7 @@ Phase: loan disbursement finalization
     
     AccountingService::GroupLoanClosingPortCompulsorySavingsDepositTransient.
                   port_deposit_and_compulsory_savings_to_transient_account(self, 
-                compulsory_savings_amount, deposit)
+                compulsory_savings_amount.to_s, deposit.to_s)
                 
     # clear the compulsory savings
     self.group_loan_memberships.each do |glm|
@@ -847,7 +847,7 @@ Phase: loan disbursement finalization
     )
     
     # this is the revenue. 
-    self.round_down_compulsory_savings_return_revenue = self.actual_group_loan_return_amount -  rounding_down_amount
+    self.round_down_compulsory_savings_return_revenue = ( self.actual_group_loan_return_amount -  rounding_down_amount ).truncate(2)
                                                     
                                                     
     self.save 
@@ -856,7 +856,7 @@ Phase: loan disbursement finalization
     # 1. to record deduction of amount_payable ( from transient ) 
     AccountingService::GroupLoanClosingWithdrawCompulsorySavingsDeposit.add_round_down_revenue(self) 
     # 2. to record extra revenue from rounding_down 
-    AccountingService::GroupLoanClosingWithdrawCompulsorySavingsDeposit.compulsory_savings_and_deposit_return(self, rounding_down_amount.truncate(2))  
+    AccountingService::GroupLoanClosingWithdrawCompulsorySavingsDeposit.compulsory_savings_and_deposit_return(self, rounding_down_amount.to_s)  
   end
   
   

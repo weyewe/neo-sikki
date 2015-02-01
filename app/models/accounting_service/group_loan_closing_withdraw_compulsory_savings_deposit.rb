@@ -35,6 +35,7 @@ module AccountingService
     end
     
     def GroupLoanClosingWithdrawCompulsorySavingsDeposit.compulsory_savings_and_deposit_return(group_loan, amount ) 
+      amount = BigDecimal( amount ).truncate(2)
       message = "Compulsory Savings + Deposit return: Group #{group_loan.name}, #{group_loan.group_number}." + 
                 " Amount: #{amount}." 
 
