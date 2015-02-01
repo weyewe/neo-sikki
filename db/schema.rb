@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150131053844) do
+ActiveRecord::Schema.define(version: 20150201170319) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -31,6 +31,8 @@ ActiveRecord::Schema.define(version: 20150131053844) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  add_index "accounts", ["parent_id"], name: "index_accounts_on_parent_id", using: :btree
 
   create_table "closings", force: true do |t|
     t.boolean  "is_first_closing",                                   default: false
@@ -72,6 +74,9 @@ ActiveRecord::Schema.define(version: 20150131053844) do
     t.datetime "updated_at"
   end
 
+  add_index "deceased_clearances", ["financial_product_id", "financial_product_type"], name: "deceased_clearance_source_index", using: :btree
+  add_index "deceased_clearances", ["member_id"], name: "index_deceased_clearances_on_member_id", using: :btree
+
   create_table "delayed_jobs", force: true do |t|
     t.integer  "priority",   default: 0, null: false
     t.integer  "attempts",   default: 0, null: false
@@ -95,6 +100,9 @@ ActiveRecord::Schema.define(version: 20150131053844) do
     t.datetime "updated_at"
   end
 
+  add_index "group_loan_disbursements", ["group_loan_id"], name: "index_group_loan_disbursements_on_group_loan_id", using: :btree
+  add_index "group_loan_disbursements", ["group_loan_membership_id"], name: "index_group_loan_disbursements_on_group_loan_membership_id", using: :btree
+
   create_table "group_loan_memberships", force: true do |t|
     t.integer  "group_loan_id"
     t.integer  "group_loan_product_id"
@@ -110,6 +118,11 @@ ActiveRecord::Schema.define(version: 20150131053844) do
     t.decimal  "closing_bad_debt_expense",                            precision: 12, scale: 2, default: 0.0
   end
 
+  add_index "group_loan_memberships", ["group_loan_id", "member_id"], name: "index_group_loan_memberships_on_group_loan_id_and_member_id", using: :btree
+  add_index "group_loan_memberships", ["group_loan_id"], name: "index_group_loan_memberships_on_group_loan_id", using: :btree
+  add_index "group_loan_memberships", ["group_loan_product_id"], name: "index_group_loan_memberships_on_group_loan_product_id", using: :btree
+  add_index "group_loan_memberships", ["member_id"], name: "index_group_loan_memberships_on_member_id", using: :btree
+
   create_table "group_loan_premature_clearance_payments", force: true do |t|
     t.integer  "group_loan_id"
     t.integer  "group_loan_membership_id"
@@ -120,6 +133,10 @@ ActiveRecord::Schema.define(version: 20150131053844) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  add_index "group_loan_premature_clearance_payments", ["group_loan_id"], name: "gl_pcp_gl", using: :btree
+  add_index "group_loan_premature_clearance_payments", ["group_loan_membership_id"], name: "gl_pcp_glm", using: :btree
+  add_index "group_loan_premature_clearance_payments", ["group_loan_weekly_collection_id"], name: "gl_pcp_glwc", using: :btree
 
   create_table "group_loan_products", force: true do |t|
     t.string   "name"
@@ -145,6 +162,11 @@ ActiveRecord::Schema.define(version: 20150131053844) do
     t.datetime "updated_at"
   end
 
+  add_index "group_loan_run_away_receivables", ["group_loan_id"], name: "gl_rar_gl", using: :btree
+  add_index "group_loan_run_away_receivables", ["group_loan_membership_id"], name: "gl_rar_glm", using: :btree
+  add_index "group_loan_run_away_receivables", ["group_loan_weekly_collection_id"], name: "gl_rar_glwc", using: :btree
+  add_index "group_loan_run_away_receivables", ["member_id"], name: "gl_rar_m", using: :btree
+
   create_table "group_loan_weekly_collection_voluntary_savings_entries", force: true do |t|
     t.decimal  "amount",                          precision: 10, scale: 2, default: 0.0
     t.integer  "group_loan_membership_id"
@@ -152,6 +174,9 @@ ActiveRecord::Schema.define(version: 20150131053844) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  add_index "group_loan_weekly_collection_voluntary_savings_entries", ["group_loan_membership_id"], name: "glwc_vse_glm", using: :btree
+  add_index "group_loan_weekly_collection_voluntary_savings_entries", ["group_loan_weekly_collection_id"], name: "glwc_vse_glwc", using: :btree
 
   create_table "group_loan_weekly_collections", force: true do |t|
     t.integer  "group_loan_id"
@@ -166,6 +191,8 @@ ActiveRecord::Schema.define(version: 20150131053844) do
     t.datetime "tentative_collection_date"
   end
 
+  add_index "group_loan_weekly_collections", ["group_loan_id"], name: "index_group_loan_weekly_collections_on_group_loan_id", using: :btree
+
   create_table "group_loan_weekly_payments", force: true do |t|
     t.integer  "group_loan_membership_id"
     t.integer  "group_loan_id"
@@ -174,6 +201,10 @@ ActiveRecord::Schema.define(version: 20150131053844) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  add_index "group_loan_weekly_payments", ["group_loan_id"], name: "gl_wp_gl", using: :btree
+  add_index "group_loan_weekly_payments", ["group_loan_membership_id"], name: "gl_wp_glm", using: :btree
+  add_index "group_loan_weekly_payments", ["group_loan_weekly_collection_id"], name: "gl_wp_glwc", using: :btree
 
   create_table "group_loan_weekly_uncollectibles", force: true do |t|
     t.integer  "group_loan_weekly_collection_id"
@@ -189,6 +220,10 @@ ActiveRecord::Schema.define(version: 20150131053844) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  add_index "group_loan_weekly_uncollectibles", ["group_loan_id"], name: "glwu_gl", using: :btree
+  add_index "group_loan_weekly_uncollectibles", ["group_loan_membership_id"], name: "glwu_glm", using: :btree
+  add_index "group_loan_weekly_uncollectibles", ["group_loan_weekly_collection_id"], name: "glwu_glwc", using: :btree
 
   create_table "group_loans", force: true do |t|
     t.string   "name"
@@ -252,13 +287,16 @@ ActiveRecord::Schema.define(version: 20150131053844) do
     t.datetime "updated_at"
   end
 
+  add_index "memorial_details", ["account_id"], name: "index_memorial_details_on_account_id", using: :btree
+  add_index "memorial_details", ["memorial_id"], name: "index_memorial_details_on_memorial_id", using: :btree
+
   create_table "memorials", force: true do |t|
     t.datetime "transaction_datetime"
     t.text     "description"
     t.boolean  "is_confirmed",         default: false
     t.datetime "confirmed_at"
     t.string   "code"
-    t.boolean  "is_deleted"
+    t.boolean  "is_deleted",           default: false
     t.datetime "deleted_at"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -291,6 +329,10 @@ ActiveRecord::Schema.define(version: 20150131053844) do
     t.string   "message"
   end
 
+  add_index "savings_entries", ["financial_product_id", "financial_product_type"], name: "financial_product_source_index", using: :btree
+  add_index "savings_entries", ["member_id"], name: "index_savings_entries_on_member_id", using: :btree
+  add_index "savings_entries", ["savings_source_id", "savings_source_type"], name: "savings_entry_source_index", using: :btree
+
   create_table "transaction_activities", force: true do |t|
     t.integer  "transaction_source_id"
     t.string   "transaction_source_type"
@@ -304,6 +346,8 @@ ActiveRecord::Schema.define(version: 20150131053844) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  add_index "transaction_activities", ["transaction_source_id", "transaction_source_type"], name: "transaction_activity_source_index", using: :btree
 
   create_table "transaction_data", force: true do |t|
     t.integer  "transaction_source_id"
@@ -329,6 +373,9 @@ ActiveRecord::Schema.define(version: 20150131053844) do
     t.datetime "updated_at"
   end
 
+  add_index "transaction_data_details", ["account_id"], name: "index_transaction_data_details_on_account_id", using: :btree
+  add_index "transaction_data_details", ["transaction_data_id"], name: "index_transaction_data_details_on_transaction_data_id", using: :btree
+
   create_table "users", force: true do |t|
     t.string   "email",                  default: "",    null: false
     t.string   "encrypted_password",     default: "",    null: false
@@ -353,6 +400,7 @@ ActiveRecord::Schema.define(version: 20150131053844) do
 
   add_index "users", ["email"], name: "index_users_on_email", unique: true, using: :btree
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
+  add_index "users", ["role_id"], name: "index_users_on_role_id", using: :btree
 
   create_table "valid_comb_savings_entries", force: true do |t|
     t.integer  "member_id"
@@ -364,6 +412,8 @@ ActiveRecord::Schema.define(version: 20150131053844) do
     t.datetime "updated_at"
   end
 
+  add_index "valid_comb_savings_entries", ["member_id"], name: "index_valid_comb_savings_entries_on_member_id", using: :btree
+
   create_table "valid_combs", force: true do |t|
     t.integer  "closing_id"
     t.integer  "account_id"
@@ -372,5 +422,8 @@ ActiveRecord::Schema.define(version: 20150131053844) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  add_index "valid_combs", ["account_id"], name: "index_valid_combs_on_account_id", using: :btree
+  add_index "valid_combs", ["closing_id"], name: "index_valid_combs_on_closing_id", using: :btree
 
 end

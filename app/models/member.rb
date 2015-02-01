@@ -1,7 +1,7 @@
 class Member < ActiveRecord::Base
   has_many :valid_comb_savings_entries 
   # attr_accessible :title, :body
-  belongs_to :office 
+  # belongs_to :office 
   
   has_many :group_loans, :through => :group_loan_memberships 
   has_many :group_loan_memberships 

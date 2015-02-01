@@ -30,6 +30,8 @@ gem 'turbolinks'
 gem 'protected_attributes'
 gem 'delayed_job_active_record'
 
+gem "lol_dba"
+
 
 gem 'thin'
 # gem 'roadie' # for sending email 's css

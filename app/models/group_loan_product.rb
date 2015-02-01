@@ -1,6 +1,6 @@
 class GroupLoanProduct < ActiveRecord::Base
   # attr_accessible :title, :body
-  belongs_to :office 
+  # belongs_to :office 
   
   validates_presence_of  :total_weeks, 
                         :principal,
