@@ -6,7 +6,7 @@ class Api::GroupLoansController < Api::BaseApiController
       livesearch = "%#{params[:livesearch]}%"
       @objects = GroupLoan.includes(:group_loan_memberships).where{
         (
-          (name =~  livesearch )
+          (name =~  livesearch )  
         )
         
       }.page(params[:page]).per(params[:limit]).order("id DESC")
