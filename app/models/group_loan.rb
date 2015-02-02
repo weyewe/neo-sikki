@@ -3,6 +3,7 @@ require 'csv'
 class GroupLoan < ActiveRecord::Base
   # attr_accessible :title, :body
   # belongs_to :office 
+  belongs_to :office 
   has_many :members, :through => :group_loan_memberships 
   has_many :group_loan_memberships 
   has_many :group_loan_weekly_collections 

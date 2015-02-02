@@ -296,7 +296,7 @@ ActiveRecord::Schema.define(version: 20150201170319) do
     t.boolean  "is_confirmed",         default: false
     t.datetime "confirmed_at"
     t.string   "code"
-    t.boolean  "is_deleted",           default: false
+    t.boolean  "is_deleted"
     t.datetime "deleted_at"
     t.datetime "created_at"
     t.datetime "updated_at"
