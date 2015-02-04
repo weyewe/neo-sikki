@@ -55,7 +55,8 @@ module AccountingService
         ta.confirm
     end
     
-    def IndependentSavings.post_locked_savings_account( savings_entry , multiplier, absolut_amount ) 
+    def IndependentSavings.post_locked_savings_account( savings_entry , multiplier) 
+        absolut_amount = savings_entry.amount 
         member = savings_entry.member
         message = "" 
         main_cash_entry_case = 0 
@@ -106,12 +107,13 @@ module AccountingService
         ta.confirm
     end
     
-    def IndependentSavings.post_membership_savings_account( savings_entry , multiplier, absolut_amount ) 
+    def IndependentSavings.post_membership_savings_account( savings_entry , multiplier ) 
+        absolut_amount = savings_entry.amount 
         member = savings_entry.member
         message = "" 
         main_cash_entry_case = 0 
         savings_account_entry_case = 0 
-        
+         
         if multiplier == -1 
           message = "Voluntary Savings Withdrawal: Member #{member.name}, #{member.id_number}"
           main_cash_entry_case  = NORMAL_BALANCE[:credit]
