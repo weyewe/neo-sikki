@@ -252,8 +252,6 @@ class UserMailer < ActionMailer::Base
     target = ["w.yunnal@gmail.com"]
     target << email 
     
-    start_date =  parse_date( params[:start_date] )
-    end_date =  parse_date( params[:end_date] )
     @objects = TransactionData.eager_load(:transaction_data_details => [:account]).where{
       (is_confirmed.eq true ) & 
       (transaction_datetime.gte start_date) & 

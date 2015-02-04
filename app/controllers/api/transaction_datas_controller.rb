@@ -116,7 +116,8 @@ class Api::TransactionDatasController < Api::BaseApiController
     end
     
     
-    UserMailer.delay.welcome 
+    # UserMailer.delay.welcome 
+    UserMailer.delay.send_transaction_data( start_date, end_date, email ) 
     render :json => { :message => "Awesome", :success => true }
     
   end
