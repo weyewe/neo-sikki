@@ -474,6 +474,7 @@ class UserMailer < ActionMailer::Base
     )
     
     @public_url = file.public_url 
+    puts "The public url: #{@public_url}"
     
     
     
