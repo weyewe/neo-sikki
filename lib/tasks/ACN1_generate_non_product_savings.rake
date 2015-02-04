@@ -36,9 +36,9 @@ task :generate_non_product_savings_gl => :environment do
 	  if s_e.savings_status == SAVINGS_STATUS[:savings_account]
 	    AccountingService::IndependentSavings.delay.post_savings_account(s_e, multiplier   )
     elsif SAVINGS_STATUS[:membership]
-      AccountingService::IndependentSavings.delay.post_savings_account(s_e, multiplier   )
+      AccountingService::IndependentSavings.delay.post_membership_savings_account(s_e, multiplier   )
     elsif SAVINGS_STATUS[:locked]
-      AccountingService::IndependentSavings.delay.post_savings_account(s_e, multiplier )
+      AccountingService::IndependentSavings.delay.post_locked_savings_account(s_e, multiplier )
     end
     
     counter += 1 
