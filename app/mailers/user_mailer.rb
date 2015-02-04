@@ -458,6 +458,8 @@ class UserMailer < ActionMailer::Base
   UPLOADING DATA TO THE S3
 =end
 
+    puts "Gonna upload to s3!!!"
+
     connection = Fog::Storage.new({
       :provider                 => 'AWS',
       :aws_access_key_id        => Figaro.env.s3_key ,
@@ -466,7 +468,7 @@ class UserMailer < ActionMailer::Base
     directory = connection.directories.get( Figaro.env.s3_bucket  ) 
     
     file = directory.files.create(
-      :key    => 'config.ru',
+      :key    => @awesome_filename,
       :body   => File.open( @filepath ),
       :public => true
     )
