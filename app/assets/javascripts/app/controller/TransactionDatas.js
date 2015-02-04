@@ -77,6 +77,9 @@ Ext.define('AM.controller.TransactionDatas', {
 			'transactiondatalist button[action=downloadObject]': {
         click: this.downloadObject
 			}	,
+			'transactiondatadownloadform button[action=save]': {
+        click: this.executeDownload
+			}	,
 		
     });
   },
@@ -116,10 +119,8 @@ Ext.define('AM.controller.TransactionDatas', {
 	},
 
   setPeriod: function() {
-	var view = Ext.widget('transactiondataform');
-  view.show();
-
-	 
+		var view = Ext.widget('transactiondataform');
+	  view.show();
   },
 
 	executeSetPeriod: function(button){
@@ -169,14 +170,6 @@ Ext.define('AM.controller.TransactionDatas', {
 			
 			win.close();
 		}
-		
-		
-		
-		
-		
-		
-		
-		
 	},
 
   editObject: function() {
@@ -448,15 +441,110 @@ Ext.define('AM.controller.TransactionDatas', {
 	},
 	
 	downloadObject: function(){
-			var url = "transaction_datas/download_xls?start_date=" + encodeURIComponent(this.startDate) + "&" + 
-							"end_date=" + encodeURIComponent(this.endDate);
-							
-			window.open(
-				url, 'xls');
-				
-				// var myOtherUrl = 
-				       // "http://example.com/index.html?url=" + encodeURIComponent(myUrl);
-	}
+			// var url = "transaction_datas/download_xls?start_date=" + encodeURIComponent(this.startDate) + "&" + 
+			// 				"end_date=" + encodeURIComponent(this.endDate);
+			// 				
+			// window.open(
+			// 	url, 'xls');
+			
+			var view = Ext.widget('transactiondatadownloadform');
+		  view.show();
+			
+	},
+	
+	executeDownload: function(button){
+		var win = button.up('window');
+    var form = win.down('form');
+ 
+		var me = this; 
+ 
+    var values = form.getValues();
+
+		console.log( values ) 
+		console.log( values["start_date"])
+		console.log( values["end_date"])
+		
+		var transactiondataDetailGrid = this.getTransactiondataDetailList();
+		
+		
+		var transactiondataGrid = this.getList();
+		
+		var download_start_date = values["start_date"];
+		var download_end_date = values["end_date"];
+		var download_email = values["email"] ;
+		
+		// console.log("record id: " + record.get("id"));
+		if(download_start_date && download_end_date && download_email  ){ 
+			 
+			// form.query('checkbox').forEach(function(checkbox){
+			// 	record.set( checkbox['name']  ,checkbox['checked'] ) ;
+			// });
+			// 
+			form.setLoading(true);
+			Ext.Ajax.request({
+				url: 'api/download_transaction_data',    // where you wanna post
+				success : function(x, y ){
+					
+					// console.log(arguments.length );
+					// console.log("the x value is ");
+					// console.log( x ) ;
+					// console.log(" the y value is " );
+					// console.log( y );
+					
+					// console.log(x.request.responseText.reader.jsonData["message"]); // x.request.scope.reader.jsonData["message"];
+					
+					 
+					var json = x.responseText; 
+					console.log( x.request  ) ;
+					
+					var obj = Ext.JSON.decode(json);
+
+					console.log(obj );
+					
+					if( obj.success ){
+						form.setLoading(false); 
+						win.close();
+						
+						Ext.Msg.alert('Sukses', "Laporan transaksi dari tanggal " + 
+																		download_start_date + 
+																		" sampai " + 
+																		download_end_date + 
+																		" akan dikirimkan ke " + download_email );
+						
+					}else{
+						
+						form.setLoading(false);  
+						
+						Ext.Msg.alert('FAIL',  obj.message );
+						
+					}
+					
+					
+					
+					// to  we want get the error message 
+					
+					
+					
+				},
+				failure : function(x,op){
+					Ext.Msg.alert('Gagal', "Gagal melakukan scheduling pembuatan laporan"  );
+				},
+				params: { 
+					start_date: download_start_date, 
+					end_date : download_end_date , 
+					email : download_email 
+			  }  // your json data
+			});
+			
+			
+			
+			
+			
+			
+
+		}
+		
+	},
 
 	
 

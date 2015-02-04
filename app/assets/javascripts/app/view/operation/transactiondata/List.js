@@ -35,7 +35,7 @@ Ext.define('AM.view.operation.transactiondata.List' ,{
 		this.downloadObjectButton = new Ext.Button({
 			text: 'Download',
 			action: 'downloadObject',
-			disabled: true 
+			disabled : false 
 		});
 		
 		

@@ -80,4 +80,44 @@ class Api::TransactionDatasController < Api::BaseApiController
     
     render :json => { :records => @objects , :total => @objects.count, :success => true }
   end
+  
+  
+  VALID_EMAIL_REGEX = /\A[\w+\-.]+@[a-z\d\-]+(\.[a-z]+)*\.[a-z]+\z/i
+  
+  
+  def download_transaction_data
+    start_date =  parse_date( params[:start_date] )
+    end_date =  parse_date( params[:end_date] )
+    email = params[:email]
+    
+    if start_date.nil? 
+      render :json => { :message => "Start Date harus ada", :success => false }
+      return 
+    end
+    
+    if end_date.nil? 
+      render :json => { :message => "End Date harus ada", :success => false }
+      return 
+    end
+    
+    if not email.present? 
+      render :json => { :message => "Email harus ada", :success => false }
+      return 
+    end
+    
+    if start_date > end_date
+      render :json => { :message => "Start Date tidak boleh > End Date", :success => false }
+      return 
+    end
+    
+    if not ( email =~  VALID_EMAIL_REGEX )
+      render :json => { :message => "Email tidak valid", :success => false }
+      return
+    end
+    
+    
+    UserMailer.delay.welcome 
+    render :json => { :message => "Awesome", :success => true }
+    
+  end
 end

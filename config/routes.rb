@@ -8,6 +8,8 @@ NeoSikki::Application.routes.draw do
   namespace :api do 
     devise_for :users
     
+    
+    post "download_transaction_data", :to => 'transaction_datas#download_transaction_data', :as => :download_tranasction_data
     post 'authenticate_auth_token', :to => 'sessions#authenticate_auth_token', :as => :authenticate_auth_token 
     put 'update_password' , :to => "passwords#update" , :as => :update_password
     
