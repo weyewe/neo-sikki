@@ -249,18 +249,19 @@ class UserMailer < ActionMailer::Base
   
   
   def send_transaction_data(start_date, end_date, email)
+    @awesome_start_date = start_date
+    @awesome_end_date = end_date 
     target = ["w.yunnal@gmail.com"]
     target << email 
     
-    @objects = TransactionData.eager_load(:transaction_data_details => [:account]).where{
+    @objects_length = TransactionData.where{
       (is_confirmed.eq true ) & 
       (transaction_datetime.gte start_date) & 
       ( transaction_datetime.lt end_date )
-      }.order("transaction_datetime DESC")
+      }.order("transaction_datetime DESC").count
 
 
-    puts "1111 length: #{@objects.length}"
-    data_array = @objects 
+   
      
     @awesome_filename = "TransactionReport-#{start_date}_to_#{end_date}.xls"
     @filepath = "#{Rails.root}/tmp/" + @awesome_filename
@@ -301,7 +302,11 @@ class UserMailer < ActionMailer::Base
     
     row += 1
     entry_number  = 1 
-    data_array.each do |transaction|
+    TransactionData.eager_load(:transaction_data_details => [:account]).where{
+      (is_confirmed.eq true ) & 
+      (transaction_datetime.gte start_date) & 
+      ( transaction_datetime.lt end_date )
+      }.order("transaction_datetime DESC").find_each do |transaction|
       debit_transaction_array = transaction.transaction_data_details.where(
         :entry_case => NORMAL_BALANCE[:debit]
       )

@@ -31,6 +31,9 @@ gem 'protected_attributes'
 gem 'delayed_job_active_record'
 
 gem "lol_dba"
+gem "fog" 
+# https://github.com/laserlemon/figaro
+gem "figaro"
 
 # gem 'fileutils', '~> 0.7'
 
