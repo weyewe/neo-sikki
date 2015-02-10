@@ -594,9 +594,13 @@ result = TransactionData.eager_load(:transaction_data_details => [:account]).whe
         ( confirmed_at.lt end_date )
       }.order("member_id ASC, confirmed_at ASC").find_each do |s_e|
       member = s_e.member 
-      next if member.nil? 
+      next if member.nil?
       last_glm = member.group_loan_memberships.eager_load(:group_loan).order("group_loan_memberships.id DESC").first
-      last_group_loan = last_glm.group_loan 
+      
+      last_group_loan = nil 
+    
+      last_group_loan = last_glm.group_loan  if not last_glm.nil? 
+      
       
       worksheet.write(row, LOCKED_SAVINGS_NUMBER_COLUMN  ,  entry_number )
       worksheet.write(row, LOCKED_SAVINGS_MEMBER_ID  , member.id_number )
