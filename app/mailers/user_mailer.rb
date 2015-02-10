@@ -623,6 +623,7 @@ result = TransactionData.eager_load(:transaction_data_details => [:account]).whe
       end
       
       row += 1
+      entry_number += 1 
     end
     
     workbook.close
