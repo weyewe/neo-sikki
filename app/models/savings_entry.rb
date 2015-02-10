@@ -374,30 +374,35 @@ class SavingsEntry < ActiveRecord::Base
   
    
   def unconfirm
+    
     if not self.is_confirmed?
       self.errors.add(:generic_errors, 'Belum dikonfirmasi.')
       return self
     end
     self.is_confirmed = false
     self.confirmed_at = nil 
-    self.save 
-    
-    member = self.member 
-    multiplier = -1 
-    multiplier = 1 if self.direction ==  FUND_TRANSFER_DIRECTION[:outgoing]
     
     
-    if self.savings_status == SAVINGS_STATUS[:savings_account]
-      member.update_total_savings_account( multiplier  *self.amount )
-    elsif  self.savings_status == SAVINGS_STATUS[:membership]
-      member.update_total_membership_savings_account( multiplier  *self.amount )
-    elsif self.savings_status == SAVINGS_STATUS[:locked]
-      member.update_total_locked_savings_account( multiplier  *self.amount )
+    if self.save 
+      member = self.member 
+      multiplier = -1 
+      multiplier = 1 if self.direction ==  FUND_TRANSFER_DIRECTION[:outgoing]
+
+
+      if self.savings_status == SAVINGS_STATUS[:savings_account]
+        member.update_total_savings_account( multiplier  *self.amount )
+      elsif  self.savings_status == SAVINGS_STATUS[:membership]
+        member.update_total_membership_savings_account( multiplier  *self.amount )
+      elsif self.savings_status == SAVINGS_STATUS[:locked]
+        member.update_total_locked_savings_account( multiplier  *self.amount )
+      end
+
+
+      # member.update_total_savings_account( multiplier  *self.amount )
+      AccountingService::IndependentSavings.cancel_journal_posting( self )
     end
     
     
-    # member.update_total_savings_account( multiplier  *self.amount )
-    AccountingService::IndependentSavings.cancel_journal_posting( self ) 
   end
   
   

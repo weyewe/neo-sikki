@@ -4,6 +4,32 @@ require 'active_record'
 require 'csv'
 
 
+=begin
+savings_status_array = [
+	SAVINGS_STATUS[:savings_account],
+  SAVINGS_STATUS[:membership],
+  SAVINGS_STATUS[:locked]
+]
+SavingsEntry.where{
+
+  ( savings_status.in  savings_status_array ) & 
+	( is_confirmed.eq true ) & 
+	( confirmed_at.eq nil ) & 
+	( savings_source_id.eq nil )
+
+}.count
+
+
+(
+	:savings_status => [
+		SAVINGS_STATUS[:savings_account],
+    SAVINGS_STATUS[:membership],
+    SAVINGS_STATUS[:locked]
+	],
+	:is_confirmed => true 
+)
+=end
+
 
 task :fix_generate_non_product_savings_gl => :environment do
   

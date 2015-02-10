@@ -407,14 +407,23 @@ class UserMailer < ActionMailer::Base
     worksheet.write(0, DEBIT_AMOUNT  , 'Jumlah')
     worksheet.write(0, CREDIT_ACCOUNT_NAME  , 'Akun di kredit')
     worksheet.write(0, CREDIT_AMOUNT  , 'Jumlah')
+=begin
+result = TransactionData.eager_load(:transaction_data_details => [:account]).where{
+    (is_confirmed.eq true ) & 
+    (transaction_datetime.gte start_date) & 
+    ( transaction_datetime.lt end_date )
+  }.order("transaction_datetime DESC").limit(1000).map{|x| x.transaction_datetime}
+=end 
+    
     
     row += 1
     entry_number  = 1 
     TransactionData.eager_load(:transaction_data_details => [:account]).where{
-      (is_confirmed.eq true ) & 
-      (transaction_datetime.gte start_date) & 
-      ( transaction_datetime.lt end_date )
-      }.order("transaction_datetime DESC").find_each do |transaction|
+        (is_confirmed.eq true ) & 
+        (transaction_datetime.gte start_date) & 
+        ( transaction_datetime.lt end_date )
+      }.order("transaction_datetime ASC").find_each do |transaction|
+        
       debit_transaction_array = transaction.transaction_data_details.where(
         :entry_case => NORMAL_BALANCE[:debit]
       )
@@ -481,6 +490,158 @@ class UserMailer < ActionMailer::Base
     now = DateTime.now
     
     mail(:to => mail_list, :subject => "Transaction Data Report #{now.year}-#{now.month}-#{now.day}") 
+  end
+  
+  
+  def send_locked_savings_download_link( start_date, end_date, email )  
+    content = 'awesome banzai'
+    mail_list = ["w.yunnal@gmail.com"]
+    mail_list << email 
+    
+    
+    @awesome_start_date = start_date
+    @awesome_end_date = end_date 
+    
+     
+=begin
+SavingsEntry.where{
+  (is_confirmed.eq true ) & 
+  (savings_status.eq SAVINGS_STATUS[:locked])
+}.count
+=end
+		
+    
+    @objects_length = SavingsEntry.where{
+      (is_confirmed.eq true ) & 
+      (savings_status.eq SAVINGS_STATUS[:locked]) &
+      (confirmed_at.gte start_date) & 
+      ( confirmed_at.lt end_date )
+      
+    }.count
+
+
+   
+     
+    @awesome_filename = "LockedSavings-#{start_date.to_date}_to_#{end_date.to_date}.xls"
+    @filepath = "#{Rails.root}/tmp/" + @awesome_filename
+    
+     
+    # File.delete( @filepath ) if File.exists?( @filepath )
+    if File.exists?( @filepath )
+      puts "234 the file at #{@filepath} EXISTS"
+      File.delete( @filepath ) 
+    end
+    
+    
+    
+    workbook = WriteExcel.new( @filepath )
+      
+    worksheet = workbook.add_worksheet
+    
+    
+    row = 0 
+    
+   
+    # col 1 
+    worksheet.set_column(LOCKED_SAVINGS_NUMBER_COLUMN, LOCKED_SAVINGS_NUMBER_COLUMN,  20)
+    # col 2
+    worksheet.set_column(LOCKED_SAVINGS_MEMBER_ID, LOCKED_SAVINGS_MEMBER_ID,  20)
+    # col 3
+    worksheet.set_column(LOCKED_SAVINGS_MEMBER_NAME, LOCKED_SAVINGS_MEMBER_NAME,  30)
+    # col 4
+    worksheet.set_column(LOCKED_SAVINGS_TRANSACTION_DATE, LOCKED_SAVINGS_TRANSACTION_DATE,  20)
+    # col 5
+    worksheet.set_column(LOCKED_SAVINGS_TRANSACTION_TYPE, LOCKED_SAVINGS_TRANSACTION_TYPE,  20)
+    # col 6,7,8
+    worksheet.set_column(LOCKED_SAVINGS_TRANSACTION_AMOUNT, LOCKED_SAVINGS_LAST_GROUP_NAME,  30)
+    
+    
+    worksheet.write(0, LOCKED_SAVINGS_NUMBER_COLUMN  , 'NO')
+    worksheet.write(0, LOCKED_SAVINGS_MEMBER_ID  , 'Member ID')
+    worksheet.write(0, LOCKED_SAVINGS_MEMBER_NAME  , 'Member Name')
+    worksheet.write(0, LOCKED_SAVINGS_TRANSACTION_DATE  , 'Tanggal Transaksi')
+    worksheet.write(0, LOCKED_SAVINGS_TRANSACTION_TYPE  , 'Tipe Transaksi')
+    worksheet.write(0, LOCKED_SAVINGS_TRANSACTION_AMOUNT  , 'Jumlah')
+    worksheet.write(0, LOCKED_SAVINGS_LAST_GROUP_NO  , 'Last Group Loan No')
+    worksheet.write(0, LOCKED_SAVINGS_LAST_GROUP_NAME  , 'Last Group Loan Name')
+=begin
+result = TransactionData.eager_load(:transaction_data_details => [:account]).where{
+    (is_confirmed.eq true ) & 
+    (transaction_datetime.gte start_date) & 
+    ( transaction_datetime.lt end_date )
+  }.order("transaction_datetime DESC").limit(1000).map{|x| x.transaction_datetime}
+=end 
+    
+    
+    row += 1
+    entry_number  = 1 
+    SavingsEntry.eager_load(:member).where{
+        (is_confirmed.eq true ) & 
+        (savings_status.eq SAVINGS_STATUS[:locked]) &
+        (confirmed_at.gte start_date) & 
+        ( confirmed_at.lt end_date )
+      }.order("member_id ASC, confirmed_at ASC").find_each do |s_e|
+      member = s_e.member 
+      last_group_loan = member.group_loan_memberships.eager_load(:group_loan).order("id DESC").first
+     
+      worksheet.write(row, LOCKED_SAVINGS_NUMBER_COLUMN  ,  entry_number )
+      worksheet.write(row, LOCKED_SAVINGS_MEMBER_ID  , member.id_number )
+      worksheet.write(row, LOCKED_SAVINGS_MEMBER_NAME  , member.name  )
+      
+      worksheet.write(row, LOCKED_SAVINGS_TRANSACTION_DATE  , s_e.confirmed_at )
+      
+      
+      
+      
+      if s_e.direction == FUND_TRANSFER_DIRECTION[:incoming]
+        worksheet.write(row, LOCKED_SAVINGS_TRANSACTION_TYPE  , "Penambahan")
+      elsif s_e.direction == FUND_TRANSFER_DIRECTION[:outgoing]
+        worksheet.write(row, LOCKED_SAVINGS_TRANSACTION_TYPE  , "Penarikan" )
+      end
+      
+      worksheet.write(row, LOCKED_SAVINGS_TRANSACTION_AMOUNT  ,  s_e.amount )
+      
+      if last_group_loan.nil?
+        worksheet.write(row, LOCKED_SAVINGS_LAST_GROUP_NO  ,  "N/A" )
+        worksheet.write(row, LOCKED_SAVINGS_LAST_GROUP_NAME  ,  "N/A")
+      else
+        worksheet.write(row, LOCKED_SAVINGS_LAST_GROUP_NO  ,  last_group_loan.group_number )
+        worksheet.write(row, LOCKED_SAVINGS_LAST_GROUP_NAME  ,  last_group_loan.name )
+      end
+      
+      entry_number += 1
+    end
+    
+    workbook.close
+    
+    
+=begin
+  UPLOADING DATA TO THE S3
+=end
+
+    puts "Gonna upload to s3!!!"
+
+    connection = Fog::Storage.new({
+      :provider                 => 'AWS',
+      :aws_access_key_id        => Figaro.env.s3_key ,
+      :aws_secret_access_key    => Figaro.env.s3_secret 
+    })
+    directory = connection.directories.get( Figaro.env.s3_bucket  ) 
+    
+    file = directory.files.create(
+      :key    => @awesome_filename,
+      :body   => File.open( @filepath ),
+      :public => true
+    )
+    
+    @public_url = file.public_url 
+    puts "The public url: #{@public_url}"
+    
+    
+    
+    now = DateTime.now
+    
+    mail(:to => mail_list, :subject => "Locked Savings Report #{now.year}-#{now.month}-#{now.day}") 
   end
   
     
