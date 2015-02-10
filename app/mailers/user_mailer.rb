@@ -493,9 +493,9 @@ result = TransactionData.eager_load(:transaction_data_details => [:account]).whe
   end
   
 =begin
-  start_date = DateTime.new(2014,12,1,0,0,0)
+  start_date = DateTime.new(2011,1,1,0,0,0)
   end_date = DateTime.new(2014,12,30,0,0,0)
-  email = "admin@11ina.com"
+  email = "isabella.harefa@gmail.com"
   
   
   example use case:
@@ -594,6 +594,7 @@ result = TransactionData.eager_load(:transaction_data_details => [:account]).whe
         ( confirmed_at.lt end_date )
       }.order("member_id ASC, confirmed_at ASC").find_each do |s_e|
       member = s_e.member 
+      next if member.nil? 
       last_glm = member.group_loan_memberships.eager_load(:group_loan).order("group_loan_memberships.id DESC").first
       last_group_loan = last_glm.group_loan 
       
