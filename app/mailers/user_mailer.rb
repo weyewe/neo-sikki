@@ -492,7 +492,16 @@ result = TransactionData.eager_load(:transaction_data_details => [:account]).whe
     mail(:to => mail_list, :subject => "Transaction Data Report #{now.year}-#{now.month}-#{now.day}") 
   end
   
+=begin
+  start_date = DateTime.new(2014,12,1,0,0,0)
+  end_date = DateTime.new(2014,12,30,0,0,0)
+  email = "admin@11ina.com"
   
+  
+  example use case:
+  # with delayed_job
+  Notifier.delay.signup(@user)
+=end
   def send_locked_savings_download_link( start_date, end_date, email )  
     content = 'awesome banzai'
     mail_list = ["w.yunnal@gmail.com"]
@@ -570,6 +579,8 @@ result = TransactionData.eager_load(:transaction_data_details => [:account]).whe
     (transaction_datetime.gte start_date) & 
     ( transaction_datetime.lt end_date )
   }.order("transaction_datetime DESC").limit(1000).map{|x| x.transaction_datetime}
+  
+  start
 =end 
     
     
@@ -582,8 +593,9 @@ result = TransactionData.eager_load(:transaction_data_details => [:account]).whe
         ( confirmed_at.lt end_date )
       }.order("member_id ASC, confirmed_at ASC").find_each do |s_e|
       member = s_e.member 
-      last_group_loan = member.group_loan_memberships.eager_load(:group_loan).order("id DESC").first
-     
+      last_glm = member.group_loan_memberships.eager_load(:group_loan).order("group_loan_memberships.id DESC").first
+      last_group_loan = last_glm.group_loan 
+      
       worksheet.write(row, LOCKED_SAVINGS_NUMBER_COLUMN  ,  entry_number )
       worksheet.write(row, LOCKED_SAVINGS_MEMBER_ID  , member.id_number )
       worksheet.write(row, LOCKED_SAVINGS_MEMBER_NAME  , member.name  )
