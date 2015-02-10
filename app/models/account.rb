@@ -274,7 +274,9 @@ class Account < ActiveRecord::Base
 
    
 
-
+  def self.all_ledger_accounts
+    self.where(:account_case == ACCOUNT_CASE[:ledger])
+  end
 
 
   def self.create_base_objects 

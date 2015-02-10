@@ -125,7 +125,7 @@ class Closing < ActiveRecord::Base
     end_transaction = end_period
     
     
-    leaves_account = Account.leaves
+    leaves_account = Account.all_ledger_accounts
     
     
     
@@ -183,7 +183,7 @@ class Closing < ActiveRecord::Base
       end
       
       
-      puts " #{leaf_account.name} (#{leaf_account.code}) :: #{valid_comb_amount}   ===  #{final_valid_comb_amount.abs}"
+      puts " #{leaf_account.name} (#{leaf_account.code}) :: #{valid_comb_amount} "
       
       
       
