@@ -157,12 +157,135 @@ describe Closing do
 =begin
 accounting_closing_datetime = DateTime.new(2014,12,31,0,0,0)
 closing = Closing.create_object(
-  :end_period => DateTime.now,
+  :end_period => accounting_closing_datetime,
   :description => "This is the description" 
 )
 
 closing.confirm(:confirmed_at => DateTime.now )
 
+
+accounting_closing_datetime = DateTime.new(2014,12,31,0,0,0)
+total_incoming = BigDecimal("0")
+
+total_incoming_voluntary = BigDecimal("0")
+total_incoming_membership = BigDecimal("0")
+total_incoming_locked = BigDecimal("0")
+
+total_incoming_group_loan_compulsory = BigDecimal("0")
+total_incoming_group_loan_voluntary = BigDecimal("0")
+
+total_incoming = SavingsEntry.where{
+  (direction.eq FUND_TRANSFER_DIRECTION[:incoming]) & 
+  (is_confirmed.eq true ) & 
+  (confirmed_at.lte accounting_closing_datetime)
+}.sum("amount")
+
+total_incoming_voluntary = SavingsEntry.where{
+  ( direction.eq FUND_TRANSFER_DIRECTION[:incoming]) & 
+  ( savings_status.eq SAVINGS_STATUS[:savings_account] ) & 
+  ( is_confirmed.eq true) & 
+  ( confirmed_at.lte accounting_closing_datetime )
+}.sum("amount")
+
+total_incoming_membership = SavingsEntry.where{
+  ( direction.eq FUND_TRANSFER_DIRECTION[:incoming]) & 
+  ( savings_status.eq SAVINGS_STATUS[:membership] ) & 
+  ( is_confirmed.eq true) & 
+  ( confirmed_at.lte accounting_closing_datetime )
+}.sum("amount")
+
+total_incoming_locked = SavingsEntry.where{
+  ( direction.eq FUND_TRANSFER_DIRECTION[:incoming]) & 
+  ( savings_status.eq SAVINGS_STATUS[:locked] ) & 
+  ( is_confirmed.eq true) & 
+  ( confirmed_at.lte accounting_closing_datetime )
+}.sum("amount")
+ 
+total_incoming_group_loan_compulsory = SavingsEntry.where{
+   ( direction.eq FUND_TRANSFER_DIRECTION[:incoming]) & 
+   ( savings_status.eq SAVINGS_STATUS[:group_loan_compulsory_savings] ) & 
+   ( is_confirmed.eq true) & 
+   ( confirmed_at.lte accounting_closing_datetime )
+ }.sum("amount")
+ 
+total_incoming_group_loan_voluntary = SavingsEntry.where{
+ ( direction.eq FUND_TRANSFER_DIRECTION[:incoming]) & 
+ ( savings_status.eq SAVINGS_STATUS[:group_loan_voluntary_savings] ) & 
+ ( is_confirmed.eq true) & 
+ ( confirmed_at.lte accounting_closing_datetime )
+}.sum("amount")
+
+total_outgoing = BigDecimal("0")
+
+total_outgoing_voluntary = BigDecimal("0")
+total_outgoing_membership = BigDecimal("0")
+total_outgoing_locked = BigDecimal("0")
+
+total_outgoing_group_loan_compulsory = BigDecimal("0")
+total_outgoing_group_loan_voluntary = BigDecimal("0")
+
+total_outgoing = SavingsEntry.where{
+  (direction.eq FUND_TRANSFER_DIRECTION[:outgoing]) & 
+  (is_confirmed.eq true ) & 
+  (confirmed_at.lte accounting_closing_datetime)
+}.sum("amount")
+
+total_outgoing_voluntary = SavingsEntry.where{
+  ( direction.eq FUND_TRANSFER_DIRECTION[:outgoing]) & 
+  ( savings_status.eq SAVINGS_STATUS[:savings_account] ) & 
+  ( is_confirmed.eq true) & 
+  ( confirmed_at.lte accounting_closing_datetime )
+}.sum("amount")
+
+total_outgoing_membership = SavingsEntry.where{
+  ( direction.eq FUND_TRANSFER_DIRECTION[:outgoing]) & 
+  ( savings_status.eq SAVINGS_STATUS[:membership] ) & 
+  ( is_confirmed.eq true) & 
+  ( confirmed_at.lte accounting_closing_datetime )
+}.sum("amount")
+
+total_outgoing_locked = SavingsEntry.where{
+  ( direction.eq FUND_TRANSFER_DIRECTION[:outgoing]) & 
+  ( savings_status.eq SAVINGS_STATUS[:locked] ) & 
+  ( is_confirmed.eq true) & 
+  ( confirmed_at.lte accounting_closing_datetime )
+}.sum("amount")
+ 
+total_outgoing_group_loan_compulsory = SavingsEntry.where{
+   ( direction.eq FUND_TRANSFER_DIRECTION[:outgoing]) & 
+   ( savings_status.eq SAVINGS_STATUS[:group_loan_compulsory_savings] ) & 
+   ( is_confirmed.eq true) & 
+   ( confirmed_at.lte accounting_closing_datetime )
+ }.sum("amount")
+ 
+total_outgoing_group_loan_voluntary = SavingsEntry.where{
+ ( direction.eq FUND_TRANSFER_DIRECTION[:outgoing]) & 
+ ( savings_status.eq SAVINGS_STATUS[:group_loan_voluntary_savings] ) & 
+ ( is_confirmed.eq true) & 
+ ( confirmed_at.lte accounting_closing_datetime )
+}.sum("amount")
+
+puts "total incoming: #{total_incoming.to_s}"
+puts "total incoming voluntary: #{total_incoming_voluntary.to_s}"
+puts "total incoming membership: #{total_incoming_membership.to_s}"
+puts "total incoming locked: #{total_incoming_locked.to_s}"
+puts "total incoming group_loan_compulsory : #{total_incoming_group_loan_compulsory.to_s}"
+puts "total incoming group_loan_voluntary: #{total_incoming_group_loan_voluntary.to_s}"
+
+puts "\n\n"
+puts "total outgoing: #{total_outgoing.to_s}"
+puts "total outgoing voluntary: #{total_outgoing_voluntary.to_s}"
+puts "total outgoing membership: #{total_outgoing_membership.to_s}"
+puts "total outgoing locked: #{total_outgoing_locked.to_s}"
+puts "total outgoing group_loan_compulsory : #{total_outgoing_group_loan_compulsory.to_s}"
+puts "total outgoing group_loan_voluntary: #{total_outgoing_group_loan_voluntary.to_s}"
+
+zero_amount = BigDecimal("0")
+GroupLoanMembership.where{
+  (is_active.eq false) & 
+  (total_compulsory_savings.not_eq  zero_amount)
+
+}.count
 =end
       
       # closing = Closing.create_object(
