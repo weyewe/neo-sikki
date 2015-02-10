@@ -208,6 +208,12 @@ class Closing < ActiveRecord::Base
     
   end
   
+  def print_balance_sheet
+    self.valid_combs.joins(:account).order("accounts.code ASC").each do |valid_comb|
+      puts "#{valid_comb.account.name} = #{valid_comb.amount}"
+    end
+  end
+  
   def generate_parent_valid_combs( node_id_list )
     node_account_list = Account.where(:id => node_id_list)
     

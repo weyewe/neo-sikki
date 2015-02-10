@@ -501,6 +501,7 @@ result = TransactionData.eager_load(:transaction_data_details => [:account]).whe
   example use case:
   # with delayed_job
   Notifier.delay.signup(@user)
+  UserMailer.delay.send_locked_savings_download_link( start_date, end_date, email )  
 =end
   def send_locked_savings_download_link( start_date, end_date, email )  
     content = 'awesome banzai'

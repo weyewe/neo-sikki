@@ -154,7 +154,16 @@ describe Closing do
         :end_period => @accounting_closing_datetime,
         :description => "This is the description" 
       )
-      
+=begin
+accounting_closing_datetime = DateTime.new(2014,12,31,0,0,0)
+closing = Closing.create_object(
+  :end_period => accounting_closing_datetime,
+  :description => "This is the description" 
+)
+
+closing.confirm(:confirmed_at => DateTime.now )
+
+=end
       
       # closing = Closing.create_object(
       #   :end_period => DateTime.now,
