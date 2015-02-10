@@ -216,7 +216,7 @@ ACCOUNT_CODE = {
                           :code =>    "3-111",
                           :name => "Net Earning",
                           :normal_balance => 2,
-                          :status => 1,
+                          :status => 2,
                           :parent_code =>  "3-110" 
                         } ,
   

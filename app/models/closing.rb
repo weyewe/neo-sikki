@@ -119,6 +119,25 @@ class Closing < ActiveRecord::Base
   end
   
   
+  def generate_valid_combs_for_non_children
+    Account.roots.each do |x|
+      
+      next if x.children.count != 0 
+      
+      
+      valid_comb = ValidComb.create_object(
+        :account_id => x.id,
+        :closing_id => self.id,
+        :amount => BigDecimal("0"),
+        :entry_case => x.normal_balance
+      )
+      
+    end
+    
+    
+  end
+  
+  
   
   def generate_valid_combs
     start_transaction = start_period
@@ -210,7 +229,7 @@ class Closing < ActiveRecord::Base
   
   def print_balance_sheet
     self.valid_combs.joins(:account).order("accounts.code ASC").each do |valid_comb|
-      puts "#{valid_comb.account.name} = #{valid_comb.amount}"
+      puts "[#{valid_comb.account.code}] #{valid_comb.account.name} = #{valid_comb.amount}"
     end
   end
   
@@ -365,6 +384,8 @@ class Closing < ActiveRecord::Base
     if self.save 
       # self.generate_closing_entries # revenue = 0, expense = 0
       self.generate_valid_combs
+      
+      self.generate_valid_combs_for_non_children
       # self.extract_closing_entries
     end 
     
