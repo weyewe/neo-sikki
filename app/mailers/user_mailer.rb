@@ -622,7 +622,7 @@ result = TransactionData.eager_load(:transaction_data_details => [:account]).whe
         worksheet.write(row, LOCKED_SAVINGS_LAST_GROUP_NAME  ,  last_group_loan.name )
       end
       
-      entry_number += 1
+      row += 1
     end
     
     workbook.close
