@@ -669,13 +669,13 @@ result = TransactionData.eager_load(:transaction_data_details => [:account]).whe
 =begin
   start_date = DateTime.new(2011,1,1,0,0,0)
   end_date = DateTime.new(2014,12,30,0,0,0)
-  email = "isabella.harefa@gmail.com"
+  email = "w.yunnal@gmail.com"
 
 
   example use case:
   # with delayed_job
   Notifier.delay.signup(@user)
-  UserMailer.delay.send_locked_savings_download_link( start_date, end_date, email )  
+  UserMailer.delay.send_membership_and_locked_savings_summary_download_link( start_date, end_date, email )  
 =end
   def send_membership_and_locked_savings_summary_download_link( start_date, end_date, email )  
     content = 'membership + locked savings'
@@ -732,7 +732,7 @@ SavingsEntry.where{
     zero_amount = BigDecimal("0")
     
     @objects_length = Member.where{
-      (total_locked_savings_account.gt zero_amount) & 
+      (total_locked_savings_account.gt zero_amount) | 
       (total_membership_savings.gt zero_amount) 
     }.count
     
@@ -743,7 +743,7 @@ SavingsEntry.where{
     
     
     Member.where{
-      (total_locked_savings_account.gt zero_amount) & 
+      (total_locked_savings_account.gt zero_amount) |  
       (total_membership_savings.gt zero_amount) 
     }.find_each do |member|
       
