@@ -663,6 +663,132 @@ result = TransactionData.eager_load(:transaction_data_details => [:account]).whe
     mail(:to => mail_list, :subject => "Locked Savings Report #{now.year}-#{now.month}-#{now.day}") 
   end
   
+  
+
+
+=begin
+  start_date = DateTime.new(2011,1,1,0,0,0)
+  end_date = DateTime.new(2014,12,30,0,0,0)
+  email = "isabella.harefa@gmail.com"
+
+
+  example use case:
+  # with delayed_job
+  Notifier.delay.signup(@user)
+  UserMailer.delay.send_locked_savings_download_link( start_date, end_date, email )  
+=end
+  def send_membership_and_locked_savings_summary_download_link( start_date, end_date, email )  
+    content = 'membership + locked savings'
+    mail_list = ["w.yunnal@gmail.com"]
+    mail_list << email 
+
+
+    @awesome_start_date = "all date"
+    @awesome_end_date = "all date" 
+
+
+=begin
+SavingsEntry.where{
+  (is_confirmed.eq true ) & 
+  (savings_status.eq SAVINGS_STATUS[:locked])
+}.count
+=end
+
+
+    
+
+
+
+
+    @awesome_filename = "LockedSavings-#{start_date.to_date}_to_#{end_date.to_date}.xls"
+    @filepath = "#{Rails.root}/tmp/" + @awesome_filename
+
+
+    # File.delete( @filepath ) if File.exists?( @filepath )
+    if File.exists?( @filepath )
+      puts "234 the file at #{@filepath} EXISTS"
+      File.delete( @filepath ) 
+    end
+
+
+
+    workbook = WriteExcel.new( @filepath )
+
+    worksheet = workbook.add_worksheet
+
+
+    row = 0 
+ 
+    worksheet.set_column(0, 0,  20)
+    worksheet.set_column(1, 4,  30)
+
+    worksheet.write(0, 0  , 'NO')
+    worksheet.write(0, 1  , 'Member ID')
+    worksheet.write(0, 2  , 'Member Name')
+    worksheet.write(0, 3  , 'Membership Savings')
+    worksheet.write(0, 4  , 'Locked Savings')
+
+    
+    zero_amount = BigDecimal("0")
+    
+    @objects_length = Member.where{
+      (total_locked_savings_account.gt zero_amount) & 
+      (total_membership_savings.gt zero_amount) 
+    }.count
+    
+    
+    
+    row += 1
+    entry_number  = 1 
+    
+    
+    Member.where{
+      (total_locked_savings_account.gt zero_amount) & 
+      (total_membership_savings.gt zero_amount) 
+    }.find_each do |member|
+      
+      worksheet.write(row, 0  ,  entry_number )
+      worksheet.write(row, 1  , member.id_number )
+      worksheet.write(row, 2  , member.name  )
+
+      worksheet.write(row, 3  , member.total_membership_savings.to_s )
+      worksheet.write(row, 4  , member.total_locked_savings_account.to_s )
+      
+      row += 1
+      entry_number += 1
+    end
+    
+    workbook.close
+
+
+=begin
+  UPLOADING DATA TO THE S3
+=end
+
+    puts "Gonna upload to s3!!!"
+
+    connection = Fog::Storage.new({
+      :provider                 => 'AWS',
+      :aws_access_key_id        => Figaro.env.s3_key ,
+      :aws_secret_access_key    => Figaro.env.s3_secret 
+    })
+    directory = connection.directories.get( Figaro.env.s3_bucket  ) 
+
+    file = directory.files.create(
+      :key    => @awesome_filename,
+      :body   => File.open( @filepath ),
+      :public => true
+    )
+
+    @public_url = file.public_url 
+    puts "The public url: #{@public_url}"
+
+
+
+    now = DateTime.now
+
+    mail(:to => mail_list, :subject => "Member Savings Summary #{now.year}-#{now.month}-#{now.day}") 
+  end
     
     
 end
