@@ -719,7 +719,7 @@ result = TransactionData.eager_load(:transaction_data_details => [:account]).whe
     entry_number  = 1 
     Member.order("id_number ASC").find_each do |member|
         
-      active_glm = member.group_loan_memberships.where(:is_active => true).order("id ASC").first
+      active_glm = member.group_loan_memberships.where(:is_active => true).order("id DESC").first
       
       worksheet.write(row, 0  ,  entry_number )
 
