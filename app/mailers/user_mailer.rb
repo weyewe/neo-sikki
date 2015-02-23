@@ -717,7 +717,7 @@ result = TransactionData.eager_load(:transaction_data_details => [:account]).whe
     
     row += 1
     entry_number  = 1 
-    Member.order("id_number ASC").find_each do |transaction|
+    Member.order("id_number ASC").find_each do |member|
         
       active_glm = member.group_loan_memberships.where(:is_active => true).order("id ASC").first
       
