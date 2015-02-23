@@ -657,6 +657,120 @@ result = TransactionData.eager_load(:transaction_data_details => [:account]).whe
     
     mail(:to => mail_list, :subject => "Locked Savings Report #{now.year}-#{now.month}-#{now.day}") 
   end
+
+
+  def send_member_data_download_link
+    content = 'awesome banzai'
+    mail_list = ["w.yunnal@gmail.com", "isabella.harefa@gmail.com"]
+    
+    
+    
+    @objects_length = Member.count
+
+
+   
+     
+    @awesome_filename = "MemberData_#{DateTime.now}.xls"
+    @filepath = "#{Rails.root}/tmp/" + @awesome_filename
+    
+     
+    # File.delete( @filepath ) if File.exists?( @filepath )
+    if File.exists?( @filepath )
+      puts "234 the file at #{@filepath} EXISTS"
+      File.delete( @filepath ) 
+    end
+    
+    
+    
+    workbook = WriteExcel.new( @filepath )
+      
+    worksheet = workbook.add_worksheet
+    
+    
+    row = 0 
+    
+    worksheet.set_column(0, 0,  10) # Column  A   width set to 20
+    
+    worksheet.set_column(1, 6,  20)
+    
+    
+    worksheet.write(0, 0  , 'NO')
+    worksheet.write(0, 1  , 'No Kelompok')
+    worksheet.write(0, 2  , 'Nama Kelompok')
+    worksheet.write(0, 3  , 'Nama Member')
+    worksheet.write(0, 4  , 'Id Member')
+    worksheet.write(0, 5  , 'Kelurahan')
+    worksheet.write(0, 6  , 'RW')
+=begin
+result = TransactionData.eager_load(:transaction_data_details => [:account]).where{
+    (is_confirmed.eq true ) & 
+    (transaction_datetime.gte start_date) & 
+    ( transaction_datetime.lt end_date )
+  }.order("transaction_datetime DESC").limit(1000).map{|x| x.transaction_datetime}
+=end 
+    
+    
+    row += 1
+    entry_number  = 1 
+    Member.order("id_number ASC").find_each do |transaction|
+        
+      active_glm = member.group_loan_memberships.where(:is_active => true).order("id ASC").first
+      
+      worksheet.write(row, 0  ,  entry_number )
+
+      group_name = "N/A"
+      group_no = "N/A"
+
+      if not active_glm.nil?
+        group_name = active_glm.group_loan.name
+        group_name = active_glm.group_loan.group_number
+      end
+
+      worksheet.write(row, 1  , group_no )
+      worksheet.write(row, 2  , group_name )
+      worksheet.write(row, 3  , member.name )
+      worksheet.write(row, 4  , member.id_number )
+      worksheet.write(row, 5  , member.village )
+      worksheet.write(row, 6  , member.rw )
+    
+    
+      length = 0 
+    
+      row += length   + 1 
+      entry_number += 1
+    end
+    
+    workbook.close
+    
+    
+=begin
+  UPLOADING DATA TO THE S3
+=end
+
+    puts "Gonna upload to s3!!!"
+
+    connection = Fog::Storage.new({
+      :provider                 => 'AWS',
+      :aws_access_key_id        => Figaro.env.s3_key ,
+      :aws_secret_access_key    => Figaro.env.s3_secret 
+    })
+    directory = connection.directories.get( Figaro.env.s3_bucket  ) 
+    
+    file = directory.files.create(
+      :key    => @awesome_filename,
+      :body   => File.open( @filepath ),
+      :public => true
+    )
+    
+    @public_url = file.public_url 
+    puts "The public url: #{@public_url}"
+    
+    
+    
+    now = DateTime.now
+    
+    mail(:to => mail_list, :subject => "Member report #{now.year}-#{now.month}-#{now.day}") 
+  end
   
     
     
