@@ -728,7 +728,7 @@ result = TransactionData.eager_load(:transaction_data_details => [:account]).whe
 
       if not active_glm.nil?
         group_name = active_glm.group_loan.name
-        group_name = active_glm.group_loan.group_number
+        group_no = active_glm.group_loan.group_number
       end
 
       worksheet.write(row, 1  , group_no )
