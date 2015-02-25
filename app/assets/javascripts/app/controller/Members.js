@@ -53,7 +53,7 @@ Ext.define('AM.controller.Members', {
 			'memberlist button[action=unmarkasdeceasedObject]': {
         click: this.unmarkAsDeceasedObject
 			}	,
-			'unmarkmemberasdeceasedform button[action=confirmUndeceased]' : {
+			'unmarkmemberasdeceasedform button[action=unconfirmDeceased]' : {
 				click : this.executeConfirmUndeceased
 			},
 			
@@ -141,6 +141,8 @@ Ext.define('AM.controller.Members', {
 	},
 
 	executeConfirmUndeceased : function(button){
+		// console.log("unconfirm deceased");
+
 		var me = this; 
 		var win = button.up('window');
     var form = win.down('form');
