@@ -21,3 +21,4 @@ heroku_env.rb
 
 # Ignore application configuration
 /config/application.yml
+/play_data/*
