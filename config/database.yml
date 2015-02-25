@@ -15,9 +15,10 @@
 development:
   adapter: postgresql
   encoding: unicode
-  database: neosikki_development
+  database: neo_sikki_development
   pool: 5
   username: weyewe
+  password: willy1234W
 
 #   pg_restore --verbose --clean --no-acl --no-owner -h localhost -U weyewe -d neosikki_development latest.dump
 
@@ -45,6 +46,7 @@ test:
   database: neosikki_test
   pool: 5
   username: weyewe
+  password: willy1234W
 
 production:
   adapter: postgresql

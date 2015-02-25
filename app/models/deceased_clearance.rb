@@ -23,6 +23,10 @@ class DeceasedClearance < ActiveRecord::Base
         group_loan_membership, 
         group_loan_deceased_clearance) 
   end
+
+  def undo_deceased_declaration_posting
+    AccountingService::Deceased.undo_deceased( self ) 
+  end
   
             
 =begin

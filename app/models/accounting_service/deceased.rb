@@ -37,8 +37,18 @@ module AccountingService
       ta.confirm
     end
     
-    def Deceased.cancel_bad_debt_allocation(object)
+
+    def Deceased.undo_deceased(object)
+      last_transaction_data = TransactionData.where(
+        :transaction_source_id => object.id , 
+        :transaction_source_type => object.class.to_s ,
+        :code => TRANSACTION_DATA_CODE[:group_loan_deceased_declaration],
+        :is_contra_transaction => false
+      ).order("id DESC").first 
+
+      last_transaction_data.create_contra_and_confirm if not last_transaction_data.nil?
     end
+
     
 
   end

@@ -40,7 +40,7 @@ Ext.define('AM.controller.Members', {
       'memberlist button[action=deleteObject]': {
         click: this.deleteObject
       },
-			'memberlist textfield[name=searchField]': {
+	  	'memberlist textfield[name=searchField]': {
         change: this.liveSearch
       },
 			'memberlist button[action=markasdeceasedObject]': {
@@ -48,6 +48,13 @@ Ext.define('AM.controller.Members', {
 			}	,
 			'markmemberasdeceasedform button[action=confirmDeceased]' : {
 				click : this.executeConfirmDeceased
+			},
+
+			'memberlist button[action=unmarkasdeceasedObject]': {
+        click: this.unmarkAsDeceasedObject
+			}	,
+			'unmarkmemberasdeceasedform button[action=confirmUndeceased]' : {
+				click : this.executeConfirmUndeceased
 			},
 			
 			'memberlist button[action=markasrunawayObject]': {
@@ -101,6 +108,59 @@ Ext.define('AM.controller.Members', {
 			record.save({
 				params : {
 					mark_as_deceased: true 
+				},
+				success : function(record){
+					form.setLoading(false);
+					
+					list.fireEvent('confirmed', record);
+					
+					
+					store.load();
+					win.close();
+					
+				},
+				failure : function(record,op ){
+					// console.log("Fail update");
+					form.setLoading(false);
+					var message  = op.request.scope.reader.jsonData["message"];
+					var errors = message['errors'];
+					form.getForm().markInvalid(errors);
+					record.reject(); 
+					// this.reject(); 
+				}
+			});
+		}
+	},
+
+	unmarkAsDeceasedObject: function(){
+		// console.log("mark as Deceased is clicked");
+		var view = Ext.widget('unmarkmemberasdeceasedform');
+		var record = this.getList().getSelectedObject();
+		view.setParentData( record );
+    view.show();
+	},
+
+	executeConfirmUndeceased : function(button){
+		var me = this; 
+		var win = button.up('window');
+    var form = win.down('form');
+		var list = this.getList();
+
+    var store = this.getMembersStore();
+		var record = this.getList().getSelectedObject();
+    var values = form.getValues();
+ 
+		if(record){
+			var rec_id = record.get("id");
+			 
+			// form.query('checkbox').forEach(function(checkbox){
+			// 	record.set( checkbox['name']  ,checkbox['checked'] ) ;
+			// });
+			// 
+			form.setLoading(true);
+			record.save({
+				params : {
+					unmark_as_deceased: true 
 				},
 				success : function(record){
 					form.setLoading(false);

@@ -194,54 +194,64 @@ class Member < ActiveRecord::Base
       
     end
   end
-  
-  
-=begin
-  NEVER EVER DO the undo for deceased and run_away
-=end
-  def undo_mark_as_deceased 
-    # deceased_week_number? 
-    self.group_loan_memberships.where(
-      :is_active => false, 
-      :deactivation_case => GROUP_LOAN_DEACTIVATION_CASE[:deceased] 
-    ).each do |glm|
-      
-      
-      if glm.deactivation_case == GROUP_LOAN_DEACTIVATION_CASE[:deceased]   
-        deactivation_week = glm.deactivation_week_number 
-        deactivation_weekly_collection = glm.group_loan.group_loan_weekly_collections.where(:week_number =>deactivation_week ).first 
 
-        if deactivation_weekly_collection.is_collected == true 
-          self.errors.add(:generic_errors, "Sudah ada pengumpulan pada group loan #{glm.group_loan.name} di minggu #{deactivation_week}")
-          return self 
-        end
+  def undo_mark_as_deceased
+    if not self.is_deceased?
+      self.errors.add(:generic_errors, "Not Deceased")
+      return self 
+    end
+
+
+    self.group_loan_memberships.where(
+        :deactivation_case => GROUP_LOAN_DEACTIVATION_CASE[:deceased], 
+        :is_active => false 
+      ).each do |glm|
+
+      group_loan = glm.group_loan
+
+      if group_loan.first_uncollected_weekly_collection.week_number != glm.deactivation_week_number
+        msg = "Harus unconfirm pengumpulan dari group #{group_loan.name} " + 
+              "sampai ke minggu ke #{glm.deactivation_week_number}"
+        self.errors.add(:generic_errors, msg)
+
+        return self 
       end
-      
-        
-        
-      
-      deceased_clearance = DeceasedClearance.where(
-        :financial_product_id  => glm.group_loan.id,
-        :financial_product_type => glm.group_loan.class.to_s,
-        :member_id => glm.member_id
-      ).first 
-      
-   
-      
-      
-      
-      deceased_clearance.destroy 
+
+
+    end
+
+
+
+
+
+    # if there is any group_loan_membership in which
+    # the member is a glm from, and the weekly collection has move forward,
+    # they have to uncollect the weekly collection
+
+    self.deceased_clearances.each do |x|
+      x.undo_deceased_declaration_posting
+      x.destroy 
+    end
+
+
+    self.deceased_at = nil 
+    self.is_deceased = false 
+    self.save 
+
+    self.group_loan_memberships.where(
+        :deactivation_case => GROUP_LOAN_DEACTIVATION_CASE[:deceased], 
+        :is_active => false 
+      ).each do |glm|
+
       glm.is_active = true 
-      glm.deactivation_case = nil 
-      glm.deactivation_week_number = nil 
-      glm.save
+      glm.deactivation_case = nil
+      glm.save 
     end
     
-    self.is_deceased = false 
-    self.deceased_at = nil 
-    self.save 
+
+    return self 
   end
-  
+    
   def mark_as_run_away(params)
     if self.is_run_away? 
       self.errors.add(:generic_errors, "#{self.name} sudah dinyatakan kabur")

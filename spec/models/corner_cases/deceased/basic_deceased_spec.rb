@@ -142,6 +142,14 @@ describe DeceasedClearance do
     @first_group_loan_weekly_collection.is_collected.should be_truthy 
     @first_group_loan_weekly_collection.is_confirmed.should be_truthy 
   end
+
+  it "should not allow to undo mark as deceased if the member is not deceased yet" do
+    @deceased_glm = @group_loan.active_group_loan_memberships.first 
+    @deceased_member = @deceased_glm.member 
+    @deceased_member.undo_mark_as_deceased
+
+    @deceased_member.errors.size.should_not == 0 
+  end
   
    
   context "a member is passed away ( week 2 ) "  do
@@ -171,6 +179,43 @@ describe DeceasedClearance do
       @deceased_glm.is_active.should be_falsey 
       @deceased_glm.deactivation_week_number.should == @second_group_loan_weekly_collection.week_number
       @deceased_glm.deactivation_case.should == GROUP_LOAN_DEACTIVATION_CASE[:deceased]
+    end
+
+    context "unconfirm deceased" do
+      before(:each) do
+
+
+        @dc = DeceasedClearance.first 
+        @dc_id = @dc.id
+        @dc_class = @dc.class.to_s
+        @member  = @deceased_glm.member
+        @member.reload
+        @member.undo_mark_as_deceased
+
+        
+
+      end
+
+      it "should produce no error" do
+        @member.errors.size.should == 0 
+        @member.is_deceased.should be_falsey
+      end
+
+      it "should create contra transaction" do
+
+        
+
+        ta = TransactionData.where({
+
+        :transaction_source_id => @dc_id , 
+        :transaction_source_type => @dc_class ,
+        :code => TRANSACTION_DATA_CODE[:group_loan_deceased_declaration],
+        :is_contra_transaction => true 
+        }).order("id DESC").first
+
+        ta.should be_valid
+        ta.is_confirmed.should be_truthy
+      end
     end
     
     it 'should extract the glm that is active at that particular week' do
@@ -246,6 +291,33 @@ describe DeceasedClearance do
       it 'should not create GroupLoanWeeklyPayment to the deceased member' do
         GroupLoanWeeklyPayment.where(:group_loan_weekly_collection_id => @second_group_loan_weekly_collection.id,
                 :group_loan_membership_id => @deceased_glm.id ).count.should == 0 
+      end
+
+      it "should not be allowed to undo deceased clearance" do
+        @deceased_member.reload
+        @deceased_member.undo_mark_as_deceased
+        @deceased_member.errors.size.should_not == 0
+      end
+
+      it "should be allowed to undo deceased clearance if collection is undoo" do
+        @second_group_loan_weekly_collection.unconfirm
+        @second_group_loan_weekly_collection.uncollect
+
+        @deceased_member.reload
+
+        @deceased_member.undo_mark_as_deceased
+        @deceased_member.errors.size.should == 0 
+
+        @deceased_member.reload
+        
+        @deceased_member.is_deceased.should be_falsey
+        @deceased_member.deceased_at.should be_nil
+
+        @deceased_member.group_loan_memberships.each do |x|
+          x.is_active.should be_truthy
+        end
+
+
       end
     end
      

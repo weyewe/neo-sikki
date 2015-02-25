@@ -117,6 +117,16 @@ class Api::MembersController < Api::BaseApiController
       rescue ActiveRecord::ActiveRecordError  
       else
       end
+
+    elsif params[:unmark_as_deceased].present?
+
+      begin
+        ActiveRecord::Base.transaction do 
+          @object.undo_mark_as_deceased 
+        end
+      rescue ActiveRecord::ActiveRecordError  
+      else
+      end
       
       
     elsif params[:mark_as_run_away].present?  
