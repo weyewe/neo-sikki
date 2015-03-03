@@ -924,112 +924,112 @@ SavingsEntry.where{
 #  15 potongan koperasi: 585000.0
 # 16 Total: 2545000.0
 
-
+    @data = data
     target = ["w.yunnal@gmail.com"]
     # target << email 
     
 
    
      
-    @awesome_filename = "slip_gaji-#{data[0]}-#{DateTime.now}.xls"
-    @filepath = "#{Rails.root}/tmp/" + @awesome_filename
+#     @awesome_filename = "slip_gaji-#{data[0]}-#{DateTime.now}.xls"
+#     @filepath = "#{Rails.root}/tmp/" + @awesome_filename
     
      
-    # File.delete( @filepath ) if File.exists?( @filepath )
-    if File.exists?( @filepath )
-      puts "234 the file at #{@filepath} EXISTS"
-      File.delete( @filepath ) 
-    end
+#     # File.delete( @filepath ) if File.exists?( @filepath )
+#     if File.exists?( @filepath )
+#       puts "234 the file at #{@filepath} EXISTS"
+#       File.delete( @filepath ) 
+#     end
     
     
     
-    workbook = WriteExcel.new( @filepath )
+#     workbook = WriteExcel.new( @filepath )
       
-    worksheet = workbook.add_worksheet
+#     worksheet = workbook.add_worksheet
     
     
-    row = 0 
+#     row = 0 
     
-    worksheet.set_column(0, 3,  20) 
+#     worksheet.set_column(0, 3,  20) 
     
 
-       #   0      nama : ARIanto WIbowo
-#  1 email : arie@ssd.dnet.net.id
-#  2 tanggal bergabung : 3/29/2011
-#  3 jabatan: Staff IT
-#  4 lokasi: IT JKT
+#        #   0      nama : ARIanto WIbowo
+# #  1 email : arie@ssd.dnet.net.id
+# #  2 tanggal bergabung : 3/29/2011
+# #  3 jabatan: Staff IT
+# #  4 lokasi: IT JKT
 
-
-    
-    worksheet.write(0, 0  , 'PT Solusi Sentral Data')
-    worksheet.write(1, 0  , 'Slip Gaji')
-
-    worksheet.write(4, 0  , 'Nama Karyawan')
-    worksheet.write(4, 1  , data[0])
-    worksheet.write(5, 0  , 'Department')
-    worksheet.write(5, 1  , data[4])
-    worksheet.write(6, 0  , 'Jabatan')
-    worksheet.write(6, 1  , data[3])
-    worksheet.write(7, 0  , 'Tanggal Masuk')
-    worksheet.write(7, 1  , data[2])
-
-
-
-
-#  6 jumlah hari kerja: 26
-#  7 cuti: 1
-#  8 absen: 0
-    worksheet.write(4, 2  , 'Jumlah hari kerja')
-    worksheet.write(4, 3  , data[6])
-    worksheet.write(5, 2  , 'Cuti')
-    worksheet.write(5, 3  , data[1])
-    worksheet.write(6, 2  , 'Absen')
-    worksheet.write(6, 3  , data[0])
-
-
-
-
-
-
-#  9 gaji pokok: 2200000.0
-#  10 tunjangan masa kerja: 75000.0
-#  11 tunjangan hadir: 150000.0
-#  12 tunjangan transport: 390000.0
-#  13 tunjangan makan: 390000.0
-
-    worksheet.write(10, 0  , 'Gaji Pokok')
-    worksheet.write(10, 1  , data[9] ) 
-    worksheet.write(11, 0  , 'Tunjangan Makan')
-    worksheet.write(11, 1  , data[13])
-    worksheet.write(12, 0  , 'Tunjangan Transport')
-    worksheet.write(12, 1  , data[12])
-    worksheet.write(13, 0  , 'Tunjangan Hadir Penuh')
-    worksheet.write(13, 1  , data[11])
-    worksheet.write(14, 0  , 'Tunjangan Masa Kerja')
-    worksheet.write(14, 1  , data[10])
-
-    worksheet.write(15, 0  , 'Potongan Asuransi')
-    worksheet.write(15, 1  ,  data[14])
-    worksheet.write(16, 0  , 'Potongan Koperasi')
-    worksheet.write(16, 1  ,  data[15])
-
-    worksheet.write(18, 0  , 'Gaji Diterima')
-    worksheet.write(18, 1  ,  data[16])
-
-
-    worksheet.write(19, 0  , 'Pembayaran')
-    worksheet.write(19, 1  , 'Transfer')
-
-    worksheet.write(20, 0  , 'Rekening')
-    worksheet.write(20, 1  , data[5])
 
     
-    workbook.close
+#     worksheet.write(0, 0  , 'PT Solusi Sentral Data')
+#     worksheet.write(1, 0  , 'Slip Gaji')
+
+#     worksheet.write(4, 0  , 'Nama Karyawan')
+#     worksheet.write(4, 1  , data[0])
+#     worksheet.write(5, 0  , 'Department')
+#     worksheet.write(5, 1  , data[4])
+#     worksheet.write(6, 0  , 'Jabatan')
+#     worksheet.write(6, 1  , data[3])
+#     worksheet.write(7, 0  , 'Tanggal Masuk')
+#     worksheet.write(7, 1  , data[2])
+
+
+
+
+# #  6 jumlah hari kerja: 26
+# #  7 cuti: 1
+# #  8 absen: 0
+#     worksheet.write(4, 2  , 'Jumlah hari kerja')
+#     worksheet.write(4, 3  , data[6])
+#     worksheet.write(5, 2  , 'Cuti')
+#     worksheet.write(5, 3  , data[1])
+#     worksheet.write(6, 2  , 'Absen')
+#     worksheet.write(6, 3  , data[0])
+
+
+
+
+
+
+# #  9 gaji pokok: 2200000.0
+# #  10 tunjangan masa kerja: 75000.0
+# #  11 tunjangan hadir: 150000.0
+# #  12 tunjangan transport: 390000.0
+# #  13 tunjangan makan: 390000.0
+
+#     worksheet.write(10, 0  , 'Gaji Pokok')
+#     worksheet.write(10, 1  , data[9] ) 
+#     worksheet.write(11, 0  , 'Tunjangan Makan')
+#     worksheet.write(11, 1  , data[13])
+#     worksheet.write(12, 0  , 'Tunjangan Transport')
+#     worksheet.write(12, 1  , data[12])
+#     worksheet.write(13, 0  , 'Tunjangan Hadir Penuh')
+#     worksheet.write(13, 1  , data[11])
+#     worksheet.write(14, 0  , 'Tunjangan Masa Kerja')
+#     worksheet.write(14, 1  , data[10])
+
+#     worksheet.write(15, 0  , 'Potongan Asuransi')
+#     worksheet.write(15, 1  ,  data[14])
+#     worksheet.write(16, 0  , 'Potongan Koperasi')
+#     worksheet.write(16, 1  ,  data[15])
+
+#     worksheet.write(18, 0  , 'Gaji Diterima')
+#     worksheet.write(18, 1  ,  data[16])
+
+
+#     worksheet.write(19, 0  , 'Pembayaran')
+#     worksheet.write(19, 1  , 'Transfer')
+
+#     worksheet.write(20, 0  , 'Rekening')
+#     worksheet.write(20, 1  , data[5])
+
+    
+#     workbook.close
     
      
      
     
-    attachments[ "#{@awesome_filename}"] = File.read(@filepath )
+#     attachments[ "#{@awesome_filename}"] = File.read(@filepath )
     mail(:to => target, :subject => "SlipGaji #{DateTime.now}")
   end
     

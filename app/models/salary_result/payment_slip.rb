@@ -1,7 +1,9 @@
 require 'csv'
 require 'writeexcel'
 
-
+=begin
+  data = SalaryResult::PaymentSlip.extract_result
+=end
 module SalaryResult
   class PaymentSlip
 
@@ -104,6 +106,27 @@ module SalaryResult
     end
 
     def self.send_salary_slip_to_employee(data)
+
+
+
+#       nama : ARIanto WIbowo
+# email : arie@ssd.dnet.net.id
+# tanggal bergabung : 3/29/2011
+# jabatan: Staff IT
+# lokasi: IT JKT
+# rekening_bca: 224-154-2124
+# jumlah hari kerja: 26
+# cuti: 1
+# absen: 0
+# gaji pokok: 2200000.0
+# tunjangan masa kerja: 75000.0
+# tunjangan hadir: 150000.0
+# tunjangan transport: 390000.0
+# tunjangan makan: 390000.0
+# potongan asuransi: 0.0
+# potongan koperasi: 585000.0
+# Total: 2545000.0
+
 
 
       target_employee = data.first 
