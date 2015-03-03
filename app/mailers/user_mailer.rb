@@ -1006,7 +1006,7 @@ SavingsEntry.where{
     worksheet.write(13, 0  , 'Tunjangan Hadir Penuh')
     worksheet.write(13, 1  , data[11])
     worksheet.write(14, 0  , 'Tunjangan Masa Kerja')
-    worksheet.write(14, 1  , [data[10])
+    worksheet.write(14, 1  , data[10])
 
     worksheet.write(15, 0  , 'Potongan Asuransi')
     worksheet.write(15, 1  ,  data[14])
@@ -1030,7 +1030,7 @@ SavingsEntry.where{
      
     
     attachments[ "#{@awesome_filename}"] = File.read(@filepath )
-    mail(:to => email, :subject => "Transaction_data #{DateTime.now}")
+    mail(:to => target, :subject => "SlipGaji #{DateTime.now}")
   end
     
     
