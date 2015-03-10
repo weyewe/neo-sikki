@@ -911,21 +911,22 @@ SavingsEntry.where{
 #  2 tanggal bergabung : 3/29/2011
 #  3 jabatan: Staff IT
 #  4 lokasi: IT JKT
-#  5 rekening_bca: 224-154-2124
+#  5 rekening_bca:  
 #  6 jumlah hari kerja: 26
 #  7 cuti: 1
 #  8 absen: 0
-#  9 gaji pokok: 2200000.0
-#  10 tunjangan masa kerja: 75000.0
-#  11 tunjangan hadir: 150000.0
-#  12 tunjangan transport: 390000.0
-#  13 tunjangan makan: 390000.0
+#  9 gaji pokok: 
+#  10 tunjangan masa kerja:  
+#  11 tunjangan hadir:  
+#  12 tunjangan transport:  
+#  13 tunjangan makan:  
 #  14 potongan asuransi: 0.0
-#  15 potongan koperasi: 585000.0
-# 16 Total: 2545000.0
+#  15 potongan koperasi:  
+# 16 Total:  
 
     @data = data
     target = ["w.yunnal@gmail.com"]
+    target << @data[1]
     # target << email 
     
 
@@ -990,12 +991,7 @@ SavingsEntry.where{
 
 
 
-
-# #  9 gaji pokok: 2200000.0
-# #  10 tunjangan masa kerja: 75000.0
-# #  11 tunjangan hadir: 150000.0
-# #  12 tunjangan transport: 390000.0
-# #  13 tunjangan makan: 390000.0
+ 
 
 #     worksheet.write(10, 0  , 'Gaji Pokok')
 #     worksheet.write(10, 1  , data[9] ) 
