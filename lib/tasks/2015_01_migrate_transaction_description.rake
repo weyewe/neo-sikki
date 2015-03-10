@@ -11,6 +11,8 @@ b. What is Semprotan -> Group's name
 
     group_loan = GroupLoan.find_by_id( transaction_data.transaction_source_id)
 
+    return if group_loan.nil? 
+
     group_no = group_loan.group_number
     group_name = group_loan.name 
 
@@ -30,6 +32,9 @@ c. What is 11? I think it is the 11th weekly collection?
 =end
   def self.update_group_loan_weekly_collection_description( transaction_data  ) 
     glwc = GroupLoanWeeklyCollection.find_by_id( transaction_data.transaction_source_id)
+
+    return if glwc.nil?
+
     group_loan = glwc.group_loan
     collection_week_number = glwc.week_number
 
@@ -46,6 +51,7 @@ c. What is 11? I think it is the 11th weekly collection?
 
   def self.update_loan_close_withdrawal_return_description( transaction_data ) 
     group_loan = GroupLoan.find_by_id( transaction_data.transaction_source_id)
+    return if group_loan.nil?
 
     group_no = group_loan.group_number
     group_name = group_loan.name 
@@ -167,10 +173,10 @@ task :convert_transaction_description => :environment do
           TRANSACTION_DATA_CODE[:group_loan_close_withdrawal_return],
           TRANSACTION_DATA_CODE[:savings_account],
           TRANSACTION_DATA_CODE[:locked_savings_account],
-          TRANSACTION_DATA_CODE[:group_loan_premature_clearance_remaining_weeks_payment],
+          TRANSACTION_DATA_CODE[:group_loan_premature_clearance_remaining_weeks_payment]
       ]
     ).count
-  total = transaction_data_count.length
+  total = transaction_data_count 
   
   counter = 1 
   
@@ -182,17 +188,13 @@ task :convert_transaction_description => :environment do
           TRANSACTION_DATA_CODE[:group_loan_close_withdrawal_return],
           TRANSACTION_DATA_CODE[:savings_account],
           TRANSACTION_DATA_CODE[:locked_savings_account],
-          TRANSACTION_DATA_CODE[:group_loan_premature_clearance_remaining_weeks_payment],
+          TRANSACTION_DATA_CODE[:group_loan_premature_clearance_remaining_weeks_payment]
       ]
     ).find_each do |x|
 
     puts "transaction #{counter}/#{total}"
     
-    AccountingService::Deceased.delay.create_bad_debt_allocation(
-        x.group_loan_membership.group_loan, 
-        x.member, 
-        x.group_loan_membership, 
-        x)
+    TransactionDataConverter.delay.update_description( x ) 
     
     counter += 1 
   end
