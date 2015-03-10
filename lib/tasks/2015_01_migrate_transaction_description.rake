@@ -158,7 +158,7 @@ end
 
 task :convert_transaction_description => :environment do
   
-  transaction_data_count =  TransactionActivity.where(
+  transaction_data_count =  TransactionData.where(
       :is_contra_transaction => false,
       :code => [
           TRANSACTION_DATA_CODE[:loan_disbursement],
@@ -173,7 +173,7 @@ task :convert_transaction_description => :environment do
   
   counter = 1 
   
-  TransactionActivity.where(
+  TransactionData.where(
       :is_contra_transaction => false,
       :code => [
           TRANSACTION_DATA_CODE[:loan_disbursement],
