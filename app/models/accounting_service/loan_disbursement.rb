@@ -1,8 +1,16 @@
 module AccountingService
   class LoanDisbursement
+
+
     def LoanDisbursement.create_loan_disbursement(object) 
       
-      msg = "Loan Disbursement #{object.name}, GroupNumber: #{object.group_number}"
+      # msg = "Loan Disbursement #{object.name}, GroupNumber: #{object.group_number}"
+
+
+      group_no = object.group_number
+      group_name = object.name 
+      appendix = AccountingService::Utility.extract_appendix( object) 
+      msg = "Adm (#{appendix}-#{group_no}) #{group_name}"
       
       ta = TransactionData.create_object({
         :transaction_datetime => object.disbursed_at,

@@ -6,27 +6,29 @@ module AccountingService
         absolut_amount = savings_entry.amount 
         return if member.nil? 
         
-        message = "" 
+        # message = "" 
+        msg = ""
         main_cash_entry_case = 0 
         savings_account_entry_case = 0 
         
         if multiplier == -1 
-          message = "Voluntary Savings Withdrawal: Member #{member.name}, #{member.id_number}"
+          # message = "Voluntary Savings Withdrawal: Member #{member.name}, #{member.id_number}"
+          msg = "#{member.name} (#{member.id_number})  Ambil Tab. Pribadi"
           main_cash_entry_case  = NORMAL_BALANCE[:credit]
           savings_account_entry_case = NORMAL_BALANCE[:debit]
         else
-          message = "Voluntary Savings Addition: Member #{member.name}, #{member.id_number}"
+          # message = "Voluntary Savings Addition: Member #{member.name}, #{member.id_number}"
+          msg = "#{member.name} (#{member.id_number})  Tambah Tab. Pribadi"
           main_cash_entry_case  = NORMAL_BALANCE[:debit]
           savings_account_entry_case = NORMAL_BALANCE[:credit]
         end
         
-         
-        
+      
         
         
         ta = TransactionData.create_object({
           :transaction_datetime => savings_entry.confirmed_at,
-          :description =>  message,
+          :description =>  msg,
           :transaction_source_id => savings_entry.id , 
           :transaction_source_type => savings_entry.class.to_s ,
           :code => TRANSACTION_DATA_CODE[:savings_account],
@@ -40,7 +42,7 @@ module AccountingService
           :account_id          => Account.find_by_code(ACCOUNT_CODE[:main_cash_leaf][:code]).id      ,
           :entry_case          => main_cash_entry_case    ,
           :amount              => absolut_amount,
-          :description => message
+          :description => msg
         )
 
         TransactionDataDetail.create_object(
@@ -48,7 +50,7 @@ module AccountingService
           :account_id          => Account.find_by_code(ACCOUNT_CODE[:voluntary_savings_leaf][:code]).id        ,
           :entry_case          => savings_account_entry_case  ,
           :amount              => absolut_amount,
-          :description => message
+          :description => msg
         )
   
 
@@ -58,16 +60,20 @@ module AccountingService
     def IndependentSavings.post_locked_savings_account( savings_entry , multiplier) 
         absolut_amount = savings_entry.amount 
         member = savings_entry.member
-        message = "" 
+        # message = "" 
+        msg = ""
         main_cash_entry_case = 0 
         savings_account_entry_case = 0 
         
         if multiplier == -1 
-          message = "Voluntary Savings Withdrawal: Member #{member.name}, #{member.id_number}"
+          # message = "Voluntary Savings Withdrawal: Member #{member.name}, #{member.id_number}"
+          
+          msg = "#{member.name} (#{member.id_number})  Ambil TMD"
           main_cash_entry_case  = NORMAL_BALANCE[:credit]
           savings_account_entry_case = NORMAL_BALANCE[:debit]
         else
-          message = "Voluntary Savings Addition: Member #{member.name}, #{member.id_number}"
+          # message = "Voluntary Savings Addition: Member #{member.name}, #{member.id_number}"
+          msg = "#{member.name} (#{member.id_number})  Tambah TMD"
           main_cash_entry_case  = NORMAL_BALANCE[:debit]
           savings_account_entry_case = NORMAL_BALANCE[:credit]
         end
@@ -78,7 +84,7 @@ module AccountingService
         
         ta = TransactionData.create_object({
           :transaction_datetime => savings_entry.confirmed_at,
-          :description =>  message,
+          :description =>  msg,
           :transaction_source_id => savings_entry.id , 
           :transaction_source_type => savings_entry.class.to_s ,
           :code => TRANSACTION_DATA_CODE[:locked_savings_account],
@@ -92,7 +98,7 @@ module AccountingService
           :account_id          => Account.find_by_code(ACCOUNT_CODE[:main_cash_leaf][:code]).id      ,
           :entry_case          => main_cash_entry_case    ,
           :amount              => absolut_amount,
-          :description => message
+          :description => msg
         )
 
         TransactionDataDetail.create_object(
@@ -100,7 +106,7 @@ module AccountingService
           :account_id          => Account.find_by_code(ACCOUNT_CODE[:locked_savings_leaf][:code]).id        ,
           :entry_case          => savings_account_entry_case  ,
           :amount              => absolut_amount,
-          :description => message
+          :description => msg
         )
   
 

@@ -16,7 +16,7 @@ b. What is Semprotan -> Group's name
     group_no = group_loan.group_number
     group_name = group_loan.name 
 
-    appendix = self.extract_appendix( group_loan )
+    appendix = AccountingService::Utility.extract_appendix( group_loan )
 
     msg = "Adm (#{appendix}-#{group_no}) #{group_name}"
     transaction_data.description = msg
@@ -41,7 +41,7 @@ c. What is 11? I think it is the 11th weekly collection?
     group_name = group_loan.name 
     group_no = group_loan.group_number
 
-    appendix = self.extract_appendix( group_loan )
+    appendix = AccountingService::Utility.extract_appendix( group_loan )
 
 
     msg = "#{appendix}-#{group_no} #{group_name} Set.#{collection_week_number}"
@@ -56,7 +56,7 @@ c. What is 11? I think it is the 11th weekly collection?
     group_no = group_loan.group_number
     group_name = group_loan.name 
 
-    appendix = self.extract_appendix( group_loan )
+    appendix = AccountingService::Utility.extract_appendix( group_loan )
 
     msg = "Bagi tab.  (#{appendix}-#{group_no}) #{group_name}"
     transaction_data.description = msg
@@ -119,21 +119,14 @@ Emayanti  = member's name
     group_no = group_loan.group_number
     group_name = group_loan.name 
 
-    appendix = self.extract_appendix( group_loan )
+    appendix = AccountingService::Utility.extract_appendix( group_loan )
 
     msg = "#{member.name} (#{appendix}-#{group_no}) Pelunasan"
     transaction_data.description = msg
     transaction_data.save
   end
 
-  def self.extract_appendix( group_loan)
-    first_group_loan_product_name = group_loan.group_loan_memberships.first.group_loan_product.name
-    appendix  = "N/A"
-    appendix = "NS" if first_group_loan_product_name =~ /^NS/i 
-    appendix = "S" if first_group_loan_product_name =~ /^S/i 
-
-    return appendix
-  end
+  
 
   def self.update_description( transaction_data ) 
     if transaction_data.code ==  TRANSACTION_DATA_CODE[:loan_disbursement]
