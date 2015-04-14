@@ -17,6 +17,9 @@ class Member < ActiveRecord::Base
   validates_presence_of :name # , :id_number 
   
    
+  def all_savings_amount
+    self.total_savings_account + self.total_locked_savings_account + self.total_membership_savings
+  end
    
   def self.update_all_savings
     Member.find_each do |member|  

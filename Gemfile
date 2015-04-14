@@ -34,6 +34,8 @@ gem "lol_dba"
 gem "fog" 
 # https://github.com/laserlemon/figaro
 gem "figaro"
+gem 'prawn', 
+  :git => 'https://github.com/prawnpdf/prawn.git'
 
 # gem 'fileutils', '~> 0.7'
 

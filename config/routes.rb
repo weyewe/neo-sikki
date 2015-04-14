@@ -5,6 +5,10 @@ NeoSikki::Application.routes.draw do
   get 'group_loans/pending_fulfillment' => 'group_loans#download_pending', :as => :download_pending  
   get 'transaction_datas/download_xls' => 'transaction_datas#download_xls', :as => :download_transaction
   
+
+  get 'print_weekly_collection/:group_loan_weekly_collection_id' => 
+                    'group_loan_weekly_collections#print_weekly_collection' , :as => :print_weekly_collection
+
   namespace :api do 
     devise_for :users
     

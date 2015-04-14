@@ -78,6 +78,21 @@ describe GroupLoan do
     
   Close the group loan 
 =end
+
+  it "should not create gruop loan if name is not present" do
+
+    puts "GONNA TEST THE GROUP LOAN CREATION WITHOUT NAME"
+    @group_loan = GroupLoan.create_object({
+        :name                             => "",
+        :number_of_meetings => 3 
+      })
+
+
+    @group_loan.errors.size.should_not == 0
+    @group_loan.persisted?.should be_falsey
+  end
+
+
   context "normal operation: no corner cases, no update, uber-ideal case" do
     before(:each) do
       
@@ -325,4 +340,7 @@ describe GroupLoan do
     end
     
   end
+
+
+
 end

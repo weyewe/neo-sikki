@@ -7,6 +7,14 @@ GIT
       activesupport (>= 3.0)
       polyamorous (~> 1.1.0)
 
+GIT
+  remote: https://github.com/prawnpdf/prawn.git
+  revision: cebf0c932e1ff8db1a5a72220b2616d9217e918c
+  specs:
+    prawn (2.0.2)
+      pdf-core (~> 0.5.1)
+      ttfunk (~> 1.4.0)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -184,6 +192,7 @@ GEM
     nokogiri (1.6.5)
       mini_portile (~> 0.6.0)
     orm_adapter (0.5.0)
+    pdf-core (0.5.1)
     pg (0.18.1)
     polyamorous (1.1.0)
       activerecord (>= 3.0)
@@ -264,6 +273,7 @@ GEM
     treetop (1.4.15)
       polyglot
       polyglot (>= 0.3.1)
+    ttfunk (1.4.0)
     turbolinks (2.5.3)
       coffee-rails
     tzinfo (0.3.42)
@@ -292,6 +302,7 @@ DEPENDENCIES
   kaminari
   lol_dba
   pg
+  prawn!
   protected_attributes
   rails (= 4.0.0)
   rails_12factor
