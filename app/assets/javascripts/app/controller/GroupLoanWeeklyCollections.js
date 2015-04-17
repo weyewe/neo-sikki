@@ -120,8 +120,21 @@ Ext.define('AM.controller.GroupLoanWeeklyCollections', {
 	    'grouploanweeklycollectionvoluntarysavingsentrylist button[action=deleteObject]': {
 	      click: this.deleteSavingsObject
 	    },
+
+	    'grouploanweeklycollectionlist button[action=downloadFormObject]': {
+        	click: this.downloadCollectionForm
+		}	,
     });
   },
+
+  	downloadCollectionForm: function(){
+  		var me  = this;
+		var record = this.getList().getSelectedObject();
+
+		
+		
+		window.open( '/print_weekly_collection/' +  record.get("id") + '.pdf' , "_blank");
+  	},
 
 	onDestroy: function(){
 		// console.log("on Destroy the savings_entries list ");

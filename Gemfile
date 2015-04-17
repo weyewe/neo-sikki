@@ -36,6 +36,7 @@ gem "fog"
 gem "figaro"
 gem 'prawn', 
   :git => 'https://github.com/prawnpdf/prawn.git'
+gem 'prawn-table'
 
 # gem 'fileutils', '~> 0.7'
 

@@ -15,7 +15,7 @@
 development:
   adapter: postgresql
   encoding: unicode
-  database: awesome_neo_sikki_development
+  database: awesome_kki
   pool: 5
   username: weyewe
   password: willy1234W

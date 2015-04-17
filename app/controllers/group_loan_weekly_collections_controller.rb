@@ -16,7 +16,7 @@ class GroupLoanWeeklyCollectionsController < ApplicationController
        #        type: "application/pdf"
        #      end
       format.pdf do
-        pdf = WeeklyCollectionPdf.new(@sales_order, view_context)
+        pdf = WeeklyCollectionPdf.new(@object, view_context)
         send_data pdf.render, filename:
         "group_#{@object.group_loan.name}_week_#{@object.week_number}.pdf",
         type: "application/pdf"

@@ -12,15 +12,16 @@ class WeeklyCollectionPdf < Prawn::Document
   
   # 595.28 x 841.89
   def initialize(object , view)
-    super(:size => "A4", :layout => "landscape")  #[width,length]
+    super(:size => "A4", :page_layout => :landscape)  #[width,length]
     @page_width = 841
     @page_length = 595
     @object = object
-    @active_glm_list = @object.active_group_loan_memberships.joins(:gruop_loan_product).order("id ASC")
+    @group_loan = object.group_loan
+    @active_glm_list = @object.active_group_loan_memberships.joins(:group_loan_product).order("id ASC")
     @view = view
   
     # page_size  [684, 792]
-    font("Helvetica")
+    # font("Helvetica")
     
     # text "My report caption", :size => 18, :align => :right
     # move_down font.height * 2
@@ -61,7 +62,7 @@ class WeeklyCollectionPdf < Prawn::Document
     
     bounding_box( [0,cursor], :width => @page_width) do
       bounding_box([gap, bounds.top - gap], :width => width) do 
-        text  "No & Nama Kelompok: #{@object.name}"
+        text  "No & Nama Kelompok: [#{@group_loan.group_number}] - #{@group_loan.name}"
         text  "Nama PKP: "
         text  "Setoran Ke: #{@object.week_number}"
       end

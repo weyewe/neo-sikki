@@ -77,8 +77,16 @@ Ext.define('AM.view.operation.grouploanweeklycollection.List' ,{
  
 
 
+ 		this.downloadFormObjectButton = new Ext.Button({
+			text: 'Pre-printed Form',
+			action: 'downloadFormObject',
+			disabled: true
+		});
+
+
 		this.tbar = [ this.collectObjectButton, this.uncollectObjectButton, '-',
-								this.confirmObjectButton , 	this.unconfirmObjectButton  ];
+								this.confirmObjectButton , 	this.unconfirmObjectButton,
+								'->',  this.downloadFormObjectButton];
 								
 		this.bbar = Ext.create("Ext.PagingToolbar", {
 			store	: this.store, 
@@ -103,6 +111,8 @@ Ext.define('AM.view.operation.grouploanweeklycollection.List' ,{
 		this.confirmObjectButton.enable();
 		this.unconfirmObjectButton.enable();
 		this.uncollectObjectButton.enable();
+
+		this.downloadFormObjectButton.enable();
 		
 		selectedObject = this.getSelectedObject();
 		if( selectedObject && selectedObject.get("is_collected") == true ){
@@ -128,5 +138,6 @@ Ext.define('AM.view.operation.grouploanweeklycollection.List' ,{
 		this.confirmObjectButton.disable();
 		this.unconfirmObjectButton.disable();
 		this.uncollectObjectButton.disable();
+		this.downloadFormObjectButton.disable();
 	}
 });
