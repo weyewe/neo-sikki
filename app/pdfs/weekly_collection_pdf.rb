@@ -97,7 +97,7 @@ class WeeklyCollectionPdf < Prawn::Document
     move_down 40
     
     # table subscription_item_rows , :position => :center , :width => @page_width -100 do
-    table subscription_item_rows , :position => :center do
+    table subscription_item_rows , :position => :left do
       row(0).font_style = :bold
 
       columns(0..10).align = :left
@@ -107,13 +107,13 @@ class WeeklyCollectionPdf < Prawn::Document
           0 => 30 , #  entry number  
           1 => 80,  # Nama member
           2 => 50, # No member
-          3 => 50, # Jumlah Pinjaman
-          4 => 50, # setoran mingguan
+          3 => 80, # Jumlah Pinjaman
+          4 => 80, # setoran mingguan
           5 => 30 , #  Bayar
           6 => 30,  # Tepat Waktu
           7 => 50, # Menabung minggu lalu
           8 => 50, # Ambil Tab Minggu Lalu
-          9 => 50, # Saldo sisa tabungan pribadi
+          9 => 100, # Saldo sisa tabungan pribadi
           10 => 50, # Sisa pinjaman
       }
       # self.cell_style = {
@@ -155,13 +155,13 @@ class WeeklyCollectionPdf < Prawn::Document
             "#{count}",
             "#{member.name}",
             "#{member.id_number}",
-            "#{glp.principal * glp.total_weeks}",
-            "#{glp.weekly_payment_amount}",
+            "#{precision( glp.principal * glp.total_weeks) }",
+            "#{precision( glp.weekly_payment_amount) }",
             "", # bayar
             "", #  tepat waktu
             "", # menabung minggu lalu
             "", # ambil tab minggu lalu
-            "#{member.all_savings_amount}" , # saldo sisa tabungan pribadi
+            "#{precision( member.all_savings_amount) }" , # saldo sisa tabungan pribadi
             ""  # sisa pinjaman
 
        ]
