@@ -210,3 +210,18 @@ LOCKED_SAVINGS_TRANSACTION_TYPE = 4
 LOCKED_SAVINGS_TRANSACTION_AMOUNT = 5
 LOCKED_SAVINGS_LAST_GROUP_NO = 6
 LOCKED_SAVINGS_LAST_GROUP_NAME = 7
+
+PAYMENT_DAY = {
+  :monday => 1, 
+  :tuesday => 2, 
+  :wednesday => 3, 
+  :thursday => 4 , 
+  :friday => 5,
+  :saturday => 6,
+  :sunday => 7
+}
+
+TITLE_SELECTION = {
+  :field_officer => 1, 
+  :branch_head => 2 
+}

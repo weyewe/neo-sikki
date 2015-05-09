@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150201170319) do
+ActiveRecord::Schema.define(version: 20150509062523) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -33,6 +33,16 @@ ActiveRecord::Schema.define(version: 20150201170319) do
   end
 
   add_index "accounts", ["parent_id"], name: "index_accounts_on_parent_id", using: :btree
+
+  create_table "branches", force: true do |t|
+    t.string   "name"
+    t.text     "description"
+    t.text     "address"
+    t.string   "code"
+    t.integer  "branch_head_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "closings", force: true do |t|
     t.boolean  "is_first_closing",                                   default: false
@@ -92,6 +102,15 @@ ActiveRecord::Schema.define(version: 20150201170319) do
   end
 
   add_index "delayed_jobs", ["priority", "run_at"], name: "delayed_jobs_priority", using: :btree
+
+  create_table "employees", force: true do |t|
+    t.integer  "branch_id"
+    t.string   "name"
+    t.string   "id_number"
+    t.string   "description"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "group_loan_disbursements", force: true do |t|
     t.integer  "group_loan_membership_id"

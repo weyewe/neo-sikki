@@ -15,8 +15,25 @@ class Member < ActiveRecord::Base
   
   # validates_uniqueness_of :id_number 
   validates_presence_of :name # , :id_number 
+  # validates_presence_of :id_card_number 
+  # validates_uniqueness_of :id_number 
+  # validates_uniqueness_of :id_card_number 
   
-   
+# Member.where{id_card_number.eq nil}.each {|x| array << [x.id_number, x.name] }
+=begin
+
+require 'csv'
+CSV.open("/home/willy/Desktop/awesome_data.csv", "w") do |csv|
+  csv << ["id_number", "name", "KTP", "data"]
+
+  array.each do |x| 
+    csv << ( x << "" )
+  end
+end
+  
+=end
+  
+end
   def all_savings_amount
     self.total_savings_account + self.total_locked_savings_account + self.total_membership_savings
   end
