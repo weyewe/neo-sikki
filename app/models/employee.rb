@@ -1,4 +1,4 @@
-class Branch < ActiveRecord::Base
+class Employee < ActiveRecord::Base
   # attr_accessible :title, :body
   # belongs_to :office 
 
@@ -7,17 +7,11 @@ class Branch < ActiveRecord::Base
         
   validates_presence_of :name
   validates_uniqueness_of :name 
+  validates_presence_of :code
+  validates_uniqueness_of :code
 
   
-  # validate :title_must_be_valid
   validate :branch_id_must_be_valid 
-
-  # def title_must_be_valid
-  #   if not TITLE_SELECTION.incude?( self.title ) 
-  #     self.errors.add(:title, "Harus memilih Title")
-  #     return self 
-  #   end
-  # end
 
 
   def branch_id_must_be_valid
@@ -44,6 +38,7 @@ class Branch < ActiveRecord::Base
     new_object.branch_id       = params[:branch_id]
     new_object.name            = params[:name]
     new_object.description     = params[:description]
+    new_object.code             = params[:code]
     # new_object.title     = params[:title]
 
     new_object.save 
@@ -56,6 +51,7 @@ class Branch < ActiveRecord::Base
     self.branch_id       = params[:branch_id]
     self.name            = params[:name]
     self.description     = params[:description]
+    self.code = params[:code]
     # self.title     = params[:title]
     
     self.save 

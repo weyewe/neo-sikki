@@ -5,17 +5,21 @@ class Branch < ActiveRecord::Base
   has_many :employees
   
         
-  validates_presence_of :name
-  validates_uniqueness_of :name 
+  validates_presence_of :name, :code
+  validates_uniqueness_of :name , :code
+
 
   
-  
+  def self.active_objects
+    self
+  end  
   
   def self.create_object(   params) 
     new_object                 = self.new 
     new_object.name            = params[:name]
     new_object.description     = params[:description]
     new_object.address     = params[:address]
+    new_object.code  = params[:code]
 
     new_object.save 
     return new_object
@@ -26,6 +30,7 @@ class Branch < ActiveRecord::Base
     self.name            = params[:name]
     self.description     = params[:description]
     self.address     = params[:address]
+    self.code = params[:code]
     
     self.save 
 

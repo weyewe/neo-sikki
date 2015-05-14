@@ -4,7 +4,7 @@ class CreateEmployees < ActiveRecord::Migration
 
       t.integer :branch_id 
       t.string :name 
-      t.string :id_number 
+      t.string :code 
       t.string :description 
 
       # t.integer :title 

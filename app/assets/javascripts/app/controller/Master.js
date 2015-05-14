@@ -65,6 +65,33 @@ Ext.define("AM.controller.Master", {
 						}
 					]
       },
+
+      { 
+          text:'Branch', 
+          viewClass:'AM.view.master.Branch', 
+          leaf:true, 
+          iconCls:'text',
+ 					conditions : [
+						{
+							controller : "branches",
+							action  : 'index'
+						}
+					]
+      },
+      { 
+          text:'Employee', 
+          viewClass:'AM.view.master.Employee', 
+          leaf:true, 
+          iconCls:'text',
+ 					conditions : [
+						{
+							controller : "employees",
+							action  : 'index'
+						}
+					]
+      },
+
+
       { 
 				text:'GroupLoan Product', 
 				viewClass:'AM.view.master.GroupLoanProduct', 

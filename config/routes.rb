@@ -24,6 +24,12 @@ NeoSikki::Application.routes.draw do
     get 'search_group_loan_memberships' => 'group_loan_memberships#search', :as => :search_group_loan_membership
     get 'search_group_loan_weekly_collections' => 'group_loan_weekly_collections#search', :as => :search_group_loan_weekly_collection
     
+
+    get 'search_branches' => 'branches#search', :as => :search_branches
+
+
+    resources :branches
+    resources :employees
     resources :app_users
     resources :members
     resources :group_loans 

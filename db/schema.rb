@@ -106,7 +106,7 @@ ActiveRecord::Schema.define(version: 20150509062523) do
   create_table "employees", force: true do |t|
     t.integer  "branch_id"
     t.string   "name"
-    t.string   "id_number"
+    t.string   "code"
     t.string   "description"
     t.datetime "created_at"
     t.datetime "updated_at"

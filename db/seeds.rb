@@ -596,3 +596,12 @@ end
 
 =end
 
+(1.upto 5).each do |x|
+Branch.create_object({
+  :name => "Branch #{x}",
+  :address => "Address #{x}",
+  :code => "code #{x}",
+  :description => "description #{x}"
+
+  })
+end

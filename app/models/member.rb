@@ -33,7 +33,7 @@ end
   
 =end
   
-end
+
   def all_savings_amount
     self.total_savings_account + self.total_locked_savings_account + self.total_membership_savings
   end
