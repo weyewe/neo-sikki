@@ -11,6 +11,7 @@ describe Branch do
       :name => "Name",
       :description => "awesome description",
       :address => "awesome address",
+      :code => '23423'
     )
     
 
@@ -22,6 +23,7 @@ describe Branch do
       :name => "",
       :description => "awesome description",
       :address => "awesome address",
+      :code => "32"
     )
     
     @branch.errors.size.should_not == 0 
@@ -30,6 +32,7 @@ describe Branch do
       :name => nil,
       :description => "awesome description",
       :address => "awesome address",
+      :code => "3afw3r2"
     )
     @branch.errors.size.should_not == 0 
   end
@@ -42,6 +45,7 @@ describe Branch do
         :name => @name,
         :description => "awesome description",
         :address => "awesome address",
+        :code => "234"
       )
     end
     
@@ -56,6 +60,7 @@ describe Branch do
         :name => @name,
         :description => "awesome description",
         :address => "awesome address",
+        :code => "8238"
       )
       @branch.errors.size.should_not == 0 
       @branch.should_not be_valid 

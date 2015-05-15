@@ -180,7 +180,8 @@ describe GroupLoan do
               @glwc_vs =   GroupLoanWeeklyCollectionVoluntarySavingsEntry.create_object( 
                 :amount        => BigDecimal( "150000"),
                 :group_loan_membership_id => @first_glm.id ,
-                :group_loan_weekly_collection_id => @first_group_loan_weekly_collection.id 
+                :group_loan_weekly_collection_id => @first_group_loan_weekly_collection.id ,
+                :direction => FUND_TRANSFER_DIRECTION[:incoming]
               )
               
               

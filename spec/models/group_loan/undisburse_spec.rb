@@ -225,7 +225,8 @@ describe GroupLoanWeeklyCollection do
         @glwcvs =  @object = GroupLoanWeeklyCollectionVoluntarySavingsEntry.create_object( 
           :amount        => BigDecimal( "150000"),
           :group_loan_membership_id => @first_glm.id ,
-          :group_loan_weekly_collection_id => @first_glwc.id 
+          :group_loan_weekly_collection_id => @first_glwc.id ,
+          :direction => FUND_TRANSFER_DIRECTION[:incoming]
         )
 
         @group_loan.reload

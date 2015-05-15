@@ -9,12 +9,14 @@ describe Employee do
       :name => "Branch 1",
       :description => "awesome description",
       :address => "awesome address",
+      :code => "xx1"
     )
 
     @branch_2 = Branch.create_object(
       :name => "Branch 2",
       :description => "awesome description",
       :address => "awesome address",
+      :code => "xx23"
     )
   end
 
@@ -27,6 +29,7 @@ describe Employee do
       :branch_id => @branch_1,
       :name => "Employee name",
       :description => "awesome address",
+      :code => '221'
     )
     
 
@@ -38,6 +41,7 @@ describe Employee do
       :name => "",
       :description => "awesome description",
       :address => "awesome address",
+      :code => "e2"
     )
     
     @employee.errors.size.should_not == 0 
@@ -46,6 +50,7 @@ describe Employee do
       :name => nil,
       :description => "awesome description",
       :address => "awesome address",
+      :code => '33'
     )
     @employee.errors.size.should_not == 0 
   end
@@ -58,6 +63,7 @@ describe Employee do
         :name => @name,
         :description => "awesome description",
         :address => "awesome address",
+        :code => 'e2234'
       )
     end
     
@@ -72,6 +78,7 @@ describe Employee do
         :name => @name,
         :description => "awesome description",
         :address => "awesome address",
+        :code => "234234"
       )
       @employee.errors.size.should_not == 0 
       @employee.should_not be_valid 

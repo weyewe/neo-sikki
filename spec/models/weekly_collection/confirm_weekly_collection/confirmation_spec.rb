@@ -155,7 +155,8 @@ describe GroupLoanWeeklyCollection do
         GroupLoanWeeklyCollectionVoluntarySavingsEntry.create_object(
           :amount                            =>  voluntary_savings_amount, 
           :group_loan_membership_id          => glm.id , 
-          :group_loan_weekly_collection_id   => @first_glwc.id 
+          :group_loan_weekly_collection_id   => @first_glwc.id ,
+          :direction => FUND_TRANSFER_DIRECTION[:incoming]
         )
         
         
