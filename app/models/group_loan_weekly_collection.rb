@@ -193,7 +193,7 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
           where(:direction => FUND_TRANSFER_DIRECTION[:outgoing]).each do |x|
       member = x.group_loan_membership.member
 
-      if  member.total_savings_account - self.amount < BigDecimal("0")
+      if  member.total_savings_account - x.amount < BigDecimal("0")
         self.errors.add(:generic_errors, "Tidak cukup dana untuk member #{member.name}")
         return self 
       end
@@ -355,7 +355,7 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
             where(:direction => FUND_TRANSFER_DIRECTION[:incoming] ).each do |x|
       member = x.group_loan_membership.member
 
-      if member.total_savings_account - self.amount < BigDecimal("0")
+      if member.total_savings_account - x.amount < BigDecimal("0")
         self.errors.add(:generic_errors, "Tidak cukup dana untuk member #{member.name}")
         return self 
       end

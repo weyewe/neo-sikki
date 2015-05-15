@@ -379,6 +379,29 @@ class SavingsEntry < ActiveRecord::Base
       self.errors.add(:generic_errors, 'Belum dikonfirmasi.')
       return self
     end
+
+    if self.direction ==  FUND_TRANSFER_DIRECTION[:incoming] and SAVINGS_STATUS[:savings_account]
+      if member.total_savings_account - self.amount < BigDecimal("0")
+        self.errors.add(:generic_errors, "Nilai akhir akan minus")
+        return self
+      end
+    end
+
+    if self.direction ==  FUND_TRANSFER_DIRECTION[:incoming] and SAVINGS_STATUS[:membership]
+      if member.total_membership_savings - self.amount < BigDecimal("0")
+        self.errors.add(:generic_errors, "Nilai akhir akan minus")
+        return self
+      end
+    end
+
+    if self.direction ==  FUND_TRANSFER_DIRECTION[:incoming] and SAVINGS_STATUS[:locked]
+      if member.total_locked_savings_account - self.amount < BigDecimal("0")
+        self.errors.add(:generic_errors, "Nilai akhir akan minus")
+        return self
+      end
+    end
+
+
     self.is_confirmed = false
     self.confirmed_at = nil 
     
@@ -569,13 +592,14 @@ class SavingsEntry < ActiveRecord::Base
     
     puts "last_transaction_data : #{last_transaction_data}"
     
-
+    group_loan_weekly_savings_entry = savings_source
+    group_loan_membership = savings_source.group_loan_membership
     last_transaction_data.create_contra_and_confirm if not  last_transaction_data.nil?
 
     member = group_loan_membership.member 
     multiplier = 1 
     multiplier = -1 if savings_source.direction == FUND_TRANSFER_DIRECTION[:incoming]
-    member.update_total_savings_account( savings_source * new_object.amount)
+    member.update_total_savings_account( multiplier * savings_source.amount)
 
     self.destroy 
   end
