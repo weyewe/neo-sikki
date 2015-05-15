@@ -186,6 +186,19 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
       self.errors.add(:confirmed_at, "Harus ada tanggal konfirmasi pembayaran")
       return self 
     end
+
+
+    self.group_loan_weekly_collection_voluntary_savings_entries.
+          joins(:group_loan_membership => [:member]).
+          where(:direction => FUND_TRANSFER_DIRECTION[:outgoing]).each do |x|
+      member = x.group_loan_membership.member
+
+      if  member.total_savings_account - self.amount < BigDecimal("0")
+        self.errors.add(:generic_errors, "Tidak cukup dana untuk member #{member.name}")
+        return self 
+      end
+    end
+
     
     begin
       ActiveRecord::Base.transaction do
@@ -336,6 +349,18 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
       # puts "Total error in self: #{self.errors.size}"
       return self 
     end
+
+    self.group_loan_weekly_collection_voluntary_savings_entries.
+            joins(:group_loan_membership => [:member]).
+            where(:direction => x.direction == FUND_TRANSFER_DIRECTION[:incoming] ) each do |x|
+      member = x.group_loan_membership.member
+
+      if member.total_savings_account - self.amount < BigDecimal("0")
+        self.errors.add(:generic_errors, "Tidak cukup dana untuk member #{member.name}")
+        return self 
+      end
+    end
+
     
     begin
       ActiveRecord::Base.transaction do

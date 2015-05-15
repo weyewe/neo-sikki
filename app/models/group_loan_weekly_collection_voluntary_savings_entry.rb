@@ -13,6 +13,20 @@ class GroupLoanWeeklyCollectionVoluntarySavingsEntry < ActiveRecord::Base
   validate :no_double_group_loan_membership
   
   validate :valid_group_loan_membership_id
+
+  validate :valid_direction
+
+  def valid_direction  
+
+    if not [
+        FUND_TRANSFER_DIRECTION[:incoming],
+        FUND_TRANSFER_DIRECTION[:outgoing]
+      ].include?(self.direction)
+      self.errors.add(:direction, "Harus memilih tipe transaksi: penambahan atau pengurangan")
+      return self 
+    end
+  end
+
   
   def valid_group_loan_membership_id
     return if group_loan_membership_id.nil? 
@@ -28,11 +42,22 @@ class GroupLoanWeeklyCollectionVoluntarySavingsEntry < ActiveRecord::Base
   
   def valid_amount
     return if not self.amount.present? 
+    return if not valid_direction 
+
+
     
     if self.amount <= BigDecimal('0')
       self.errors.add(:amount, "Harus lebih besar daripada 0")
       return self 
     end
+
+    if self.direction == FUND_TRANSFER_DIRECTION[:outgoing]
+      if member.total_savings_account - self.amount < BigDecimal("0")
+        self.errors.add(:amount, "Tidak cukup dana")
+        return self 
+      end
+    end
+
   end
   
   def valid_group_loan_membership_id 
@@ -104,6 +129,7 @@ class GroupLoanWeeklyCollectionVoluntarySavingsEntry < ActiveRecord::Base
     new_object.amount        = BigDecimal( params[:amount] )
     new_object.group_loan_membership_id = params[:group_loan_membership_id]
     new_object.group_loan_weekly_collection_id = params[:group_loan_weekly_collection_id]
+    new_object.direction = params[:direction]
     
     new_object.save
     
@@ -120,6 +146,7 @@ class GroupLoanWeeklyCollectionVoluntarySavingsEntry < ActiveRecord::Base
     self.amount        = BigDecimal( params[:amount] )
     self.group_loan_membership_id = params[:group_loan_membership_id]
     self.group_loan_weekly_collection_id = params[:group_loan_weekly_collection_id]
+    self.direction = params[:direction]
     
     self.save 
     
@@ -154,19 +181,13 @@ class GroupLoanWeeklyCollectionVoluntarySavingsEntry < ActiveRecord::Base
       :member_id => member.id
     )
     
-    total_amount = BigDecimal("0")
-    
-    puts "5585 Inside the unconfirm"
+   
 
     weekly_collection_voluntary_savings_array.each do |x|
-      x.create_contra_and_confirm_for_group_loan_weekly_collection_voluntary_savings( self, TRANSACTION_DATA_CODE[:group_loan_weekly_collection_voluntary_savings] )
-      
-      total_amount += x.amount 
-      x.destroy 
+      x.create_contra_and_confirm_for_group_loan_weekly_collection_voluntary_savings( self )
     end
-
-    member.update_total_savings_account( -1* total_amount)
-    self.destroy
+ 
+    return self 
   end
   
   

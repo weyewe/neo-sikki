@@ -557,6 +557,30 @@ class SavingsEntry < ActiveRecord::Base
     # group_loan_membership.update_total_compulsory_savings( -1 * new_object.amount)
   end
   
+
+  def create_contra_and_confirm_for_group_loan_weekly_collection_voluntary_savings(savings_source)
+    puts "5585444 savings_entry.create_contra_and_confirm"
+    last_transaction_data = TransactionData.where(
+      :transaction_source_id => savings_source.id , 
+      :transaction_source_type => savings_source.class.to_s ,
+      :code => TRANSACTION_DATA_CODE[:group_loan_weekly_collection_voluntary_savings],
+      :is_contra_transaction => false
+    ).order("id DESC").first 
+    
+    puts "last_transaction_data : #{last_transaction_data}"
+    
+
+    last_transaction_data.create_contra_and_confirm if not  last_transaction_data.nil?
+
+    member = group_loan_membership.member 
+    multiplier = 1 
+    multiplier = -1 if savings_source.direction == FUND_TRANSFER_DIRECTION[:incoming]
+    member.update_total_savings_account( savings_source * new_object.amount)
+
+    self.destroy 
+  end
+
+
   
   def self.create_weekly_collection_voluntary_savings( savings_source )
     # puts "Gonna create savings_entry"
@@ -576,7 +600,9 @@ class SavingsEntry < ActiveRecord::Base
                         :confirmed_at => savings_source.group_loan_weekly_collection.confirmed_at 
                         
     # puts "The amount: #{new_object.amount}"
-    member.update_total_savings_account( new_object.amount)
+    multiplier = 1 
+    multiplier = -1 if savings_source.direction == FUND_TRANSFER_DIRECTION[:outgoing]
+    member.update_total_savings_account( multiplier * new_object.amount)
     
     
     # do accounting posting 
@@ -707,19 +733,6 @@ class SavingsEntry < ActiveRecord::Base
     last_transaction_data.create_contra_and_confirm if not  last_transaction_data.nil?
   end
   
-  def create_contra_and_confirm_for_group_loan_weekly_collection_voluntary_savings(savings_source, transaction_code)
-    puts "5585444 savings_entry.create_contra_and_confirm"
-    last_transaction_data = TransactionData.where(
-      :transaction_source_id => savings_source.id , 
-      :transaction_source_type => savings_source.class.to_s ,
-      :code => transaction_code,
-      :is_contra_transaction => false
-    ).order("id DESC").first 
-    
-    puts "last_transaction_data : #{last_transaction_data}"
-    
 
-    last_transaction_data.create_contra_and_confirm if not  last_transaction_data.nil?
-  end
                       
 end
