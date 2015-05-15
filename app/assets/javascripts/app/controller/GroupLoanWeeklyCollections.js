@@ -307,6 +307,8 @@ Ext.define('AM.controller.GroupLoanWeeklyCollections', {
 			
 			wrapper.selectedParentId = id ; 
 			
+			savingsGrid.setTitle(null );
+			attendanceGrid.setTitle(null)
 			// empty out the savingsGrid
 		}
 		
