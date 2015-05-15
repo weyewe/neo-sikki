@@ -7,26 +7,30 @@ class Api::EmployeesController < Api::BaseApiController
       livesearch = "%#{params[:livesearch]}%"
         
         
-        @objects = Employee.where{
+        @objects = Employee.joins(:branch).where{
           (
             (name =~  livesearch ) | 
             (description =~ livesearch) | 
-            (code =~ livesearch) 
+            (code =~ livesearch) |
+            (branch.name =~ livesearch) | 
+            (branch.code =~ livesearch)
           )
 
         }.page(params[:page]).per(params[:limit]).order("id DESC")
 
-        @total = Employee.where{
+        @total = Employee.joins(:branch).where{
           (
             (name =~  livesearch ) | 
             (description =~ livesearch) |  
-            (code =~ livesearch) 
+            (code =~ livesearch) |
+            (branch.name =~ livesearch) | 
+            (branch.code =~ livesearch)
           )
         }.count
    
     else
       puts "In this shite"
-      @objects = Employee.page(params[:page]).per(params[:limit]).order("id DESC")
+      @objects = Employee.joins(:branch).page(params[:page]).per(params[:limit]).order("id DESC")
       @total = Employee.count 
     end
     
@@ -42,6 +46,8 @@ class Api::EmployeesController < Api::BaseApiController
                           
                             :id               =>    @object.id                  ,
                             :name       =>     @object.name   ,
+                            :branch_id       =>     @object.branch.id   ,
+                            :branch_code       =>     @object.branch.code   ,
                             :description    =>    @object.description  ,
                             :code        =>    @object.code     
                           ] , 
@@ -72,6 +78,9 @@ class Api::EmployeesController < Api::BaseApiController
                           :id               =>    @object.id                  ,
                           :name       =>     @object.name   ,
                           :description    =>    @object.description  ,
+                          :branch_id       =>     @object.branch.id   ,
+                          :branch_code       =>     @object.branch.code   ,
+
                           :code        =>    @object.code     
                           
                         ],

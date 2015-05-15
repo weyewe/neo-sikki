@@ -13,6 +13,9 @@ class Employee < ActiveRecord::Base
   
   validate :branch_id_must_be_valid 
 
+  def self.active_objects
+    self
+  end
 
   def branch_id_must_be_valid
     if branch_id.nil?

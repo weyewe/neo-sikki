@@ -30,6 +30,8 @@ NeoSikki::Application.routes.draw do
 
     resources :branches
     resources :employees
+    resources :group_loan_weekly_collection_attendances 
+    
     resources :app_users
     resources :members
     resources :group_loans 

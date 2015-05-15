@@ -1,7 +1,9 @@
 Ext.define('AM.controller.GroupLoanWeeklyCollections', {
   extend: 'Ext.app.Controller',
 
-  stores: ['GroupLoanWeeklyCollections', 'GroupLoans', 'GroupLoanWeeklyCollectionVoluntarySavingsEntries'],
+  stores: ['GroupLoanWeeklyCollections', 'GroupLoans', 
+  			'GroupLoanWeeklyCollectionVoluntarySavingsEntries',
+  			'GroupLoanWeeklyCollectionAttendances'],
   models: ['GroupLoanWeeklyCollection'],
 
   views: [
@@ -27,6 +29,10 @@ Ext.define('AM.controller.GroupLoanWeeklyCollections', {
 		{
 			ref: 'savingsList',
 			selector: 'grouploanweeklycollectionvoluntarysavingsentrylist'
+		},
+		{
+			ref: 'attendanceList',
+			selector: 'grouploanweeklycollectionattendancelist'
 		},
 		{
 			ref : 'searchField',
@@ -100,23 +106,35 @@ Ext.define('AM.controller.GroupLoanWeeklyCollections', {
 			
 			// related to the savings entry
 			
-			'grouploanweeklycollectionvoluntarysavingsentrylist': {
-        // itemdblclick: this.editObject,
-        selectionchange: this.savingsGridSelectionChange 
+	'grouploanweeklycollectionvoluntarysavingsentrylist': {
+	    // itemdblclick: this.editObject,
+	    selectionchange: this.savingsGridSelectionChange 
       },
 
+      'grouploanweeklycollectionattendancelist': {
+	    // itemdblclick: this.editObject,
+	    selectionchange: this.attendanceGridSelectionChange 
+      },
 
-			'grouploanweeklycollectionvoluntarysavingsentrylist button[action=addObject]': {
-	      click: this.addSavingsObject
-	    },
+    'grouploanweeklycollectionattendanceform button[action=save]': {
+        click: this.updateAttendanceObject
+     },
+
+    'grouploanweeklycollectionattendancelist button[action=editObject]': {
+      click: this.editAttendanceObject
+    },
+
+	'grouploanweeklycollectionvoluntarysavingsentrylist button[action=addObject]': {
+      click: this.addSavingsObject
+    },
 	
-			'grouploanweeklycollectionvoluntarysavingsentryform button[action=save]': {
+	'grouploanweeklycollectionvoluntarysavingsentryform button[action=save]': {
         click: this.updateSavingsObject
-      },
+     },
 
-	    'grouploanweeklycollectionvoluntarysavingsentrylist button[action=editObject]': {
-	      click: this.editSavingsObject
-	    },
+    'grouploanweeklycollectionvoluntarysavingsentrylist button[action=editObject]': {
+      click: this.editSavingsObject
+    },
 	    'grouploanweeklycollectionvoluntarysavingsentrylist button[action=deleteObject]': {
 	      click: this.deleteSavingsObject
 	    },
@@ -173,12 +191,30 @@ Ext.define('AM.controller.GroupLoanWeeklyCollections', {
 		// 	console.log( savingsGrid);
 		// 	alert("The savings grid is here");
 		// } 
-  
-    if (selections.length > 0) {
-			savingsGrid.enableRecordButtons();
-    } else {
-			savingsGrid.disableRecordButtons();
-    }
+	  
+	    if (selections.length > 0) {
+				savingsGrid.enableRecordButtons();
+	    } else {
+				savingsGrid.disableRecordButtons();
+	    }
+
+		 
+	},
+
+	attendanceGridSelectionChange : function( selectionModel, selections){
+		var grid = this.getList();
+		var attendanceGrid = this.getAttendanceList();
+		
+		// if( savingsGrid ){
+		// 	console.log( savingsGrid);
+		// 	alert("The savings grid is here");
+		// } 
+	  
+	    if (selections.length > 0) {
+				attendanceGrid.enableRecordButtons();
+	    } else {
+				attendanceGrid.disableRecordButtons();
+	    }
 
 		 
 	},
@@ -188,7 +224,8 @@ Ext.define('AM.controller.GroupLoanWeeklyCollections', {
 		
 		
     var grid = this.getList();
-		var savingsGrid = this.getSavingsList();
+	var savingsGrid = this.getSavingsList();
+	var attendanceGrid = this.getAttendanceList();
 		
 		// if( savingsGrid ){
 		// 	console.log( savingsGrid);
@@ -197,10 +234,11 @@ Ext.define('AM.controller.GroupLoanWeeklyCollections', {
   
     if (selections.length > 0) {
       grid.enableRecordButtons();
-			savingsGrid.addObjectButton.enable(); 
+	  savingsGrid.addObjectButton.enable();  
     } else {
       grid.disableRecordButtons();
-			savingsGrid.addObjectButton.disable(); 
+			savingsGrid.addObjectButton.disable();  
+			savingsGrid.disableRecordButtons();
     }
 
 		var selectedListId; 
@@ -217,20 +255,36 @@ Ext.define('AM.controller.GroupLoanWeeklyCollections', {
 				title = "";
 			}
 			savingsGrid.setTitle( title );
+
+			var title = "";
+			if( row ){
+				title = "Attendance, Week: " + row.get("week_number");
+			}else{
+				title = "";
+			}
+			attendanceGrid.setTitle( title );
+
+			
+
+
 		}
 		
 		savingsGrid.getStore().getProxy().extraParams.parent_id =  selectedListId ;
 		savingsGrid.getStore().load();
+
+		attendanceGrid.getStore().getProxy().extraParams.parent_id =  selectedListId ;
+		attendanceGrid.getStore().load();
 		
 		
   },
 
 	parentSelectionChange: function(selectionModel, selections) {
 		var me = this; 
-    var grid = me.getList();
+    	var grid = me.getList();
 		var parentList = me.getParentList();
 		var wrapper = me.getWrapper();
 		var savingsGrid = this.getSavingsList(); 
+		var attendanceGrid = this.getAttendanceList(); 
 		
 		
 		
@@ -239,6 +293,7 @@ Ext.define('AM.controller.GroupLoanWeeklyCollections', {
 		if (parentList.getSelectionModel().hasSelection()) {
 			
 			savingsGrid.getStore().loadData([], false);
+			attendanceGrid.getStore().loadData([], false);
 			var row = parentList.getSelectionModel().getSelection()[0];
 			var id = row.get("id"); 
 			
@@ -258,7 +313,6 @@ Ext.define('AM.controller.GroupLoanWeeklyCollections', {
 		grid.getStore().getProxy().extraParams.parent_id =  wrapper.selectedParentId ;
 		grid.getStore().load(); 
 		
-		savingsGrid.setTitle("");
   },
 
 	collectObject: function(){
@@ -502,6 +556,118 @@ Ext.define('AM.controller.GroupLoanWeeklyCollections', {
 	
 	
 	
+
+
+
+	editAttendanceObject: function() {
+		var me = this; 
+		var parentObject  = this.getList().getSelectedObject();
+ 	   var record = this.getAttendanceList().getSelectedObject();
+
+ 	   console.log( record );
+		
+		 
+		if( parentObject) { 
+			var view = Ext.widget('grouploanweeklycollectionattendanceform');
+	
+
+	   	 	view.down('form').loadRecord(record);
+			view.show();
+		}
+  },
+
+  updateAttendanceObject: function(button) {
+		var me = this; 
+    var win = button.up('window');
+    var form = win.down('form');
+		var parentList = this.getParentList();
+		
+		var groupLoanWeeklyCollectionId = this.getList().getSelectedObject().get("id");
+		var wrapper = this.getWrapper();
+
+    var store = this.getGroupLoanWeeklyCollectionAttendancesStore();
+    var record = form.getRecord();
+    var values = form.getValues();
+
+// console.log("The values: " ) ;
+// console.log( values );
+
+		
+		if( record ){
+			record.set( values );
+
+			form.query('checkbox').forEach(function(checkbox){
+				record.set( checkbox['name']  ,checkbox['checked'] ) ;
+			});
+
+
+			 
+			form.setLoading(true);
+			record.save({
+				success : function(record){
+					form.setLoading(false);
+					//  since the grid is backed by store, if store changes, it will be updated
+					
+					// store.getProxy().extraParams = {
+					//     livesearch: ''
+					// };
+	 
+					store.load({
+						params: {
+							parent_id : groupLoanWeeklyCollectionId
+						}
+					});
+					 
+					
+					win.close();
+				},
+				failure : function(record,op ){
+					form.setLoading(false);
+					var message  = op.request.scope.reader.jsonData["message"];
+					var errors = message['errors'];
+					form.getForm().markInvalid(errors);
+					this.reject();
+				}
+			});
+				
+			 
+		}else{
+			//  no record at all  => gonna create the new one 
+			var me  = this; 
+			var newObject = new AM.model.GroupLoanWeeklyCollectionAttendance( values ) ;
+			form.query('checkbox').forEach(function(checkbox){
+				record.set( checkbox['name']  ,checkbox['checked'] ) ;
+			});
+			
+			// learnt from here
+			// http://www.sencha.com/forum/showthread.php?137580-ExtJS-4-Sync-and-success-failure-processing
+			// form.mask("Loading....."); 
+			form.setLoading(true);
+			newObject.save({
+				success: function(record){
+	
+					store.load({
+						params: {
+							parent_id : groupLoanWeeklyCollectionId
+						}
+					});
+					
+					form.setLoading(false);
+					win.close();
+					
+				},
+				failure: function( record, op){
+					form.setLoading(false);
+					var message  = op.request.scope.reader.jsonData["message"];
+					var errors = message['errors'];
+					form.getForm().markInvalid(errors);
+					this.reject();
+				}
+			});
+		} 
+  },
+
+
 	/*
 	FOR THE SAVINGS
 	*/
@@ -517,12 +683,12 @@ Ext.define('AM.controller.GroupLoanWeeklyCollections', {
 			view.setParentData( parentObject );
 			view.show();
 		}
-  },
+ 	 },
 
   editSavingsObject: function() {
 		var me = this; 
 		var parentObject  = this.getList().getSelectedObject();
-    var record = this.getSavingsList().getSelectedObject();
+ 	   var record = this.getSavingsList().getSelectedObject();
 
 		
 		 
@@ -537,8 +703,6 @@ Ext.define('AM.controller.GroupLoanWeeklyCollections', {
 	    view.down('form').loadRecord(record);
 			view.show();
 		}
-		
-		 
   },
 
   updateSavingsObject: function(button) {

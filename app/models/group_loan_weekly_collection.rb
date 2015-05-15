@@ -8,6 +8,8 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
   has_many :group_loan_premature_clearance_payments 
   has_many :group_loan_weekly_payments
   has_many :group_loan_weekly_collection_voluntary_savings_entries
+  has_many :group_loan_weekly_collection_attendances
+  
   
   
   

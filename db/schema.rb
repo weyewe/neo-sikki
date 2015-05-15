@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150509062523) do
+ActiveRecord::Schema.define(version: 20150515032225) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -185,6 +185,15 @@ ActiveRecord::Schema.define(version: 20150509062523) do
   add_index "group_loan_run_away_receivables", ["group_loan_membership_id"], name: "gl_rar_glm", using: :btree
   add_index "group_loan_run_away_receivables", ["group_loan_weekly_collection_id"], name: "gl_rar_glwc", using: :btree
   add_index "group_loan_run_away_receivables", ["member_id"], name: "gl_rar_m", using: :btree
+
+  create_table "group_loan_weekly_collection_attendances", force: true do |t|
+    t.integer  "group_loan_weekly_collection_id"
+    t.integer  "group_loan_membership_id"
+    t.boolean  "attendance_status",               default: true
+    t.boolean  "payment_status",                  default: true
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "group_loan_weekly_collection_voluntary_savings_entries", force: true do |t|
     t.decimal  "amount",                          precision: 10, scale: 2, default: 0.0

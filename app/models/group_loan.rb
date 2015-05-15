@@ -221,10 +221,35 @@ Phase: loan disbursement finalization
   def schedule_group_loan_weekly_collection
     disbursed_date = self.disbursed_at
     (1..self.number_of_collections).each do |week_number|
-      GroupLoanWeeklyCollection.create :group_loan_id => self.id, :week_number => week_number,
-      :tentative_collection_date => disbursed_date + week_number.weeks 
+      weekly_collection = GroupLoanWeeklyCollection.create :group_loan_id => self.id, :week_number => week_number,
+        :tentative_collection_date => disbursed_date + week_number.weeks 
+
+      self.group_loan_memberships.each do |glm|
+        GroupLoanWeeklyCollectionAttendance.create_object :group_loan_weekly_collection_id => weekly_collection.id,
+                    :group_loan_membership_id => glm.id 
+      end
     end
   end
+
+
+=begin
+  GroupLoan.where(:is_loan_disbursed => true ).limit(10).order("id DESC").each do |gl|
+    gl.group_loan_weekly_collections.each do |glwc|
+      gl.group_loan_memberships.each do |glm|
+        GroupLoanWeeklyCollectionAttendance.create_object :group_loan_weekly_collection_id => glwc.id,
+                    :group_loan_membership_id => glm.id 
+      end
+    end
+  end
+
+  a  = User.find_by_email "admin@gmail.com"
+  a.password = "willy1234"
+  a.password_confirmation = "willy1234"
+  a.save
+
+  array = []
+  GroupLoan.where(:is_loan_disbursed => true ).limit(10).order("id DESC").each {|x| array << x.name }
+=end
   
   def create_group_loan_default_payments
     self.active_group_loan_memberships.each do |glm|
