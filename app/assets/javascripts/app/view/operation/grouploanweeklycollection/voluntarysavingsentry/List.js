@@ -12,9 +12,12 @@ Ext.define('AM.view.operation.grouploanweeklycollection.voluntarysavingsentry.Li
 			{ header: 'Member', dataIndex: 'member_name'   },
 			
 			
+			
+
+			{ header: 'Status', dataIndex: 'direction_text'   },
 			{
 				xtype : 'templatecolumn',
-				text : "Jumlah Penerimaan",
+				text : "Jumlah",
 				sortable : false,
 				flex : 1,
 				tpl : '<b>{amount}</b>'   

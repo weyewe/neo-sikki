@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150515032225) do
+ActiveRecord::Schema.define(version: 20150515070916) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -201,6 +201,7 @@ ActiveRecord::Schema.define(version: 20150515032225) do
     t.integer  "group_loan_weekly_collection_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "direction",                                                default: 1
   end
 
   add_index "group_loan_weekly_collection_voluntary_savings_entries", ["group_loan_membership_id"], name: "glwc_vse_glm", using: :btree

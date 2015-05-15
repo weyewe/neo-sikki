@@ -15,8 +15,22 @@ Ext.define('AM.view.operation.grouploanweeklycollection.voluntarysavingsentry.Fo
 	setExtraParamForJsonRemoteStore: function(id){
 		this.remoteJsonStore.proxy.extraParams = {group_loan_weekly_collection_id: id};
 	},
+
+
 	
   initComponent: function() {
+  		var localJsonStoreDirection = Ext.create(Ext.data.Store, {
+			type : 'array',
+			storeId : 'fund_transfer_direction',
+			fields	: [ 
+				{ name : "direction"}, 
+				{ name : "direction_text"}  
+			], 
+			data : [
+				{ direction : 1, direction_text : "Penambahan"},
+				{ direction : 2, direction_text : "Penarikan"}
+			] 
+		});
 	
 	 
 		var selectedParentId = this.parentId;
@@ -110,6 +124,27 @@ Ext.define('AM.view.operation.grouploanweeklycollection.voluntarysavingsentry.Fo
 					name : 'amount',
 					fieldLabel: 'Jumlah Tabungan'
 				},
+				{
+					fieldLabel: 'Tipe Transaksi',
+					xtype: 'combo',
+					queryMode: 'remote',
+					forceSelection: true, 
+					displayField : 'direction_text',
+					valueField : 'direction',
+					pageSize : 5,
+					minChars : 1, 
+					allowBlank : false, 
+					triggerAction: 'all',
+					store : localJsonStoreDirection, 
+					listConfig : {
+						getInnerTpl: function(){
+							return  	'<div data-qtip="{direction_text}">' +  
+													'<div class="combo-name">{direction_text}</div>' +
+							 					'</div>';
+						}
+					},
+					name : 'direction' 
+				}
 			]
     }];
 

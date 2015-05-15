@@ -352,7 +352,7 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
 
     self.group_loan_weekly_collection_voluntary_savings_entries.
             joins(:group_loan_membership => [:member]).
-            where(:direction => x.direction == FUND_TRANSFER_DIRECTION[:incoming] ) each do |x|
+            where(:direction => FUND_TRANSFER_DIRECTION[:incoming] ).each do |x|
       member = x.group_loan_membership.member
 
       if member.total_savings_account - self.amount < BigDecimal("0")

@@ -41,9 +41,7 @@ class GroupLoanWeeklyCollectionVoluntarySavingsEntry < ActiveRecord::Base
   
   
   def valid_amount
-    return if not self.amount.present? 
-    return if not valid_direction 
-
+    return if not self.amount.present?
 
     
     if self.amount <= BigDecimal('0')
@@ -52,7 +50,7 @@ class GroupLoanWeeklyCollectionVoluntarySavingsEntry < ActiveRecord::Base
     end
 
     if self.direction == FUND_TRANSFER_DIRECTION[:outgoing]
-      if member.total_savings_account - self.amount < BigDecimal("0")
+      if group_loan_membership.member.total_savings_account - self.amount < BigDecimal("0")
         self.errors.add(:amount, "Tidak cukup dana")
         return self 
       end
@@ -190,10 +188,11 @@ class GroupLoanWeeklyCollectionVoluntarySavingsEntry < ActiveRecord::Base
     return self 
   end
   
-  
-  
-   
-  
-  
-  
 end
+
+=begin
+  GroupLoanWeeklyCollectionVoluntarySavingsEntry.all.each do |x|
+    x.direction = FUND_TRANSFER_DIRECTION[:incoming]
+    x.save
+  end
+=end
