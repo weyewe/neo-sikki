@@ -17,6 +17,11 @@ class WeeklyCollectionPdf < Prawn::Document
     @page_length = 595
     @object = object
     @group_loan = object.group_loan
+    @glwc_id_list = []
+    @group_loan.group_loan_weekly_collections.where{
+        (week_number.lte object.week_number )
+      }.each {|x| @glwc_id_list << x.id }
+
     @active_glm_list = @object.active_group_loan_memberships.joins(:group_loan_product).order("id ASC")
     @view = view
     @glwc_attendance_list  = @object.group_loan_weekly_collection_attendances
@@ -44,7 +49,7 @@ class WeeklyCollectionPdf < Prawn::Document
    
   def title
     bounding_box( [150,cursor], :width => @page_width - 300) do
-      text "Form Laporan Area - Setoran", 
+      text "Laporan Konfirmasi Setoran", 
           :size => 15, 
           :align => :center 
           
@@ -144,7 +149,7 @@ class WeeklyCollectionPdf < Prawn::Document
     
     header = [["No", "Nama", "ID", "Jumlah Pinjaman", "Setoran Mingguan",
                 "Bayar", "Tepat Waktu", "Menabung minggu lalu", "Ambil Tab minggu lalu", 
-                "Saldo sisa tabungan pribadi", "Sisa Cicil"
+                "Saldo sisa tabungan pribadi", "Sisa Cicil", "Total DTR", "Total Telat"
 
       ]] 
     body = [] 
@@ -189,6 +194,18 @@ class WeeklyCollectionPdf < Prawn::Document
       remaining_savings_adjusted = ( ( member.total_savings_account) /1000 ).to_s.gsub(".0",'')
       remaining_amount_adjusted = ( ( remaining_amount) /1000 ).to_s.gsub(".0",'')
 
+      total_dtr = GroupLoanWeeklyCollectionAttendance.where(
+          :group_loan_membership_id => active_glm.id,
+          :group_loan_weekly_collection_id => @glwc_id_list,
+          :payment_status => false
+        ).count 
+
+      total_telat = GroupLoanWeeklyCollectionAttendance.where(
+          :group_loan_membership_id => active_glm.id,
+          :group_loan_weekly_collection_id => @glwc_id_list,
+          :attendance_status => false
+        ).count 
+
       body << [ 
             "#{count}",
             "#{member.name}",
@@ -200,8 +217,9 @@ class WeeklyCollectionPdf < Prawn::Document
             "#{savings_addition_adjusted}", # menabung minggu lalu
             "#{savings_withdrawal_adjusted}", # ambil tab minggu lalu
             "#{ remaining_savings_adjusted }" , # saldo sisa tabungan pribadi
-            "#{remaining_amount_adjusted}"  # sisa pinjaman
-
+            "#{remaining_amount_adjusted}",  # sisa pinjaman
+            "#{total_dtr}",
+            "#{total_telat}"
        ]
     end  
     

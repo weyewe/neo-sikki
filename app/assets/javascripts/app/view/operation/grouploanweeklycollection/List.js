@@ -78,7 +78,7 @@ Ext.define('AM.view.operation.grouploanweeklycollection.List' ,{
 
 
  		this.downloadFormObjectButton = new Ext.Button({
-			text: 'Pre-printed Form',
+			text: 'LKS',
 			action: 'downloadFormObject',
 			disabled: true
 		});
