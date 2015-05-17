@@ -237,6 +237,7 @@ Phase: loan disbursement finalization
       group_loan_memberships_array.each do |glm|
         GroupLoanWeeklyCollectionAttendance.create_object :group_loan_weekly_collection_id => glwc.id,
                     :group_loan_membership_id => glm.id 
+      end
     end
   end
 
