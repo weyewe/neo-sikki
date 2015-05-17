@@ -137,7 +137,7 @@ Ext.define('AM.view.operation.grouploan.List' ,{
 		});
 		
 		this.downloadPendingButton = new Ext.Button({
-			text: 'Download Pending',
+			text: 'FKS',
 			action: 'downloadPending',
 			disabled: false
 		});
@@ -153,8 +153,9 @@ Ext.define('AM.view.operation.grouploan.List' ,{
 						this.withdrawObjectButton, 
 						'-',
 						this.searchField,
-						'-',
-						this.downloadPendingButton ];
+						'->',
+						// this.downloadPendingButton
+						 ];
 						
 		this.bbar = Ext.create("Ext.PagingToolbar", {
 			store	: this.store, 
