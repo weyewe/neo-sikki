@@ -364,6 +364,7 @@ Phase: loan disbursement finalization
     
     # destroy all weekly collection
     self.group_loan_weekly_collections.each do |x|
+      x.group_loan_weekly_collection_attendances.each {|x| x.destroy } 
       x.destroy 
     end
     
