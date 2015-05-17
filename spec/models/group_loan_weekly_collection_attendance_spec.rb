@@ -189,3 +189,9 @@ describe GroupLoanWeeklyCollectionAttendance do
 
 
 end
+=begin
+creating the weekly collection attendance
+GroupLoanWeeklyCollection.where(:is_loan_disbursed => true).find_each do |gl|
+	gl.delay.migration_only_generate_group_loan_weekly_collection_attendance
+end
+=end

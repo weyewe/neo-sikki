@@ -231,6 +231,15 @@ Phase: loan disbursement finalization
     end
   end
 
+  def migration_only_generate_group_loan_weekly_collection_attendance
+    group_loan_memberships_array = self.group_loan_memberships 
+    self.group_loan_weekly_collections.each do |glwc|
+      group_loan_memberships_array.each do |glm|
+        GroupLoanWeeklyCollectionAttendance.create_object :group_loan_weekly_collection_id => glwc.id,
+                    :group_loan_membership_id => glm.id 
+    end
+  end
+
 
 =begin
   GroupLoan.where(:is_loan_disbursed => true ).limit(10).order("id DESC").each do |gl|
