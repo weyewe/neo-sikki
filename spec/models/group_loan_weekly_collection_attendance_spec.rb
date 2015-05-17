@@ -191,7 +191,11 @@ describe GroupLoanWeeklyCollectionAttendance do
 end
 =begin
 creating the weekly collection attendance
-GroupLoanWeeklyCollection.where(:is_loan_disbursed => true).find_each do |gl|
+total_gl = GroupLoan.where(:is_loan_disbursed => true).count
+counter = 1 
+GroupLoan.where(:is_loan_disbursed => true).find_each do |gl|
+	puts "#{counter}/#{total_gl}"
 	gl.delay.migration_only_generate_group_loan_weekly_collection_attendance
+	counter += 1 
 end
 =end
