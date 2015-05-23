@@ -15,6 +15,7 @@ class Api2::GroupLoanWeeklyCollectionReportsController < Api2::BaseReportApiCont
   	@object  = GroupLoanWeeklyCollection.find_by_id params[:id]
   	@objects =[]
 
+  	@group_loan = @object.group_loan
   	@active_glm_list = @object.active_group_loan_memberships.joins(:group_loan_product).order("id ASC")
 	@glwc_attendance_list  = @object.group_loan_weekly_collection_attendances
    	@glwc_voluntary_savings_list = @object.group_loan_weekly_collection_voluntary_savings_entries
