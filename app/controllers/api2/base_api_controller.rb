@@ -1,11 +1,7 @@
-class Api::BaseApiController < ApplicationController
-  respond_to :json
-  
-  before_filter :authenticate_auth_token, :ensure_authorized
-
-  # protect_from_forgery  :null_session
-  # skip_before_filter :verify_authenticity_token  
-  
+class Api2::BaseApiController 
+	respond_to :json
+	skip_before_filter :verify_authenticity_token 
+	
   def access_denied
     return render( :json => {:access_denied => "Requires appropriate role"} )
   end
@@ -305,5 +301,4 @@ class Api::BaseApiController < ApplicationController
       return
     end
   end
-   
 end
