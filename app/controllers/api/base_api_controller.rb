@@ -3,7 +3,7 @@ class Api::BaseApiController < ApplicationController
   
   before_filter :authenticate_auth_token, :ensure_authorized
 
-  protect_from_forgery with: :null
+  protect_from_forgery with: :null_session
   
   
   def access_denied
