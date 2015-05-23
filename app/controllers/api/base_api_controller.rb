@@ -2,6 +2,8 @@ class Api::BaseApiController < ApplicationController
   respond_to :json
   
   before_filter :authenticate_auth_token, :ensure_authorized
+
+  protect_from_forgery with: :null
   
   
   def access_denied

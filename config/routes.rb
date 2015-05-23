@@ -9,6 +9,11 @@ NeoSikki::Application.routes.draw do
   get 'print_weekly_collection/:group_loan_weekly_collection_id' => 
                     'group_loan_weekly_collections#print_weekly_collection' , :as => :print_weekly_collection
 
+
+  namespace :api2 do
+    devise_for :users
+  end
+
   namespace :api do 
     devise_for :users
     
