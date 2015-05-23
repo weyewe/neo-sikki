@@ -93,7 +93,7 @@ class Api2::GroupLoanWeeklyCollectionReportsController < Api2::BaseReportApiCont
 
   	render :json => { :success => true, 
                       :group_loan_weekly_collection_report_details => [@objects]  }
-
+    return 
   end
 
 end
