@@ -12,6 +12,7 @@ NeoSikki::Application.routes.draw do
 
   namespace :api2 do
     devise_for :users
+    resources :group_loan_weekly_collection_reports
   end
 
   namespace :api do 

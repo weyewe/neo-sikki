@@ -1,4 +1,4 @@
-class Api2::SessionsController < Api2::BaseApiController
+class Api2::SessionsController < Api2::BaseReportApiController
   before_filter :authenticate_user!, :except => [:create, :destroy, :say_hi ]
   skip_before_filter :authenticate_auth_token, :only => [:create, :destroy, :say_hi ]
   skip_before_filter :ensure_authorized, :only => [:create, :destroy, :say_hi ]

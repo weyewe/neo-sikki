@@ -1,4 +1,4 @@
-class Api2::BaseApiController   < ApplicationController
+class Api2::BaseReportApiController   < ApplicationController
 	respond_to :json
 	skip_before_filter :verify_authenticity_token 
 
