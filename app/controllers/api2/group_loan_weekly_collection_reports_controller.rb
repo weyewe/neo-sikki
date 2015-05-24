@@ -128,7 +128,7 @@ class Api2::GroupLoanWeeklyCollectionReportsController < Api2::BaseReportApiCont
 
   	render :json => { :success => true, 
                       :week_number => @object.week_number, 
-                      :confirmed_at => @object.confirmed_at.to_s , 
+                      :confirmed_at => @object.confirmed_at.to_datetime.to_s , 
                       :group_loan_name => @group_loan.name, 
                       :group_loan_group_number => @group_loan.group_number,
 
