@@ -24,6 +24,7 @@ class Api2::GroupLoanWeeklyCollectionReportsController < Api2::BaseReportApiCont
 #tomorrow_string = DateTime.now.to_s
 # parsed_datetime = tomorrow_string.to_datetime
   
+  "2015-05-25T09:21:46+00:00"
 =end
 
   def index
@@ -126,6 +127,11 @@ class Api2::GroupLoanWeeklyCollectionReportsController < Api2::BaseReportApiCont
   	end
 
   	render :json => { :success => true, 
+                      :week_number => @object.week_number, 
+                      :confirmed_at => @object.confirmed_at.to_string , 
+                      :group_loan_name => @group_loan.name, 
+                      :group_loan_group_number => @group_loan.group_number,
+
                       :group_loan_weekly_collection_report_details => @objects  }
     return 
   end
