@@ -1,11 +1,44 @@
 class Api2::GroupLoanWeeklyCollectionReportsController < Api2::BaseReportApiController
   
+=begin
+  # in jakarta, it is GMT + 7 
+  # in server, it is UTC time => GMT + 0 
+
+  tomorrow = DateTime.now + 1.days
+  tomorrow_last_week = tomorrow - 1.weeks 
+
+  # if today is sunday
+  monday = DateTime.now + 1.days
+  last_monday = monday - 1.weeks 
+
+  # we want the report to be processed at 9pm. which means, it is 2pm Server time (UTC)
+
+  today = DateTime.now 
+  tomorrow = DateTime.now + 1 
+  today_starting_hour = today.beginning_of_day
+  today_ending_hour = today.end_of_day
+
+  client_today_starting_hour = today_starting_hour + 7.hours
+  client_today_ending_hour  = today_ending_hour + 7.hours
+
+#tomorrow_string = DateTime.now.to_s
+# parsed_datetime = tomorrow_string.to_datetime
+  
+=end
+
   def index
+    client_starting_datetime   = params[:starting_datetime].to_datetime 
+    client_ending_datetime = params[:ending_datetime].to_datetime 
 
-    @objects = GroupLoanWeeklyCollection. 
-                page(params[:page]).per(params[:limit]).order("id ASC")
+    @objects = GroupLoanWeeklyCollection.where{
+      (is_collected.eq true ) & 
+      (is_confirmed.eq true ) & 
 
-    @total = GroupLoanWeeklyCollection.count 
+      (confirmed_at.gte client_starting_datetime ) & 
+      (confirmed_at.lte client_ending_datetime )
+    }
+
+    @total = @objects.count 
 
   
   end
@@ -17,7 +50,7 @@ class Api2::GroupLoanWeeklyCollectionReportsController < Api2::BaseReportApiCont
 
   	@group_loan = @object.group_loan
   	@active_glm_list = @object.active_group_loan_memberships.joins(:group_loan_product).order("id ASC")
-	@glwc_attendance_list  = @object.group_loan_weekly_collection_attendances
+	  @glwc_attendance_list  = @object.group_loan_weekly_collection_attendances
    	@glwc_voluntary_savings_list = @object.group_loan_weekly_collection_voluntary_savings_entries
   
 
