@@ -17,8 +17,7 @@ development:
   encoding: unicode
   database: awesome_kki
   pool: 5
-  username: weyewe
-  password: willy1234W
+  username: nitrous 
 
 #   pg_restore --verbose --clean --no-acl --no-owner -h localhost -U weyewe -d neosikki_development latest.dump
 
@@ -45,8 +44,7 @@ test:
   encoding: unicode
   database: neosikki_test
   pool: 5
-  username: weyewe
-  password: willy1234W
+  username: nitrous
 
 production:
   adapter: postgresql
