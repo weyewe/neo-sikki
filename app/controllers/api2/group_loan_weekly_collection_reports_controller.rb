@@ -31,13 +31,20 @@ class Api2::GroupLoanWeeklyCollectionReportsController < Api2::BaseReportApiCont
     client_starting_datetime   = params[:starting_datetime].to_datetime 
     client_ending_datetime = params[:ending_datetime].to_datetime 
 
+    # today_kki_date = DateTime.now.in_time_zone 'Jakarta'
+  # weekly_collection_report_disburse_day = today_kki_date  + 2.days
+  #  last_week_report_data = weekly_collection_report_disburse_day - 1.weeks
+  # client_starting_datetime = last_week_report_data.beginning_of_day.utc
+  # client_ending_datetime =  last_week_report_data.end_of_day.utc
+
+
     @objects = GroupLoanWeeklyCollection.where{
       (is_collected.eq true ) & 
       (is_confirmed.eq true ) & 
 
       (confirmed_at.gte client_starting_datetime ) & 
       (confirmed_at.lte client_ending_datetime )
-    }
+    }.order("group_loan_id DESC")
 
     @total = @objects.count 
 

@@ -35,12 +35,16 @@ class Api::AppUsersController < Api::BaseApiController
     @object = User.create_object( params[:user] )  
     
     
+
  
     if @object.errors.size == 0 
+      @object.device_id = params[:deviceToken]
+      
       render :json => { :success => true, 
                         :users => [@object] , 
                         :total => User.active_objects.count }  
     else
+
       msg = {
         :success => false, 
         :message => {
