@@ -1,9 +1,9 @@
 
-Ext.define('AM.view.operation.payment_voucher.Form', {
+Ext.define('AM.view.operation.memorial.Form', {
   extend: 'Ext.window.Window',
-  alias : 'widget.payment_voucherform',
+  alias : 'widget.memorialform',
 
-  title : 'Add / Edit PaymentVoucher',
+  title : 'Add / Edit Memorial',
   layout: 'fit',
 	width	: 500,
   autoShow: true,  // does it need to be called?
