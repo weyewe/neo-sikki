@@ -26,6 +26,9 @@ class Api2::MembershipSavingsReportsController < Api2::BaseReportApiController
 end
 
 
+  # json.id_number            object.id_number
+  # json.name             object.name
+
 
   # json.membership_savings_entries object.savings_entries.where(
   #               :savings_status => SAVINGS_STATUS[:membership],
