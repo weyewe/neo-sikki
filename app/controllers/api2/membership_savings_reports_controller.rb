@@ -7,15 +7,15 @@ class Api2::MembershipSavingsReportsController < Api2::BaseReportApiController
 
     @objects = Member.includes(:savings_entries).where{
       ( savings_entries.savings_status == SAVINGS_STATUS[:membership] ) & 
-      ( savings_entries.confirmed_at.lte ending_datetime ) & 
-      ( savings_entries.confirmed_at.gte starting_datetime)
+      ( savings_entries.confirmed_at.lte client_ending_datetime ) & 
+      ( savings_entries.confirmed_at.gte client_starting_datetime)
 
     }.page( params[:page]).limit( params[:limit]).order("id ASC")
 
     @total = Member.includes(:savings_entries).where{
       ( savings_entries.savings_status == SAVINGS_STATUS[:membership] ) & 
-      ( savings_entries.confirmed_at.lte ending_datetime ) & 
-      ( savings_entries.confirmed_at.gte starting_datetime)
+      ( savings_entries.confirmed_at.lte client_ending_datetime ) & 
+      ( savings_entries.confirmed_at.gte client_starting_datetime)
 
     }.count
 
