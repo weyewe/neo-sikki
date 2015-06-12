@@ -13,6 +13,11 @@ NeoSikki::Application.routes.draw do
   namespace :api2 do
     devise_for :users
     resources :group_loan_weekly_collection_reports
+
+    resources :membership_savings_reports 
+
+    get 'get_total_members' => 'members#get_total_members', :as => :get_total_members
+
   end
 
   namespace :api do 
