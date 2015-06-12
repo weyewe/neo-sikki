@@ -24,13 +24,3 @@ class Api2::MembershipSavingsReportsController < Api2::BaseReportApiController
 end
 
 
-
-  # json.membership_savings_entries object.savings_entries.where(
-  #               :savings_status => SAVINGS_STATUS[:membership],
-  #               :is_confirmed => true ) do |membership_savings|
-
-  #    json.direction  membership_savings.direction
-  #    json.amount membership_savings.amount 
-
-  #   json.confirmed_at   format_date_friendly( membership_savings.confirmed_at )
-  # end
