@@ -24,6 +24,21 @@ class GroupLoanMembership < ActiveRecord::Base
   validate :no_deceased_or_run_away_member
   validate :valid_member_id
   validate :valid_group_loan_product_id
+
+
+  def weekly_collection_attendance( weekly_collection )
+    GroupLoanWeeklyCollectionAttendance.where(
+        :group_loan_membership_id => self.id , 
+        :group_loan_weekly_collection_id => weekly_collection.id 
+      ).first 
+  end
+
+  def weekly_collection_voluntary_savings_entry( weekly_collection ) 
+    GroupLoanWeeklyCollectionVoluntarySavingsEntry.where(
+        :group_loan_membership_id => self.id , 
+        :group_loan_weekly_collection_id => weekly_collection.id 
+      )
+  end
   
   def valid_member_id
     return if member_id.nil? 

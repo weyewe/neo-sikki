@@ -1,0 +1,41 @@
+1. create api for group loan weekly collection 
+	a. search group loan weekly collection
+		GET api2/group_loans
+		query_string?livesearch=''&auth_token=''&page=''&limit=''
+
+		response: list of all group loans that satisfies the query 
+	b. get all the associated group loan membership
+		GET api2/first_uncollected_weekly_collection/:group_loan_id 
+		query_string?&auth_token=''
+
+	c. add voluntary savings 
+		POST api2/group_loan_weekly_collection_voluntary_savings_entries 
+		query_string?group_loan_membership_id=''&
+						group_loan_weekly_collection_id=''&
+						auth_token=''
+
+		response: { success: true }
+
+		if you want to update
+		PUT api2/group_loan_weekly_collection_voluntary_savings_entries/:id
+
+		if you want to delete
+		DELETE 	api2/group_loan_weekly_collection_voluntary_savings_entries/:id
+
+	d. add attendance status
+		PUT api2/mark_attendances
+
+		query_string?auth_token=''&
+						group_loan_weekly_collection_id=''&
+						group_loan_membership_id=''
+
+
+
+	e. collect the said group loan weekly collection 
+		PUT api2/group_loan_weekly_collections/:id
+
+		query_string?auth_token=''&is_collect=true 
+
+2. create user role for that api (start with the group loan weekly collection)
+
+3. 
