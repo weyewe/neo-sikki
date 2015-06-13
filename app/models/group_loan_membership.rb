@@ -37,7 +37,7 @@ class GroupLoanMembership < ActiveRecord::Base
     GroupLoanWeeklyCollectionVoluntarySavingsEntry.where(
         :group_loan_membership_id => self.id , 
         :group_loan_weekly_collection_id => weekly_collection.id 
-      )
+      ).first
   end
   
   def valid_member_id

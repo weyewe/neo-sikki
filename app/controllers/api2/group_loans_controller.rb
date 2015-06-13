@@ -12,7 +12,7 @@ class Api2::GroupLoansController < Api2::BaseReportApiController
         ( is_closed.eq false ) & 
         (
           (name =~  livesearch ) | 
-          (group_number =~ livesearch ) | 
+          (group_number =~ livesearch ) 
         )
         
       }.page(params[:page]).per(params[:limit]).order("group_loans.id DESC")
@@ -22,7 +22,7 @@ class Api2::GroupLoansController < Api2::BaseReportApiController
         ( is_closed.eq false ) & 
         (
           (name =~  livesearch ) | 
-          (group_number =~ livesearch ) | 
+          (group_number =~ livesearch ) 
         )
       }.count
 

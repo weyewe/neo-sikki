@@ -18,6 +18,15 @@ NeoSikki::Application.routes.draw do
 
     get 'get_total_members' => 'members#get_total_members', :as => :get_total_members
 
+    resources :group_loans
+
+
+    get 'first_uncollected_weekly_collection/:group_loan_id' => 
+            'group_loan_weekly_collections#first_uncollected_weekly_collection', 
+            :as => :first_uncollected_weekly_collection
+
+    resources :group_loan_weekly_collection_attendances
+    resources :group_loan_weekly_collection_voluntary_savings_entries 
   end
 
   namespace :api do 

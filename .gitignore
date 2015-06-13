@@ -24,3 +24,5 @@ heroku_env.rb
 /play_data/*
 
 /play_api/*
+
+/config/deploy.rb

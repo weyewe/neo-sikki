@@ -213,86 +213,86 @@ data_entry_role = Role.create!(
 
 
 # 
-# =begin
-#   CREATING THE Member 
-# =end
-#   member_array = []
-#   (1..80).each do |number|
-#     member = Member.create_object({
-#       :name =>  "Member #{number}",
-#       :address => "Address alamat #{number}" ,
-#       :id_number => "342432#{number}"
-#     })
-#     member_array << member 
-#   end
-# 
-#  
-#   # customer_array = [cust_1, cust_2, cust_3, cust_4] 
-#   
-#   member_array = Member.all 
-# 
+=begin
+  CREATING THE Member 
+=end
+  member_array = []
+  (1..80).each do |number|
+    member = Member.create_object({
+      :name =>  "Member #{number}",
+      :address => "Address alamat #{number}" ,
+      :id_number => "342432#{number}"
+    })
+    member_array << member 
+  end
+
+ 
+  # customer_array = [cust_1, cust_2, cust_3, cust_4] 
+  
+  member_array = Member.all 
+
 # =begin
 #   Create GroupLoanProduct
 # =end
 # 
-#   @total_weeks_1        = 8 
-#   @principal_1          = BigDecimal('20000')
-#   @interest_1           = BigDecimal("4000")
-#   @compulsory_savings_1 = BigDecimal("6000")
-#   @admin_fee_1          = BigDecimal('10000')
-#   @initial_savings_1          = BigDecimal('0')
-# 
-#   @group_loan_product_1 = GroupLoanProduct.create_object({
-#     :name => "Produk 1, 500 Ribu",
-#     :total_weeks        =>  @total_weeks_1              ,
-#     :principal          =>  @principal_1                ,
-#     :interest           =>  @interest_1                 , 
-#     :compulsory_savings        =>  @compulsory_savings_1       , 
-#     :admin_fee          =>  @admin_fee_1,
-#     :initial_savings          => @initial_savings_1
-#   }) 
-# 
-#   @total_weeks_2        = 8 
-#   @principal_2          = BigDecimal('15000')
-#   @interest_2           = BigDecimal("5000")
-#   @compulsory_savings_2 = BigDecimal("4000")
-#   @admin_fee_2          = BigDecimal('10000')
-#   @initial_savings_2          = BigDecimal('0')
-# 
-#   @group_loan_product_2 = GroupLoanProduct.create_object({
-#     :name => "Product 2, 800ribu",
-#     :total_weeks        =>  @total_weeks_2              ,
-#     :principal          =>  @principal_2                ,
-#     :interest           =>  @interest_2                 , 
-#     :compulsory_savings        =>  @compulsory_savings_2       , 
-#     :admin_fee          =>  @admin_fee_2     ,
-#     :initial_savings          => @initial_savings_2           
-#   })
-#   
-#   glp_array = [
-#     @group_loan_product_1,
-#     @group_loan_product_2
-#     ]
+  @total_weeks_1        = 8 
+  @principal_1          = BigDecimal('20000')
+  @interest_1           = BigDecimal("4000")
+  @compulsory_savings_1 = BigDecimal("6000")
+  @admin_fee_1          = BigDecimal('10000')
+  @initial_savings_1          = BigDecimal('0')
+
+  @group_loan_product_1 = GroupLoanProduct.create_object({
+    :name => "Produk 1, 500 Ribu",
+    :total_weeks        =>  @total_weeks_1              ,
+    :principal          =>  @principal_1                ,
+    :interest           =>  @interest_1                 , 
+    :compulsory_savings        =>  @compulsory_savings_1       , 
+    :admin_fee          =>  @admin_fee_1,
+    :initial_savings          => @initial_savings_1
+  }) 
+
+  @total_weeks_2        = 8 
+  @principal_2          = BigDecimal('15000')
+  @interest_2           = BigDecimal("5000")
+  @compulsory_savings_2 = BigDecimal("4000")
+  @admin_fee_2          = BigDecimal('10000')
+  @initial_savings_2          = BigDecimal('0')
+
+  @group_loan_product_2 = GroupLoanProduct.create_object({
+    :name => "Product 2, 800ribu",
+    :total_weeks        =>  @total_weeks_2              ,
+    :principal          =>  @principal_2                ,
+    :interest           =>  @interest_2                 , 
+    :compulsory_savings        =>  @compulsory_savings_2       , 
+    :admin_fee          =>  @admin_fee_2     ,
+    :initial_savings          => @initial_savings_2           
+  })
+  
+  glp_array = [
+    @group_loan_product_1,
+    @group_loan_product_2
+    ]
 
 =begin
   Create seed group_loan 
 =end
 
-  # @group_loan_1 = GroupLoan.create_object({
-  #   :name                             => "Group Loan 1 (no bad expense)" ,
-  #   :number_of_meetings => 3 
-  # })
-  # 
-  # @group_loan_2 = GroupLoan.create_object({
-  #   :name                             => "Group Loan 2" ,
-  #   :number_of_meetings => 5
-  # })
-  # 
-  # @group_loan_3 = GroupLoan.create_object({
-  #   :name                             => "Group Loan 3: with bad expense" ,
-  #   :number_of_meetings => 3 
-  # })
-  # 
+  @group_loan_1 = GroupLoan.create_object({
+    :name                             => "Group Loan 1 (no bad expense)" ,
+    :number_of_meetings => 3 
+  })
+  
+  @group_loan_2 = GroupLoan.create_object({
+    :name                             => "Group Loan 2" ,
+    :number_of_meetings => 5
+  })
+  
+  @group_loan_3 = GroupLoan.create_object({
+    :name                             => "Group Loan 3: with bad expense" ,
+    :number_of_meetings => 3 
+  })
+  
    
   
   
@@ -300,164 +300,164 @@ data_entry_role = Role.create!(
   Create seed glm
 =end
   # # Member.order("ASC")limit(10).
-  # member_array[0..9].each do |member|
-  #   selected_index=  rand(0..1)
-  #   selected_glp = glp_array[selected_index]
-  #   GroupLoanMembership.create_object({
-  #     :group_loan_id => @group_loan_1.id,
-  #     :member_id => member.id ,
-  #     :group_loan_product_id => selected_glp.id
-  #   })
-  # end
-  # 
-  # # create group loan 3 
-  # member_array[10..19].each do |member|
-  #   selected_index=  rand(0..1)
-  #   selected_glp = glp_array[selected_index]
-  #   GroupLoanMembership.create_object({
-  #     :group_loan_id => @group_loan_3.id,
-  #     :member_id => member.id ,
-  #     :group_loan_product_id => selected_glp.id
-  #   })
-  # end
-  # 
-  # 
+  member_array[0..9].each do |member|
+    selected_index=  rand(0..1)
+    selected_glp = glp_array[selected_index]
+    GroupLoanMembership.create_object({
+      :group_loan_id => @group_loan_1.id,
+      :member_id => member.id ,
+      :group_loan_product_id => selected_glp.id
+    })
+  end
+  
+  # create group loan 3 
+  member_array[10..19].each do |member|
+    selected_index=  rand(0..1)
+    selected_glp = glp_array[selected_index]
+    GroupLoanMembership.create_object({
+      :group_loan_id => @group_loan_3.id,
+      :member_id => member.id ,
+      :group_loan_product_id => selected_glp.id
+    })
+  end
+  
+  
 =begin
   Start the group loan  1
 =end
-  # @group_loan_1.start(:started_at => DateTime.now )
-  # 
-  # @group_loan_1.disburse_loan(:disbursed_at => DateTime.now )
-  # 
-  # @deceased_glm = @group_loan_1.group_loan_memberships.first 
-  # @deceased_member = @deceased_glm.member 
-  # 
-  # 
-  # 
-  # @run_away_glm = @group_loan_1.group_loan_memberships[2]
-  # @run_away_member = @run_away_glm.member
-  # 
-  # @premature_clearance_glm = @group_loan_1.group_loan_memberships[5]
-  # @premature_clearance_member = @premature_clearance_glm.member 
-  # 
-  # 
-  # 
-  # @savings_member = Member.last
-  # 
-  # 
-  # (1..10).each do |x|
-  #   
-  #   
-  #   se = SavingsEntry.create_object(
-  #     :amount => BigDecimal( (x*10000).to_s ),
-  #     :direction => FUND_TRANSFER_DIRECTION[:incoming],
-  #     :member_id => @savings_member.id 
-  #    )
-  #   se.confirm(:confirmed_at => DateTime.now )
-  # end
-  # 
+  @group_loan_1.start(:started_at => DateTime.now )
+  
+  @group_loan_1.disburse_loan(:disbursed_at => DateTime.now )
+  
+  @deceased_glm = @group_loan_1.group_loan_memberships.first 
+  @deceased_member = @deceased_glm.member 
+  
+  
+  
+  @run_away_glm = @group_loan_1.group_loan_memberships[2]
+  @run_away_member = @run_away_glm.member
+  
+  @premature_clearance_glm = @group_loan_1.group_loan_memberships[5]
+  @premature_clearance_member = @premature_clearance_glm.member 
+  
+  
+  
+  @savings_member = Member.last
+  
+  
+  (1..10).each do |x|
+    
+    
+    se = SavingsEntry.create_object(
+      :amount => BigDecimal( (x*10000).to_s ),
+      :direction => FUND_TRANSFER_DIRECTION[:incoming],
+      :member_id => @savings_member.id 
+     )
+    se.confirm(:confirmed_at => DateTime.now )
+  end
+  
   
 =begin
   Finish weekly collection on group_loan_1 
 =end
-  # 
-  # @group_loan_1.group_loan_weekly_collections.order("id ASC").each do |x|
-  #   break if x.week_number == 2
-  #   x.collect(:collected_at => DateTime.now)
-  #   x.confirm(:confirmed_at => DateTime.now)
-  # end
-  # 
-  # # create deceased 
-  # @deceased_member.mark_as_deceased(:deceased_at => DateTime.now )
-  # 
-  # 
-  # @group_loan_1.group_loan_weekly_collections.order("id ASC").each do |x|
-  #   next if x.is_collected?   and x.is_collected?
-  #   break if x.week_number == 4
-  #   x.collect(:collected_at => DateTime.now)
-  #   x.confirm(:confirmed_at => DateTime.now)
-  # end
-  # 
-  # # create run_away 
-  # @fourth_week_collection = @group_loan_1.group_loan_weekly_collections.where(:week_number => 4 ).first 
-  # @run_away_member.mark_as_run_away( :run_away_at => DateTime.now )
-  # 
-  # @group_loan_1.group_loan_weekly_collections.order("id ASC").each do |x|
-  #   next if x.is_collected?   and x.is_collected?
-  #   break if x.week_number == 6 
-  #   x.collect(:collected_at => DateTime.now)
-  #   x.confirm(:confirmed_at => DateTime.now)
-  # end
-  # 
-  # 
-  # # create premature clearance
-  # @sixth_week_collection = @group_loan_1.group_loan_weekly_collections.where(:week_number => 6 ).first 
-  # 
-  # @premature_clearance = GroupLoanPrematureClearancePayment.create_object(
-  #   :group_loan_id                    => @group_loan_1.id , 
-  #   :group_loan_membership_id         => @premature_clearance_glm.id , 
-  #   :group_loan_weekly_collection_id  => @sixth_week_collection.id 
-  # )
-  # 
-  # @group_loan_1.group_loan_weekly_collections.order("id ASC").each do |x|
-  #   next if x.is_collected?   and x.is_collected?
-  #   
-  #   x.collect(:collected_at => DateTime.now)
-  #   x.confirm(:confirmed_at => DateTime.now)
-  # end
-  # 
+  
+  @group_loan_1.group_loan_weekly_collections.order("id ASC").each do |x|
+    break if x.week_number == 2
+    x.collect(:collected_at => DateTime.now)
+    x.confirm(:confirmed_at => DateTime.now)
+  end
+  
+  # create deceased 
+  @deceased_member.mark_as_deceased(:deceased_at => DateTime.now )
+  
+  
+  @group_loan_1.group_loan_weekly_collections.order("id ASC").each do |x|
+    next if x.is_collected?   and x.is_collected?
+    break if x.week_number == 4
+    x.collect(:collected_at => DateTime.now)
+    x.confirm(:confirmed_at => DateTime.now)
+  end
+  
+  # create run_away 
+  @fourth_week_collection = @group_loan_1.group_loan_weekly_collections.where(:week_number => 4 ).first 
+  @run_away_member.mark_as_run_away( :run_away_at => DateTime.now )
+  
+  @group_loan_1.group_loan_weekly_collections.order("id ASC").each do |x|
+    next if x.is_collected?   and x.is_collected?
+    break if x.week_number == 6 
+    x.collect(:collected_at => DateTime.now)
+    x.confirm(:confirmed_at => DateTime.now)
+  end
+  
+  
+  # create premature clearance
+  @sixth_week_collection = @group_loan_1.group_loan_weekly_collections.where(:week_number => 6 ).first 
+  
+  @premature_clearance = GroupLoanPrematureClearancePayment.create_object(
+    :group_loan_id                    => @group_loan_1.id , 
+    :group_loan_membership_id         => @premature_clearance_glm.id , 
+    :group_loan_weekly_collection_id  => @sixth_week_collection.id 
+  )
+  
+  @group_loan_1.group_loan_weekly_collections.order("id ASC").each do |x|
+    next if x.is_collected?   and x.is_collected?
+    
+    x.collect(:collected_at => DateTime.now)
+    x.confirm(:confirmed_at => DateTime.now)
+  end
+  
   
 =begin
   ################## FOR Group Loan 3 
 =end
-  # @group_loan_3.start(:started_at => DateTime.now )
-  # 
-  # @group_loan_3.disburse_loan(:disbursed_at => DateTime.now )
-  # 
-  # @deceased_glm = @group_loan_3.group_loan_memberships.first 
-  # @deceased_member = @deceased_glm.member 
-  # 
-  # 
-  # 
-  # @run_away_glm = @group_loan_3.group_loan_memberships[2]
-  # @run_away_member = @run_away_glm.member
-  # 
-  # @premature_clearance_glm = @group_loan_3.group_loan_memberships[5]
-  # @premature_clearance_member = @premature_clearance_glm.member 
+  @group_loan_3.start(:started_at => DateTime.now )
+  
+  @group_loan_3.disburse_loan(:disbursed_at => DateTime.now )
+  
+  @deceased_glm = @group_loan_3.group_loan_memberships.first 
+  @deceased_member = @deceased_glm.member 
+  
+  
+  
+  @run_away_glm = @group_loan_3.group_loan_memberships[2]
+  @run_away_member = @run_away_glm.member
+  
+  @premature_clearance_glm = @group_loan_3.group_loan_memberships[5]
+  @premature_clearance_member = @premature_clearance_glm.member 
 
-   #  
-   # 
-   # @group_loan_3.group_loan_weekly_collections.order("id ASC").each do |x|
-   #   break if x.week_number == 2
-   #   x.collect(:collected_at => DateTime.now)
-   #   x.confirm(:confirmed_at => DateTime.now)
-   # end
-   # 
-   # # create deceased 
-   # @deceased_member.mark_as_deceased(:deceased_at => DateTime.now )
-   # 
-   # 
-   # @group_loan_3.group_loan_weekly_collections.order("id ASC").each do |x|
-   #   next if x.is_collected?   and x.is_collected?
-   #   break if x.week_number == 4
-   #   x.collect(:collected_at => DateTime.now)
-   #   x.confirm(:confirmed_at => DateTime.now)
-   # end
-   # 
-   # # create run_away 
-   # @fourth_week_collection = @group_loan_3.group_loan_weekly_collections.where(:week_number => 4 ).first 
-   # @run_away_member.mark_as_run_away( :run_away_at => DateTime.now )
-   # 
-   # @group_loan_3.group_loan_run_away_receivables.each do |x|
-   #   x.set_payment_case(:payment_case =>  GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:end_of_cycle])
-   # end
-   # 
-   # @group_loan_3.group_loan_weekly_collections.order("id ASC").each do |x|
-   #   next if x.is_collected?   and x.is_collected?
-   #   break if x.week_number == 6 
-   #   x.collect(:collected_at => DateTime.now)
-   #   x.confirm(:confirmed_at => DateTime.now)
-   # end
+    
+   
+   @group_loan_3.group_loan_weekly_collections.order("id ASC").each do |x|
+     break if x.week_number == 2
+     x.collect(:collected_at => DateTime.now)
+     x.confirm(:confirmed_at => DateTime.now)
+   end
+   
+   # create deceased 
+   @deceased_member.mark_as_deceased(:deceased_at => DateTime.now )
+   
+   
+   @group_loan_3.group_loan_weekly_collections.order("id ASC").each do |x|
+     next if x.is_collected?   and x.is_collected?
+     break if x.week_number == 4
+     x.collect(:collected_at => DateTime.now)
+     x.confirm(:confirmed_at => DateTime.now)
+   end
+   
+   # create run_away 
+   @fourth_week_collection = @group_loan_3.group_loan_weekly_collections.where(:week_number => 4 ).first 
+   @run_away_member.mark_as_run_away( :run_away_at => DateTime.now )
+   
+   @group_loan_3.group_loan_run_away_receivables.each do |x|
+     x.set_payment_case(:payment_case =>  GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:end_of_cycle])
+   end
+   
+   @group_loan_3.group_loan_weekly_collections.order("id ASC").each do |x|
+     next if x.is_collected?   and x.is_collected?
+     break if x.week_number == 6 
+     x.collect(:collected_at => DateTime.now)
+     x.confirm(:confirmed_at => DateTime.now)
+   end
    # 
    # 
    # 
@@ -596,12 +596,12 @@ end
 
 =end
 
-(1.upto 5).each do |x|
-Branch.create_object({
-  :name => "Branch #{x}",
-  :address => "Address #{x}",
-  :code => "code #{x}",
-  :description => "description #{x}"
+# (1.upto 5).each do |x|
+# Branch.create_object({
+#   :name => "Branch #{x}",
+#   :address => "Address #{x}",
+#   :code => "code #{x}",
+#   :description => "description #{x}"
 
-  })
-end
+#   })
+# end
