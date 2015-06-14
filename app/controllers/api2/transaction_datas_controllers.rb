@@ -8,18 +8,13 @@ class Api2::TransactionDatasController < Api2::BaseReportApiController
     	start_date =  parse_date( params[:start_date] )
 	   	end_date =  parse_date( params[:end_date] ) 
 
-	   	# @objects = TransactionData.joins(:transaction_data_details => [:account]).where{
-	   	# 	( is_confirmed.eq true )  & 
-	   	# 	(transaction_datetime.gte start_date) & 
-     #   		( transaction_datetime.lt end_date )
-	   	# }.page(params[:page]).per(params[:limit]).
-	   	# order("transaction_datetime ASC")
+
 
 	   	@objects = TransactionData.joins(:transaction_data_details => [:account]).where{
 	   		( is_confirmed.eq true )  & 
 	   		(transaction_datetime.gte start_date) & 
        		( transaction_datetime.lt end_date )
-	   	}.
+	   	}.page(params[:page]).per(params[:limit]).
 	   	order("transaction_datetime ASC")
 
 	   	@total = TransactionData.joins(:transaction_data_details => [:account]).where{
