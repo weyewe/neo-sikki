@@ -27,6 +27,7 @@ NeoSikki::Application.routes.draw do
 
     resources :group_loan_weekly_collection_attendances
     resources :group_loan_weekly_collection_voluntary_savings_entries 
+    resources :transaction_datas
   end
 
   namespace :api do 
