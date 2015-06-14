@@ -11,9 +11,9 @@ json.transaction_datas @objects do |object|
 	json.transaction_datetime			format_date_friendly( object.transaction_datetime ) 
 
 	json.transaction_data_details object.transaction_data_details do |tdd|
-		object.entry_case 		tdd.entry_case
-		object.account_name		tdd.account.name 
-		object.amount			tdd.amount 
+		json.entry_case 		tdd.entry_case
+		json.account_name		tdd.account.name 
+		json.amount			tdd.amount 
 	end
 end
 
