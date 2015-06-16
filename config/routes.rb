@@ -15,6 +15,7 @@ NeoSikki::Application.routes.draw do
     resources :group_loan_weekly_collection_reports
 
     resources :membership_savings_reports 
+    resources :savings_entry_reports
 
     get 'get_total_members' => 'members#get_total_members', :as => :get_total_members
 

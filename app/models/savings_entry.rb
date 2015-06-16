@@ -93,6 +93,92 @@ class SavingsEntry < ActiveRecord::Base
       end
     end
   end
+
+=begin
+  
+
+
+SavingsEntry.where{ 
+  (confirmed_at.eq nil) &
+  (savings_status.eq SAVINGS_STATUS[:membership] ) 
+        }.count
+
+
+def get_balance( end_date) 
+  total_addition = SavingsEntry.where(
+      :savings_status => SAVINGS_STATUS[:membership],
+      :direction => FUND_TRANSFER_DIRECTION[:incoming]
+  ).where{
+    (confirmed_at.not_eq nil) & 
+    (confirmed_at.lte end_date) 
+  }.sum("amount")
+
+  total_deduction = SavingsEntry.where(
+      :savings_status => SAVINGS_STATUS[:membership],
+      :direction => FUND_TRANSFER_DIRECTION[:outgoing]
+  ).where{
+    (confirmed_at.not_eq nil) & 
+    (confirmed_at.lte end_date) 
+  }.sum("amount")
+
+  net = total_addition - total_deduction
+  return net 
+end
+
+end_date = DateTime.new(2013,5,5,0,0,0).in_time_zone "Jakarta"
+end_date_1 = end_date.end_of_year.utc
+
+
+end_date = DateTime.new(2014,5,5,0,0,0).in_time_zone "Jakarta"
+end_date_2 = end_date.end_of_year.utc
+
+balance_1 = get_balance( end_date_1 )
+
+balance_2 = get_balance( end_date_2 )
+
+puts "2013: #{balance_1.to_s}"
+puts "2014: #{balance_2.to_s}"
+
+movement_2 = get_movement( end_date_2 )
+
+date_2014 = DateTime.new(2014,5,5,0,0,0).in_time_zone "Jakarta"
+
+def get_movement( date_2014)
+
+  starting_datetime = date.utc 
+  ending_datetime = date.utc 
+
+  total_addition = SavingsEntry.where(
+      :savings_status => SAVINGS_STATUS[:membership],
+      :direction => FUND_TRANSFER_DIRECTION[:incoming]
+  ).where{
+      (confirmed_at.not_eq nil) & 
+      
+      (confirmed_at.lte ending ) & 
+      (confirmed_at.gt starting)
+
+  }.sum("amount")
+
+  total_deduction = SavingsEntry.where(
+      :savings_status => SAVINGS_STATUS[:membership],
+      :direction => FUND_TRANSFER_DIRECTION[:outgoing]
+  ).where{
+      (confirmed_at.not_eq nil) & 
+      (confirmed_at.lte ending ) & 
+      (confirmed_at.gt starting)
+
+  }.sum("amount")
+
+  net = total_addition - total_deduction
+  return net 
+  
+
+end
+
+
+  
+
+=end
   
 =begin
   # Independent savings, 
