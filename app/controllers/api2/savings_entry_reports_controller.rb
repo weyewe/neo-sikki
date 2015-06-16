@@ -10,8 +10,8 @@ class Api2::SavingsEntryReportsController < Api2::BaseReportApiController
     ).where{
         (confirmed_at.not_eq nil) & 
         
-        (confirmed_at.lte ending ) & 
-        (confirmed_at.gt starting)
+        (confirmed_at.lte client_ending_datetime ) & 
+        (confirmed_at.gt client_starting_datetime)
 
     }.page( params[:page]).limit( params[:limit]).order("confirmed_at ASC")
 
@@ -21,8 +21,8 @@ class Api2::SavingsEntryReportsController < Api2::BaseReportApiController
     ).where{
         (confirmed_at.not_eq nil) & 
         
-        (confirmed_at.lte ending ) & 
-        (confirmed_at.gt starting)
+        (confirmed_at.lte client_ending_datetime ) & 
+        (confirmed_at.gt client_starting_datetime)
 
     }.count
 
