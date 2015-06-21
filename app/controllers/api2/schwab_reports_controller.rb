@@ -2,11 +2,11 @@ class Api2::SchwabReportsController < Api2::BaseReportApiController
   
 
 
-  def get_savings_data( the_member, savings_type, direction , end_date  ) 
+  def get_savings_data( the_member, savings_type, the_direction , end_date  ) 
     SavingsEntry.where{
       (member_id.eq the_member.id) & 
       (savings_status.eq savings_type) & 
-      (direction.eq  direction  ) & 
+      (direction.eq  the_direction  ) & 
       (confirmed_at.lte end_date ) 
     }
   end
