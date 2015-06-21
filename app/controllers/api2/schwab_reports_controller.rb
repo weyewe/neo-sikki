@@ -46,7 +46,7 @@ class Api2::SchwabReportsController < Api2::BaseReportApiController
     member_list = Member.page( params[:page]).limit( params[:limit]).order("id ASC")
     @objects = [] 
 
-    map = member.list.map{ |x| x.id } 
+    map = member_list.map{ |x| x.id } 
     puts map 
 
     member_list.each do |the_member|
