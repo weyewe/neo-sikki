@@ -156,7 +156,7 @@ class Api2::SchwabReportsController < Api2::BaseReportApiController
 
     @total = Member.count
     render :json => { :success => true, 
-                  :records => [@objects] , 
+                  :records =>  @objects , 
                   :total => @total }  
   end
 
