@@ -42,7 +42,7 @@ class Api2::SchwabReportsController < Api2::BaseReportApiController
     december_2014 = DateTime.new(2014,12,4,0,0,0).utc.end_of_month 
     may_2015  = DateTime.new(2015,5,4,0,0,0).utc.end_of_month 
 
-    member_list = Member..page( params[:page]).limit( params[:limit]).order("members.id ASC")
+    member_list = Member.page( params[:page]).limit( params[:limit]).order("members.id ASC")
     @objects = [] 
 
     member_list.each do |the_member|
