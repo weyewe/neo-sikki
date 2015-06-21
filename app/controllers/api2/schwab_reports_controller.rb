@@ -150,11 +150,14 @@ class Api2::SchwabReportsController < Api2::BaseReportApiController
         SAVINGS_STATUS[:locked],
         may_2015 )
 
+      @objects << row 
     end
 
 
     @total = Member.count
-
+    render :json => { :success => true, 
+                  :records => [@objects] , 
+                  :total => @total }  
   end
 
 end
