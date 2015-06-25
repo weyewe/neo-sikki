@@ -728,6 +728,21 @@ end
   end
    
    
+
+  def self.migrate_generated_data_by_weekly_collection
+    SavingsEntry.where{
+      (is_confirmed.eq true )  & 
+      (confirmed_at.eq nil )  & 
+      (savings_source_type.eq  "GroupLoanWeeklyCollectionVoluntarySavingsEntry")
+    }.find_each do |se|
+      puts "counter: #{counter}"
+      grlwc_vse = GroupLoanWeeklyCollectionVoluntarySavingsEntry.find_by_id( se.savings_source_id )
+
+      glwc = GroupLoanWeeklyCollection.find_by_id( grlwc_vse.group_loan_weekly_collection_id )
+      se.confirmed_at = glwc.confirmed_at 
+      se.save 
+    end
+  end
  
   
   def self.create_group_loan_compulsory_savings_withdrawal( savings_source, amount ) 
