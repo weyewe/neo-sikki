@@ -735,7 +735,7 @@ end
       (confirmed_at.eq nil )  & 
       (savings_source_type.eq  "GroupLoanWeeklyCollectionVoluntarySavingsEntry")
     }.find_each do |se|
-      puts "counter: #{counter}"
+      
       grlwc_vse = GroupLoanWeeklyCollectionVoluntarySavingsEntry.find_by_id( se.savings_source_id )
 
       glwc = GroupLoanWeeklyCollection.find_by_id( grlwc_vse.group_loan_weekly_collection_id )
