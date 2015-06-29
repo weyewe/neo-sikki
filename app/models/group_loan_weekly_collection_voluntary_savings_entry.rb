@@ -161,7 +161,7 @@ class GroupLoanWeeklyCollectionVoluntarySavingsEntry < ActiveRecord::Base
   end
   
   def confirm 
-    if group_loan_weekly_collection.is_collected? and not group_loan_weekly_collection.is_confirmed? 
+    if group_loan_weekly_collection.is_collected? # and not group_loan_weekly_collection.is_confirmed? 
       SavingsEntry.create_weekly_collection_voluntary_savings( self ) 
     else
       self.errors.add(:generic_errors, "Sudah dikonfirmasi")

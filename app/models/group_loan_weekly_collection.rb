@@ -199,13 +199,14 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
     
     begin
       ActiveRecord::Base.transaction do
+        self.confirmed_at = params[:confirmed_at]
+        self.is_confirmed = true 
+        self.save 
         # accounting posting for each voluntary_savings paid on weekly collection 
         self.group_loan_weekly_collection_voluntary_savings_entries.each do |x|
           x.confirm
         end
-        self.confirmed_at = params[:confirmed_at]
-        self.is_confirmed = true 
-        self.save 
+
 
         # we create accounting posting as well: cash, account receivable, 
         # interest revenue and compulsory savings

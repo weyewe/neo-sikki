@@ -173,6 +173,17 @@ describe GroupLoanWeeklyCollection do
       ).first
       
     end
+
+    it "should create 1 voluntary savings with confirmed_at equal to weekly_collection.confirmed_at " do
+      savings_entry = SavingsEntry.where(
+          :savings_source_id => @first_gl_wcvse.id,
+          :savings_source_type => @first_gl_wcvse.class.to_s,
+        ).first 
+
+      puts ">>>>>>>>>>>>>>>>>>> the confirmed_at"
+      puts "#{savings_entry.confirmed_at}"
+      savings_entry.confirmed_at.should == @first_glwc.confirmed_at
+    end
     
     it "should create one savings entry: 1 transaction data" do
       TransactionData.where(
