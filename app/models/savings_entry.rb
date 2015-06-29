@@ -857,6 +857,30 @@ end
 
     last_transaction_data.create_contra_and_confirm if not  last_transaction_data.nil?
   end
+
+
+def self.savings_ratio_in_month( target_datetime )
+  start_datetime = target_datetime.beginning_of_month
+  end_datetime = target_datetime.end_of_month 
+
+  total_counter_weekly_collection = SavingsEntry.where{
+            (is_confirmed.eq true )  &   
+            (savings_source_type.eq  "GroupLoanWeeklyCollectionVoluntarySavingsEntry") & 
+            ( confirmed_at.gte start_datetime ) & 
+            ( confirmed_at.lt end_datetime )
+          }.count 
+
+  total_counter_independent = SavingsEntry.where{
+            (savings_status.eq  SAVINGS_STATUS[:savings_account]) & 
+            ( is_confirmed.eq true ) & 
+            ( confirmed_at.gte start_datetime ) & 
+            ( confirmed_at.lt end_datetime ) & 
+            ( savings_source_type.eq nil )
+          }.count 
+
+  return [total_counter_weekly_collection , total_counter_independent]
+
+end
   
 
                       

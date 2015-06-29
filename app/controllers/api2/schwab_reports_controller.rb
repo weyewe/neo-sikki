@@ -98,61 +98,74 @@ class Api2::SchwabReportsController < Api2::BaseReportApiController
     december_2014 = DateTime.new(2014,12,4,0,0,0).utc.end_of_month 
     may_2015  = DateTime.new(2015,5,4,0,0,0).utc.end_of_month 
 
-a = Member.find_by_id_number("6619")
-a.savings_entries.where{
-    (savings_status.eq SAVINGS_STATUS[:savings_account]) & 
-    (is_confirmed.eq true ) & 
-    (confirmed_at.lte may_2015)
 
-}.count 
+def ratio_in_month( target_datetime )
+  start_datetime = target_datetime.beginning_of_month
+  end_datetime = target_datetime.end_of_month 
 
-a.savings_entries.where{
-    (savings_status.eq SAVINGS_STATUS[:savings_account]) & 
-    (is_confirmed.eq true ) & 
-    (confirmed_at.gte may_2015)
+  total_counter_weekly_collection = SavingsEntry.where{
+            (is_confirmed.eq true )  &   
+            (savings_source_type.eq  "GroupLoanWeeklyCollectionVoluntarySavingsEntry") & 
+            ( confirmed_at.gte start_datetime ) & 
+            ( confirmed_at.lt end_datetime )
+          }.count 
 
-}.count 
+  total_counter_independent = SavingsEntry.where{
+            (savings_status.eq  SAVINGS_STATUS[:savings_account]) & 
+            ( is_confirmed.eq true ) & 
+            ( confirmed_at.gte start_datetime ) & 
+            ( confirmed_at.lt end_datetime ) & 
+            ( savings_source_type.eq nil )
+          }.count 
 
-se = a.savings_entries.where{
-    (savings_status.eq SAVINGS_STATUS[:savings_account]) & 
-    (is_confirmed.eq true )  
-}.count 
+  return [total_counter_weekly_collection , total_counter_independent]
 
-se = a.savings_entries.where{
-    (savings_status.eq SAVINGS_STATUS[:savings_account]) & 
-    (is_confirmed.eq true )   & 
-    (confirmed_at.eq nil )
-}.first 
-
-se = a.savings_entries.where{
-    (savings_status.eq SAVINGS_STATUS[:savings_account]) & 
-    (is_confirmed.eq true ) & 
-    (confirmed_at.lte may_2015) 
-}.first 
-
-SavingsEntry.where{
-  (is_confirmed.eq true )  & 
-  (confirmed_at.eq nil )  & 
-  (savings_source_type.eq  "GroupLoanWeeklyCollectionVoluntarySavingsEntry")
-}.count
-
-
-counter = 0 
-SavingsEntry.where{
-  (is_confirmed.eq true )  & 
-  (confirmed_at.eq nil )  & 
-  (savings_source_type.eq  "GroupLoanWeeklyCollectionVoluntarySavingsEntry")
-}.find_each do |se|
-  puts "counter: #{counter}"
-  grlwc_vse = GroupLoanWeeklyCollectionVoluntarySavingsEntry.find_by_id( se.savings_source_id )
-
-  glwc = GroupLoanWeeklyCollection.find_by_id( grlwc_vse.group_loan_weekly_collection_id )
-  se.confirmed_at = glwc.confirmed_at 
-  se.save 
 end
 
+array = [] 
+(1.upto 12 ).each do |x|
+  datetime  = DateTime.new(2013, x , 5, 0 ,0 ,0 ).utc 
+
+  array <<   ratio_in_month( datetime ) 
+end
+
+array.each {|x| puts "#{x[0]}   : #{x[1]}" } 
+
+SavingsEntry.where{
+            (is_confirmed.eq true )  &   
+            (savings_source_type.eq  "GroupLoanWeeklyCollectionVoluntarySavingsEntry") 
+          }.order("confirmed_at ASC").first.confirmed_at 
 
 
+
+
+ 
+
+start_jan_2015   = DateTime.new(2015,1,5,0,0,0).utc.beginning_of_month 
+end_jan_2015   = DateTime.new(2015,1,5,0,0,0).utc.end_of_month
+
+
+SavingsEntry.where{
+  (is_confirmed.eq true )  &   
+  (savings_source_type.eq  "GroupLoanWeeklyCollectionVoluntarySavingsEntry")  
+}.count 
+
+SavingsEntry.where{
+  (is_confirmed.eq true )  &   
+  (savings_source_type.eq  "GroupLoanWeeklyCollectionVoluntarySavingsEntry") & 
+  ( confirmed_at.gte start_jan_2015 ) & 
+  ( confirmed_at.lt end_jan_2105 )
+}.count 
+
+
+SavingsEntry.where{ 
+  (savings_status.eq  SAVINGS_STATUS[:savings_account]) & 
+  ( is_confirmed.eq true ) & 
+  ( confirmed_at.gte start_jan_2015 ) & 
+  ( confirmed_at.lt end_jan_2105 ) & 
+  ( savings_source_type.eq nil )
+}.count 
+ 
  
 =end
 
