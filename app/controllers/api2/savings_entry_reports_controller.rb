@@ -31,9 +31,9 @@ class Api2::SavingsEntryReportsController < Api2::BaseReportApiController
     member = Member.find_by_id_number params[:id_number]
 
     @objects = member.savings_entries.
-              where(:savings_status => SAVINGS_STATUS[:savings_account]).
+              where(:savings_status => SAVINGS_STATUS[:savings_account], :is_confirmed => true ).
               order("confirmed_at ASC")
-              
+
     @total = @objects.count 
   end
 
