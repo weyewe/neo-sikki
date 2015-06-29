@@ -30,7 +30,10 @@ class Api2::SavingsEntryReportsController < Api2::BaseReportApiController
   def member_history
     member = Member.find_by_id_number params[:id_number]
 
-    @objects = member.savings_entries.where(:savings_status => SAVINGS_STATUS[:savings_account]).order("created_at ASC")
+    @objects = member.savings_entries.
+              where(:savings_status => SAVINGS_STATUS[:savings_account]).
+              order("confirmed_at ASC")
+              
     @total = @objects.count 
   end
 
