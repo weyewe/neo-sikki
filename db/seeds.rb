@@ -1,3 +1,14 @@
+=begin
+  
+result = [] 
+Member.find_each do |x|
+  result << x.name  if x.group_loan_memberships.count > 1 
+  
+  break if result.length == 50 
+
+end
+=end
+
 
 
 role = {
