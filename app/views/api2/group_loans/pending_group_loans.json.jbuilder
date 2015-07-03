@@ -1,6 +1,8 @@
 json.success true 
 
 json.group_loans @objects do |object|
+ 
+
 
 
 	json.group_number 			object[0]
@@ -10,6 +12,8 @@ json.group_loans @objects do |object|
 	json.total_weekly_collections 			 			object[4]
 	json.total_paid_weekly_collections 			 			object[5]
 	json.next_collection_amount 			 			object[6]
+	json.last_collected_at 			 			object[7]
+	json.next_collection_amount 			 			object[8]
 
 end
 
