@@ -24,6 +24,9 @@ NeoSikki::Application.routes.draw do
     resources :group_loans
 
 
+    get 'pending_group_loans' => 'group_loans#pending_group_loans', :as => :pending_group_loans
+
+
     get 'first_uncollected_weekly_collection/:group_loan_id' => 
             'group_loan_weekly_collections#first_uncollected_weekly_collection', 
             :as => :first_uncollected_weekly_collection
