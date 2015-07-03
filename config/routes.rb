@@ -89,6 +89,8 @@ NeoSikki::Application.routes.draw do
     put 'confirm_savings_entry' => 'savings_entries#confirm' , :as => :confirm_savings_entry
     
     get 'group_loan_weekly_collection/active_group_loan_memberships' => 'group_loan_weekly_collections#active_group_loan_memberships' , :as => :get_weekly_collection_active_group_loan_memberships
-     
+    
+
+    resources :loan_trails 
   end
 end

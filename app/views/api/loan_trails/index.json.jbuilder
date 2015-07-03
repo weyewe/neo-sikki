@@ -1,6 +1,6 @@
 json.success true 
 json.total @total
-json.group_loan_memberships @objects do |object|
+json.loan_trails @objects do |object|
  
 
 	json.id 								object.id 
@@ -28,6 +28,8 @@ json.group_loan_memberships @objects do |object|
 	
 	json.deactivation_case object.deactivation_case
 	json.deactivation_case_name object.deactivation_case_name 
+
+	json.group_loan_disbursed_at  format_date_friendly( object.group_loan.disbursed_at ) 
 	
 	
 	

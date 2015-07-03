@@ -52,7 +52,7 @@ Ext.define("AM.controller.Operation", {
 		iconCls		: 'text-folder', 
     expanded	: true,
 		children 	: [
-        
+
       { 
           text:'Management', 
           viewClass:'AM.view.operation.GroupLoan', 
@@ -113,6 +113,19 @@ Ext.define("AM.controller.Operation", {
 					}
 				]
 			},
+
+	      { 
+	          text:'Loan History', 
+	          viewClass:'AM.view.operation.LoanTrail', 
+	          leaf:true, 
+	          iconCls:'text',
+	 					conditions : [
+							{
+								controller : "group_loans",
+								action  : 'index'
+							}
+						]
+	      },
     ]
 	}, 
 	
