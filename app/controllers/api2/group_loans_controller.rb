@@ -84,7 +84,7 @@ class Api2::GroupLoansController < Api2::BaseReportApiController
     client_ending_datetime = params[:ending_datetime].to_datetime 
  
     query = GroupLoan.where{
-      (is_disbursed.eq true ) & 
+      (is_loan_disbursed.eq true ) & 
       (disbursed_at.lte client_ending_datetime ) & 
       (disbursed_at.gt client_starting_datetime)
     }.order("disbursed_at ASC")
