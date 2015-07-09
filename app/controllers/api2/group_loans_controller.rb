@@ -90,7 +90,7 @@ class Api2::GroupLoansController < Api2::BaseReportApiController
     }.order("disbursed_at ASC")
 
     @objects = query.page( params[:page]).limit( params[:limit])
-    @total = query.total 
+    @total = query.count  
   end
 
 end
