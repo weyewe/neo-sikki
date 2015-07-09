@@ -79,6 +79,20 @@ class Api2::GroupLoansController < Api2::BaseReportApiController
  
   end
 
+  def disbursed_group_loans
+    client_starting_datetime   = params[:starting_datetime].to_datetime 
+    client_ending_datetime = params[:ending_datetime].to_datetime 
+ 
+    query = GroupLoan.where{
+      (is_disbursed.eq true ) & 
+      (disbursed_at.lte client_ending_datetime ) & 
+      (disbursed_at.gt client_starting_datetime)
+    }.order("disbursed_at ASC")
+
+    @objects = query.page( params[:page]).limit( params[:limit])
+    @total = query.total 
+  end
+
 end
 
 
