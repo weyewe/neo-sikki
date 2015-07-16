@@ -1,11 +1,18 @@
 class Api2::BaseReportApiController   < ApplicationController
 	respond_to :json
 	skip_before_filter :verify_authenticity_token 
+  before_filter :set_default_response_format
 
   def access_denied
     return render( :json => {:access_denied => "Requires appropriate role"} )
   end
   
+
+
+
+  def set_default_response_format
+    request.format = :json
+  end
   
   
   def authenticate_auth_token
