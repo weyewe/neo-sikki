@@ -9,8 +9,8 @@ class Api2::SessionsController < Api2::BaseReportApiController
   respond_to :json
 
   def create
-    
-     
+    puts "\n"*10
+     puts "We are in the create!!!!\n"*10
     resource = User.find_for_database_authentication(:email => params[:user_login][:email])
     return invalid_login_attempt unless resource
     
