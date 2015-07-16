@@ -11,6 +11,8 @@ class Api2::BaseReportApiController   < ApplicationController
 
 
   def set_default_response_format
+    puts "\n"*10
+    puts "Setting the defaut response format\n"*10
     request.format = :json
   end
   
