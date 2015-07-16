@@ -10,7 +10,7 @@ NeoSikki::Application.routes.draw do
                     'group_loan_weekly_collections#print_weekly_collection' , :as => :print_weekly_collection
 
 
-  namespace :api2 do
+  namespace :api2 , constraints: { format: 'json' } do
     devise_for :users
     resources :group_loan_weekly_collection_reports
 
