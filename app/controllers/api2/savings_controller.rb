@@ -23,6 +23,13 @@ class Api2::SavingsController < Api2::BaseReportApiController
     params[:savings_entry][:savings_status] = SAVINGS_STATUS[:savings_account]
     @object = SavingsEntry.create_object( params[:savings_entry] )
 
+    direction_text = ""
+    if @object.direction == FUND_TRANSFER_DIRECTION[:incoming] 
+      direction_text    =   "Penambahan" 
+    elsif @object.direction == FUND_TRANSFER_DIRECTION[:outgoing]
+      direction_text    =   "Penarikan" 
+    end
+    
     if @object.errors.size == 0 
       render :json => { :success => true, 
                         :savings_entries =>[{

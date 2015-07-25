@@ -1,6 +1,18 @@
 class Api2::MembersController < Api2::BaseReportApiController
   
 
+=begin
+   
+  SavingsEntry.where(:savings_status => SAVINGS_STATUS[:savings_account]).first.member.id
+
+
+    independent_savings_array = [
+                              SAVINGS_STATUS[:savings_account],
+                              SAVINGS_STATUS[:membership],
+                              SAVINGS_STATUS[:locked] ] 
+
+
+=end
   def index 
     
     query = Member.where(:is_deceased => false , :is_run_away => false )

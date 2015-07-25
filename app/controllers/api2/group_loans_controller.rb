@@ -5,28 +5,25 @@ class Api2::GroupLoansController < Api2::BaseReportApiController
 
   def index
     
+    query = GroupLoan.includes(:group_loan_weekly_collections)
+
+
     if params[:livesearch].present? 
       livesearch = "%#{params[:livesearch]}%"
-      @objects = GroupLoan.includes(:group_loan_weekly_collections).where{
-        ( is_loan_disbursed.eq true ) & 
-        ( is_closed.eq false ) & 
-        (
-          (name =~  livesearch ) | 
-          (group_number =~ livesearch ) 
-        )
-        
-      }.page(params[:page]).per(params[:limit]).order("group_loans.id DESC")
-      
-      @total = GroupLoan.where{ 
-        ( is_loan_disbursed.eq true ) & 
-        ( is_closed.eq false ) & 
-        (
-          (name =~  livesearch ) | 
-          (group_number =~ livesearch ) 
-        )
-      }.count
 
+      query = query.where{
+        ( is_loan_disbursed.eq true ) & 
+        ( is_closed.eq false ) & 
+        (
+          (name =~  livesearch ) | 
+          (group_number =~ livesearch ) 
+        )  
+      }
+ 
     end
+
+    @objects = query.page(params[:page]).per(params[:limit]).order("group_loans.id DESC")
+    @total  = query.count
   end
 
   def pending_group_loans

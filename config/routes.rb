@@ -16,6 +16,7 @@ NeoSikki::Application.routes.draw do
 
     resources :membership_savings_reports 
     resources :savings_entry_reports
+    resources :members
 
     get 'savings_entries_history/:id_number' => 'savings_entry_reports#member_history', :as => :get_member_savings_entries_history
 
