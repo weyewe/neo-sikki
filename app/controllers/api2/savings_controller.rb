@@ -19,6 +19,8 @@ class Api2::SavingsController < Api2::BaseReportApiController
   end
 
   def create
+    @parent = Member.find_by_id params[:member_id]
+    params[:savings_entry][:savings_status] = SAVINGS_STATUS[:savings_account]
     @object = SavingsEntry.create_object( params[:savings_entry] )
 
     if @object.errors.size == 0 
@@ -37,7 +39,7 @@ class Api2::SavingsController < Api2::BaseReportApiController
                           
                            
                         }],
-                        :total => SavingsEntry.count }  
+                        :total => @parent.savings_entries.count }  
     else
       msg = {
         :success => false, 
@@ -52,6 +54,10 @@ class Api2::SavingsController < Api2::BaseReportApiController
 
   def update
     @object = SavingsEntry.find(params[:id])
+    @parent = Member.find_by_id params[:member_id]
+
+    params[:savings_entry][:savings_status] = SAVINGS_STATUS[:savings_account]
+    
     params[:savings_entry][:confirmed_at] =  parse_date( params[:savings_entry][:confirmed_at] )
     
 
@@ -82,7 +88,7 @@ class Api2::SavingsController < Api2::BaseReportApiController
                           
                            
                         }],
-                        :total => SavingsEntry.count  } 
+                        :total => @parent.savings_entries.count  } 
     else
       msg = {
         :success => false, 
@@ -101,10 +107,11 @@ class Api2::SavingsController < Api2::BaseReportApiController
 
   def destroy
     @object = SavingsEntry.find(params[:id])
+    @parent = Member.find_by_id params[:member_id]
     @object.delete_object 
 
     if  not @object.persisted?   
-      render :json => { :success => true, :total => SavingsEntry.count }  
+      render :json => { :success => true, :total => @parent.savings_entries.count }  
     else
       msg = {
         :success => false, 
