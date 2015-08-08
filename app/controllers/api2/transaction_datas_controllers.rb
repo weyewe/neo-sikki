@@ -53,6 +53,7 @@ class Api2::TransactionDatasController < Api2::BaseReportApiController
 		beginning_of_day = start_date.beginning_of_day
 		end_of_day  = start_date.end_of_day
 
+		transaction_source_type_params = params[:transaction_source_type]
 
 		transaction_source_type_list  =["GroupLoan", 
 							"GroupLoanWeeklyCollectionVoluntarySavingsEntry", 
@@ -65,9 +66,9 @@ class Api2::TransactionDatasController < Api2::BaseReportApiController
 			( is_confirmed.eq true )  & 
 			# ( transaction_source_type.in transaction_source_type_list) & 
 			# (transaction_datetime.gte beginning_of_day) & 
-			( transaction_datetime.lt end_of_day )
-		}.page(params[:page]).per(params[:limit]).
-		order("id ASC")
+			( transaction_datetime.lt end_of_day ) & 
+			( transaction_source_type.eq transaction_source_type_params)
+		}.order("id ASC")
 
 
 		@objects = query.page(params[:page]).per(params[:limit])  
