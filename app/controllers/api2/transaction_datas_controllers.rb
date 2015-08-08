@@ -63,8 +63,8 @@ class Api2::TransactionDatasController < Api2::BaseReportApiController
 
 		query  = TransactionData.includes(:transaction_data_details => [:account]).where{
 			( is_confirmed.eq true )  & 
-			( transaction_source_type.in transaction_source_type_list) & 
-			(transaction_datetime.gte beginning_of_day) & 
+			# ( transaction_source_type.in transaction_source_type_list) & 
+			# (transaction_datetime.gte beginning_of_day) & 
 			( transaction_datetime.lt end_of_day )
 		}.page(params[:page]).per(params[:limit]).
 		order("id ASC")
