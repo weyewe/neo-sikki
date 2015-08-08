@@ -2,6 +2,21 @@ class TransactionData < ActiveRecord::Base
   has_many :transaction_data_details 
   validates_presence_of :transaction_datetime 
   
+
+
+=begin 
+array = []
+TransactionData.find_each do |x|
+  array << x.transaction_source_type
+end   
+
+array.uniq!
+=end 
+
+
+  def get_source_object
+    eval "#{self.transaction_source_type}.find_by_id(#{self.transaction_source_id})"
+  end
   
   def self.active_objects
     self
