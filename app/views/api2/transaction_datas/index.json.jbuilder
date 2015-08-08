@@ -20,6 +20,7 @@ json.transaction_datas @objects do |object|
 	json.transaction_data_details object.transaction_data_details do |tdd|
 		json.entry_case 		tdd.entry_case
 		json.account_name		tdd.account.name 
+		json.account_code		tdd.account.code 
 		json.amount			tdd.amount 
 	end
 end
