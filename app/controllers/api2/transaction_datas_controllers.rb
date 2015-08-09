@@ -53,22 +53,32 @@ class Api2::TransactionDatasController < Api2::BaseReportApiController
 		beginning_of_day = start_date.beginning_of_day
 		end_of_day  = start_date.end_of_day
 
-		transaction_source_type_params = params[:transaction_source_type]
-
-		transaction_source_type_list  =["GroupLoan", 
-							"GroupLoanWeeklyCollectionVoluntarySavingsEntry", 
-							"GroupLoanWeeklyCollection", 
-							"DeceasedClearance", "GroupLoanPrematureClearancePayment", 
-							"SavingsEntry"]
-
-
 		query  = TransactionData.includes(:transaction_data_details => [:account]).where{
 			( is_confirmed.eq true )  & 
-			# ( transaction_source_type.in transaction_source_type_list) & 
-			# (transaction_datetime.gte beginning_of_day) & 
-			( transaction_datetime.lt end_of_day ) & 
-			( transaction_source_type.eq transaction_source_type_params)
+			( transaction_datetime.gte beginning_of_day) & 
+			( transaction_datetime.lt end_of_day )  
 		}.order("id ASC")
+
+		if params[:transaction_source_type].present?
+
+			transaction_source_type_params = params[:transaction_source_type]
+
+			query = query.where{
+				( transaction_source_type.eq transaction_source_type_params) 
+			}
+		end
+
+
+		# transaction_source_type_params = params[:transaction_source_type]
+
+		# transaction_source_type_list  =["GroupLoan", 
+		# 					"GroupLoanWeeklyCollectionVoluntarySavingsEntry", 
+		# 					"GroupLoanWeeklyCollection", 
+		# 					"DeceasedClearance", "GroupLoanPrematureClearancePayment", 
+		# 					"SavingsEntry"]
+
+
+		query  = query.order("id ASC")
 
 
 		@objects = query.page(params[:page]).per(params[:limit])  
