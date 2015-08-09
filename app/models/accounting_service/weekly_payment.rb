@@ -2,7 +2,7 @@ module AccountingService
   class WeeklyPayment
     def WeeklyPayment.create_journal_posting(group_loan,group_loan_weekly_collection, 
               total_compulsory_savings , total_principal,
-              total_interest_revenue) 
+              total_interest_revenue ) 
       
         # message = "#{group_loan.name} #{TRANSACTION_DATA_CODE[:group_loan_weekly_collection][:text_message]} #{group_loan_weekly_collection.week_number}"
         # message = "Weekly Collection: Group #{group_loan.name}, #{group_loan.group_number}, week #{group_loan_weekly_collection.week_number}"
@@ -36,7 +36,9 @@ module AccountingService
           :transaction_data_id => ta.id,        
           :account_id          => Account.find_by_code(ACCOUNT_CODE[:main_cash_leaf][:code]).id      ,
           :entry_case          => NORMAL_BALANCE[:debit]     ,
-          :amount              => total_compulsory_savings + total_principal +  total_interest_revenue,
+          :amount              => total_compulsory_savings + 
+                                total_principal +  
+                                total_interest_revenue  ,
           :description => msg
         )
 
@@ -62,6 +64,7 @@ module AccountingService
           :description => msg
         )
 
+      
         ta.confirm
 
 

@@ -88,6 +88,7 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
     total_interest_revenue = BigDecimal("0")
     total_principal = BigDecimal("0")
     total_compulsory_savings = BigDecimal("0")
+
     
     # paying_member = (active_glm_id_list + run_away_glm_id_list).uniq - uncollectible_glm_id_list
     
@@ -102,7 +103,7 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
       self,
       total_compulsory_savings ,
       total_principal,
-      total_interest_revenue
+      total_interest_revenue 
     )
   end
   

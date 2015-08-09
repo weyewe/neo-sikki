@@ -94,6 +94,11 @@ class TransactionDataDetail < ActiveRecord::Base
     
     return new_object
   end
+
+
+  def delete_object
+    self.destroy 
+  end
   
   def create_contra(new_transaction_data)
     

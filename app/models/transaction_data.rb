@@ -118,6 +118,14 @@ array.uniq!
   def internal_object_destroy
   end
   
+
+  def delete_object
+    self.transaction_data_details.each do |tdd|
+      tdd.delete_object 
+    end
+
+    self.destroy 
+  end
    
    
   def create_contra_and_confirm

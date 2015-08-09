@@ -46,6 +46,10 @@ module AccountingService
         :is_contra_transaction => false
       ).order("id DESC").first 
 
+      # if last_transaction_data.present?
+      #   last_transaction_data.delete_object
+      # end
+
       last_transaction_data.create_contra_and_confirm if not last_transaction_data.nil?
     end
 
