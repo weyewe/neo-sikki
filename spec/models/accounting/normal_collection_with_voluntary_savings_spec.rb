@@ -242,25 +242,14 @@ describe GroupLoan do
                 @first_group_loan_weekly_collection.unconfirm
               end
               
-              it "should create transaction data to unconfirm weekly collection" do
-                contra = TransactionData.where(:transaction_source_id => @first_group_loan_weekly_collection.id, 
+              it "should DESTROY  transaction data to unconfirm weekly collection" do
+                 TransactionData.where(:transaction_source_id => @first_group_loan_weekly_collection.id, 
                   :transaction_source_type => @first_group_loan_weekly_collection.class.to_s,
-                  :code => TRANSACTION_DATA_CODE[:group_loan_weekly_collection],
-                  :is_contra_transaction => true 
-                ).order("id DESC").first
-                
-                contra.is_confirmed.should be_truthy
+                  :code => TRANSACTION_DATA_CODE[:group_loan_weekly_collection]
+                ).order("id DESC").count.should == 0  
               end
               
-              it "should create transaction data to unconfirm weekly_collection voluntary savings" do
-                contra = TransactionData.where(:transaction_source_id => @glwc_vs.id, 
-                  :transaction_source_type => @glwc_vs.class.to_s,
-                  :code => TRANSACTION_DATA_CODE[:group_loan_weekly_collection_voluntary_savings],
-                  :is_contra_transaction => true 
-                ).order("id DESC").first
-                
-                contra.is_confirmed.should be_truthy
-              end
+ 
               
             end
             

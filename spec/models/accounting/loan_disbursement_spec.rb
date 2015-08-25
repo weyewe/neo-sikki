@@ -146,20 +146,15 @@ describe GroupLoan do
               @group_loan.is_loan_disbursed.should be_falsey 
             end
             
-            it "should create 2 transaction_data" do
+            it "should DELETE transaction_data" do
+
+
               TransactionData.where(:transaction_source_id => @group_loan.id, 
                 :transaction_source_type => @group_loan.class.to_s,
                 :code => TRANSACTION_DATA_CODE[:loan_disbursement]
-              ).count.should == 2
+              ).count.should == 0
 
-              contra = TransactionData.where(:transaction_source_id => @group_loan.id, 
-                :transaction_source_type => @group_loan.class.to_s,
-                :code => TRANSACTION_DATA_CODE[:loan_disbursement],
-                :is_contra_transaction => true 
-              ).order("id DESC").first
-              
-              contra.is_contra_transaction.should be_truthy 
-              contra.is_confirmed.should be_truthy
+       
             end
             
             context " re-doing loan disbursement" do
@@ -167,11 +162,11 @@ describe GroupLoan do
                 @group_loan.disburse_loan(:disbursed_at => @disbursed_at)
               end
               
-              it "should create 3 transaction_data" do
+              it "should create 1 transaction_data" do
                 TransactionData.where(:transaction_source_id => @group_loan.id, 
                   :transaction_source_type => @group_loan.class.to_s,
                   :code => TRANSACTION_DATA_CODE[:loan_disbursement]
-                ).count.should == 3
+                ).count.should == 1
               end
             end
           end

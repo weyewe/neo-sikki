@@ -198,14 +198,12 @@ describe GroupLoanWeeklyUncollectible do
         @second_group_loan_weekly_collection.is_confirmed.should be_falsy
       end
       
-      it "should create contra transaction" do
-        contra = TransactionData.where(:transaction_source_id => @first_gl_wu.id, 
+      it "should NOT create contra transaction" do
+        TransactionData.where(:transaction_source_id => @first_gl_wu.id, 
           :transaction_source_type => @first_gl_wu.class.to_s,
-          :code => TRANSACTION_DATA_CODE[:group_loan_uncollectible_declaration],
-          :is_contra_transaction => true 
-        ).order("id DESC").first
-        
-        contra.is_confirmed.should be_truthy
+          :code => TRANSACTION_DATA_CODE[:group_loan_uncollectible_declaration] 
+        ).order("id DESC").count.should ==  0 
+ 
       end
       
       

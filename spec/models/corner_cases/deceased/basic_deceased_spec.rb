@@ -201,7 +201,7 @@ describe DeceasedClearance do
         @member.is_deceased.should be_falsey
       end
 
-      it "should create contra transaction" do
+      it "should DELETE  transaction" do
 
         
 
@@ -209,12 +209,9 @@ describe DeceasedClearance do
 
         :transaction_source_id => @dc_id , 
         :transaction_source_type => @dc_class ,
-        :code => TRANSACTION_DATA_CODE[:group_loan_deceased_declaration],
-        :is_contra_transaction => true 
-        }).order("id DESC").first
-
-        ta.should be_valid
-        ta.is_confirmed.should be_truthy
+        :code => TRANSACTION_DATA_CODE[:group_loan_deceased_declaration]  
+        }).order("id DESC").count.should == 0 
+ 
       end
     end
     

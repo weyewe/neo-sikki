@@ -76,9 +76,8 @@ describe MemorialDetail do
     TransactionData.where(
       :transaction_source_id => @memorial.id , 
       :transaction_source_type => @memorial.class.to_s ,
-      :code => TRANSACTION_DATA_CODE[:memorial_general],
-      :is_contra_transaction => true
-    ).order("id DESC").count.should == 1 
+      :code => TRANSACTION_DATA_CODE[:memorial_general] 
+    ).order("id DESC").count.should == 0
     
   
   end

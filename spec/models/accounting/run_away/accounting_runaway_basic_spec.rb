@@ -194,22 +194,13 @@ describe GroupLoan do
         
       end
       
-      it "should create contra" do
+      it "should DELETE transaction" do
         TransactionData.where(
           :transaction_source_id => @second_group_loan_weekly_collection.id, 
           :transaction_source_type => @second_group_loan_weekly_collection.class.to_s,
-          :code => TRANSACTION_DATA_CODE[:group_loan_run_away_in_cycle_clearance],
-          :is_contra_transaction => true 
-        ).count.should == 1
-
-        a = TransactionData.where(
-          :transaction_source_id => @second_group_loan_weekly_collection.id, 
-          :transaction_source_type => @second_group_loan_weekly_collection.class.to_s,
-          :code => TRANSACTION_DATA_CODE[:group_loan_run_away_in_cycle_clearance],
-          :is_contra_transaction => true 
-        ).order("id DESC").first 
-
-        a.is_confirmed.should be_truthy
+          :code => TRANSACTION_DATA_CODE[:group_loan_run_away_in_cycle_clearance]
+        ).count.should == 0 
+ 
       end
     end
   end
