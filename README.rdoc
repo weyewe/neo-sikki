@@ -13,7 +13,61 @@ on weekly confirmation:
 array = [] 
 TransactionData.where(
 	:is_contra_transaction => true 
-).find_each {|x| array << [ x.transaction_source_type, x.transaction_source_id ]  }
+).find_each {|x| array <<  x.code }
+
+
+contra_array = [] 
+TransactionData.where(
+	:is_contra_transaction => true 
+).find_each {|x| contra_array <<  [x.transaction_source_id , x.transaction_source_type, x.id ]   }
+
+even_array = [] 
+odd_array = [] 
+
+counter = 0 
+contra_array.each do |el|
+	counter = counter + 1 
+	puts "row: #{counter}"
+	total = TransactionData.where( :transaction_source_id => el[0], :transaction_source_type => el[1] ).count 
+
+	odd_array << el  if total%2 != 0  
+	even_array << el  if total%2 == 0  
+end
+
+el = odd_array.first 
+TransactionData.where( :transaction_source_id => el[0], :transaction_source_type => el[1] ).offset(1).order("id DESC").count
+
+
+
+odd_array.length
+even_array.length
+
+even_array.each do |el|
+	TransactionData.where( :transaction_source_id => el[0], :transaction_source_type => el[1] ).each {|td| td.delete_object}
+end
+
+odd_array.each do |el|
+	TransactionData.where( :transaction_source_id => el[0], :transaction_source_type => el[1] ).offset(1).order("id DESC").each {|td| td.delete_object }
+end
+
+
+
+
+
+
+
+
+# code with contra present: [30, 20, 200, 203, 40, 140, 10]
+:group_loan_weekly_collection_voluntary_savings => 30, 
+:group_loan_weekly_collection => 20, 
+:savings_account => 200,
+:locked_savings_account => 203,
+:group_loan_premature_clearance_remaining_weeks_payment => 40 ,
+:group_loan_deceased_declaration => 140, 
+:loan_disbursement => 10,
+
+I want to delete all contra => total contra = 939
+
 
 
 NOW! things to do:

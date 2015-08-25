@@ -129,21 +129,27 @@ array.uniq!
    
    
   def create_contra_and_confirm
-    new_object = self.class.new 
-    
-    new_object.transaction_datetime = self.transaction_datetime
-    new_object.description =  "[contra posting at #{DateTime.now}]" + self.description
-    new_object.code = self.code 
-    
-    new_object.transaction_source_id = self.transaction_source_id
-    new_object.transaction_source_type = self.transaction_source_type
-    new_object.is_contra_transaction = true 
-    new_object.save 
-    
+    # destroy the transaction
     self.transaction_data_details.each do |tdd|
-      tdd.create_contra(new_object)
+      tdd.delete_object
     end
-    new_object.confirm 
+    self.destroy 
+
+    # new_object = self.class.new 
+    
+    # new_object.transaction_datetime = self.transaction_datetime
+    # new_object.description =  "[contra posting at #{DateTime.now}]" + self.description
+    # new_object.code = self.code 
+    
+    # new_object.transaction_source_id = self.transaction_source_id
+    # new_object.transaction_source_type = self.transaction_source_type
+    # new_object.is_contra_transaction = true 
+    # new_object.save 
+    
+    # self.transaction_data_details.each do |tdd|
+    #   tdd.create_contra(new_object)
+    # end
+    # new_object.confirm 
   end
   
 end
