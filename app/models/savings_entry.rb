@@ -718,11 +718,11 @@ end
     # do accounting posting 
     group_loan = group_loan_membership.group_loan
     group_loan_weekly_collection = savings_source.group_loan_weekly_collection
-    AccountingService::WeeklyCollectionVoluntarySavings.create_journal_posting(
-      group_loan,
-      group_loan_weekly_collection,
-      savings_source
-    )
+    # AccountingService::WeeklyCollectionVoluntarySavings.create_journal_posting(
+    #   group_loan,
+    #   group_loan_weekly_collection,
+    #   savings_source
+    # )
     
     
   end

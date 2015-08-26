@@ -2,7 +2,7 @@ module AccountingService
   class WeeklyPayment
     def WeeklyPayment.create_journal_posting(group_loan,group_loan_weekly_collection, 
               total_compulsory_savings , total_principal,
-              total_interest_revenue ) 
+              total_interest_revenue , total_voluntary_savings_withdrawal, total_voluntary_savings_addition) 
       
         # message = "#{group_loan.name} #{TRANSACTION_DATA_CODE[:group_loan_weekly_collection][:text_message]} #{group_loan_weekly_collection.week_number}"
         # message = "Weekly Collection: Group #{group_loan.name}, #{group_loan.group_number}, week #{group_loan_weekly_collection.week_number}"
@@ -63,6 +63,44 @@ module AccountingService
           :amount              => total_compulsory_savings,
           :description => msg
         )
+
+        if total_voluntary_savings_addition > BigDecimal("0")
+            addition_msg = msg + " => " + " Total penambahan voluntary savings di weekly collection: #{total_voluntary_savings_addition.to_s}"
+            TransactionDataDetail.create_object(
+              :transaction_data_id => ta.id,        
+              :account_id          => Account.find_by_code(ACCOUNT_CODE[:voluntary_savings_leaf][:code]).id      ,
+              :entry_case          => NORMAL_BALANCE[:credit]     ,
+              :amount              => total_voluntary_savings_addition,
+              :description => addition_msg
+            )
+
+            TransactionDataDetail.create_object(
+              :transaction_data_id => ta.id,        
+              :account_id          => Account.find_by_code(ACCOUNT_CODE[:main_cash_leaf][:code]).id        ,
+              :entry_case          => NORMAL_BALANCE[:debit]     ,
+              :amount              => total_voluntary_savings_addition,
+              :description => addition_msg
+            ) 
+        end
+
+        if total_voluntary_savings_withdrawal > BigDecimal("0")
+            withdrawal_msg = msg + " => " + " Total penarikan voluntary savings di weekly collection: #{total_voluntary_savings_withdrawal.to_s}"
+            TransactionDataDetail.create_object(
+              :transaction_data_id => ta.id,        
+              :account_id          => Account.find_by_code(ACCOUNT_CODE[:voluntary_savings_leaf][:code]).id      ,
+              :entry_case          => NORMAL_BALANCE[:debit]     ,
+              :amount              => total_voluntary_savings_withdrawal,
+              :description => withdrawal_msg
+            )
+
+            TransactionDataDetail.create_object(
+              :transaction_data_id => ta.id,        
+              :account_id          => Account.find_by_code(ACCOUNT_CODE[:main_cash_leaf][:code]).id        ,
+              :entry_case          => NORMAL_BALANCE[:credit]     ,
+              :amount              => total_voluntary_savings_withdrawal,
+              :description => withdrawal_msg
+            ) 
+        end
 
       
         ta.confirm

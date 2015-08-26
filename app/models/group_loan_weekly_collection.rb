@@ -89,6 +89,17 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
     total_principal = BigDecimal("0")
     total_compulsory_savings = BigDecimal("0")
 
+    total_voluntary_savings_withdrawal = BigDecimal('0')
+    total_voluntary_savings_addition = BigDecimal('0')
+
+    total_voluntary_savings_addition = self.group_loan_weekly_collection_voluntary_savings_entries.where(
+        :direction => FUND_TRANSFER_DIRECTION[:incoming]
+      ).sum("amount")
+
+  total_voluntary_savings_withdrawal = self.group_loan_weekly_collection_voluntary_savings_entries.where(
+        :direction => FUND_TRANSFER_DIRECTION[:outgoing]
+      ).sum("amount")
+
     
     # paying_member = (active_glm_id_list + run_away_glm_id_list).uniq - uncollectible_glm_id_list
     
@@ -103,7 +114,9 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
       self,
       total_compulsory_savings ,
       total_principal,
-      total_interest_revenue 
+      total_interest_revenue ,
+      total_voluntary_savings_withdrawal,
+      total_voluntary_savings_addition 
     )
   end
   
