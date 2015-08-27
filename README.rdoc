@@ -1,0 +1,53 @@
+no kontra anymore => we can execute the rake task to delete contra 
+
+we need to delete all transaction data related to the group_loan_weekly_collection_voluntary_savings 
+
+we need to add the posting to the group_loan_weekly_payment 
+
+
+we have the transaction data containing journal posting
+
+# IN CREATING THE TRANSACTION DATA
+TRANSACTION_DATA_CODE[:group_loan_weekly_collection_voluntary_savings]
+         ta = TransactionData.create_object({
+            :transaction_datetime => group_loan_weekly_collection.collected_at,
+            :description =>  message,
+            :transaction_source_id => savings_source.id , 
+            :transaction_source_type => savings_source.class.to_s ,
+            :code => TRANSACTION_DATA_CODE[:group_loan_weekly_collection_voluntary_savings],
+            :is_contra_transaction => false 
+          }, true )
+
+ # IN CREATING THE SAVINGS_ENTRY
+     new_object = self.create :savings_source_id => savings_source.id,
+                        :savings_source_type => savings_source.class.to_s,
+                        :amount => savings_source.amount,
+                        :savings_status => SAVINGS_STATUS[:savings_account],
+                        :direction => FUND_TRANSFER_DIRECTION[:incoming],
+                        :financial_product_id => group_loan_membership.group_loan_id,
+                        :financial_product_type => group_loan_membership.group_loan.class.to_s,
+                        :member_id => member.id ,
+                        :is_confirmed => true, 
+                        :confirmed_at => savings_source.group_loan_weekly_collection.confirmed_at 
+
+
+TransactionData.where(:code => TRANSACTION_DATA_CODE[:group_loan_weekly_collection_voluntary_savings]).count
+
+transaction_source_id: 4849, transaction_source_type: "GroupLoanWeeklyCollectionVoluntarySavingsEntry"
+
+glwc_vse_id_list = [] 
+
+TransactionData.where(:code =>  TRANSACTION_DATA_CODE[:group_loan_weekly_collection_voluntary_savings]).find_each do |td|
+
+	glwc_vse_id_list << td.transaction_source_id
+
+end
+
+TransactionData.where(:code =>  TRANSACTION_DATA_CODE[:group_loan_weekly_collection]).first
+#transaction_source_id: 9388, transaction_source_type: "GroupLoanWeeklyCollection", 
+
+gwlc_id_list = []
+GroupLoanWeeklyCollectionVoluntarySavingsEntry.where(:id => glwc_vse_id_list).find_each do |glwc_vse|
+	gwlc_id_list << glwc_vse.group_loan_weekly_collection_id
+end
+

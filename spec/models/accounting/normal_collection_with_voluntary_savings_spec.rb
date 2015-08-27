@@ -222,19 +222,11 @@ describe GroupLoan do
               a.is_confirmed.should be_truthy 
             end
             
-            it "should create transaction data for voluntary savings" do
+            it "should NOT create transaction data for voluntary savings" do
               TransactionData.where(:transaction_source_id => @glwc_vs.id, 
                 :transaction_source_type => @glwc_vs.class.to_s,
                 :code => TRANSACTION_DATA_CODE[:group_loan_weekly_collection_voluntary_savings]
-              ).count.should == 1 
-
-              a = TransactionData.where(:transaction_source_id => @glwc_vs.id, 
-                :transaction_source_type => @glwc_vs.class.to_s,
-                :code => TRANSACTION_DATA_CODE[:group_loan_weekly_collection_voluntary_savings]
-              ).first
-
-              a.is_confirmed.should be_truthy 
-              a.total_debit.should == a.total_credit
+              ).count.should == 0 
             end
             
             context "unconfirm weekly collection" do

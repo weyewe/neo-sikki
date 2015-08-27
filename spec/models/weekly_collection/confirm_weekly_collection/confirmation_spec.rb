@@ -185,12 +185,61 @@ describe GroupLoanWeeklyCollection do
       savings_entry.confirmed_at.should == @first_glwc.confirmed_at
     end
     
-    it "should create one savings entry: 1 transaction data" do
+    it "should NOT create transaction data from group loan weekly collection oluntary savings" do
       TransactionData.where(
         :transaction_source_id => @first_gl_wcvse.id , 
         :transaction_source_type => @first_gl_wcvse.class.to_s ,
         :code => TRANSACTION_DATA_CODE[:group_loan_weekly_collection_voluntary_savings],
-      ).count.should == 1 
+      ).count.should == 0 
+    end
+
+    it "should create voluntary savings posting to weekly_payment" do
+      total_voluntary_savings_withdrawal = BigDecimal('0')
+      total_voluntary_savings_addition = BigDecimal('0')
+
+      total_voluntary_savings_addition = @first_glwc.group_loan_weekly_collection_voluntary_savings_entries.where(
+          :direction => FUND_TRANSFER_DIRECTION[:incoming]
+        ).sum("amount")
+
+      total_voluntary_savings_withdrawal = @first_glwc.group_loan_weekly_collection_voluntary_savings_entries.where(
+          :direction => FUND_TRANSFER_DIRECTION[:outgoing]
+        ).sum("amount")
+
+      td  = TransactionData.where(
+          :transaction_source_id => @first_glwc.id , 
+          :transaction_source_type => @first_glwc.class.to_s ,
+          :code => TRANSACTION_DATA_CODE[:group_loan_weekly_collection]
+         ).first
+
+      if total_voluntary_savings_addition > BigDecimal("0")
+
+        td.transaction_data_details.where(
+            :account_id => Account.find_by_code(ACCOUNT_CODE[:voluntary_savings_leaf][:code]).id  ,
+            :entry_case          => NORMAL_BALANCE[:credit]     
+          ).count.should == 1 
+ 
+          
+        td.transaction_data_details.where(
+            :account_id => Account.find_by_code(ACCOUNT_CODE[:voluntary_savings_leaf][:code]).id  ,
+            :entry_case          => NORMAL_BALANCE[:credit]     
+          ).first.amount.should  == total_voluntary_savings_addition
+
+
+
+      end
+
+      if total_voluntary_savings_withdrawal > BigDecimal("0")
+        
+        td.transaction_data_details.where(
+            :account_id => Account.find_by_code(ACCOUNT_CODE[:voluntary_savings_leaf][:code]).id  ,
+            :entry_case          => NORMAL_BALANCE[:credit]     
+          ).count.should == total_voluntary_savings_withdrawal
+
+        td.transaction_data_details.where(
+            :account_id => Account.find_by_code(ACCOUNT_CODE[:voluntary_savings_leaf][:code]).id  ,
+            :entry_case          => NORMAL_BALANCE[:credit]     
+          ).first.amount.should == 1 
+      end
     end
     
     it 'should increase the voluntary savings amount' do

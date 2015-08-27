@@ -119,15 +119,7 @@ describe GroupLoanWeeklyCollection do
     se.amount.should ==  @amount
   end
 
-  it "should create one transaction data" do
-    td = TransactionData.where(
-        :transaction_source_id => @glwc_vse.id , 
-            :transaction_source_type => @glwc_vse.class.to_s ,
-      ).first 
-
-    td.code.should  == TRANSACTION_DATA_CODE[:group_loan_weekly_collection_voluntary_savings]
-  end
-  
+ 
 
   context "unconfirm glwc and there is sufficient fund" do
     before(:each) do 

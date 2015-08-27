@@ -6,7 +6,7 @@ class TransactionDataDetail < ActiveRecord::Base
   validate :valid_transaction_data_id 
   validate :valid_entry_case
   validate :valid_amount
-  validate :transaction_data_must_not_be_confirmed 
+  # validate :transaction_data_must_not_be_confirmed 
   
   
   
