@@ -106,7 +106,7 @@ task :migrate_glwc_vse_posting => :environment  do
 
 	end
 
-	TransactionData.where(:transaction_source_id => glwc_vse_id_list, :transaction_source => "GroupLoanWeeklyCollectionVoluntarySavingsEntry").each do |td|
+	TransactionData.where(:transaction_source_id => glwc_vse_id_list, :transaction_source_type => "GroupLoanWeeklyCollectionVoluntarySavingsEntry").each do |td|
 		td.transaction_data_details.each {|x| x.destroy }
 
 		td.destroy 
