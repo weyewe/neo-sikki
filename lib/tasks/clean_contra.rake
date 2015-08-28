@@ -1,4 +1,5 @@
 # bundle exec rake clean_contra; bundle exec rake migrate_glwc_vse_posting
+# heroku run rake clean_contra; heroku run rake migrate_glwc_vse_posting
 task :clean_contra => :environment do
 	contra_array = [] 
 	TransactionData.where(
@@ -27,6 +28,14 @@ task :clean_contra => :environment do
 	end
 
 end
+
+task :destroy_all_weekly_collection_posting => :environment do 
+	TransactionData.where( :code =>  TRANSACTION_DATA_CODE[:group_loan_weekly_collection] ).find_each do |x|
+
+		x.transaction_data_details.each {|tdd| tdd.destroy }
+		x.destroy
+	end
+end		
  
  # TransactionData.where( :code =>  TRANSACTION_DATA_CODE[:group_loan_weekly_collection_voluntary_savings] ).
 
