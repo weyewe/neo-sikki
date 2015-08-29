@@ -36,6 +36,12 @@ task :destroy_all_weekly_collection_posting => :environment do
 		x.destroy
 	end
 end		
+
+task :regenerate_posting => :environment do 
+	GroupLoanWeeklyCollection.where(:is_confirmed => true ).find_each do |glwc|
+		glwc.delay.recreate_journal_posting
+	end
+end
  
  # TransactionData.where( :code =>  TRANSACTION_DATA_CODE[:group_loan_weekly_collection_voluntary_savings] ).
 

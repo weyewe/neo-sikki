@@ -119,6 +119,51 @@ class GroupLoanWeeklyCollection < ActiveRecord::Base
       total_voluntary_savings_addition 
     )
   end
+
+  def recreate_journal_posting
+    uncollectible_glm_id_list = self.uncollectible_group_loan_membership_id_list
+    active_glm_id_list = self.active_group_loan_memberships.map {|x| x.id }
+    run_away_glm_id_list = group_loan.
+                          group_loan_memberships.joins(:group_loan_run_away_receivable).
+                          where{
+                            (deactivation_case.eq  GROUP_LOAN_DEACTIVATION_CASE[:run_away] ) & 
+                            (group_loan_run_away_receivable.payment_case.eq GROUP_LOAN_RUN_AWAY_RECEIVABLE_CASE[:weekly])
+                          }.map{|x| x.id }
+    active_glm_id_list = active_glm_id_list - uncollectible_glm_id_list
+    run_away_glm_id_list = run_away_glm_id_list - uncollectible_glm_id_list
+
+    total_main_cash = BigDecimal("0")
+    total_interest_revenue = BigDecimal("0")
+    total_principal = BigDecimal("0")
+    total_compulsory_savings = BigDecimal("0")
+
+    total_voluntary_savings_withdrawal = BigDecimal('0')
+    total_voluntary_savings_addition = BigDecimal('0')
+
+    total_voluntary_savings_addition = self.group_loan_weekly_collection_voluntary_savings_entries.where(
+        :direction => FUND_TRANSFER_DIRECTION[:incoming]
+      ).sum("amount")
+
+    total_voluntary_savings_withdrawal = self.group_loan_weekly_collection_voluntary_savings_entries.where(
+        :direction => FUND_TRANSFER_DIRECTION[:outgoing]
+      ).sum("amount")
+
+    GroupLoanMembership.where(:id =>  active_glm_id_list + run_away_glm_id_list ).joins(:group_loan_product).each do |glm|
+      total_interest_revenue +=   glm.group_loan_product.interest 
+      total_principal +=         glm.group_loan_product.principal 
+      total_compulsory_savings += glm.group_loan_product.compulsory_savings
+    end
+
+    AccountingService::WeeklyPayment.create_journal_posting(
+      group_loan,
+      self,
+      total_compulsory_savings ,
+      total_principal,
+      total_interest_revenue ,
+      total_voluntary_savings_withdrawal,
+      total_voluntary_savings_addition 
+    )
+  end
   
   
   
