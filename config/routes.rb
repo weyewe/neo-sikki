@@ -38,6 +38,7 @@ NeoSikki::Application.routes.draw do
     resources :transaction_datas
 
     resources :schwab_reports 
+    resources :audit_reports 
 
     resources :savings 
   end
