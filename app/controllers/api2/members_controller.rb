@@ -24,12 +24,9 @@ class Api2::MembersController < Api2::BaseReportApiController
       	( id_number =~ livesearch) 
       }
        
-    else 
-      @objects = Member.includes(:group_loan_memberships => [:group_loan]).page(params[:page]).per(params[:limit]).order("id DESC")
-      @total = Member.count 
     end
 
-    @objects = query.page(params[:page]).per(params[:limit]).order("id DESC")
+    @objects = query.page(params[:page]).per(params[:limit]).order("members.id_number ASC")
     @total = query.count 
      
   end

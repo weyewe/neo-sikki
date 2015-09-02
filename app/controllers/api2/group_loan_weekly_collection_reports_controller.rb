@@ -45,7 +45,7 @@ class Api2::GroupLoanWeeklyCollectionReportsController < Api2::BaseReportApiCont
 
       (confirmed_at.gte client_starting_datetime ) & 
       (confirmed_at.lte client_ending_datetime )
-    }.order("group_loans.group_number DESC")
+    }.order("group_loans.group_number ASC, group_loans.name ASC")
 
     @total = @objects.count 
 
