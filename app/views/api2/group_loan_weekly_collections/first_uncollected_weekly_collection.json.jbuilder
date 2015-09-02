@@ -16,6 +16,7 @@ json.group_loan_memberships @objects do |object|
 
 	json.member_name 			 			object.member.name 
 	json.member_address		object.member.address
+	json.member_voluntary_savings_amount		object.member.total_savings_account
 	json.member_id_number object.member.id_number 
 
 	json.member_weekly_payment_amount object.group_loan_product.
