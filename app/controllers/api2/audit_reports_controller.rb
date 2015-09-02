@@ -1,4 +1,4 @@
-class Api2::SchwabReportsController < Api2::BaseReportApiController
+class Api2::AuditReportsController < Api2::BaseReportApiController
   
 
 
