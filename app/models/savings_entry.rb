@@ -211,6 +211,7 @@ end
     new_object.financial_product_id   = nil 
     new_object.financial_product_type = nil
     new_object.member_id              = params[:member_id]
+    new_object.description = params[:description]
     new_object.save 
      
     return new_object
@@ -246,6 +247,7 @@ end
     self.financial_product_id   = nil 
     self.financial_product_type = nil
     self.member_id              = params[:member_id]
+    self.description = params[:description]
     
     self.save
   end

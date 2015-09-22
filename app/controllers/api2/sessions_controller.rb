@@ -21,7 +21,10 @@ class Api2::SessionsController < Api2::BaseReportApiController
       render :json=> {:success=>true, 
                       :auth_token=>resource.authentication_token, 
                       :email=>resource.email,
-                      :role => resource.role.to_json
+                      :role => resource.role.to_json.
+                      :name => resource.name, 
+                      :username => resource.username, 
+                      :login => resource.login
               }
       return
     end
