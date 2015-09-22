@@ -20,8 +20,7 @@ class Api2::MembersController < Api2::BaseReportApiController
       livesearch = "%#{params[:livesearch]}%"
 
       query = query.where{
-      	( name =~ livesearch) | 
-      	( id_number =~ livesearch) 
+      	( name =~ livesearch) 
       }
        
     end
