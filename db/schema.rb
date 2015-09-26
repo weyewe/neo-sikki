@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150515070916) do
+ActiveRecord::Schema.define(version: 20150926044219) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -327,6 +327,16 @@ ActiveRecord::Schema.define(version: 20150515070916) do
     t.string   "code"
     t.boolean  "is_deleted",           default: false
     t.datetime "deleted_at"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "print_errors", force: true do |t|
+    t.integer  "user_id"
+    t.datetime "saving_date"
+    t.decimal  "amount",       precision: 10, scale: 2, default: 0.0
+    t.text     "print_status"
+    t.text     "reason"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
