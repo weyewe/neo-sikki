@@ -8,6 +8,7 @@ class PrintError < ActiveRecord::Base
 		new_object.amount = BigDecimal( params[:amount] || '0') 
 		new_object.print_status  = params[:print_status]
 		new_object.reason = params[:reason]
+		new_object.member_id = params[:member_id]
 
 		new_object.save 
 
@@ -20,6 +21,7 @@ class PrintError < ActiveRecord::Base
 		self.amount = BigDecimal( params[:amount] || '0') 
 		self.print_status = params[:print_status]
 		self.reason = params[:reason]
+		self.member_id = params[:member_id]
 		self.save 
 
 		return self 
