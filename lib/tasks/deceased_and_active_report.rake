@@ -20,7 +20,8 @@ task :member_deceased_2015 => :environment do
       deceased_member.name,
       deceased_member.id_number, 
       deceased_member.id_card_number,
-      deceased_member.birthday_date
+      deceased_member.birthday_date,
+      deceased_member.deceased_at
     ]
   end
 
