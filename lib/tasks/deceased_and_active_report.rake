@@ -37,18 +37,21 @@ task :active_glm_now => :environment do
 
   array = []
 
-  GroupLoanMembership.includes(:member, :group_loan).where{
+  GroupLoanMembership.includes(:member, :group_loan, :group_loan_product).where{
     ( is_active.eq true )  
   }.find_each do |glm|
     member = glm.member
     group_loan = glm.group_loan 
+    glp = glm.group_loan_product 
+
     array << [
       member.name,
       member.id_number, 
       member.id_card_number,
       member.birthday_date,
       group_loan.name , 
-      group_loan.group_number
+      group_loan.group_number,
+      glp.principal
     ]
   end
 
