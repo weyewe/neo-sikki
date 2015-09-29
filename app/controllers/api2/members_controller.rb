@@ -37,7 +37,7 @@ class Api2::MembersController < Api2::BaseReportApiController
   end
 
 
-  def active_members
+  def deceased_members 
     starting_datetime   = params[:starting_datetime].to_datetime 
     ending_datetime = params[:ending_datetime].to_datetime  
 
@@ -53,7 +53,7 @@ class Api2::MembersController < Api2::BaseReportApiController
     @total = query.count  
   end
 
-  def deceased_members
+  def active_members
     starting_datetime   = params[:starting_datetime].to_datetime 
     ending_datetime = params[:ending_datetime].to_datetime  
 
