@@ -16,12 +16,14 @@ NeoSikki::Application.routes.draw do
 
     resources :membership_savings_reports 
     resources :savings_entry_reports
+    get 'members/active_members' => 'members#active_members', :as => :get_active_members
+    get 'members/deceased_members' => 'members#deceased_members', :as => :get_deceased_members
+    
     resources :members
 
     resources :print_errors
 
-    get 'members/active_members' => 'members#active_members', :as => :get_active_members
-    get 'members/deceased_members' => 'members#deceased_members', :as => :get_deceased_members
+    
     
     get 'savings_entries_history/:id_number' => 'savings_entry_reports#member_history', :as => :get_member_savings_entries_history
 
