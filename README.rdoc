@@ -51,3 +51,6 @@ GroupLoanWeeklyCollectionVoluntarySavingsEntry.where(:id => glwc_vse_id_list).fi
 	gwlc_id_list << glwc_vse.group_loan_weekly_collection_id
 end
 
+
+
+Test one thing
