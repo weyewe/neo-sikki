@@ -38,7 +38,7 @@ class Api2::PrintErrorsController < Api2::BaseReportApiController
                           
                            
                         }],
-                        :total => @parent.print_errors.count }  
+                        :total => PrintError.count }  
     else
       msg = {
         :success => false, 
