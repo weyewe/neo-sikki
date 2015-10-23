@@ -5,6 +5,8 @@ class GroupLoan < ActiveRecord::Base
   # belongs_to :office 
   has_many :members, :through => :group_loan_memberships 
   has_many :group_loan_memberships 
+
+  
   has_many :group_loan_weekly_collections 
   has_many :group_loan_weekly_uncollectibles 
   

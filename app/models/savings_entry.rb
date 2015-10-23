@@ -181,6 +181,10 @@ end
 =end
   
 =begin
+
+array = []
+SavingsEntry.where{ ( savings_status.eq SAVINGS_STATUS[:savings_account]) &   ( savings_source_id.eq nil )  }.find_each {|x| array << x.description }
+ 
   # Independent savings, 
 =end
   def self.create_object( params ) 

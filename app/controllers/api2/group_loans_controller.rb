@@ -22,7 +22,7 @@ class Api2::GroupLoansController < Api2::BaseReportApiController
  
     end
 
-    @objects = query.page(params[:page]).per(params[:limit]).order("group_loans.name ASC, group_loans.group_number ASC")
+    @objects = query.page(params[:page]).per(params[:limit]).order("  group_loans.group_number ASC")
     @total  = query.count
   end
 
