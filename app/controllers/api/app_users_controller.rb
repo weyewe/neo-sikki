@@ -38,7 +38,7 @@ class Api::AppUsersController < Api::BaseApiController
 
  
     if @object.errors.size == 0 
-      @object.device_id = params[:deviceToken]
+      # @object.device_id = params[:deviceToken]
       
       render :json => { :success => true, 
                         :users => [@object] , 
