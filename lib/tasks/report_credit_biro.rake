@@ -1,12 +1,6 @@
 
-require 'rubygems'
-require 'selenium-webdriver' 
-require 'nokogiri'
-require 'csv'
-require 'httparty'
-require 'json'
-require 'droplet_kit'
- 
+require 'rubygems' 
+require 'csv' 
 
 
 # ID Debitur	Nomor ID Nasabah	Yes
