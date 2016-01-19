@@ -13,6 +13,7 @@ json.transaction_datas @objects do |object|
 	json.amount 							object.amount 
 	json.is_contra_transaction				object.is_contra_transaction
 	json.code								object.code
+	json.created_at							object.created_at 
 
  	
  	source_object  = object.get_source_object
