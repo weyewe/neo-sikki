@@ -13,7 +13,13 @@ json.transaction_datas @objects do |object|
 	json.amount 							object.amount 
 	json.is_contra_transaction				object.is_contra_transaction
 	json.code								object.code
-	json.transaction_datetime				object.transaction_datetime
+	
+	if object.transaction_datetime.present?
+		json.transaction_datetime				object.transaction_datetime.to_date.to_s
+	else
+		json.transaction_datetime				object.transaction_datetime 
+	end
+	
 	json.created_at							object.created_at 
 
  	
