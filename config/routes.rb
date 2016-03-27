@@ -48,6 +48,12 @@ NeoSikki::Application.routes.draw do
     resources :audit_reports 
 
     resources :savings 
+
+
+
+    get "show_connection_path" => "bentar_experiments#show_connection_path" , :as => :show_connection_path 
+
+    post "calculate_rico_score" => "bentar_experiments#calculate_the_shit" , :as => :awesome_bentar 
   end
 
   namespace :api do 

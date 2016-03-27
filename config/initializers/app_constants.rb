@@ -20,6 +20,7 @@ VIEW_VALUE = {
   :year => 2 
 }
  
+ 
 
 IMAGE_ASSET_URL = {
   
