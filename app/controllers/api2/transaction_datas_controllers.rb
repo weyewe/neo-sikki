@@ -50,8 +50,10 @@ class Api2::TransactionDatasController < Api2::BaseReportApiController
  
 		start_date =  parse_date( params[:start_date] ) 
 
+		end_date = parse_date( params[:end_date])
+
 		beginning_of_day = start_date.beginning_of_day
-		end_of_day  = start_date.end_of_day
+		end_of_day  = end_date.end_of_day
 
 		query  = TransactionData.includes(:transaction_data_details => [:account]).where{
 			( is_confirmed.eq true )  & 
