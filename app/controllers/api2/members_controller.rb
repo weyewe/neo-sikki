@@ -62,7 +62,7 @@ class Api2::MembersController < Api2::BaseReportApiController
       ( is_active.eq false) &
       ( deactivation_case.eq  GROUP_LOAN_DEACTIVATION_CASE[:deceased] ) &
       ( member.deceased_at.gte starting_datetime )  &
-      ( member.deceased_at.lt ending_datetime )  &
+      ( member.deceased_at.lt ending_datetime ) 
     }
 
     @objects = query.page(params[:page]).per(params[:limit]).order("id ASC")
