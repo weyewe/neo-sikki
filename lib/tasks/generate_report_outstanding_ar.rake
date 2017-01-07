@@ -47,14 +47,14 @@ task :generate_outstanding_ar_ap_2016 => :environment do
         member.savings_entries.where(
                             :is_confirmed => true,
                             :direction =>  FUND_TRANSFER_DIRECTION[:incoming],
-                            :savings_status => SAVINGS_STATUS[:savings_account]
+                            :savings_status => SAVINGS_STATUS[:locked]
                             ).
                             where{ confirmed_at.gte my{the_end_of_2016}}.sum("amount")   +
 
         member.savings_entries.where(
                             :is_confirmed => true,
                             :direction =>  FUND_TRANSFER_DIRECTION[:outgoing],
-                            :savings_status => SAVINGS_STATUS[:savings_account]
+                            :savings_status => SAVINGS_STATUS[:locked]
                             ).
                             where{ confirmed_at.gte my{the_end_of_2016}}.sum("amount")
 
