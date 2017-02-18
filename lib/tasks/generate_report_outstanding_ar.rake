@@ -201,7 +201,9 @@ task :analyze_max_ratio_of_compulsory_savings_vs_disbursed_amount => :environmen
   GroupLoanProduct.order("id ASC").find_each do |glp|
     array  << [
         glp.principal.to_i * glp.total_weeks ,
-        glp.compulsory_savings.to_i * glp.total_weeks 
+        glp.compulsory_savings.to_i * glp.total_weeks
       ]
   end
+
+  puts "the array : #{array}"
 end
