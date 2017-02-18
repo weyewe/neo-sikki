@@ -193,3 +193,15 @@ task :generate_outstanding_compulsory_savings_2016 => :environment do
   # end
 
 end
+
+
+task :analyze_max_ratio_of_compulsory_savings_vs_disbursed_amount => :environment do
+
+  array = []
+  GroupLoanProduct.order("id ASC").find_each do |glp|
+    array  << [
+        glp.principal.to_i * glp.total_weeks ,
+        glp.compulsory_savings.to_i * glp.total_weeks 
+      ]
+  end
+end
