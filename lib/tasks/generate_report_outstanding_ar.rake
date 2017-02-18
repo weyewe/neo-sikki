@@ -135,7 +135,7 @@ task :generate_outstanding_compulsory_savings_2016 => :environment do
       row << gl.name
       row << gl.group_number
       row << glm.member.name
-      row << ( glm.group_loan_product.principal * gl.number_of_collections ).to_s
+      row << ( glm.group_loan_product.principal * gl.number_of_collections ).to_i
 
 
       member  = glm.member
@@ -153,17 +153,19 @@ task :generate_outstanding_compulsory_savings_2016 => :environment do
                             :is_confirmed => true,
                             :direction =>  FUND_TRANSFER_DIRECTION[:incoming],
                             :savings_status => SAVINGS_STATUS[:group_loan_compulsory_savings]
-                            ).
-                            where{ confirmed_at.lte my{the_end_of_2016}}.sum("amount")   +
+                            ).#
+                            #where{ confirmed_at.lte my{the_end_of_2016}}.sum("amount")   +
 
         member.savings_entries.where(
                             :is_confirmed => true,
                             :direction =>  FUND_TRANSFER_DIRECTION[:outgoing],
                             :savings_status => SAVINGS_STATUS[:group_loan_compulsory_savings]
-                            ).
-                            where{ confirmed_at.lte my{the_end_of_2016}}.sum("amount")
+                            )#.
+                            #where{ confirmed_at.lte my{the_end_of_2016}}.sum("amount")
 
       row << total_compulsory_savings.to_i
+
+      row << glm.total_compulsory_savings
       array << row
 
     end
