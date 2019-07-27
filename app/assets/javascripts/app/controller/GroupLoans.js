@@ -6,7 +6,8 @@ Ext.define('AM.controller.GroupLoans', {
 
   views: [
     'operation.grouploan.List',
-    'operation.grouploan.Form'
+    'operation.grouploan.Form',
+    'operation.grouploandetail.List'
   ],
 
   	refs: [
@@ -17,7 +18,15 @@ Ext.define('AM.controller.GroupLoans', {
 		{
 			ref : 'searchField',
 			selector: 'grouploanlist textfield[name=searchField]'
-		}
+		},
+		{
+			ref : 'grouploanDetailList',
+			selector : 'grouploandetaillist'
+		},
+		{
+			ref: 'viewport',
+			selector: 'vp'
+		},
 	],
 
   init: function() {
@@ -217,8 +226,46 @@ Ext.define('AM.controller.GroupLoans', {
     } else {
       grid.disableRecordButtons();
     }
+
+
+	var me	= this;
+	var record = this.getList().getSelectedObject(); 
+	if(!record){
+		return; 
+	}
+	
+	console.log("selection change boss... ayo load si mofo baru");
+	
+	
+	me.updateChildGrid(record );
+	
+	
+    
   },
 
+
+	updateChildGrid: function(record){
+		console.log("Inside updateChildGrid haha" );
+		
+		var grouploanDetailGrid = this.getGrouploanDetailList();
+		console.log("The shite: " + record.get("name"));
+		console.log( grouploanDetailGrid);
+		// transactiondataDetailGrid.setTitle("Purchase Order: " + record.get('name'));
+		grouploanDetailGrid.setTitle(   record.get('name') ) ;
+		 
+		// grouploanDetailGrid.getStore().getProxy().extraParams.group_loan_id =  record.get('id') ;
+		 
+		// grouploanDetailGrid.getStore().load({
+		// 	params : {
+		// 		group_loan_id : record.get('id')
+		// 	},
+		// 	callback : function(records, options, success){
+		// 		grouploanDetailGrid.enableAddButton(); 
+		// 	}
+		// });
+		
+	},
+	
 
 	startObject: function(){
 		// console.log("the startObject callback function");

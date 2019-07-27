@@ -7,6 +7,7 @@ Ext.define('AM.controller.TransactionDatas', {
 	startDate : null,
 	endDate: null, 
 	isPeriodSet : false ,
+	
   views: [
     'operation.transactiondata.List',
     'operation.transactiondata.Form',
