@@ -20,18 +20,44 @@ Ext.define('AM.view.operation.grouploan.CloseForm', {
           labelWidth: 165,
 					anchor: '100%'
       },
+      
+  
+			
       items: [
 
 				{
 					xtype: 'displayfield',
 					fieldLabel: 'GroupLoan',
 					name: 'name' 
-				},  
+				}, 
+				{
+					xtype: 'displayfield',
+					fieldLabel: 'Tabungan Wajib',
+					name: 'total_compulsory_savings_pre_closure' 
+				},
+				{
+					xtype: 'displayfield',
+					fieldLabel: 'Titipan Premature Clearence',
+					name: 'premature_clearance_deposit' 
+				},
+				{
+					xtype: 'displayfield',
+					fieldLabel: 'Pendapatan bagi hasil dari member kabur',
+					name: 'expected_revenue_from_run_away_member_end_of_cycle_resolution' 
+				},
+				
+				
 				{
 					xtype: 'displayfield',
 					fieldLabel: 'Bad Debt Allowance',
 					name: 'bad_debt_allowance' 
 				},
+				{
+					xtype: 'displayfield',
+					fieldLabel: 'Bad Debt Expense',
+					name: 'bad_debt_expense' 
+				},
+				
 				{
 					xtype: 'datefield',
 					name : 'closed_at',
@@ -55,10 +81,26 @@ Ext.define('AM.view.operation.grouploan.CloseForm', {
   },
 
 	setParentData: function( record ) {
-		// console.log("Inside set Parent Data");
-// d.get('total_members_count') );
+		
+		
+		console.log("Inside set Parent Data");
+		console.log( record );  
+		
 		this.down('form').getForm().findField('name').setValue(record.get('name')); 
 		this.down('form').getForm().findField('bad_debt_allowance').setValue(record.get('bad_debt_allowance')); 
+		
+		this.down('form').getForm().findField('total_compulsory_savings_pre_closure').setValue(record.get('total_compulsory_savings_pre_closure')); 
+		this.down('form').getForm().findField('premature_clearance_deposit').setValue(record.get('premature_clearance_deposit')); 
+		this.down('form').getForm().findField('expected_revenue_from_run_away_member_end_of_cycle_resolution').setValue(record.get('expected_revenue_from_run_away_member_end_of_cycle_resolution')); 
+		this.down('form').getForm().findField('bad_debt_expense').setValue(record.get('bad_debt_expense')); 
+		
+		
 		this.down('form').getForm().findField('closed_at').setValue(record.get('closed_at')); 
+		
+		 
+		
+		
+		
+		
 	}
 });

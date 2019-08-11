@@ -18,11 +18,10 @@ Ext.define('AM.view.operation.GroupLoan', {
 				xtype : 'grouploanlist' ,
 				flex : 1 
 			} ,
-			{
-				xtype : 'grouploandetaillist' ,
-				flex : 3
-			} 
-			
-			
+			// {
+			// 	xtype : 'grouploandetaillist' , 
+			// 	flex: 1
+			// } 
+			 
 		]
 });

@@ -273,12 +273,12 @@ Ext.define('AM.controller.TransactionDatas', {
 	executeConfirm: function(button){
 		var me = this; 
 		var win = button.up('window');
-    var form = win.down('form');
+    	var form = win.down('form');
 		var list = this.getList();
 
-    var store = this.getTransactionDatasStore();
+    	var store = this.getTransactionDatasStore();
 		var record = this.getList().getSelectedObject();
-    var values = form.getValues();
+    	var values = form.getValues();
  
 		if(record){
 			var rec_id = record.get("id");
@@ -321,12 +321,12 @@ Ext.define('AM.controller.TransactionDatas', {
 	executeUnconfirm: function(button){
 		var me = this; 
 		var win = button.up('window');
-    var form = win.down('form');
+    	var form = win.down('form');
 		var list = this.getList();
 
-    var store = this.getTransactionDatasStore();
+    	var store = this.getTransactionDatasStore();
 		var record = this.getList().getSelectedObject();
-    var values = form.getValues();
+    	var values = form.getValues();
  
 		if(record){
 			var rec_id = record.get("id");
@@ -400,6 +400,14 @@ Ext.define('AM.controller.TransactionDatas', {
 		transactiondataDetailGrid.setObjectTitle( record ) ;
 		
 		// console.log("record id: " + record.get("id"));
+		
+		console.log("Inside updateChildGrid TransactionDatas.js store");
+		console.log(transactiondataDetailGrid.getStore() );
+		
+		
+		console.log("Inside updateChildGrid TransactionDatas.js proxy");
+		console.log(transactiondataDetailGrid.getStore().getProxy() );
+		
 		
 		transactiondataDetailGrid.getStore().getProxy().extraParams.transaction_data_id =  record.get('id') ;
 		 

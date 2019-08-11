@@ -16,29 +16,25 @@ Ext.define('AM.view.operation.grouploan.List' ,{
 
 	initComponent: function() {
 		this.columns = [
-
+			
+			{ header: 'Group No', dataIndex: 'group_number'   },
 			{
 				xtype : 'templatecolumn',
-				text : "GroupLoan",
+				text : "Info",
 				flex : 1,
-				tpl :	'No: <b>{group_number}</b> </br />' + 
-						'Name: <b>{name}</b>' + '<br />' + '<br />' + 
-							'Jumlah Meeting: <br /><b>{number_of_meetings}</b>'  + '<br />' + '<br />' + 
-							'Jumlah Pengumpulan: <br /><b>{number_of_collections}</b>'  + '<br />' + '<br />' + 
-							'Anggota Aktif: <br /><b>{active_group_loan_memberships_count}</b>'
+				tpl : 'Name: <b>{name}</b>' + '<br />' + '<br />' + 
+							'Jumlah Meeting: <b>{number_of_meetings}</b>'   + '<br />' + 
+							'Jumlah Pengumpulan: <b>{number_of_collections}</b>'    + '<br />' + 
+							'Anggota Aktif:  <b>{active_group_loan_memberships_count}</b>'
+			},
+			{
+				xtype : 'templatecolumn',
+				text : "Start",
+				flex : 1,
+				tpl : 'Status: <b>{is_started}</b>'+ '<br />' + '<br />' + 
+							'Tanggal Mulai: <br /><b>{started_at}</b>' 
 			},
 			
-			
-			// { header: 'Group No', dataIndex: 'group_number'   },
-			// {
-			// 	xtype : 'templatecolumn',
-			// 	text : "Info",
-			// 	flex : 1,
-			// 	tpl : '<b>{name}</b>' + '<br />' + '<br />' + 
-			// 				'Jumlah Meeting: <br /><b>{number_of_meetings}</b>'  + '<br />' + '<br />' + 
-			// 				'Jumlah Pengumpulan: <br /><b>{number_of_collections}</b>'  + '<br />' + '<br />' + 
-			// 				'Anggota Aktif: <br /><b>{active_group_loan_memberships_count}</b>'
-			// },
 			// {
 			// 	xtype : 'templatecolumn',
 			// 	text : "Start",
@@ -49,6 +45,15 @@ Ext.define('AM.view.operation.grouploan.List' ,{
 			// 				'Tanggal Mulai: <br /><b>{started_at}</b>' 
 			// },
 			
+			
+			{
+				xtype : 'templatecolumn',
+				text : "Disbursement",
+				flex : 1,
+				tpl : 'Status: <b>{is_loan_disbursed}</b>' + '<br />' + '<br />' +   
+							'Tanggal Disburse: <br /><b>{disbursed_at}</b>'     
+			},
+
 			// {
 			// 	xtype : 'templatecolumn',
 			// 	text : "Disbursement",
@@ -59,6 +64,15 @@ Ext.define('AM.view.operation.grouploan.List' ,{
 			// 				'Anggota Penerima: <br /><b>{disbursed_group_loan_memberships_count}</b>'+ '<br />' + '<br />' +  
 			// 				'Tanggal Mulai: <br /><b>{disbursed_at}</b>'     
 			// },
+			
+			
+			{
+				xtype : 'templatecolumn',
+				text : "Selesai",
+				flex : 1,
+				tpl : 'Status: <b>{is_closed}</b>' + '<br />' + '<br />' + 
+							'Tanggal Selesai: <br /><b>{closed_at}</b>'     
+			},
 			
 			// {
 			// 	xtype : 'templatecolumn',
@@ -76,14 +90,13 @@ Ext.define('AM.view.operation.grouploan.List' ,{
 			// 				'Tanggal Selesai: <br /><b>{closed_at}</b>'     
 			// },
 			
-			// {
-			// 	xtype : 'templatecolumn',
-			// 	text : "Savings Return",
-			// 	flex : 1,
-			// 	tpl : 'Status: <b>{is_compulsory_savings_withdrawn}</b>' + '<br />' + '<br />' + 
-			// 				'Pengembalian: <br /><b>{compulsory_savings_return_amount}</b>' + '<br />' + '<br />' +
-			// 				'TanggalPengembalian: <br /><b>{compulsory_savings_withdrawn_at}</b>'     
-			// },
+			{
+				xtype : 'templatecolumn',
+				text : "Savings Return",
+				flex : 1,
+				tpl : 'Status: <b>{is_compulsory_savings_withdrawn}</b>' + '<br />' + '<br />' +  
+							'Tanggal Pengembalian: <br /><b>{compulsory_savings_withdrawn_at}</b>'     
+			},
 			
 		];
 
@@ -92,54 +105,54 @@ Ext.define('AM.view.operation.grouploan.List' ,{
 			action: 'addObject'
 		});
 
-		// this.editObjectButton = new Ext.Button({
-		// 	text: 'Edit',
-		// 	action: 'editObject',
-		// 	disabled: true
-		// });
+		this.editObjectButton = new Ext.Button({
+			text: 'Edit',
+			action: 'editObject',
+			disabled: true
+		});
 
-		// this.deleteObjectButton = new Ext.Button({
-		// 	text: 'Delete',
-		// 	action: 'deleteObject',
-		// 	disabled: true
-		// });
+		this.deleteObjectButton = new Ext.Button({
+			text: 'Delete',
+			action: 'deleteObject',
+			disabled: true
+		});
 		
-		// this.startObjectButton = new Ext.Button({
-		// 	text: 'Start',
-		// 	action: 'startObject',
-		// 	disabled: true
-		// });
+		this.startObjectButton = new Ext.Button({
+			text: 'Start',
+			action: 'startObject',
+			disabled: true
+		});
 		
-		// this.unstartObjectButton = new Ext.Button({
-		// 	text: 'Cancel Start',
-		// 	action: 'unstartObject',
-		// 	disabled: true,
-		// 	hidden : true 
-		// });
+		this.unstartObjectButton = new Ext.Button({
+			text: 'Cancel Start',
+			action: 'unstartObject',
+			disabled: true,
+			hidden : true 
+		});
 		
-		// this.disburseObjectButton = new Ext.Button({
-		// 	text: 'Disburse',
-		// 	action: 'disburseObject',
-		// 	disabled: true
-		// });
+		this.disburseObjectButton = new Ext.Button({
+			text: 'Disburse',
+			action: 'disburseObject',
+			disabled: true
+		});
 		
-		// this.undisburseObjectButton = new Ext.Button({
-		// 	text: 'Cancel Disburse',
-		// 	action: 'undisburseObject',
-		// 	disabled: true,
-		// 	hidden : true 
-		// });
+		this.undisburseObjectButton = new Ext.Button({
+			text: 'Cancel Disburse',
+			action: 'undisburseObject',
+			disabled: true,
+			hidden : true 
+		});
 		
-		// this.closeObjectButton = new Ext.Button({
-		// 	text: 'Close',
-		// 	action: 'closeObject',
-		// 	disabled: true
-		// });
-		// this.withdrawObjectButton = new Ext.Button({
-		// 	text: 'Withdraw',
-		// 	action: 'withdrawObject',
-		// 	disabled: true
-		// });
+		this.closeObjectButton = new Ext.Button({
+			text: 'Close',
+			action: 'closeObject',
+			disabled: true
+		});
+		this.withdrawObjectButton = new Ext.Button({
+			text: 'Withdraw',
+			action: 'withdrawObject',
+			disabled: true
+		});
 		
 		this.searchField = new Ext.form.field.Text({
 			name: 'searchField',
@@ -149,11 +162,11 @@ Ext.define('AM.view.operation.grouploan.List' ,{
 			checkChangeBuffer: 300
 		});
 		
-		// this.downloadPendingButton = new Ext.Button({
-		// 	text: 'FKS',
-		// 	action: 'downloadPending',
-		// 	disabled: false
-		// });
+		this.downloadPendingButton = new Ext.Button({
+			text: 'FKS',
+			action: 'downloadPending',
+			disabled: false
+		});
 		
 
 
@@ -161,14 +174,14 @@ Ext.define('AM.view.operation.grouploan.List' ,{
 		this.tbar = [
 			
 			this.addObjectButton, 
-			'->',
-			// this.editObjectButton, this.deleteObjectButton,
-		 // 			'-',
-			// 			this.startObjectButton, this.unstartObjectButton,
-			// 			this.disburseObjectButton,this.undisburseObjectButton,
-			// 			this.closeObjectButton,
-			// 			this.withdrawObjectButton, 
-			// 			'-',
+			// '->',
+			this.editObjectButton, this.deleteObjectButton,
+		  			'-',
+						this.startObjectButton, this.unstartObjectButton,
+						this.disburseObjectButton,this.undisburseObjectButton,
+						this.closeObjectButton,
+						this.withdrawObjectButton, 
+						'-',
 						this.searchField,
 						// '->',
 						// this.downloadPendingButton
@@ -191,42 +204,42 @@ Ext.define('AM.view.operation.grouploan.List' ,{
 	},
 
 	enableRecordButtons: function() {
-		// this.editObjectButton.enable();
-		// this.deleteObjectButton.enable();
-		// this.startObjectButton.enable();
-		// this.unstartObjectButton.enable();
-		// this.disburseObjectButton.enable();
-		// this.undisburseObjectButton.enable();
-		// this.closeObjectButton.enable();
-		// this.withdrawObjectButton.enable();
-		// // this.downloadPendingButton.enable();
+		this.editObjectButton.enable();
+		this.deleteObjectButton.enable();
+		this.startObjectButton.enable();
+		this.unstartObjectButton.enable();
+		this.disburseObjectButton.enable();
+		this.undisburseObjectButton.enable();
+		this.closeObjectButton.enable();
+		this.withdrawObjectButton.enable();
+		// this.downloadPendingButton.enable();
 		
-		// selectedObject = this.getSelectedObject();
-		// if( selectedObject && selectedObject.get("is_started") == true ){
-		// 	this.startObjectButton.hide();
-		// 	this.unstartObjectButton.show();
-		// }else{
-		// 	this.startObjectButton.show();
-		// 	this.unstartObjectButton.hide();
-		// }
+		selectedObject = this.getSelectedObject();
+		if( selectedObject && selectedObject.get("is_started") == true ){
+			this.startObjectButton.hide();
+			this.unstartObjectButton.show();
+		}else{
+			this.startObjectButton.show();
+			this.unstartObjectButton.hide();
+		}
 		
-		// if( selectedObject && selectedObject.get("is_loan_disbursed") == true ){
-		// 	this.disburseObjectButton.hide();
-		// 	this.undisburseObjectButton.show();
-		// }else{
-		// 	this.disburseObjectButton.show();
-		// 	this.undisburseObjectButton.hide();
-		// }
+		if( selectedObject && selectedObject.get("is_loan_disbursed") == true ){
+			this.disburseObjectButton.hide();
+			this.undisburseObjectButton.show();
+		}else{
+			this.disburseObjectButton.show();
+			this.undisburseObjectButton.hide();
+		}
 		
 	},
 
 	disableRecordButtons: function() {
-		// this.editObjectButton.disable();
-		// this.deleteObjectButton.disable();
-		// this.startObjectButton.disable();
-		// this.disburseObjectButton.disable();
-		// this.closeObjectButton.disable();
-		// this.withdrawObjectButton.disable();
+		this.editObjectButton.disable();
+		this.deleteObjectButton.disable();
+		this.startObjectButton.disable();
+		this.disburseObjectButton.disable();
+		this.closeObjectButton.disable();
+		this.withdrawObjectButton.disable();
 		
 		
 		// this.downloadPendingButton.disable();

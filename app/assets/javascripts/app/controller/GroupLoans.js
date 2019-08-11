@@ -48,14 +48,14 @@ Ext.define('AM.controller.GroupLoans', {
       'grouploanlist button[action=deleteObject]': {
         click: this.deleteObject
       },
-			'grouploanlist textfield[name=searchField]': {
+	  'grouploanlist textfield[name=searchField]': {
         change: this.liveSearch
       },
 
 
-			'grouploanlist button[action=startObject]': {
-        click: this.startObject
-			}	,
+	'grouploanlist button[action=startObject]': {
+    	click: this.startObject
+	}	,
 			
 			'grouploanlist button[action=unstartObject]': {
         click: this.unstartObject
@@ -228,16 +228,16 @@ Ext.define('AM.controller.GroupLoans', {
     }
 
 
-	var me	= this;
-	var record = this.getList().getSelectedObject(); 
-	if(!record){
-		return; 
-	}
+	// var me	= this;
+	// var record = this.getList().getSelectedObject(); 
+	// if(!record){
+	// 	return; 
+	// }
 	
-	console.log("selection change boss... ayo load si mofo baru");
+	// console.log("selection change boss... ayo load si mofo baru");
 	
 	
-	me.updateChildGrid(record );
+	// me.updateChildGrid(record );
 	
 	
     
@@ -253,6 +253,15 @@ Ext.define('AM.controller.GroupLoans', {
 		// transactiondataDetailGrid.setTitle("Purchase Order: " + record.get('name'));
 		grouploanDetailGrid.setTitle(   record.get('name') ) ;
 		 
+		 
+		 
+		console.log("the store");
+		console.log(grouploanDetailGrid.getStore()) ;
+		
+		
+		console.log("\nthe proxy");
+		console.log(grouploanDetailGrid.getStore().getProxy().extraParams) ;
+		console.log("record id: " + record.get("id"));
 		// grouploanDetailGrid.getStore().getProxy().extraParams.group_loan_id =  record.get('id') ;
 		 
 		// grouploanDetailGrid.getStore().load({
@@ -260,7 +269,7 @@ Ext.define('AM.controller.GroupLoans', {
 		// 		group_loan_id : record.get('id')
 		// 	},
 		// 	callback : function(records, options, success){
-		// 		grouploanDetailGrid.enableAddButton(); 
+		// 		// grouploanDetailGrid.enableAddButton(); 
 		// 	}
 		// });
 		
@@ -484,7 +493,44 @@ Ext.define('AM.controller.GroupLoans', {
 		var record = this.getList().getSelectedObject();
 		view.setParentData( record );
 		// view.down('form').getForm().findField('c').setValue(record.get('deceased_at')); 
-    view.show();
+    	view.show();
+    	
+    	view.setLoading(true);
+    	
+    	
+    	
+    	var recordId = record.getId(); 
+    	console.log("before the ext.ajax");
+		Ext.Ajax.request({
+		    url: 'api/group_loans/' + recordId,
+		    method: "GET", 
+		    success: function(response){
+		    	
+		        var text = response.responseText;
+		        
+		        // console.log("The text");
+		        // console.log( text ); 
+		        
+		            // puts "The params[:id]: #{params[:id]}
+				var obj = Ext.JSON.decode(text);
+				
+				// console.log("The object: ");
+				// console.log( obj ) ; 
+				
+				// console.log("The group loan only");
+				// console.log( obj["group_loans"]);
+				// console.log("The single object only");
+				// console.log( obj["group_loans"][0]);
+				
+				// console.log("updating the record with this new value");
+				record.set( obj["group_loans"][0] ); 
+				view.setParentData( record );
+				view.setLoading(false);
+				
+		        
+		    }
+		});
+    	
 	},
 	
 	executeClose : function(button){
@@ -496,6 +542,9 @@ Ext.define('AM.controller.GroupLoans', {
     var store = this.getGroupLoansStore();
 		var record = this.getList().getSelectedObject();
     var values = form.getValues();
+    
+    // console.log("The values on execute close)");
+    // console.log( values ) ;
  
 		if(record){
 			var rec_id = record.get("id");

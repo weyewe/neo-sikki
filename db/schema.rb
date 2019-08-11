@@ -11,10 +11,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150927165902) do
+ActiveRecord::Schema.define(version: 20190811051859) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+  enable_extension "pg_stat_statements"
 
   create_table "accounts", force: true do |t|
     t.string   "name"
@@ -57,6 +58,17 @@ ActiveRecord::Schema.define(version: 20150927165902) do
     t.integer  "net_earnings_case"
     t.boolean  "is_confirmed",                                       default: false
     t.datetime "confirmed_at"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "collection_groups", force: true do |t|
+    t.string   "name"
+    t.text     "description"
+    t.integer  "branch_id"
+    t.integer  "user_id"
+    t.integer  "collection_day"
+    t.integer  "collection_hour"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -436,6 +448,7 @@ ActiveRecord::Schema.define(version: 20150927165902) do
     t.string   "authentication_token"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "branch_id"
   end
 
   add_index "users", ["email"], name: "index_users_on_email", unique: true, using: :btree

@@ -15,7 +15,7 @@ Ext.define('AM.view.master.branch.List' ,{
 			
 			{	header: 'Nama', dataIndex: 'name', flex: 2 }, 
 			{	header: 'Deskripsi', dataIndex: 'description', flex: 2}, 
-			{	header: 'Alamat', dataIndex: 'adderss', flex: 2}, 
+			{	header: 'Alamat', dataIndex: 'address', flex: 2}, 
 			
 		];
 

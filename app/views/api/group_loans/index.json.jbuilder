@@ -12,11 +12,11 @@ json.group_loans @objects do |object|
 	json.is_started 												object.is_started
 	json.started_at 												format_date_friendly( object.started_at )
 	json.is_loan_disbursed 									object.is_loan_disbursed
-	#json.disbursed_at 											format_date_friendly( object.disbursed_at )
-	#json.is_closed 													object.is_closed
-	#json.closed_at 													format_date_friendly( object.closed_at ) 
-	#json.is_compulsory_savings_withdrawn 		object.is_compulsory_savings_withdrawn
-	#json.compulsory_savings_withdrawn_at	 	format_date_friendly( object.compulsory_savings_withdrawn_at )
+	json.disbursed_at 											format_date_friendly( object.disbursed_at )
+	json.is_closed 													object.is_closed
+	json.closed_at 													format_date_friendly( object.closed_at ) 
+	json.is_compulsory_savings_withdrawn 		object.is_compulsory_savings_withdrawn
+	json.compulsory_savings_withdrawn_at	 	format_date_friendly( object.compulsory_savings_withdrawn_at )
 	
 	
 	#json.start_fund 														object.start_fund

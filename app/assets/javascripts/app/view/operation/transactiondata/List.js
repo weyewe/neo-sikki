@@ -83,7 +83,6 @@ Ext.define('AM.view.operation.transactiondata.List' ,{
 			
 
 
-		
 		this.bbar = Ext.create("Ext.PagingToolbar", {
 			store	: this.store, 
 			displayInfo: true,

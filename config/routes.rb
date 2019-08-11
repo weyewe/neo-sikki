@@ -66,6 +66,7 @@ NeoSikki::Application.routes.draw do
     put 'update_password' , :to => "passwords#update" , :as => :update_password
 
     get 'search_role' => 'roles#search', :as => :search_role
+    get 'search_branch' => 'branches#search', :as => :search_branch
     get 'search_group_loan_products' => 'group_loan_products#search', :as => :search_group_loan_product
     get 'search_group_loans' => 'group_loans#search', :as => :search_group_loan
     get 'search_members' => 'members#search', :as => :search_member
@@ -82,7 +83,14 @@ NeoSikki::Application.routes.draw do
 
     resources :app_users
     resources :members
-    resources :group_loans
+    resources :group_loans 
+    
+    # do 
+    #   member do 
+    #     :show_detail
+    #   end
+    # end
+    
     resources :group_loan_products
     resources :group_loan_memberships
     resources :group_loan_weekly_collections

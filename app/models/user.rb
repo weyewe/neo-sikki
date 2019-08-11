@@ -18,6 +18,8 @@ class User < ActiveRecord::Base
   
   validate :valid_role
   
+  belongs_to :branch
+  
   def valid_role
     
     return if not role_id.present?
@@ -78,6 +80,7 @@ class User < ActiveRecord::Base
     new_object.name                  = params[:name]
     new_object.email                 = params[:email] 
     new_object.role_id               =   params[:role_id]
+    new_object.branch_id = params[:branch_id]
     
     new_object.password              = password
     new_object.password_confirmation = password 
@@ -106,6 +109,8 @@ class User < ActiveRecord::Base
     else
       self.role_id = params[:role_id]
     end 
+    
+    self.branch_id = params[:branch_id]
     
     self.save
     return self

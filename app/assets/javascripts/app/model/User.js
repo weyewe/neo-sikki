@@ -2,9 +2,12 @@ Ext.define('AM.model.User', {
   	extend: 'Ext.data.Model',
   	fields: [
     	{ name: 'id', type: 'int' },
-			{ name: 'role_id', type: 'int' },
-			{ name: 'role_name', type: 'string' },
-			
+		{ name: 'role_id', type: 'int' },
+		{ name: 'role_name', type: 'string' },
+		
+		{ name: 'branch_id', type: 'int' },
+		{ name: 'branch_name', type: 'string' },
+		
     	{ name: 'name', type: 'string' } ,
 
 		 

@@ -51,6 +51,32 @@ Ext.define('AM.view.master.user.Form', {
 			autoLoad : false 
 		});
 		
+		
+		
+		var remoteBranchJsonStore = Ext.create(Ext.data.JsonStore, {
+			storeId : 'branch_search',
+			fields	: [
+	 				{
+						name : 'branch_name',
+						mapping : "name"
+					},
+					{
+						name : 'branch_id',
+						mapping : 'id'
+					}
+			],
+			proxy  	: {
+				type : 'ajax',
+				url : 'api/search_branch',
+				reader : {
+					type : 'json',
+					root : 'records', 
+					totalProperty  : 'total'
+				}
+			},
+			autoLoad : false 
+		});
+		
     this.items = [{
       xtype: 'form',
 			msgTarget	: 'side',
@@ -115,6 +141,27 @@ Ext.define('AM.view.master.user.Form', {
 						}
 					},
 					name : 'role_id' 
+				},
+				{
+					fieldLabel: 'Branch',
+					xtype: 'combo',
+					queryMode: 'remote',
+					forceSelection: true, 
+					displayField : 'branch_name',
+					valueField : 'branch_id',
+					pageSize : 5,
+					minChars : 1, 
+					allowBlank : false, 
+					triggerAction: 'all',
+					store : remoteBranchJsonStore , 
+					listConfig : {
+						getInnerTpl: function(){
+							return  	'<div data-qtip="{branch_name}">' +  
+													'<div class="combo-name">{branch_name}</div>' +  
+							 					'</div>';
+						}
+					},
+					name : 'branch_id' 
 				}
 			]
     }];
@@ -135,6 +182,7 @@ Ext.define('AM.view.master.user.Form', {
 	
 		var role_id = record.get("role_id");
 		var comboBox = this.down('form').getForm().findField('role_id'); 
+		var branchComboBox = this.down('form').getForm().findField('branch_id'); 
 		var me = this; 
 		var store = comboBox.store; 
 		store.load({
@@ -146,6 +194,19 @@ Ext.define('AM.view.master.user.Form', {
 				comboBox.setValue( role_id );
 			}
 		});
+		
+		
+		var branchStore = branchComboBox.store; 
+		branchStore.load({
+			params: {
+				selected_id : role_id 
+			},
+			callback : function(records, options, success){
+				me.setLoading(false);
+				branchComboBox.setValue( role_id );
+			}
+		});
+		
 	}
 });
 

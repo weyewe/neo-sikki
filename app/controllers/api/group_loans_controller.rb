@@ -201,7 +201,52 @@ class Api::GroupLoansController < Api::BaseApiController
     end
   end
   
+  
+  # fuck. i don't know what this thing is used for. let's setup 
+  # new action. to be save
   def show
+    puts "inside the show"
+    puts "=============\n"*5
+    puts "The params: #{params}"
+    @object = GroupLoan.find_by_id params[:id]
+    puts "The params[:id]: #{params[:id]}"
+    puts "The object: #{@object}"
+    render :json => { :success => true, 
+                      :group_loans => [
+                          :id 						                 =>  	@object.id                  ,
+                        	:name 			 										 =>     @object.name                                ,
+                        	:group_number                   => @object.group_number, 
+                        	:number_of_meetings 						 =>   @object.number_of_meetings                  ,
+                        	:number_of_collections					 =>   @object.number_of_collections               ,
+                        	:total_members_count             =>   @object.total_members_count, 
+                        	:is_started 										 =>   @object.is_started                          ,
+                        	:started_at 										 =>   format_date_friendly(@object.started_at)    ,
+                        	:is_loan_disbursed 							 =>   @object.is_loan_disbursed                   ,
+                        	:disbursed_at 									 =>   format_date_friendly( @object.disbursed_at) ,
+                        	:is_closed 											 =>   @object.is_closed                           ,
+                        	:closed_at 											 =>   format_date_friendly( @object.closed_at )   ,
+                        	:is_compulsory_savings_withdrawn =>   @object.is_compulsory_savings_withdrawn     ,
+                        	:compulsory_savings_withdrawn_at =>   format_date_friendly( @object.compulsory_savings_withdrawn_at),                          
+                          :start_fund                               => @object.start_fund,
+                          :disbursed_group_loan_memberships_count   => @object.disbursed_group_loan_memberships_count,
+                          :disbursed_fund                           => @object.disbursed_fund,
+                        	:active_group_loan_memberships_count		  => @object.active_group_loan_memberships.count,
+                        	:non_disbursed_fund => @object.non_disbursed_fund,
+                        	:compulsory_savings_return_amount => @object.compulsory_savings_return_amount,
+                        	:bad_debt_allowance => @object.bad_debt_allowance,
+                        	:bad_debt_expense => @object.bad_debt_expense,
+                        	:premature_clearance_deposit => @object.premature_clearance_deposit ,
+                        	:expected_revenue_from_run_away_member_end_of_cycle_resolution => @object.expected_revenue_from_run_away_member_end_of_cycle_resolution, 
+                        	:total_compulsory_savings_pre_closure => @object.total_compulsory_savings_pre_closure
+                        	
+                        	
+                        ] , 
+                      :total => GroupLoan.count }
+                      
+                
+  end
+  
+  def show_detail
     puts "inside the show"
     puts "=============\n"*5
     puts "The params: #{params}"

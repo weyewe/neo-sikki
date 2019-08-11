@@ -4,9 +4,6 @@ Ext.define('AM.view.operation.transactiondatadetail.List' ,{
 
   	store: 'TransactionDataDetails', 
  
-
- 
-		
 		
 	initComponent: function() {
 		this.columns = [
@@ -57,6 +54,11 @@ Ext.define('AM.view.operation.transactiondatadetail.List' ,{
 		});
 
 
+		console.log("Transaction data detail. before bbar");
+		console.log("The store: " + this.store);
+		console.log(this.store);
+		console.log(this.getStore());
+
 		// this.tbar = [this.addObjectButton,  this.editObjectButton, this.deleteObjectButton ]; 
 		this.bbar = Ext.create("Ext.PagingToolbar", {
 			store	: this.store, 
@@ -64,8 +66,11 @@ Ext.define('AM.view.operation.transactiondatadetail.List' ,{
 			displayMsg: 'Details {0} - {1} of {2}',
 			emptyMsg: "No details" 
 		});
+		console.log("Gonna call parents");
+		
 
 		this.callParent(arguments);
+		console.log("finished call parents");
 	},
  
 	loadMask	: true,

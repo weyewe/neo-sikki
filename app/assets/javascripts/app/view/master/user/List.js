@@ -8,9 +8,11 @@ Ext.define('AM.view.master.user.List' ,{
 	initComponent: function() {
 		this.columns = [
 			{ header: 'ID', dataIndex: 'id'},
+			{ header: 'Branch',  dataIndex: 'branch_name', flex: 1},
+			{	header: 'Role', dataIndex: 'role_name', flex: 1 },
 			{ header: 'Nama',  dataIndex: 'name', flex: 1},
 			{	header: 'Email', dataIndex: 'email', flex: 1 },
-			{	header: 'Role', dataIndex: 'role_name', flex: 1 },
+			
 		];
 
 		this.addObjectButton = new Ext.Button({
