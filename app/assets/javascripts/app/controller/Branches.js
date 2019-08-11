@@ -21,6 +21,9 @@ Ext.define('AM.controller.Branches', {
 	],
 
   init: function() {
+  	console.log("I am initialized: Branches!");
+		
+		
     this.control({
       'branchlist': {
         itemdblclick: this.editObject,
@@ -61,6 +64,7 @@ Ext.define('AM.controller.Branches', {
 	   
 
 	loadObjectList : function(me){
+		console.log("hajar kena");
 		me.getStore().getProxy().extraParams = {}
 		me.getStore().load();
 	},

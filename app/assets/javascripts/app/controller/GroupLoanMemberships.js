@@ -31,6 +31,11 @@ Ext.define('AM.controller.GroupLoanMemberships', {
 	],
 
   init: function() {
+  	
+  	console.log("I am initialized: GroupLoanMemberships!");
+		
+		
+		
     this.control({
 			'grouploanmembershipProcess operationgrouploanList' : {
 				afterrender : this.loadParentObjectList,
@@ -90,7 +95,7 @@ Ext.define('AM.controller.GroupLoanMemberships', {
 	},
 	
 	loadParentObjectList: function(me){
-		// console.log("after render the group_loan list");
+		console.log("after render the group_loan list");
 		me.getStore().getProxy().extraParams =  {};
 		me.getStore().load(); 
 	},

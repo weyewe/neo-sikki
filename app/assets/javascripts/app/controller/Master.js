@@ -50,7 +50,7 @@ Ext.define("AM.controller.Master", {
 		text 			: "Setup", 
 		viewClass : '',
 		iconCls		: 'text-folder', 
-    expanded	: true,
+    	expanded	: true,
 		children 	: [
         
       { 
@@ -78,19 +78,6 @@ Ext.define("AM.controller.Master", {
 						}
 					]
       },
-      { 
-          text:'Employee', 
-          viewClass:'AM.view.master.Employee', 
-          leaf:true, 
-          iconCls:'text',
- 					conditions : [
-						{
-							controller : "employees",
-							action  : 'index'
-						}
-					]
-      },
-
 
       { 
 				text:'GroupLoan Product', 
@@ -103,20 +90,34 @@ Ext.define("AM.controller.Master", {
 						action : 'index'
 					}
 				]
-			}, 
+		}, 
 			
-			{ 
-				text:'User', 
-				viewClass:'AM.view.master.User', 
-				leaf:true, 
-				iconCls:'text' ,
-				conditions : [
-					{
-						controller : 'users',
-						action : 'index'
-					}
-				]
-			},
+		{ 
+			text:'User', 
+			viewClass:'AM.view.master.User', 
+			leaf:true, 
+			iconCls:'text' ,
+			conditions : [
+				{
+					controller : 'users',
+					action : 'index'
+				}
+			]
+		},
+		{ 
+		  text:'Kumpulan', 
+		  viewClass:'AM.view.master.CollectionGroup', 
+		  leaf:true, 
+		  iconCls:'text',
+		 			conditions : [
+						{
+							// ini controller apaan si? 
+							controller : "branches",
+							action  : 'index'
+						}
+					]
+		},
+
     ]
 	},
 	
