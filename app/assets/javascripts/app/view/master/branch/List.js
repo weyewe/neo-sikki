@@ -51,6 +51,11 @@ Ext.define('AM.view.master.branch.List' ,{
 						this.searchField 
 						
 		];
+		
+		console.log("The store in branch#list");
+		console.log( this.store );
+		
+		console.log(this.getStore() );
 		this.bbar = Ext.create("Ext.PagingToolbar", {
 			store	: this.store, 
 			displayInfo: true,
@@ -58,6 +63,7 @@ Ext.define('AM.view.master.branch.List' ,{
 			emptyMsg: "No topics to display" 
 		});
 
+		console.log("Gonna get parent");
 		this.callParent(arguments);
 	},
  

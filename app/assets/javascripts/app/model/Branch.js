@@ -4,36 +4,31 @@ Ext.define('AM.model.Branch', {
     	{ name: 'id', type: 'int' },
     	{ name: 'branch_id', type: 'int' },
     	{ name: 'name', type: 'string' },
-			{ name: 'description', type: 'string' } ,
-			{ name: 'address', type: 'string' } ,
-			
-			{ name: 'code', type: 'string' }     ,
+		{ name: 'description', type: 'string' } ,
+		{ name: 'address', type: 'string' } ,
+		{ name: 'code', type: 'string' }     
 			
   	],
-
-	 
-
-
-   
+  	
   	idProperty: 'id' ,
 
-		proxy: {
-			url: 'api/branches',
-			type: 'rest',
-			format: 'json',
+	proxy: {
+		url: 'api/branches',
+		type: 'rest',
+		format: 'json',
 
-			reader: {
-				root: 'branches',
-				successProperty: 'success',
-				totalProperty : 'total'
-			},
+		reader: {
+			root: 'branches',
+			successProperty: 'success',
+			totalProperty : 'total'
+		},
 
-			writer: {
-				getRecordData: function(record) {
-					return { branch : record.data };
-				}
+		writer: {
+			getRecordData: function(record) {
+				return { branch : record.data };
 			}
 		}
+	}
 	
   
 });

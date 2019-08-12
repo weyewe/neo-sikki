@@ -1,48 +1,48 @@
-Ext.define('AM.controller.Bitches', {
+Ext.define('AM.controller.CollectionGroups', {
   extend: 'Ext.app.Controller',
 
-  stores: ['Branches'],
-  models: ['Branch'],
+  stores: ['CollectionGroups'],
+  models: ['CollectionGroup'],
 
   views: [
-    'master.branch.List',
-    'master.branch.Form' 
+    'master.collectiongroup.List',
+    'master.collectiongroup.Form' 
   ],
 
   	refs: [
 		{
 			ref: 'list',
-			selector: 'branchlist'
+			selector: 'collectiongrouplist'
 		},
 		{
 			ref : 'searchField',
-			selector: 'branchlist textfield[name=searchField]'
+			selector: 'collectiongrouplist textfield[name=searchField]'
 		}
 	],
 
   init: function() {
-  	console.log("I am initialized: Bitches!");
+  	console.log("I am initialized: CollectionGroups!");
 		
 		
     this.control({
-      'branchlist': {
+      'collectiongrouplist': {
         itemdblclick: this.editObject,
         selectionchange: this.selectionChange,
 				afterrender : this.loadObjectList,
       },
-      'branchform button[action=save]': {
+      'collectiongroupform button[action=save]': {
         click: this.updateObject
       },
-      'branchlist button[action=addObject]': {
+      'collectiongrouplist button[action=addObject]': {
         click: this.addObject
       },
-      'branchlist button[action=editObject]': {
+      'collectiongrouplist button[action=editObject]': {
         click: this.editObject
       },
-      'branchlist button[action=deleteObject]': {
+      'collectiongrouplist button[action=deleteObject]': {
         click: this.deleteObject
       },
-	  	'branchlist textfield[name=searchField]': {
+	  	'collectiongrouplist textfield[name=searchField]': {
         change: this.liveSearch
       },
 		 
@@ -53,11 +53,11 @@ Ext.define('AM.controller.Bitches', {
 	liveSearch : function(grid, newValue, oldValue, options){
 		var me = this;
 
-		me.getBranchesStore().getProxy().extraParams = {
+		me.getCollectionGroupsStore().getProxy().extraParams = {
 		    livesearch: newValue
 		};
 	 
-		me.getBranchesStore().load();
+		me.getCollectionGroupsStore().load();
 	},
 	
 	 
@@ -70,14 +70,14 @@ Ext.define('AM.controller.Bitches', {
 	},
 
   addObject: function() {
-    var view = Ext.widget('branchform');
+    var view = Ext.widget('collectiongroupform');
     view.show();
   },
 
   editObject: function() {
 		var me = this; 
     var record = this.getList().getSelectedObject();
-    var view = Ext.widget('branchform');
+    var view = Ext.widget('collectiongroupform');
 
 		
 
@@ -89,7 +89,7 @@ Ext.define('AM.controller.Bitches', {
     var win = button.up('window');
     var form = win.down('form');
 
-    var store = this.getBranchesStore();
+    var store = this.getCollectionGroupsStore();
     var record = form.getRecord();
     var values = form.getValues();
 
@@ -135,7 +135,7 @@ Ext.define('AM.controller.Bitches', {
 		}else{
 			//  no record at all  => gonna create the new one 
 			var me  = this; 
-			var newObject = new AM.model.Branch( values ) ;
+			var newObject = new AM.model.CollectionGroup( values ) ;
 			
 			// learnt from here
 			// http://www.sencha.com/forum/showthread.php?137580-ExtJS-4-Sync-and-success-failure-processing
@@ -164,7 +164,7 @@ Ext.define('AM.controller.Bitches', {
     var record = this.getList().getSelectedObject();
 
     if (record) {
-      var store = this.getBranchesStore();
+      var store = this.getCollectionGroupsStore();
       store.remove(record);
       store.sync();
 // to do refresh programmatically
