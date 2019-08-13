@@ -2,37 +2,37 @@ class Api::CollectionGroupsController < Api::BaseApiController
   
   def index
     
+
     if params[:livesearch].present? 
       livesearch = "%#{params[:livesearch]}%"
-      @objects = GroupLoanMembership.where{ 
-        (
-          (name =~  livesearch )
-        )
         
-      }.page(params[:page]).per(params[:limit]).order("id DESC")
-      
-      @total = GroupLoanMembership.where{ 
-        (
-          (name =~  livesearch )
-        )
-      }.count
-      
-      # calendar
-      
-    elsif params[:parent_id].present?
-      # @group_loan = GroupLoan.find_by_id params[:parent_id]
-      @objects = CollectionGroup.# includes(:group_loan_product, :member, :group_loan).
-                  where(:branch_id => params[:parent_id]).
-                  page(params[:page]).per(params[:limit]).order("id DESC")
-                  
-        puts "Total objects => #{@objects.count}"
-      @total = CollectionGroup.where(:branch_id => params[:parent_id]).count 
-    else
-      @objects = []
-      @total = 0 
+        
+        @objects = CollectionGroup.joins(:branch, :user).where{
+          (
+            (name =~  livesearch ) | 
+            (description =~ livesearch) | 
+            (branch.name =~ livesearch) | 
+            (user.name =~ livesearch) 
+          )
+
+        }.page(params[:page]).per(params[:limit]).order("id DESC")
+
+        @total = CollectionGroup.joins(:branch, :user).where{
+          (
+            (name =~  livesearch ) | 
+            (description =~ livesearch) | 
+            (branch.name =~ livesearch) | 
+            (user.name =~ livesearch) 
+          )
+        }.count
+   
+    else 
+      @objects = CollectionGroup.joins(:branch, :user).order("id DESC").page(params[:page]).per(params[:limit])
+      @total = CollectionGroup.count 
     end
     
-    # render :json => { :group_loan_memberships => @objects , :total => @total , :success => true }
+    
+
   end
   
 

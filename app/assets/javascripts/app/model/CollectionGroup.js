@@ -2,6 +2,15 @@ Ext.define('AM.model.CollectionGroup', {
   	extend: 'Ext.data.Model',
   	fields: [
     	{ name: 'id', type: 'int' }, 
+    	{ name: 'name', type: 'string' },  
+    	{ name: 'description', type: 'string' },  
+    	
+    	{ name: 'branch_id', type: 'int' },
+    	{ name: 'branch_name', type: 'string' }, 
+    	
+    	{ name: 'user_id', type: 'string' }, 
+    	{ name: 'user_name', type: 'string' }, 
+    	
   	],
 
   	idProperty: 'id' ,
