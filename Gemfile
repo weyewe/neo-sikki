@@ -67,7 +67,7 @@ gem 'awesome_nested_set'
 gem 'devise', '~> 3.0.3'
 gem "kaminari"  
 gem 'uuidtools'
-gem 'fastercsv', '~> 1.5.5'
+# gem 'fastercsv', '~> 1.5.5'
 
 gem 'bootstrap-sass', '~> 2.3.1.0'
 gem 'the_role', '~> 2.0.0'

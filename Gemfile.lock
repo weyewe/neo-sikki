@@ -79,7 +79,6 @@ GEM
     eventmachine (1.0.4)
     excon (0.44.1)
     execjs (2.2.2)
-    fastercsv (1.5.5)
     figaro (1.1.0)
       thor (~> 0.14)
     fission (0.5.0)
@@ -314,7 +313,6 @@ DEPENDENCIES
   coffee-rails (~> 4.0.0)
   delayed_job_active_record
   devise (~> 3.0.3)
-  fastercsv (~> 1.5.5)
   figaro
   fog
   httparty
@@ -344,3 +342,6 @@ DEPENDENCIES
   uuidtools
   whenever
   writeexcel (~> 1.0.5)
+
+BUNDLED WITH
+   1.17.3

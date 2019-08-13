@@ -217,9 +217,30 @@ PAYMENT_DAY = {
   :tuesday => 2,   
   :wednesday => 3,     
   :thursday => 4 ,       
-  :friday => 5,      
-  :saturday => 6,      
-  :sunday => 7       
+  :friday => 5    
+}
+
+
+PAYMENT_HOUR = {
+  :hour_8_00 => 1,    
+  :hour_8_30 => 2,    
+  :hour_9_00 => 3,    
+  :hour_9_30 => 4,    
+  :hour_10_00 => 5,    
+  :hour_10_30 => 6,    
+  :hour_11_00 => 7,    
+  :hour_11_30 => 8,    
+  :hour_12_00 => 9,    
+  :hour_12_30 => 10,    
+  :hour_13_00 => 11,    
+  :hour_13_30 => 12,  
+  :hour_14_00 => 13,    
+  :hour_14_30 => 14,    
+  :hour_15_00 => 15,    
+  :hour_15_30 => 16,    
+  :hour_16_00 => 17,    
+  :hour_16_30 => 18,
+  :hour_17_00 => 19,
 }
 
 TITLE_SELECTION = {
