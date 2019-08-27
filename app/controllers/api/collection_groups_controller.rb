@@ -5,29 +5,30 @@ class Api::CollectionGroupsController < Api::BaseApiController
 
     if params[:livesearch].present? 
       livesearch = "%#{params[:livesearch]}%"
-        
-        
-        @objects = CollectionGroup.joins(:branch, :user).where{
-          (
-            (name =~  livesearch ) | 
-            (description =~ livesearch) | 
-            (branch.name =~ livesearch) | 
-            (user.name =~ livesearch) 
-          )
+      
+      
+      @objects = CollectionGroup.joins(:branch, :user).where{
+        (
+          (name =~  livesearch ) | 
+          (description =~ livesearch) | 
+          (branch.name =~ livesearch) | 
+          (user.name =~ livesearch) 
+        )
 
-        }.page(params[:page]).per(params[:limit]).order("id DESC")
+      }.page(params[:page]).per(params[:limit]).order("id DESC")
 
-        @total = CollectionGroup.joins(:branch, :user).where{
-          (
-            (name =~  livesearch ) | 
-            (description =~ livesearch) | 
-            (branch.name =~ livesearch) | 
-            (user.name =~ livesearch) 
-          )
-        }.count
-   
+      @total = CollectionGroup.joins(:branch, :user).where{
+        (
+          (name =~  livesearch ) | 
+          (description =~ livesearch) | 
+          (branch.name =~ livesearch) | 
+          (user.name =~ livesearch) 
+        )
+      }.count
+ 
     else 
-      @objects = CollectionGroup.joins(:branch, :user).order("id DESC").page(params[:page]).per(params[:limit])
+      @objects = CollectionGroup.joins(:branch, :user).order("id DESC").
+                  page(params[:page]).per(params[:limit])
       @total = CollectionGroup.count 
     end
     
@@ -61,7 +62,7 @@ class Api::CollectionGroupsController < Api::BaseApiController
     if params[:deactivate].present?  
       @object.deactivate(:deactivation_case => params[:group_loan_membership][:deactivation_case] )
     else
-      @object.update_object( params[:group_loan_membership] )
+      @object.update_object( params[:collection_group] )
     end
     
     

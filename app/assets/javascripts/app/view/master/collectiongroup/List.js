@@ -9,11 +9,14 @@ Ext.define('AM.view.master.collectiongroup.List' ,{
 		console.log("Gonna init columns"); 
 		
 		this.columns = [
+			{ header: 'ID',  dataIndex: 'id', flex: 1},
 			{ header: 'Branch',  dataIndex: 'branch_name', flex: 1},
 			
 			{ header: 'Nama',  dataIndex: 'name', flex: 1},
 			{ header: 'Deskripsi',  dataIndex: 'description', flex: 1},
-			{ header: 'User',  dataIndex: 'user_name', flex: 1}, 
+			{ header: 'User',  dataIndex: 'user_name', flex: 1},
+			{ header: 'Hari',  dataIndex: 'collection_day_name', flex: 1},
+			{ header: 'Jam',  dataIndex: 'collection_hour_name', flex: 1},
 			
 		];
 

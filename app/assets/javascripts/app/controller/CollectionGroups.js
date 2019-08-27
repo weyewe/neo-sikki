@@ -82,6 +82,9 @@ Ext.define('AM.controller.CollectionGroups', {
 		
 
     view.down('form').loadRecord(record);
+    console.log("inside form edit object");
+    console.log( record );
+    view.setComboBoxData(record);
   },
 
   updateObject: function(button) {

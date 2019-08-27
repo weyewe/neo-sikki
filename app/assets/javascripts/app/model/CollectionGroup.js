@@ -8,8 +8,14 @@ Ext.define('AM.model.CollectionGroup', {
     	{ name: 'branch_id', type: 'int' },
     	{ name: 'branch_name', type: 'string' }, 
     	
-    	{ name: 'user_id', type: 'string' }, 
+    	{ name: 'user_id', type: 'int' }, 
     	{ name: 'user_name', type: 'string' }, 
+    	
+    	{ name: 'collection_day', type: 'int' },
+    	{ name: 'collection_day_name', type: 'string' }, 
+    	
+    	{ name: 'collection_hour', type: 'int' },
+    	{ name: 'collection_hour_name', type: 'string' }, 
     	
   	],
 

@@ -15,6 +15,12 @@ json.collection_groups @objects do |object|
 	json.user_id		object.user_id
 	json.user_name		object.user.name
 	
+	json.collection_day_name   object.collection_day_name 
+	json.collection_day        object.collection_day 
+	
+	json.collection_hour_name   object.collection_hour_name 
+	json.collection_hour        object.collection_hour 
+	
 	
 	
 end

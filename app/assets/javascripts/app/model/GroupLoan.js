@@ -32,6 +32,9 @@ Ext.define('AM.model.GroupLoan', {
 			{ name: 'total_compulsory_savings_pre_closure', type: 'string' },
 			
 			
+			
+			// branch 
+			// kumpulan 
   	],
 
 	 
