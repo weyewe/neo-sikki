@@ -56,11 +56,11 @@ Ext.define('AM.view.master.collectiongroup.List' ,{
 						this.searchField 
 		];
 		
-		console.log("Assigning to bbar ");
-		console.log("The store: " );
-		console.log( this.store );
+		// console.log("Assigning to bbar ");
+		// console.log("The store: " );
+		// console.log( this.store );
 		
-		console.log(this.getStore() );
+		// console.log(this.getStore() );
 		
 		this.bbar = Ext.create("Ext.PagingToolbar", {
 			store	: this.store, 
