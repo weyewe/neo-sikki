@@ -149,23 +149,29 @@ task :generate_outstanding_compulsory_savings_2016 => :environment do
 
         # direction  = FUND_TRANSFER_DIRECTION[:incoming]
 
-      total_compulsory_savings  =   member.savings_entries.where(
+
+
+      total_incoming_compulsory =   member.savings_entries.where(
                             :is_confirmed => true,
                             :direction =>  FUND_TRANSFER_DIRECTION[:incoming],
                             :savings_status => SAVINGS_STATUS[:group_loan_compulsory_savings]
-                            ).#
-                            #where{ confirmed_at.lte my{the_end_of_2016}}.sum("amount")   +
+                            ).
+                            where{ confirmed_at.lte my{the_end_of_2016}}.sum("amount").to_i
 
-        member.savings_entries.where(
+      total_outgoing_compulsory =   member.savings_entries.where(
                             :is_confirmed => true,
                             :direction =>  FUND_TRANSFER_DIRECTION[:outgoing],
                             :savings_status => SAVINGS_STATUS[:group_loan_compulsory_savings]
-                            )#.
-                            #where{ confirmed_at.lte my{the_end_of_2016}}.sum("amount")
+                            ).
+                            where{ confirmed_at.lte my{the_end_of_2016}}.sum("amount").to_i
 
-      row << total_compulsory_savings.to_i
 
-      row << glm.total_compulsory_savings
+      total_compulsory_savings  = total_incoming_compulsory - total_outgoing_compulsory
+      row << total_incoming_compulsory
+      row << total_outgoing_compulsory
+      row << total_compulsory_savings
+
+      # row << glm.total_compulsory_savings
       array << row
 
     end
@@ -186,4 +192,18 @@ task :generate_outstanding_compulsory_savings_2016 => :environment do
   #
   # end
 
+end
+
+
+task :analyze_max_ratio_of_compulsory_savings_vs_disbursed_amount => :environment do
+
+  array = []
+  GroupLoanProduct.order("id ASC").find_each do |glp|
+    array  << [
+        glp.principal.to_i * glp.total_weeks ,
+        glp.compulsory_savings.to_i * glp.total_weeks
+      ]
+  end
+
+  puts "the array : #{array}"
 end
