@@ -237,7 +237,8 @@ class Api::GroupLoansController < Api::BaseApiController
                         	:bad_debt_expense => @object.bad_debt_expense,
                         	:premature_clearance_deposit => @object.premature_clearance_deposit ,
                         	:expected_revenue_from_run_away_member_end_of_cycle_resolution => @object.expected_revenue_from_run_away_member_end_of_cycle_resolution, 
-                        	:total_compulsory_savings_pre_closure => @object.total_compulsory_savings_pre_closure
+                        	:total_compulsory_savings_pre_closure => @object.total_compulsory_savings_pre_closure,
+                        	:weekly_collection_amount => @object.weekly_collection_amount
                         	
                         	
                         ] , 

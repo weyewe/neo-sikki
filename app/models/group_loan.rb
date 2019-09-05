@@ -1036,6 +1036,8 @@ Phase: loan disbursement finalization
     end
   end
   
+  
+  
 =begin
   Close GroupLoan
 =end
@@ -1054,7 +1056,9 @@ Phase: loan disbursement finalization
   
   
   
- 
+  def weekly_collection_amount 
+    self.group_loan_weekly_collections.first.amount_receivable
+  end
  
 end
 

@@ -24,8 +24,9 @@ Ext.define('AM.view.operation.grouploan.List' ,{
 				flex : 1,
 				tpl : 'Name: <b>{name}</b>' + '<br />' + '<br />' + 
 							'Jumlah Meeting: <b>{number_of_meetings}</b>'   + '<br />' + 
-							'Jumlah Pengumpulan: <b>{number_of_collections}</b>'    + '<br />' + 
-							'Anggota Aktif:  <b>{active_group_loan_memberships_count}</b>'
+							'Jumlah Pengumpulan: <b>{number_of_collections}</b>'    + '<br />'
+							// + 
+							// 'Anggota Aktif:  <b>{active_group_loan_memberships_count}</b>'
 			},
 			{
 				xtype : 'templatecolumn',
@@ -73,6 +74,7 @@ Ext.define('AM.view.operation.grouploan.List' ,{
 				tpl : 'Status: <b>{is_closed}</b>' + '<br />' + '<br />' + 
 							'Tanggal Selesai: <br /><b>{closed_at}</b>'     
 			},
+			
 			
 			// {
 			// 	xtype : 'templatecolumn',
@@ -154,6 +156,12 @@ Ext.define('AM.view.operation.grouploan.List' ,{
 			disabled: true
 		});
 		
+		this.infoObjectButton = new Ext.Button({
+			text: 'Info',
+			action: 'infoObject',
+			disabled: true
+		});
+		
 		this.searchField = new Ext.form.field.Text({
 			name: 'searchField',
 			hideLabel: true,
@@ -181,6 +189,7 @@ Ext.define('AM.view.operation.grouploan.List' ,{
 						this.disburseObjectButton,this.undisburseObjectButton,
 						this.closeObjectButton,
 						this.withdrawObjectButton, 
+						this.infoObjectButton, 
 						'-',
 						this.searchField,
 						// '->',
@@ -212,6 +221,7 @@ Ext.define('AM.view.operation.grouploan.List' ,{
 		this.undisburseObjectButton.enable();
 		this.closeObjectButton.enable();
 		this.withdrawObjectButton.enable();
+		this.infoObjectButton.enable(); 
 		// this.downloadPendingButton.enable();
 		
 		selectedObject = this.getSelectedObject();
@@ -240,6 +250,7 @@ Ext.define('AM.view.operation.grouploan.List' ,{
 		this.disburseObjectButton.disable();
 		this.closeObjectButton.disable();
 		this.withdrawObjectButton.disable();
+		this.infoObjectButton.disable(); 
 		
 		
 		// this.downloadPendingButton.disable();

@@ -94,12 +94,16 @@ Ext.define('AM.controller.GroupLoans', {
 			},
 			
 			'grouploanlist button[action=withdrawObject]': {
-        click: this.withdrawObject
+        		click: this.withdrawObject
 			}	,
 			
 			'withdrawgrouploanform button[action=confirmWithdraw]' : {
 				click : this.executeWithdraw
 			},
+			
+			'grouploanlist button[action=infoObject]': {
+        		click: this.infoObject
+			}	,
 			
 			'grouploanlist button[action=downloadPending]': {
         click: this.downloadPending
@@ -277,12 +281,35 @@ Ext.define('AM.controller.GroupLoans', {
 	
 
 	startObject: function(){
-		// console.log("the startObject callback function");
+ 
 		var view = Ext.widget('startgrouploanform');
 		var record = this.getList().getSelectedObject();
-		view.setParentData( record );
-    view.show();
-		// this.reloadRecordView( record, view ) ; 
+		view.setParentData( record ); 
+    	view.show();
+    	
+    	view.setLoading(true);
+    	
+    	
+    	
+    	var recordId = record.getId(); 
+    	console.log("before the ext.ajax");
+		Ext.Ajax.request({
+		    url: 'api/group_loans/' + recordId,
+		    method: "GET", 
+		    success: function(response){
+		    	
+		        var text = response.responseText;
+		        
+		     
+				var obj = Ext.JSON.decode(text);
+				
+			 
+				record.set( obj["group_loans"][0] ); 
+				view.setParentData( record );
+				view.setLoading(false); 
+		    }
+		});
+		
 	},
 	
 	unstartObject: function(){
@@ -390,7 +417,36 @@ Ext.define('AM.controller.GroupLoans', {
 		view.setParentData( record );
     view.show();
 
-		// this.reloadRecordView( record, view ) ; 
+		// this.reloadRecordView( record, view ) ;
+		
+		var view = Ext.widget('disbursegrouploanform');
+		var record = this.getList().getSelectedObject();
+		view.setParentData( record ); 
+    	view.show();
+    	
+    	view.setLoading(true);
+    	
+    	
+    	
+    	var recordId = record.getId(); 
+    	console.log("before the ext.ajax");
+		Ext.Ajax.request({
+		    url: 'api/group_loans/' + recordId,
+		    method: "GET", 
+		    success: function(response){
+		    	
+		        var text = response.responseText;
+		        
+		     
+				var obj = Ext.JSON.decode(text);
+				
+			 
+				record.set( obj["group_loans"][0] ); 
+				view.setParentData( record );
+				view.setLoading(false); 
+		    }
+		});
+		
 	},
 	
 	undisburseObject: function(){
@@ -487,6 +543,39 @@ Ext.define('AM.controller.GroupLoans', {
 	},
 	
 	
+	infoObject: function(){
+		// console.log("mark as Deceased is clicked");
+		var view = Ext.widget('infogrouploanform');
+		var record = this.getList().getSelectedObject();
+		view.setParentData( record );
+		// view.down('form').getForm().findField('c').setValue(record.get('deceased_at')); 
+    	view.show();
+    	
+    	view.setLoading(true);
+    	
+    	
+    	
+    	var recordId = record.getId(); 
+    	console.log("before the ext.ajax");
+		Ext.Ajax.request({
+		    url: 'api/group_loans/' + recordId,
+		    method: "GET", 
+		    success: function(response){
+		    	
+		        var text = response.responseText;
+		        
+		     
+				var obj = Ext.JSON.decode(text);
+				
+			 
+				record.set( obj["group_loans"][0] ); 
+				view.setParentData( record );
+				view.setLoading(false); 
+		    }
+		});
+    	
+	},
+	
 	closeObject: function(){
 		// console.log("mark as Deceased is clicked");
 		var view = Ext.widget('closegrouploanform');
@@ -508,26 +597,13 @@ Ext.define('AM.controller.GroupLoans', {
 		    	
 		        var text = response.responseText;
 		        
-		        // console.log("The text");
-		        // console.log( text ); 
-		        
-		            // puts "The params[:id]: #{params[:id]}
+		     
 				var obj = Ext.JSON.decode(text);
 				
-				// console.log("The object: ");
-				// console.log( obj ) ; 
-				
-				// console.log("The group loan only");
-				// console.log( obj["group_loans"]);
-				// console.log("The single object only");
-				// console.log( obj["group_loans"][0]);
-				
-				// console.log("updating the record with this new value");
+			 
 				record.set( obj["group_loans"][0] ); 
 				view.setParentData( record );
-				view.setLoading(false);
-				
-		        
+				view.setLoading(false); 
 		    }
 		});
     	
