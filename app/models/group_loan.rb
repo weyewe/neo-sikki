@@ -1057,7 +1057,12 @@ Phase: loan disbursement finalization
   
   
   def weekly_collection_amount 
-    self.group_loan_weekly_collections.first.amount_receivable
+    if self.group_loan_weekly_collections.count == 0 
+      return 0 
+    else
+      return self.group_loan_weekly_collections.first.amount_receivable
+    end
+    
   end
  
 end
