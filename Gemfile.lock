@@ -159,7 +159,8 @@ GEM
       fog-core
       nokogiri (~> 1.5, >= 1.5.11)
     formatador (0.2.5)
-    haml (4.0.6)
+    haml (5.1.2)
+      temple (>= 0.8.0)
       tilt
     hike (1.2.3)
     httparty (0.13.5)
@@ -274,6 +275,7 @@ GEM
       actionpack (>= 3.0)
       activesupport (>= 3.0)
       sprockets (~> 2.8)
+    temple (0.8.2)
     the_role (2.0.4)
       haml
     thin (1.6.3)
